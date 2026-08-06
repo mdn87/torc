@@ -30,7 +30,7 @@ three structurally comparable run directories with:
 - deterministic scoring inputs and output;
 - timing, context-size, and operator-step measurements;
 - an immutable artifact manifest; and
-- a clear accepted, rejected, unavailable, or failed disposition.
+- a clear accepted, rejected, unavailable, contaminated, or failed disposition.
 
 At least one real Codex-to-Claude Code smoke transition must complete through
 the compiled-prompt and TORC lanes. Native persistence is run only when an
@@ -105,11 +105,28 @@ copying private transcripts or third-party content. The manifest pins every
 fixture file by relative path and SHA-256. P1b may select a real Lugos task only
 after the P1a gate passes; that selection receives its own frozen manifest.
 
+### Oracle isolation
+
+The committed fixture separates agent-visible inputs from `oracle/` and
+`scoring/` materials. Live source and target activations run in staged
+workspaces containing only the files allowlisted for that role. The target
+workspace contains the selected lane payload and explicitly referenced
+agent-visible fixture files; it must not contain the oracle, scoring rules,
+expected continuity values, or this repository's broader planning documents.
+
+The harness assignment must prevent the live activation from reading the
+parent repository or runner workspace. Each run records the assignment's
+allowed paths and a target-visible workspace manifest containing relative
+paths, byte sizes, and SHA-256 values. If the harness cannot enforce and
+evidence that boundary, the live run is `contaminated` and cannot contribute to
+P1b scoring.
+
 ## Three experiment lanes
 
-All lanes receive the same fixture bytes, source assignment, target assignment,
-harness versions, model settings, effort, tool policy, and scoring oracle. The
-continuity mechanism is the only intentional difference.
+The runner gives all lanes the same fixture bytes, scoring oracle, source
+assignment, target assignment, harness versions, model settings, effort, and
+tool policy. Agent-visible fixture bytes are identical and exclude the oracle.
+The continuity mechanism is the only intentional difference.
 
 ### Lane A: compiled prompt
 
@@ -129,6 +146,11 @@ If no equivalent source-to-target continuation exists, the lane disposition is
 `unavailable`. An unavailable lane is not scored and cannot be silently
 replaced by a different mechanism.
 
+The named Codex-to-Claude Code smoke pair is expected to exercise this
+unavailable path. Before P1b is frozen, the operator must either add a
+same-harness experiment pair that gives native persistence a real run or
+formally narrow P1b to a two-lane compiled-prompt versus TORC comparison.
+
 ### Lane C: TORC
 
 The source adapter appends a checkpoint, TORC compiles a target projection and
@@ -141,18 +163,24 @@ separately authorized assignment and tool policy.
 
 ## Artifact contracts
 
-P1a adds version 1 JSON Schemas for:
+P1a adds version 1 JSON Schemas under `schemas/` with matching valid examples
+under `examples/`:
 
-- `experiment-manifest`: fixture, lanes, harness identities, assignments,
-  controlled settings, oracle reference, and pre-registered measures;
-- `experiment-run`: immutable stage receipts, timestamps, lane disposition,
-  adapter evidence, operator interventions, and artifact references;
-- `continuity-payload`: the exact lane-specific material delivered to the
-  target, with byte and word counts;
-- `score-report`: field-level results, contradictions, provenance, context,
-  timing, operator steps, and scorer version; and
-- `artifact-manifest`: relative paths, media types, byte sizes, and SHA-256
-  values for the immutable run evidence.
+- `schemas/experiment-manifest.schema.json`: fixture, lanes, harness identities,
+  assignments, controlled settings, oracle reference, and pre-registered
+  measures;
+- `schemas/experiment-run.schema.json`: immutable stage receipts, timestamps,
+  lane disposition, adapter evidence, operator interventions, target attempts,
+  and artifact references;
+- `schemas/continuity-payload.schema.json`: the exact lane-specific material
+  delivered to the target, with byte and word counts;
+- `schemas/score-report.schema.json`: field-level results, contradictions,
+  provenance, context, timing, operator steps, and scorer version; and
+- `schemas/artifact-manifest.schema.json`: relative paths, media types, byte
+  sizes, and SHA-256 values for the immutable run evidence.
+
+Example names follow the P0 convention, such as
+`examples/experiment-manifest.example.json`.
 
 These are local file and library contracts, not a transport protocol. JSON that
 contributes to a hash uses TORC canonical serialization. Raw credentials,
@@ -195,9 +223,16 @@ created -> source_captured -> payload_frozen -> target_completed
 A stage command writes its output and receipt atomically, and the receipt
 references its input artifact hashes. Re-running a completed stage with
 identical inputs returns the existing output. Different inputs require a new
-run identifier. A failed or interrupted target does not transfer TORC
-authority and may be retried only as a new target attempt linked to the
-original frozen payload.
+run identifier.
+
+The experiment-run contract contains an append-only `target_attempts` list.
+Each attempt has its own attempt identifier, activation or session reference,
+frozen payload hash, start and end timestamps, disposition, and artifact
+references. A failed or interrupted target does not transfer TORC authority
+and may be retried under the same run only as a new attempt referencing the
+identical frozen payload. A payload change requires a new run identifier. The
+`target_completed` receipt identifies the final completed attempt without
+rewriting prior failed attempts.
 
 P1a does not add a durable workflow state machine or background process. Stages
 advance only through an operator-invoked CLI command.
@@ -220,6 +255,10 @@ They must print the harness command plan and artifact destinations before the
 harness is started. P1a does not add a command that automatically runs all live
 lanes.
 
+The manifest is authoritative for adapter identity. A command-line `--adapter`
+value is a selection convenience and must match an adapter registered for that
+stage in the frozen manifest. A mismatch fails before any harness invocation.
+
 ## Scoring
 
 The scorer consumes only frozen artifacts and the pre-registered oracle. It
@@ -240,15 +279,19 @@ Required measures are:
 | Context delivered | UTF-8 bytes and deterministic word estimate |
 | Preparation and acceptance overhead | Monotonic elapsed duration when available, plus stage timestamps |
 | Operator correction count | Explicit interventions appended to the run record |
-| Task output quality | Pre-registered fixture checks only; no model judge in P1a |
+| Task output quality | Structural checks for required review areas, completion criteria, and output shape; no expected findings or model judge in P1a |
 
 The scorer version and normalization rules are pinned in the manifest.
 Thresholds for P1b must be frozen before its first live comparative run.
+Structural task-quality checks may require that named areas are addressed, but
+they cannot encode which defects or conclusions the target should produce.
 
 ## Failure behavior
 
 - Invalid fixture or manifest hashes stop before source capture.
 - An unavailable adapter produces an evidence-bearing `unavailable` result.
+- A workspace that exposes oracle or scoring material produces a
+  `contaminated` result that cannot be scored.
 - Source failure creates no continuity payload.
 - Payload failure creates no target activation.
 - Target failure or malformed reconstruction leaves TORC authority unchanged.
@@ -272,7 +315,8 @@ The automated P1a suite must prove:
 8. Retry with changed inputs requires a new run.
 9. Interrupted or failed target attempts preserve source authority.
 10. Artifact, payload, reconstruction, and score tampering is detected.
-11. Credentials and unrestricted environment data are absent from artifacts.
+11. Allowlisted artifact schemas reject unrestricted environment data and a
+    documented best-effort credential-pattern scan reports no findings.
 12. The deterministic replay path passes on Windows and macOS.
 
 The live readiness smoke must additionally prove:
@@ -296,7 +340,9 @@ P1a passes only when:
 - every completed run verifies with no artifact or provenance error;
 - interruption and idempotent resume evidence is captured;
 - the operator performs no more than eight documented steps per live lane; and
-- the fixture, adapters, schemas, scorer, and exact P1b run procedure are frozen.
+- the fixture, adapters, schemas, scorer, and exact P1b run procedure are
+  frozen, including whether a same-harness pair will exercise native
+  persistence or P1b is explicitly narrowed to two lanes.
 
 Passing this gate authorizes P1b experiment execution, not P2 integration.
 
@@ -323,6 +369,8 @@ At 1.5 times an estimate, simplify the apparatus before adding capability.
 - The three lanes differ only in continuity mechanism.
 - Native persistence unavailability is explicit rather than papered over.
 - Harness adapters translate; they do not route, authorize, score, or own state.
+- Live workspaces exclude oracle and scoring material, with evidence recorded.
+- Target retries are immutable attempts linked to one frozen payload.
 - Windows and macOS verification lanes are separately stated.
 - Persistent and background runtime processes remain zero.
 - Failure, retry, authority, credential, and artifact boundaries are explicit.
