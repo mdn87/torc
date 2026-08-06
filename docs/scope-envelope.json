@@ -32,16 +32,24 @@
     "operator_steps": 6
   },
   "observed": {
-    "elapsed_hours": 0,
-    "production_loc": 0,
-    "test_loc": 0,
-    "changed_files": 0,
+    "elapsed_hours": 1,
+    "production_loc": 1858,
+    "test_loc": 393,
+    "changed_files": 18,
     "runtime_processes": 0,
-    "operator_steps": 0
+    "operator_steps": 6
   },
   "vertical_slice": {
-    "status": "pending",
-    "evidence": null
+    "status": "proven_local",
+    "evidence": {
+      "test_command": "python -m pytest",
+      "demo_command": "python -m torc demo --state-dir .torc/demo --json",
+      "inspect_command": "python -m torc inspect --state-dir .torc/demo --lineage demo-lineage --json",
+      "verify_command": "python -m torc verify --state-dir .torc/demo --lineage demo-lineage --json",
+      "database": ".torc/demo/torc.sqlite3",
+      "artifacts": ".torc/demo/artifacts/",
+      "result": "accepted handoff from activation-source to activation-target with valid provenance"
+    }
   },
   "architecture_triggers": [
     "new_durable_state_machine"

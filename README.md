@@ -53,9 +53,13 @@ The projection may change shape and size. The provenance chain may not be rewrit
 
 ## Current status
 
-This repository is a seed. It contains architecture, schemas, examples, and a minimal importable Python package. It does not yet implement a production TORC runtime.
+P0 is implemented as a local Python and SQLite vertical slice. It demonstrates
+append-only canonical revisions, deterministic fit and projection, exclusive
+authority, immutable handoff preparation, separate acceptance, transactional
+lease transfer, and tamper verification. It remains a research prototype, not
+a production TORC runtime or a provider integration.
 
-The first Codex task is deliberately narrow: build a local, deterministic, no-network vertical slice that proves authoritative lineage handoff between two synthetic execution substrates. See `docs/vertical-slice.md` and `docs/prompts/CODEX_BOOTSTRAP_PROMPT.md`.
+The evidence and remaining limits are recorded in `docs/p0-results.md`.
 
 ## Baseline setup
 
@@ -65,6 +69,9 @@ python -m venv .venv
 python -m pip install -e ".[dev]"
 python -m pytest
 python -m torc doctor --json
+python -m torc demo --state-dir .torc/demo --json
+python -m torc inspect --state-dir .torc/demo --lineage demo-lineage --json
+python -m torc verify --state-dir .torc/demo --lineage demo-lineage --json
 ```
 
 macOS or Linux:
@@ -75,7 +82,15 @@ source .venv/bin/activate
 python -m pip install -e '.[dev]'
 python -m pytest
 python -m torc doctor --json
+python -m torc demo --state-dir .torc/demo --json
+python -m torc inspect --state-dir .torc/demo --lineage demo-lineage --json
+python -m torc verify --state-dir .torc/demo --lineage demo-lineage --json
 ```
+
+The deterministic demo reports `activation-source` as the lease holder before
+and after preparation, then `activation-target` after acceptance. Its projection
+uses 65 of 70 estimated words, includes all required continuity sections, and
+exports seven immutable JSON artifacts under `.torc/demo/artifacts/`.
 
 ## Documents
 
@@ -86,4 +101,5 @@ python -m torc doctor --json
 - `docs/evaluation-plan.md` - comparison against simpler alternatives
 - `docs/integration-boundaries.md` - ownership relative to existing Lugos modules
 - `docs/roadmap.md` - evidence-gated sequence after the first slice
+- `docs/p0-results.md` - P0 proof, observed scope, and remaining unknowns
 - `docs/prompts/CODEX_BOOTSTRAP_PROMPT.md` - implementation task for Codex

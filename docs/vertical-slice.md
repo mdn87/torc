@@ -69,7 +69,7 @@ Use a deterministic word or character estimate. Do not add a tokenizer dependenc
 
 ## CLI surface
 
-Codex should implement these stable demonstration commands:
+P0 implements these stable demonstration commands:
 
 ```text
 torc demo --state-dir <path> --json
@@ -78,6 +78,22 @@ torc verify --state-dir <path> [--lineage <id>] --json
 ```
 
 `demo` may orchestrate internal service calls directly. P0 does not need a complete operator CRUD CLI.
+
+Run the implemented evidence sequence from the repository root:
+
+```text
+python -m pip install -e ".[dev]"
+python -m pytest
+python -m ruff check .
+python -m torc doctor --json
+python -m torc demo --state-dir .torc/demo --json
+python -m torc inspect --state-dir .torc/demo --lineage demo-lineage --json
+python -m torc verify --state-dir .torc/demo --lineage demo-lineage --json
+```
+
+The demo database is `.torc/demo/torc.sqlite3`. Immutable exported records are
+under `.torc/demo/artifacts/`; their relative paths and SHA-256 hashes are stored
+as artifact metadata and checked by `verify`.
 
 ## Required tests
 
@@ -105,6 +121,16 @@ The demo output should report:
 - lease holder before and after acceptance
 - verification status
 - paths of inspectable exported JSON artifacts
+
+The implemented deterministic identifiers are:
+
+- lineage `demo-lineage`
+- source activation and lease `activation-source`, `lease-source`
+- target activation and lease `activation-target`, `lease-target`
+- fit decision `fit-demo-review`
+- projection `projection-demo-review`
+- handoff and result `handoff-demo-review`, `handoff-result-demo-review`
+- accepted head revision `revision-demo-0004`
 
 ## Stop conditions
 
