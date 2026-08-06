@@ -24,7 +24,8 @@
     "Harness-reported usage and timing evidence may be absent or incomplete.",
     "Native persistence may be unavailable for a cross-harness transition.",
     "The local single-operator prototype does not defend against a malicious process with filesystem access.",
-    "The P1a fixture proves apparatus readiness, not performance on a representative production workload."
+    "The P1a fixture proves apparatus readiness, not performance on a representative production workload.",
+    "Credential-pattern scanning is best-effort and cannot prove that arbitrary artifact text contains no secret."
   ],
   "estimates": {
     "elapsed_hours": 10,
@@ -47,7 +48,7 @@
     "evidence": null
   },
   "architecture_triggers": [],
-  "review_rounds_used": 0,
+  "review_rounds_used": 1,
   "scope_policy_sha256": "9707efccd8426b7b53784bc7752449f5e4a45913c141c990b6a21d8c3bb2cdae",
   "parent_envelope_sha256": null,
   "operator_override_id": null
