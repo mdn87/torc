@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "fixture_id": "p1a-review-001",
+  "required_review_areas": [
+    "authority",
+    "artifact-integrity",
+    "adapter-boundary"
+  ],
+  "required_output_fields": [
+    "review_areas",
+    "completion_status"
+  ],
+  "allowed_completion_statuses": [
+    "complete",
+    "incomplete"
+  ]
+}

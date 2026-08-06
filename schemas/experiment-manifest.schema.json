@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://torc.local/schemas/experiment-manifest.schema.json",
+  "title": "TORC experiment manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "experiment_id", "fixture", "adapters", "settings", "scoring"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "experiment_id": {"type": "string", "minLength": 1},
+    "fixture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fixture_id", "agent_visible", "oracle", "scoring"],
+      "properties": {
+        "fixture_id": {"type": "string", "minLength": 1},
+        "agent_visible": {"$ref": "#/$defs/files"},
+        "oracle": {"$ref": "#/$defs/file"},
+        "scoring": {"$ref": "#/$defs/file"}
+      }
+    },
+    "adapters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "target"],
+      "properties": {
+        "source": {"type": "array", "items": {"enum": ["replay", "codex"]}, "uniqueItems": true},
+        "target": {"type": "array", "items": {"enum": ["replay", "claude-code"]}, "uniqueItems": true}
+      }
+    },
+    "settings": {"type": "object"},
+    "scoring": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scorer_version", "normalization_version"],
+      "properties": {
+        "scorer_version": {"type": "string"},
+        "normalization_version": {"type": "string"}
+      }
+    }
+  },
+  "$defs": {
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "pattern": "^(?!/)(?!.*\\.\\.).+"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "files": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/file"}}
+  }
+}

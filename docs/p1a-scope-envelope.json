@@ -36,16 +36,16 @@
     "operator_steps": 24
   },
   "observed": {
-    "elapsed_hours": 0,
-    "production_loc": 0,
-    "test_loc": 0,
-    "changed_files": 0,
+    "elapsed_hours": 2.5,
+    "production_loc": 1319,
+    "test_loc": 452,
+    "changed_files": 23,
     "runtime_processes": 0,
-    "operator_steps": 0
+    "operator_steps": 13
   },
   "vertical_slice": {
-    "status": "pending",
-    "evidence": null
+    "status": "completed",
+    "evidence": "docs/p1a-results.md"
   },
   "architecture_triggers": [],
   "review_rounds_used": 2,

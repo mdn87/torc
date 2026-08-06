@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://torc.local/schemas/score-report.schema.json",
+  "title": "TORC experiment score report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_id", "scorer_version", "score_core", "score_core_sha256", "operational_measurements"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "run_id": {"type": "string"},
+    "scorer_version": {"type": "string"},
+    "score_core": {
+      "type": "object",
+      "required": ["field_scores", "contradiction_count", "provenance_recoverability", "context_delivered", "task_quality"],
+      "properties": {
+        "field_scores": {"type": "object"},
+        "contradiction_count": {"type": "integer", "minimum": 0},
+        "provenance_recoverability": {"type": "number", "minimum": 0, "maximum": 1},
+        "context_delivered": {"type": "object"},
+        "task_quality": {"type": "object"}
+      }
+    },
+    "score_core_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "operational_measurements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scored_at", "duration_ms", "operator_steps"],
+      "properties": {
+        "scored_at": {"type": "string", "format": "date-time"},
+        "duration_ms": {"type": ["integer", "null"], "minimum": 0},
+        "operator_steps": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}
