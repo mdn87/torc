@@ -18,6 +18,11 @@ A source agent produces a carefully structured handoff prompt. The target receiv
 
 Use the closest available existing agent checkpoint or session-resume feature with minimal Lugos glue.
 
+If the chosen source-to-target pair has no equivalent native continuation, the
+P1b manifest must either add a same-harness pair for this baseline or
+pre-register Baseline B as unavailable and narrow the comparison. It may not
+substitute a different mechanism after runs begin.
+
 ### Candidate C: TORC
 
 Use canonical lineage records, target-fit projection, immutable handoff snapshot, structured target reconstruction, acceptance checks, and explicit authority transfer.
