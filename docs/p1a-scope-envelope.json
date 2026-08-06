@@ -31,7 +31,7 @@
     "elapsed_hours": 10,
     "production_loc": 900,
     "test_loc": 700,
-    "changed_files": 20,
+    "changed_files": 23,
     "runtime_processes": 0,
     "operator_steps": 24
   },
