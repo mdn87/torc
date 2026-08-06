@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "handoff_result_id": "handoff-result-0001",
+  "handoff_id": "handoff-0001",
+  "lineage_id": "demo-lineage",
+  "target_activation_id": "activation-b",
+  "reconstruction": {
+    "lineage_identity": "TORC demo lineage",
+    "current_responsibility": "Independently review the P0 handoff implementation",
+    "settled_decisions": [
+      "Canonical lineage and execution projections remain separate"
+    ],
+    "active_commitments": [
+      "Do not broaden execution authority during handoff"
+    ],
+    "hard_constraints": [
+      "No network calls",
+      "No daemon"
+    ],
+    "unresolved_work": [
+      "Determine whether the implementation satisfies P0 invariants"
+    ],
+    "uncertainties": [
+      "Whether TORC outperforms a compiled prompt"
+    ],
+    "handoff_reason": "task_phase_transition",
+    "source_revision_id": "rev-0002",
+    "new_inferences": [
+      "A real two-model experiment should follow only if P0 passes"
+    ]
+  },
+  "checks": [
+    {
+      "requirement": "lineage_identity",
+      "passed": true,
+      "evidence": "Target reconstruction matches canonical identity"
+    },
+    {
+      "requirement": "hard_constraints",
+      "passed": true,
+      "evidence": "Both hard constraints are preserved"
+    }
+  ],
+  "disposition": "accepted",
+  "rejection_reason": null,
+  "resulting_authority": {
+    "lineage_head_revision_id": "rev-0003",
+    "activation_id": "activation-b",
+    "lease_id": "lease-b"
+  },
+  "resolved_at": "2026-08-06T20:15:00Z",
+  "integrity": {
+    "algorithm": "sha256",
+    "canonical_payload_sha256": "4444444444444444444444444444444444444444444444444444444444444444"
+  }
+}

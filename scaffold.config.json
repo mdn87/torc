@@ -1,0 +1,27 @@
+{
+  "projectName": "torc",
+  "scaffold": {
+    "template": "common",
+    "appliedOn": "2026-08-06",
+    "agentRules": {
+      "mode": "direct",
+      "outputPath": ".agents",
+      "stackHints": [
+        "python"
+      ],
+      "hasApiSurface": false,
+      "derivationMode": "project-docs",
+      "projectType": "Python research prototype",
+      "sourceDocs": [
+        "README.md",
+        "docs/project-brief.md",
+        "docs/architecture.md",
+        "docs/domain-model.md",
+        "docs/vertical-slice.md",
+        "CLAUDE.md"
+      ],
+      "remoteGitHubEnabled": false,
+      "remoteGitHubSuccess": false
+    }
+  }
+}

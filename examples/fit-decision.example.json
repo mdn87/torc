@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "fit_decision_id": "fit-0001",
+  "lineage_id": "demo-lineage",
+  "source_revision_id": "rev-0002",
+  "task_phase": "independent-review",
+  "requirements": {
+    "capabilities": [
+      "repository_read",
+      "independent_review"
+    ],
+    "policy_labels": [
+      "local-synthetic"
+    ],
+    "minimum_context_units": 200
+  },
+  "candidates": [
+    {
+      "substrate_id": "substrate-a",
+      "eligible": true,
+      "disqualifications": [],
+      "factors": [
+        {
+          "name": "independence",
+          "value": 0,
+          "weight": 5,
+          "score": 0,
+          "evidence": "Substrate A performed the implementation"
+        }
+      ],
+      "total_score": 0
+    },
+    {
+      "substrate_id": "substrate-b",
+      "eligible": true,
+      "disqualifications": [],
+      "factors": [
+        {
+          "name": "independence",
+          "value": 1,
+          "weight": 5,
+          "score": 5,
+          "evidence": "Substrate B did not perform the implementation"
+        }
+      ],
+      "total_score": 5
+    }
+  ],
+  "selected_substrate_id": "substrate-b",
+  "policy_version": "p0-1",
+  "decided_at": "2026-08-06T20:08:00Z",
+  "integrity": {
+    "algorithm": "sha256",
+    "canonical_payload_sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+  }
+}

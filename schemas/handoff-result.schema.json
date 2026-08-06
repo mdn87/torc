@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lugos.local/torc/schemas/handoff-result-v1.json",
+  "title": "TORC handoff acceptance result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "handoff_result_id",
+    "handoff_id",
+    "lineage_id",
+    "target_activation_id",
+    "reconstruction",
+    "checks",
+    "disposition",
+    "rejection_reason",
+    "resulting_authority",
+    "resolved_at",
+    "integrity"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "handoff_result_id": {"$ref": "#/$defs/id"},
+    "handoff_id": {"$ref": "#/$defs/id"},
+    "lineage_id": {"$ref": "#/$defs/id"},
+    "target_activation_id": {"$ref": "#/$defs/id"},
+    "reconstruction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lineage_identity",
+        "current_responsibility",
+        "settled_decisions",
+        "active_commitments",
+        "hard_constraints",
+        "unresolved_work",
+        "uncertainties",
+        "handoff_reason",
+        "source_revision_id",
+        "new_inferences"
+      ],
+      "properties": {
+        "lineage_identity": {"type": "string", "minLength": 1},
+        "current_responsibility": {"type": "string", "minLength": 1},
+        "settled_decisions": {"type": "array", "items": {"type": "string"}},
+        "active_commitments": {"type": "array", "items": {"type": "string"}},
+        "hard_constraints": {"type": "array", "items": {"type": "string"}},
+        "unresolved_work": {"type": "array", "items": {"type": "string"}},
+        "uncertainties": {"type": "array", "items": {"type": "string"}},
+        "handoff_reason": {"type": "string", "minLength": 1},
+        "source_revision_id": {"$ref": "#/$defs/id"},
+        "new_inferences": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["requirement", "passed", "evidence"],
+        "properties": {
+          "requirement": {"type": "string", "minLength": 1},
+          "passed": {"type": "boolean"},
+          "evidence": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "disposition": {"enum": ["accepted", "rejected"]},
+    "rejection_reason": {"type": ["string", "null"]},
+    "resulting_authority": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["lineage_head_revision_id", "activation_id", "lease_id"],
+          "properties": {
+            "lineage_head_revision_id": {"$ref": "#/$defs/id"},
+            "activation_id": {"$ref": "#/$defs/id"},
+            "lease_id": {"$ref": "#/$defs/id"}
+          }
+        },
+        {"type": "null"}
+      ]
+    },
+    "resolved_at": {"type": "string", "format": "date-time"},
+    "integrity": {"$ref": "#/$defs/integrity"}
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "canonical_payload_sha256"],
+      "properties": {
+        "algorithm": {"const": "sha256"},
+        "canonical_payload_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

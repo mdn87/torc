@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lugos.local/torc/schemas/fit-decision-v1.json",
+  "title": "TORC substrate fit decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "fit_decision_id",
+    "lineage_id",
+    "source_revision_id",
+    "task_phase",
+    "requirements",
+    "candidates",
+    "selected_substrate_id",
+    "policy_version",
+    "decided_at",
+    "integrity"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "fit_decision_id": {"$ref": "#/$defs/id"},
+    "lineage_id": {"$ref": "#/$defs/id"},
+    "source_revision_id": {"$ref": "#/$defs/id"},
+    "task_phase": {"type": "string", "minLength": 1},
+    "requirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capabilities", "policy_labels", "minimum_context_units"],
+      "properties": {
+        "capabilities": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "policy_labels": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "minimum_context_units": {"type": "integer", "minimum": 1}
+      }
+    },
+    "candidates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["substrate_id", "eligible", "disqualifications", "factors", "total_score"],
+        "properties": {
+          "substrate_id": {"$ref": "#/$defs/id"},
+          "eligible": {"type": "boolean"},
+          "disqualifications": {"type": "array", "items": {"type": "string"}},
+          "factors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["name", "value", "weight", "score", "evidence"],
+              "properties": {
+                "name": {"type": "string", "minLength": 1},
+                "value": {"type": "number"},
+                "weight": {"type": "number"},
+                "score": {"type": "number"},
+                "evidence": {"type": "string", "minLength": 1}
+              }
+            }
+          },
+          "total_score": {"type": "number"}
+        }
+      }
+    },
+    "selected_substrate_id": {"anyOf": [{"$ref": "#/$defs/id"}, {"type": "null"}]},
+    "policy_version": {"type": "string", "minLength": 1},
+    "decided_at": {"type": "string", "format": "date-time"},
+    "integrity": {"$ref": "#/$defs/integrity"}
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "canonical_payload_sha256"],
+      "properties": {
+        "algorithm": {"const": "sha256"},
+        "canonical_payload_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "substrates": [
+    {
+      "substrate_id": "substrate-a",
+      "label": "Synthetic implementation bearer",
+      "adapter": "synthetic",
+      "capabilities": [
+        "repository_read",
+        "repository_write",
+        "verification_execute"
+      ],
+      "policy_labels": [
+        "local-synthetic"
+      ],
+      "context_budget": {
+        "unit": "words",
+        "limit": 800
+      },
+      "task_affinities": [
+        "implementation"
+      ]
+    },
+    {
+      "substrate_id": "substrate-b",
+      "label": "Synthetic independent review bearer",
+      "adapter": "synthetic",
+      "capabilities": [
+        "repository_read",
+        "independent_review"
+      ],
+      "policy_labels": [
+        "local-synthetic"
+      ],
+      "context_budget": {
+        "unit": "words",
+        "limit": 300
+      },
+      "task_affinities": [
+        "review"
+      ]
+    }
+  ]
+}

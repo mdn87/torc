@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "lineage_id": "demo-lineage",
+  "revision_id": "rev-0001",
+  "parent_revision_ids": [],
+  "created_at": "2026-08-06T20:00:00Z",
+  "event_type": "lineage_created",
+  "actor": {
+    "kind": "operator",
+    "activation_id": null,
+    "substrate_id": null
+  },
+  "canonical_state": {
+    "identity": {
+      "label": "TORC demo lineage"
+    },
+    "self_model": {
+      "role": "Implement and review the P0 continuity slice"
+    },
+    "goals": [
+      "Prove an acceptance-gated lineage handoff"
+    ],
+    "commitments": [
+      "Do not broaden execution authority during handoff"
+    ],
+    "constraints": [
+      "No network calls",
+      "No daemon"
+    ],
+    "open_work": [
+      "Implement the local vertical slice"
+    ],
+    "uncertainties": [
+      "Whether TORC outperforms a compiled prompt"
+    ],
+    "artifact_refs": [
+      "artifact-project-brief"
+    ],
+    "memory_refs": []
+  },
+  "evidence_refs": [
+    "evidence-operator-decision"
+  ],
+  "integrity": {
+    "algorithm": "sha256",
+    "canonical_payload_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "previous_revision_sha256": null
+  }
+}
