@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "projection_id": "projection-review-0001",
+  "lineage_id": "demo-lineage",
+  "source_revision_id": "rev-0002",
+  "target_substrate_id": "substrate-b",
+  "compiler_version": "p0-1",
+  "policy_version": "p0-1",
+  "compiled_at": "2026-08-06T20:10:00Z",
+  "budget": {
+    "unit": "words",
+    "limit": 300,
+    "estimated_used": 170
+  },
+  "included_sections": [
+    {
+      "section_id": "identity",
+      "source_ref": "rev-0002:identity",
+      "required": true,
+      "priority": 100,
+      "estimated_units": 20,
+      "content": {
+        "label": "TORC demo lineage"
+      }
+    },
+    {
+      "section_id": "constraints",
+      "source_ref": "rev-0002:constraints",
+      "required": true,
+      "priority": 100,
+      "estimated_units": 40,
+      "content": [
+        "No network calls",
+        "No daemon"
+      ]
+    },
+    {
+      "section_id": "commitments",
+      "source_ref": "rev-0002:commitments",
+      "required": true,
+      "priority": 100,
+      "estimated_units": 40,
+      "content": [
+        "Do not broaden execution authority during handoff"
+      ]
+    },
+    {
+      "section_id": "open-work",
+      "source_ref": "rev-0002:open_work",
+      "required": true,
+      "priority": 100,
+      "estimated_units": 40,
+      "content": [
+        "Review the P0 handoff implementation"
+      ]
+    },
+    {
+      "section_id": "handoff-purpose",
+      "source_ref": "fit-0001",
+      "required": true,
+      "priority": 100,
+      "estimated_units": 30,
+      "content": "Independent review after implementation"
+    }
+  ],
+  "omitted_sections": [
+    {
+      "section_id": "historical-notes",
+      "source_ref": "artifact-history-0001",
+      "reason": "budget"
+    }
+  ],
+  "redactions": [],
+  "integrity": {
+    "algorithm": "sha256",
+    "canonical_payload_sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+  }
+}

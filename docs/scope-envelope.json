@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "objective": "Implement a local, deterministic TORC P0 vertical slice proving append-only lineage, target-fit projection, acceptance-gated handoff, exclusive authority transfer, and provenance verification between two synthetic execution substrates.",
+  "success_evidence": [
+    "The full automated test suite passes on the implementation host.",
+    "A local demo completes one accepted handoff and exports inspectable artifacts.",
+    "A rejected handoff leaves source authority unchanged.",
+    "Duplicate authoritative lease acquisition fails transactionally.",
+    "Tampering with immutable lineage or handoff artifacts is detected by verification.",
+    "Different projections do not mutate the canonical source revision."
+  ],
+  "non_goals": [
+    "Live model or provider integration.",
+    "A daemon, web service, watcher, scheduler, or background worker.",
+    "Cross-host authoritative state or consensus.",
+    "Replacement of Autowork, Sulis, agent-continuity, Omniroute, Bran, agent-mail, lugos-mcp, or HUD surfaces.",
+    "Automatic lineage merge or learned fit scoring.",
+    "Edits to the parent Lugos repository or its submodule pointer."
+  ],
+  "accepted_threats": [
+    "The local single-operator prototype does not defend against a malicious process with direct filesystem access.",
+    "SHA-256 supplies tamper evidence but not authentication or confidentiality.",
+    "Synthetic substrate descriptors do not prove continuity across real frontier models.",
+    "A deterministic word or character budget only approximates provider tokenization."
+  ],
+  "estimates": {
+    "elapsed_hours": 12,
+    "production_loc": 1200,
+    "test_loc": 900,
+    "changed_files": 28,
+    "runtime_processes": 0,
+    "operator_steps": 6
+  },
+  "observed": {
+    "elapsed_hours": 0,
+    "production_loc": 0,
+    "test_loc": 0,
+    "changed_files": 0,
+    "runtime_processes": 0,
+    "operator_steps": 0
+  },
+  "vertical_slice": {
+    "status": "pending",
+    "evidence": null
+  },
+  "architecture_triggers": [
+    "new_durable_state_machine"
+  ],
+  "review_rounds_used": 0,
+  "scope_policy_sha256": "9707efccd8426b7b53784bc7752449f5e4a45913c141c990b6a21d8c3bb2cdae",
+  "parent_envelope_sha256": null,
+  "operator_override_id": null
+}

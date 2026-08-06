@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lugos.local/torc/schemas/execution-projection-v1.json",
+  "title": "TORC execution projection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "projection_id",
+    "lineage_id",
+    "source_revision_id",
+    "target_substrate_id",
+    "compiler_version",
+    "policy_version",
+    "compiled_at",
+    "budget",
+    "included_sections",
+    "omitted_sections",
+    "redactions",
+    "integrity"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "projection_id": {"$ref": "#/$defs/id"},
+    "lineage_id": {"$ref": "#/$defs/id"},
+    "source_revision_id": {"$ref": "#/$defs/id"},
+    "target_substrate_id": {"$ref": "#/$defs/id"},
+    "compiler_version": {"type": "string", "minLength": 1},
+    "policy_version": {"type": "string", "minLength": 1},
+    "compiled_at": {"type": "string", "format": "date-time"},
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unit", "limit", "estimated_used"],
+      "properties": {
+        "unit": {"enum": ["characters", "words"]},
+        "limit": {"type": "integer", "minimum": 1},
+        "estimated_used": {"type": "integer", "minimum": 0}
+      }
+    },
+    "included_sections": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["section_id", "source_ref", "required", "priority", "estimated_units", "content"],
+        "properties": {
+          "section_id": {"$ref": "#/$defs/id"},
+          "source_ref": {"$ref": "#/$defs/id"},
+          "required": {"type": "boolean"},
+          "priority": {"type": "integer", "minimum": 0},
+          "estimated_units": {"type": "integer", "minimum": 0},
+          "content": {"type": ["object", "array", "string", "number", "boolean", "null"]}
+        }
+      }
+    },
+    "omitted_sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["section_id", "source_ref", "reason"],
+        "properties": {
+          "section_id": {"$ref": "#/$defs/id"},
+          "source_ref": {"$ref": "#/$defs/id"},
+          "reason": {"enum": ["budget", "capability_irrelevant", "policy_redaction", "superseded"]}
+        }
+      }
+    },
+    "redactions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_ref", "reason"],
+        "properties": {
+          "source_ref": {"$ref": "#/$defs/id"},
+          "reason": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "integrity": {"$ref": "#/$defs/integrity"}
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "canonical_payload_sha256"],
+      "properties": {
+        "algorithm": {"const": "sha256"},
+        "canonical_payload_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

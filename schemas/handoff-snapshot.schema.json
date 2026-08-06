@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lugos.local/torc/schemas/handoff-snapshot-v1.json",
+  "title": "TORC immutable handoff snapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "handoff_id",
+    "lineage_id",
+    "source_revision_id",
+    "source_activation_id",
+    "source_lease_id",
+    "target_substrate_id",
+    "fit_decision_id",
+    "projection_id",
+    "reason_code",
+    "rationale",
+    "continuity_requirements",
+    "source_authority",
+    "prepared_at",
+    "integrity"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "handoff_id": {"$ref": "#/$defs/id"},
+    "lineage_id": {"$ref": "#/$defs/id"},
+    "source_revision_id": {"$ref": "#/$defs/id"},
+    "source_activation_id": {"$ref": "#/$defs/id"},
+    "source_lease_id": {"$ref": "#/$defs/id"},
+    "target_substrate_id": {"$ref": "#/$defs/id"},
+    "fit_decision_id": {"$ref": "#/$defs/id"},
+    "projection_id": {"$ref": "#/$defs/id"},
+    "reason_code": {
+      "enum": [
+        "capability_escalation",
+        "task_phase_transition",
+        "context_degradation",
+        "environment_requirement",
+        "independent_challenge",
+        "policy_boundary",
+        "model_succession",
+        "failure_recovery",
+        "operational_optimization",
+        "lineage_branch"
+      ]
+    },
+    "rationale": {"type": "string", "minLength": 1},
+    "continuity_requirements": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "source_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lineage_head_revision_id", "activation_id", "lease_id"],
+      "properties": {
+        "lineage_head_revision_id": {"$ref": "#/$defs/id"},
+        "activation_id": {"$ref": "#/$defs/id"},
+        "lease_id": {"$ref": "#/$defs/id"}
+      }
+    },
+    "prepared_at": {"type": "string", "format": "date-time"},
+    "integrity": {"$ref": "#/$defs/integrity"}
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "canonical_payload_sha256"],
+      "properties": {
+        "algorithm": {"const": "sha256"},
+        "canonical_payload_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

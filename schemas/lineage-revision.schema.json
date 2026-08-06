@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lugos.local/torc/schemas/lineage-revision-v1.json",
+  "title": "TORC lineage revision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "lineage_id",
+    "revision_id",
+    "parent_revision_ids",
+    "created_at",
+    "event_type",
+    "actor",
+    "canonical_state",
+    "evidence_refs",
+    "integrity"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "lineage_id": {"$ref": "#/$defs/id"},
+    "revision_id": {"$ref": "#/$defs/id"},
+    "parent_revision_ids": {
+      "type": "array",
+      "maxItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/id"}
+    },
+    "created_at": {"type": "string", "format": "date-time"},
+    "event_type": {
+      "enum": [
+        "lineage_created",
+        "checkpoint",
+        "self_model_revised",
+        "handoff_prepared",
+        "handoff_accepted",
+        "handoff_rejected",
+        "branch_created",
+        "lineage_retired"
+      ]
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "activation_id", "substrate_id"],
+      "properties": {
+        "kind": {"enum": ["operator", "activation", "system"]},
+        "activation_id": {"anyOf": [{"$ref": "#/$defs/id"}, {"type": "null"}]},
+        "substrate_id": {"anyOf": [{"$ref": "#/$defs/id"}, {"type": "null"}]}
+      }
+    },
+    "canonical_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "identity",
+        "self_model",
+        "goals",
+        "commitments",
+        "constraints",
+        "open_work",
+        "uncertainties",
+        "artifact_refs",
+        "memory_refs"
+      ],
+      "properties": {
+        "identity": {"type": "object"},
+        "self_model": {"type": "object"},
+        "goals": {"type": "array", "items": {"type": "string"}},
+        "commitments": {"type": "array", "items": {"type": "string"}},
+        "constraints": {"type": "array", "items": {"type": "string"}},
+        "open_work": {"type": "array", "items": {"type": "string"}},
+        "uncertainties": {"type": "array", "items": {"type": "string"}},
+        "artifact_refs": {"type": "array", "items": {"$ref": "#/$defs/id"}},
+        "memory_refs": {"type": "array", "items": {"$ref": "#/$defs/id"}}
+      }
+    },
+    "evidence_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/id"}
+    },
+    "integrity": {"$ref": "#/$defs/integrity"}
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "canonical_payload_sha256", "previous_revision_sha256"],
+      "properties": {
+        "algorithm": {"const": "sha256"},
+        "canonical_payload_sha256": {"$ref": "#/$defs/sha256"},
+        "previous_revision_sha256": {
+          "anyOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]
+        }
+      }
+    }
+  }
+}
