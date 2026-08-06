@@ -48,7 +48,7 @@
     "evidence": null
   },
   "architecture_triggers": [],
-  "review_rounds_used": 1,
+  "review_rounds_used": 2,
   "scope_policy_sha256": "9707efccd8426b7b53784bc7752449f5e4a45913c141c990b6a21d8c3bb2cdae",
   "parent_envelope_sha256": null,
   "operator_override_id": null
