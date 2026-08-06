@@ -4,6 +4,10 @@
 
 Determine whether TORC's lineage, projection, and controlled succession improve real continuity enough to justify a subsystem.
 
+The comparison begins only after the experimental apparatus passes the P1a
+gate in `p1a-experimental-readiness-spec.md`. P1a proves repeatability and
+evidence capture; it does not produce or interpret comparative results.
+
 ## Compared approaches
 
 ### Baseline A: compiled prompt
@@ -57,6 +61,10 @@ TORC should not proceed to provider integration unless it shows:
 - acceptable added operational steps for the sole operator
 
 These criteria can be revised only before the comparison starts, not after seeing results.
+
+The exact fixture, harness identities, settings, scorer version, normalization
+rules, and thresholds must be frozen in the P1b manifest before its first live
+run.
 
 ## Existing-system adoption rule
 
