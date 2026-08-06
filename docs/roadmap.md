@@ -18,10 +18,22 @@
 
 Gate: all P0 invariants pass without a service process or network dependency.
 
-## P1: real two-agent experiment
+## P1a: experimental readiness
 
+- One versioned experiment fixture and scoring oracle
+- Adapter-neutral run and artifact contracts
 - One source harness adapter
 - One target harness adapter
+- Compiled-prompt, native-persistence, and TORC lane materializers
+- Deterministic replay, scoring, retry, inspection, and verification
+- One unscored real two-agent smoke transition
+
+Gate: all lanes are repeatable and comparable; compiled-prompt and TORC complete
+one real smoke transition; native persistence is completed or evidenced as
+unavailable. See `docs/p1a-experimental-readiness-spec.md`.
+
+## P1b: real two-agent comparison
+
 - Real task-phase transition
 - Comparison against compiled-prompt and native-persistence baselines
 - Measured continuity and overhead

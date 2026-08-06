@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "objective": "Build the smallest cross-platform experiment apparatus that can run equivalent compiled-prompt, native-persistence when available, and TORC continuity lanes using frozen fixtures, thin Codex and Claude Code adapters, deterministic scoring, and verifiable artifacts.",
+  "success_evidence": [
+    "The automated replay suite produces deterministic payloads, scores, and artifact hashes.",
+    "Compiled-prompt and TORC lanes complete one real Codex-to-Claude Code readiness smoke.",
+    "Native persistence completes through an existing harness feature or is recorded unavailable with probe evidence.",
+    "Interrupted and repeated stage execution is idempotent and never transfers TORC authority prematurely.",
+    "Every completed run has a valid immutable artifact manifest and deterministic score report.",
+    "Windows is verified authoritatively and deterministic replay is verified separately on macOS."
+  ],
+  "non_goals": [
+    "Comparative performance conclusions or a claim that TORC beats a baseline.",
+    "Provider SDK or direct provider API integration.",
+    "A daemon, server, watcher, queue, scheduler, broker, or background worker.",
+    "Cross-host authority, synchronization, or production state.",
+    "P2 integration with Autowork, Sulis, Bran, Omniroute, agent-mail, lugos-mcp, or HUD.",
+    "More than Codex source and Claude Code target live adapters.",
+    "Model-based judging, learned scoring, rollback, branching, or lineage merging.",
+    "Edits to the parent Lugos repository or its submodule pointer."
+  ],
+  "accepted_threats": [
+    "Live harness outputs are nondeterministic even when fixture and settings are fixed.",
+    "Harness-reported usage and timing evidence may be absent or incomplete.",
+    "Native persistence may be unavailable for a cross-harness transition.",
+    "The local single-operator prototype does not defend against a malicious process with filesystem access.",
+    "The P1a fixture proves apparatus readiness, not performance on a representative production workload."
+  ],
+  "estimates": {
+    "elapsed_hours": 10,
+    "production_loc": 900,
+    "test_loc": 700,
+    "changed_files": 20,
+    "runtime_processes": 0,
+    "operator_steps": 24
+  },
+  "observed": {
+    "elapsed_hours": 0,
+    "production_loc": 0,
+    "test_loc": 0,
+    "changed_files": 0,
+    "runtime_processes": 0,
+    "operator_steps": 0
+  },
+  "vertical_slice": {
+    "status": "pending",
+    "evidence": null
+  },
+  "architecture_triggers": [],
+  "review_rounds_used": 0,
+  "scope_policy_sha256": "9707efccd8426b7b53784bc7752449f5e4a45913c141c990b6a21d8c3bb2cdae",
+  "parent_envelope_sha256": null,
+  "operator_override_id": null
+}

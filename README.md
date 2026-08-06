@@ -99,6 +99,8 @@ exports seven immutable JSON artifacts under `.torc/demo/artifacts/`.
 - `docs/domain-model.md` - identifiers, records, and invariants
 - `docs/vertical-slice.md` - initial falsifiable implementation slice
 - `docs/evaluation-plan.md` - comparison against simpler alternatives
+- `docs/p1a-experimental-readiness-spec.md` - apparatus required before comparison
+- `docs/p1a-scope-envelope.json` - bounded P1a implementation authority and budgets
 - `docs/integration-boundaries.md` - ownership relative to existing Lugos modules
 - `docs/roadmap.md` - evidence-gated sequence after the first slice
 - `docs/p0-results.md` - P0 proof, observed scope, and remaining unknowns
