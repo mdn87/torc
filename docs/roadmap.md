@@ -35,7 +35,7 @@ unavailable. See `docs/p1a-experimental-readiness-spec.md`.
 ## P1b: real two-agent comparison
 
 - Real task-phase transition
-- Comparison against compiled-prompt and native-persistence baselines
+- Comparison against compiled-prompt and native-persistence when available
 - Measured continuity and overhead
 
 Gate: TORC beats or materially complements the simpler baseline.
