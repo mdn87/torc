@@ -83,13 +83,14 @@ Every run directory uses this layout:
   artifacts/
     source-capture.json
     continuity-payload.json
-    reconstruction.json
+    reconstruction.json        # reference to the final selected attempt
     score-report.json
     artifact-manifest.json
   receipts/
-    prepared.json
+    created.json
     source-captured.json
     payload-frozen.json
+    target-completed.json
     reconstruction-recorded.json
     scored.json
     verified.json
@@ -97,6 +98,7 @@ Every run directory uses this layout:
     <attempt-id>/
       attempt.json
       target-output.json
+      reconstruction.json
   workspaces/
     source/
       visible-workspace-manifest.json
@@ -114,6 +116,24 @@ is returned; mismatched inputs raise a domain error and require a new run.
 
 The artifact manifest uses relative POSIX-style paths even on Windows. It never
 contains an absolute host path.
+
+The `experiment prepare` command writes `receipts/created.json`; `prepare` is
+the CLI action and `created` is the stage name from the accepted spec.
+`receipts/target-completed.json` identifies the final completed attempt.
+`artifacts/reconstruction.json` is an immutable reference containing that
+attempt identifier, the attempt-local reconstruction path, and its SHA-256; it
+does not overwrite or duplicate earlier attempt reconstructions.
+
+The completed-target receipt graph uses all seven spec stages. An unavailable
+Lane B terminates through `created -> source-captured -> payload-frozen ->
+verified`: its source receipt contains probe evidence, its payload is an
+unavailable descriptor, and it has no target-completed, reconstruction, or
+scored receipt.
+
+`artifact-manifest.json` covers every immutable run artifact and receipt that
+exists before verification. `verified.json` is excluded from that manifest to
+avoid a circular hash; it seals the artifact-manifest hash and verification
+result.
 
 ## Runtime boundaries
 
@@ -218,6 +238,7 @@ Planned functions:
 normalize_string(value) -> str
 normalize_string_set(values) -> tuple[str, ...]
 score_reconstruction(oracle, reconstruction, rules) -> dict
+build_score_core(field_scores, structural_checks) -> dict
 score_run(run_dir) -> dict
 ```
 
@@ -231,8 +252,15 @@ Scoring rules:
 - Context uses UTF-8 bytes and the existing deterministic word estimator.
 - Task-quality checks are structural: required review areas, completion fields,
   and output shape. They cannot encode expected defects or conclusions.
+- `score-report.json` contains a deterministic `score_core` plus separate
+  `operational_measurements` for timing and operator steps.
+- `score_core_sha256` hashes only canonical `score_core`; wall-clock timestamps,
+  durations, and operator steps are excluded from that parity hash.
 - The same fixed clock, fixture, replay evidence, and scorer version must
-  produce byte-identical payload and score JSON.
+  produce byte-identical full score reports in automated replay tests.
+- Windows/macOS CLI parity compares continuity-payload bytes and canonical
+  `score_core` bytes plus `score_core_sha256`, not the full timing-bearing score
+  report.
 
 ## Implementation sequence
 
@@ -255,6 +283,10 @@ Contract requirements:
 - Dispositions include `accepted`, `rejected`, `unavailable`,
   `contaminated`, and `failed`.
 - Manifest separates runner-only oracle/scoring paths from role-visible paths.
+- `experiment-run` includes `operator_interventions` from its first example;
+  absence of intervention is represented by an empty array.
+- `score-report` separates deterministic `score_core` from operational timing
+  and operator-step measurements and records `score_core_sha256`.
 - Artifact entries include media type, byte size, and SHA-256.
 - Examples validate against Draft 2020-12.
 
@@ -276,14 +308,16 @@ Files:
 Implement only enough to:
 
 1. Load and hash the fixture.
-2. Prepare Lane A and Lane C run directories.
+2. Prepare Lane A, Lane B, and Lane C run directories.
 3. Capture a fixed replay source checkpoint.
-4. Freeze each lane payload.
+4. Freeze each lane payload, including an unavailable descriptor for Lane B.
 5. Stage an oracle-free replay target workspace.
 6. Record a fixed replay target reconstruction.
 7. Score deterministically.
 8. Build and verify the artifact manifest.
 9. Confirm Lane C transfers authority only after accepted reconstruction.
+10. Confirm Lane B reaches a verified `unavailable` disposition without a
+    target attempt or score.
 
 Inject a fixed clock and fixed replay evidence in tests. Production code uses a
 real UTC clock by default.
@@ -292,8 +326,10 @@ Required vertical-slice tests:
 
 ```text
 test_replay_compiled_prompt_run_completes_and_verifies
+test_replay_native_persistence_unavailable_run_completes_and_verifies
 test_replay_torc_run_transfers_only_after_reconstruction
-test_repeated_replay_produces_identical_payload_and_score_bytes
+test_fixed_clock_replay_produces_identical_payload_and_score_report_bytes
+test_score_core_excludes_operational_measurements
 test_target_workspace_excludes_oracle_and_scoring_material
 ```
 
@@ -308,7 +344,15 @@ Checkpoint:
 
 - Record elapsed time, production LOC, test LOC, and changed files.
 - If the replay slice is not working by two hours, stop broad implementation
-  and reduce contract or fixture complexity without weakening the gate.
+  and apply this pre-decided simplification order without weakening the gate:
+  1. Keep all five version 1 schemas but limit them to spec-required fields and
+     the smallest valid examples.
+  2. Keep one compact JSON object in each of the three fixture files; defer
+     narrative enrichment.
+  3. Implement only the fixed replay adapter and happy-path Lane A/B/C
+     materializers; defer stricter path checks and tamper cases to Batch 2.
+  4. Do not defer oracle separation, acceptance-gated Lane C authority,
+     deterministic `score_core`, or verified Lane B unavailability.
 - Do not start live adapter work before this slice passes.
 
 ### Batch 2: receipts, attempts, isolation, and tamper verification
@@ -323,6 +367,8 @@ Implement and test:
 - A changed payload cannot be attached as another attempt to the same run.
 - Multiple failed attempts remain append-only.
 - The final completed attempt is referenced without rewriting failed attempts.
+- Every attempt stores its own reconstruction; the top-level reconstruction
+  artifact references only the final attempt selected for scoring.
 
 Required tests:
 
@@ -352,6 +398,7 @@ test_oracle_exposure_marks_run_contaminated
 test_path_escape_and_case_collision_are_rejected
 test_environment_dump_is_rejected
 test_credential_scan_reports_fixture_finding_without_exposing_value
+test_completed_replay_artifacts_pass_credential_scan
 ```
 
 #### Task 2.3: Complete experiment verification
@@ -361,6 +408,7 @@ test_credential_scan_reports_fixture_finding_without_exposing_value
 - Manifest and fixture hashes.
 - Receipt input/output links.
 - Stage order derived from receipts.
+- Presence and linkage of the `target-completed` receipt for completed targets.
 - Target-attempt payload hashes and dispositions.
 - Final-attempt reference.
 - Lane-specific artifact exclusions.
@@ -404,7 +452,8 @@ CLI requirements:
   destinations before harness invocation.
 
 CLI tests call `main([...])` directly and cover successful replay plus adapter
-mismatch, tamper, and unavailable native persistence.
+mismatch, tamper, and a full Lane B prepare, probe, unavailable-disposition,
+and verify path.
 
 #### Task 3.2: Run the Windows replay lane
 
@@ -423,6 +472,19 @@ PowerShell commands:
 
 Repeat for `--lane torc` under `.torc/p1a/replay-c`. Record payload and score
 hashes for the macOS comparison.
+
+Run Lane B through its complete unavailable path:
+
+```powershell
+.\.venv\Scripts\python -m torc experiment prepare --manifest examples/experiment-manifest.example.json --lane native-persistence --run-dir .torc/p1a/replay-b --json
+.\.venv\Scripts\python -m torc experiment source --run-dir .torc/p1a/replay-b --adapter replay --json
+.\.venv\Scripts\python -m torc experiment verify --run-dir .torc/p1a/replay-b --json
+```
+
+The verified Lane B directory contains the frozen fixture and settings,
+unavailable continuity-payload descriptor, probe evidence, terminal
+disposition, receipts reached before unavailability, and artifact manifest. It
+contains no target attempt, reconstruction, or score.
 
 The schema example is also the runnable replay manifest. It references the
 three fixture files by relative path and pinned SHA-256.
@@ -445,12 +507,18 @@ POSIX commands:
 .venv/bin/python -m torc experiment verify --run-dir .torc/p1a/replay-a --json
 ```
 
-Repeat for Lane C. Compare canonical payload and score bytes plus their
-SHA-256 values with the Windows evidence. Operational receipt timestamps may
-differ; fixed-clock replay tests remain byte-identical.
+Repeat for Lane C. Compare deterministic payload and score-core bytes plus
+their SHA-256 values with the Windows evidence. Specifically, compare the full
+continuity-payload bytes and the canonical `score_core` bytes plus
+`score_core_sha256`. Full `score-report.json` bytes, receipt timestamps,
+durations, and operator-step measurements may differ. Fixed-clock automated
+replay tests still compare the complete score report byte-for-byte.
 
-Do not begin the live smoke until both replay lanes pass or the macOS blocker is
-recorded for operator disposition.
+Also run the Lane B unavailable sequence and verify its disposition and
+artifact manifest on macOS.
+
+Do not begin the live smoke until all three replay lanes pass or the macOS
+blocker is recorded for operator disposition.
 
 ### Batch 4: bounded live adapters and readiness smoke
 
@@ -547,6 +615,9 @@ Create `docs/p1a-results.md` with:
 - operator-step counts;
 - lease holder before and after;
 - artifact paths and verification result;
+- interruption and idempotent-resume commands, attempt identifiers, receipt
+  hashes, and verification evidence;
+- the completed replay artifact credential scan with zero findings;
 - accepted threats and operational risks;
 - observed elapsed hours, production LOC, test LOC, changed files, persistent
   runtime processes, and operator steps; and
@@ -584,17 +655,17 @@ P1a implementation task.
 | Spec requirement | Primary evidence |
 |---|---|
 | Schema examples validate | `tests/test_schemas.py` |
-| Replay outputs are deterministic | fixed-clock repeated-run tests |
+| Replay outputs are deterministic | fixed-clock full-report tests and cross-platform payload/score-core hashes |
 | Lanes share fixture and settings | manifest and fixture-hash assertions |
 | Lane A contains no TORC authority | Lane A artifact exclusion test |
-| Lane B is native or unavailable | adapter probe and run disposition |
+| Lane B is native or unavailable | end-to-end verified unavailable run directory |
 | Lane C transfer is acceptance-gated | P0 authority assertions in experiment tests |
 | Identical retry is idempotent | receipt replay test |
 | Changed input requires new run | receipt mismatch test |
 | Failed target preserves authority | failed-attempt Lane C test |
 | Tampering is detected | parameterized artifact/receipt tamper tests |
 | Artifact capture is allowlisted | schema and forbidden-field tests |
-| Credential scan is best-effort | scan finding/redaction tests |
+| Credential scan is best-effort | planted-finding test plus clean completed-run scan |
 | Oracle is isolated | role-workspace manifest tests and live boundary evidence |
 | Attempts are append-only | multiple-attempt and final-reference tests |
 | Adapter flag matches manifest | CLI mismatch test |
@@ -613,6 +684,8 @@ Run on the authoritative Windows host:
 .\.venv\Scripts\python -m torc doctor --json
 .\.venv\Scripts\python -m torc experiment inspect --run-dir .torc/p1a/replay-a --json
 .\.venv\Scripts\python -m torc experiment verify --run-dir .torc/p1a/replay-a --json
+.\.venv\Scripts\python -m torc experiment inspect --run-dir .torc/p1a/replay-b --json
+.\.venv\Scripts\python -m torc experiment verify --run-dir .torc/p1a/replay-b --json
 .\.venv\Scripts\python -m torc experiment inspect --run-dir .torc/p1a/replay-c --json
 .\.venv\Scripts\python -m torc experiment verify --run-dir .torc/p1a/replay-c --json
 ```
