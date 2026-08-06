@@ -3,10 +3,14 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
 
 from . import __version__
+from .demo import inspect_lineage, run_demo
+from .errors import TorcError
+from .store import Store
+from .verify import verify_store
 from .vocabulary import HANDOFF_REASON_CODES
 
 _REQUIRED_PATHS = (
@@ -48,8 +52,8 @@ def _doctor_payload() -> dict[str, object]:
     return {
         "project": "torc",
         "version": __version__,
-        "status": "seed" if not missing else "incomplete_seed",
-        "implementation_status": "vertical_slice_not_implemented",
+        "status": "p0_ready" if not missing else "incomplete",
+        "implementation_status": "p0_lineage_handoff_implemented",
         "repository_root": str(root) if root is not None else None,
         "missing_required_paths": missing,
         "handoff_reason_codes": list(HANDOFF_REASON_CODES),
@@ -59,17 +63,31 @@ def _doctor_payload() -> dict[str, object]:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="torc",
-        description="TORC lineage and continuity control plane seed.",
+        description="TORC lineage and continuity control plane.",
     )
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
 
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    about = subparsers.add_parser("about", help="Print the seed's architectural purpose.")
+    about = subparsers.add_parser("about", help="Print TORC's architectural purpose.")
     about.add_argument("--json", action="store_true", dest="as_json")
 
-    doctor = subparsers.add_parser("doctor", help="Verify that the repository seed is intact.")
+    doctor = subparsers.add_parser("doctor", help="Verify the repository and P0 surface.")
     doctor.add_argument("--json", action="store_true", dest="as_json")
+
+    demo = subparsers.add_parser("demo", help="Run the deterministic P0 handoff.")
+    demo.add_argument("--state-dir", type=Path, required=True)
+    demo.add_argument("--json", action="store_true", dest="as_json")
+
+    inspect = subparsers.add_parser("inspect", help="Inspect a lineage without mutation.")
+    inspect.add_argument("--state-dir", type=Path, required=True)
+    inspect.add_argument("--lineage", required=True)
+    inspect.add_argument("--json", action="store_true", dest="as_json")
+
+    verify = subparsers.add_parser("verify", help="Verify stored TORC provenance.")
+    verify.add_argument("--state-dir", type=Path, required=True)
+    verify.add_argument("--lineage")
+    verify.add_argument("--json", action="store_true", dest="as_json")
 
     return parser
 
@@ -94,7 +112,7 @@ def _run_doctor(as_json: bool) -> int:
     if as_json:
         print(json.dumps(payload, indent=2, sort_keys=True))
     else:
-        print(f"TORC seed status: {payload['status']}")
+        print(f"TORC status: {payload['status']}")
         print(f"Implementation: {payload['implementation_status']}")
         missing = payload["missing_required_paths"]
         if missing:
@@ -102,6 +120,14 @@ def _run_doctor(as_json: bool) -> int:
             for path in missing:
                 print(f"  - {path}")
     return 0 if not payload["missing_required_paths"] else 1
+
+
+def _print_payload(payload: dict[str, object], as_json: bool) -> None:
+    if as_json:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        for key, value in payload.items():
+            print(f"{key}: {value}")
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -112,6 +138,29 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _run_about(args.as_json)
     if args.command == "doctor":
         return _run_doctor(args.as_json)
+    try:
+        if args.command == "demo":
+            payload = run_demo(args.state_dir)
+            _print_payload(payload, args.as_json)
+            return 0 if payload["verification"]["valid"] else 1
+        if args.command == "inspect":
+            with Store(args.state_dir) as store:
+                payload = inspect_lineage(store, args.lineage)
+            _print_payload(payload, args.as_json)
+            return 0 if payload["integrity"]["valid"] else 1
+        if args.command == "verify":
+            with Store(args.state_dir) as store:
+                payload = verify_store(store, args.lineage)
+            _print_payload(payload, args.as_json)
+            return 0 if payload["valid"] else 1
+    except (TorcError, OSError, ValueError) as exc:
+        payload = {
+            "ok": False,
+            "error": type(exc).__name__,
+            "detail": str(exc),
+        }
+        _print_payload(payload, getattr(args, "as_json", False))
+        return 1
 
     parser.error(f"Unsupported command: {args.command}")
     return 2
