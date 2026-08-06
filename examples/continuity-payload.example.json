@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "run_id": "run-example-a",
+  "lane": "compiled-prompt",
+  "fixture_sha256": "4e11fabc974eafcf87b0ae087f1edfe6049b7bb3dc8b1defffa6566fa5821b4d",
+  "status": "ready",
+  "mechanism": "compiled-prompt",
+  "content": {
+    "active_commitments": [
+      "Keep the experiment local and deterministic"
+    ],
+    "hard_constraints": [
+      "No network calls"
+    ]
+  },
+  "context": {
+    "utf8_bytes": 127,
+    "estimated_words": 14
+  }
+}

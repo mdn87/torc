@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://torc.local/schemas/continuity-payload.schema.json",
+  "title": "TORC continuity payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_id", "lane", "fixture_sha256", "status", "mechanism", "content", "context"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "run_id": {"type": "string"},
+    "lane": {"enum": ["compiled-prompt", "native-persistence", "torc"]},
+    "fixture_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "status": {"enum": ["ready", "unavailable"]},
+    "mechanism": {"type": "string"},
+    "content": {},
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["utf8_bytes", "estimated_words"],
+      "properties": {
+        "utf8_bytes": {"type": "integer", "minimum": 0},
+        "estimated_words": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

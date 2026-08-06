@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "run_id": "run-example-a",
+  "experiment_id": "p1a-readiness-001",
+  "lane": "compiled-prompt",
+  "created_at": "2026-08-06T12:00:00Z",
+  "disposition": "accepted",
+  "stage_receipts": [
+    {
+      "path": "receipts/created.json",
+      "sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+    }
+  ],
+  "target_attempts": [
+    {
+      "attempt_id": "attempt-0001",
+      "payload_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "started_at": "2026-08-06T12:03:00Z",
+      "ended_at": "2026-08-06T12:04:00Z",
+      "disposition": "accepted",
+      "artifacts": [
+        {
+          "path": "attempts/attempt-0001/reconstruction.json",
+          "sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+        }
+      ]
+    }
+  ],
+  "operator_interventions": [],
+  "adapter_evidence": [
+    {
+      "adapter": "replay",
+      "stage": "source"
+    }
+  ]
+}

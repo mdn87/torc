@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "fixture_id": "p1a-review-001",
+  "assignment": "Independently review the bounded TORC handoff implementation and report coverage by review area.",
+  "lineage_identity": "TORC P1a fixture lineage",
+  "current_responsibility": "Review the implementation without changing it",
+  "settled_decisions": [
+    "Authority transfers only after continuity acceptance",
+    "Adapters translate but do not authorize or score"
+  ],
+  "active_commitments": [
+    "Keep the experiment local and deterministic",
+    "Preserve failed target attempts"
+  ],
+  "hard_constraints": [
+    "No network calls",
+    "No daemon or background process",
+    "Do not expose runner-only oracle or scoring material"
+  ],
+  "unresolved_work": [
+    "Verify artifact tamper detection",
+    "Assess whether native persistence is available"
+  ],
+  "uncertainties": [
+    "Whether a cross-harness native continuation exists"
+  ],
+  "evidence_refs": [
+    "task.json#settled_decisions",
+    "task.json#hard_constraints",
+    "task.json#unresolved_work"
+  ],
+  "superseded_direction": {
+    "direction": "Use an automatic model judge",
+    "status": "superseded",
+    "replacement": "Use deterministic structural checks"
+  }
+}

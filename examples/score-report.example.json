@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "run_id": "run-example-a",
+  "scorer_version": "p1a-1",
+  "score_core": {
+    "field_scores": {
+      "active_commitments": {
+        "matched": 2,
+        "required": 2,
+        "recall": 1.0
+      }
+    },
+    "contradiction_count": 0,
+    "provenance_recoverability": 1.0,
+    "context_delivered": {
+      "utf8_bytes": 127,
+      "estimated_words": 14
+    },
+    "task_quality": {
+      "passed": 3,
+      "required": 3,
+      "ratio": 1.0
+    }
+  },
+  "score_core_sha256": "f141629ee566ec77d0308f346e4a560f703478fc92f557243fe240166c9487c9",
+  "operational_measurements": {
+    "scored_at": "2026-08-06T12:05:00Z",
+    "duration_ms": 0,
+    "operator_steps": 4
+  }
+}
