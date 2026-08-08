@@ -1,0 +1,38 @@
+{
+  "identity": {
+    "label": "TORC development lineage"
+  },
+  "self_model": {
+    "role": "Implement the bounded P2 session-handoff pilot",
+    "settled_decisions": [
+      "P1b did not justify another synthetic paired series",
+      "P2 begins with one real implementation-to-review handoff"
+    ],
+    "methods": [
+      "Reuse the existing lineage, projection, handoff, and lease primitives",
+      "Keep the operator in control of every boundary"
+    ]
+  },
+  "goals": [
+    "Determine whether TORC adds practical value to a real session handoff"
+  ],
+  "commitments": [
+    "Preserve append-only canonical history and acceptance-gated authority transfer",
+    "Report operational burden honestly"
+  ],
+  "constraints": [
+    "Keep all pilot changes inside the TORC repository",
+    "Add no daemon, provider call, workflow orchestrator, or network dependency",
+    "Do not claim authority outside the TORC lineage store"
+  ],
+  "open_work": [
+    "Review the P2 operator surface and decide whether to keep using it"
+  ],
+  "uncertainties": [
+    "Whether generated briefs and explicit acceptance are worth their operator cost"
+  ],
+  "artifact_refs": [
+    "artifact-p2-scope-envelope"
+  ],
+  "memory_refs": []
+}
