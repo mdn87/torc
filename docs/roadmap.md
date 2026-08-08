@@ -34,6 +34,11 @@ unavailable. See `docs/p1a-experimental-readiness-spec.md`.
 
 ## P1b: real two-agent comparison
 
+Status: controlled synthetic series complete; roadmap gate not passed. The
+frozen P1a fixture produced a ceiling-saturated tie on continuity and task
+quality while TORC used more context. A real Lugos task transition was not run;
+see `docs/p1b-results.md`.
+
 - Real task-phase transition
 - Comparison against compiled-prompt and native-persistence when available
 - Measured continuity and overhead
