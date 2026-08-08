@@ -1,6 +1,6 @@
 # P1b Comparative Run Procedure
 
-Status: controls frozen for series `p1b-codex-claude-001`; execution not started
+Status: series `p1b-codex-claude-001` completed; see `docs/p1b-results.md`
 
 Pre-series control evidence: `docs/p1b-control-preflight.md`
 
