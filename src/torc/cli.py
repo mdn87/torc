@@ -30,6 +30,14 @@ from .experiment_runs import (
     write_stage_receipt,
 )
 from .experiment_scoring import score_run
+from .operator import (
+    checkpoint_operator_lineage,
+    create_operator_lineage,
+    load_json_object,
+    operator_lineage_status,
+    prepare_operator_handoff,
+    resolve_operator_handoff,
+)
 from .store import Store
 from .verify import verify_store
 from .vocabulary import HANDOFF_REASON_CODES
@@ -109,6 +117,51 @@ def build_parser() -> argparse.ArgumentParser:
     verify.add_argument("--state-dir", type=Path, required=True)
     verify.add_argument("--lineage")
     verify.add_argument("--json", action="store_true", dest="as_json")
+
+    lineage = subparsers.add_parser(
+        "lineage", help="Operate a real local lineage through its authority lease."
+    )
+    lineage_commands = lineage.add_subparsers(dest="lineage_command", required=True)
+    lineage_create = lineage_commands.add_parser("create")
+    lineage_create.add_argument("--state-dir", type=Path, required=True)
+    lineage_create.add_argument("--lineage", required=True)
+    lineage_create.add_argument("--state-file", type=Path, required=True)
+    lineage_create.add_argument("--substrate-file", type=Path, required=True)
+    lineage_create.add_argument("--activation-id")
+    lineage_create.add_argument("--json", action="store_true", dest="as_json")
+    lineage_checkpoint = lineage_commands.add_parser("checkpoint")
+    lineage_checkpoint.add_argument("--state-dir", type=Path, required=True)
+    lineage_checkpoint.add_argument("--lineage", required=True)
+    lineage_checkpoint.add_argument("--activation", required=True)
+    lineage_checkpoint.add_argument("--state-file", type=Path, required=True)
+    lineage_checkpoint.add_argument(
+        "--event-type", choices=("checkpoint", "self_model_revised"), default="checkpoint"
+    )
+    lineage_checkpoint.add_argument(
+        "--evidence-ref", action="append", default=[], dest="evidence_refs"
+    )
+    lineage_checkpoint.add_argument("--json", action="store_true", dest="as_json")
+    lineage_status = lineage_commands.add_parser("status")
+    lineage_status.add_argument("--state-dir", type=Path, required=True)
+    lineage_status.add_argument("--lineage", required=True)
+    lineage_status.add_argument("--json", action="store_true", dest="as_json")
+
+    handoff = subparsers.add_parser(
+        "handoff", help="Prepare or resolve an acceptance-gated lineage handoff."
+    )
+    handoff_commands = handoff.add_subparsers(dest="handoff_command", required=True)
+    handoff_prepare = handoff_commands.add_parser("prepare")
+    handoff_prepare.add_argument("--state-dir", type=Path, required=True)
+    handoff_prepare.add_argument("--lineage", required=True)
+    handoff_prepare.add_argument("--source-activation", required=True)
+    handoff_prepare.add_argument("--plan-file", type=Path, required=True)
+    handoff_prepare.add_argument("--json", action="store_true", dest="as_json")
+    handoff_resolve = handoff_commands.add_parser("resolve")
+    handoff_resolve.add_argument("--state-dir", type=Path, required=True)
+    handoff_resolve.add_argument("--handoff", required=True)
+    handoff_resolve.add_argument("--target-activation", required=True)
+    handoff_resolve.add_argument("--reconstruction-file", type=Path, required=True)
+    handoff_resolve.add_argument("--json", action="store_true", dest="as_json")
 
     experiment = subparsers.add_parser(
         "experiment", help="Prepare and operate a P1a experiment run."
@@ -505,6 +558,51 @@ def main(argv: Sequence[str] | None = None) -> int:
                 payload = verify_store(store, args.lineage)
             _print_payload(payload, args.as_json)
             return 0 if payload["valid"] else 1
+        if args.command == "lineage":
+            with Store(args.state_dir) as store:
+                if args.lineage_command == "create":
+                    payload = create_operator_lineage(
+                        store,
+                        lineage_id=args.lineage,
+                        canonical_state=load_json_object(args.state_file),
+                        substrate=load_json_object(args.substrate_file),
+                        activation_id=args.activation_id,
+                    )
+                elif args.lineage_command == "checkpoint":
+                    payload = checkpoint_operator_lineage(
+                        store,
+                        lineage_id=args.lineage,
+                        activation_id=args.activation,
+                        canonical_state=load_json_object(args.state_file),
+                        event_type=args.event_type,
+                        evidence_refs=args.evidence_refs,
+                    )
+                elif args.lineage_command == "status":
+                    payload = operator_lineage_status(store, args.lineage)
+                else:
+                    parser.error(f"Unsupported lineage command: {args.lineage_command}")
+            _print_payload(payload, args.as_json)
+            return 0 if payload.get("ok", True) else 1
+        if args.command == "handoff":
+            with Store(args.state_dir) as store:
+                if args.handoff_command == "prepare":
+                    payload = prepare_operator_handoff(
+                        store,
+                        lineage_id=args.lineage,
+                        source_activation_id=args.source_activation,
+                        plan=load_json_object(args.plan_file),
+                    )
+                elif args.handoff_command == "resolve":
+                    payload = resolve_operator_handoff(
+                        store,
+                        handoff_id=args.handoff,
+                        target_activation_id=args.target_activation,
+                        reconstruction=load_json_object(args.reconstruction_file),
+                    )
+                else:
+                    parser.error(f"Unsupported handoff command: {args.handoff_command}")
+            _print_payload(payload, args.as_json)
+            return 0 if payload.get("ok", True) else 1
         if args.command == "experiment":
             action = args.experiment_command
             if action == "prepare":

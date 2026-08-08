@@ -33,6 +33,7 @@ def prepare_handoff(
     projection_id: str,
     reason_code: str,
     rationale: str,
+    target_activation_id: str | None = None,
     continuity_requirements: list[str] | None = None,
     handoff_id: str | None = None,
     prepared_at: str | None = None,
@@ -56,6 +57,14 @@ def prepare_handoff(
         or projection["target_substrate_id"] != target_substrate_id
     ):
         raise HandoffError("fit decision or projection does not match current authority")
+    if target_activation_id is not None:
+        target = store.get_activation(target_activation_id)
+        if (
+            target["lineage_id"] != lineage_id
+            or target["substrate_id"] != target_substrate_id
+            or target["revision_id"] != source_revision_id
+        ):
+            raise HandoffError("target activation does not match the handoff preparation")
 
     record = seal_record(
         {
@@ -66,6 +75,7 @@ def prepare_handoff(
             "source_activation_id": source_activation_id,
             "source_lease_id": authority["lease_id"],
             "target_substrate_id": target_substrate_id,
+            "target_activation_id": target_activation_id,
             "fit_decision_id": fit_decision_id,
             "projection_id": projection_id,
             "reason_code": reason_code,
@@ -148,6 +158,11 @@ def resolve_handoff(
         or target["revision_id"] != snapshot["source_revision_id"]
     ):
         raise HandoffError("target activation does not match the handoff snapshot")
+    if (
+        snapshot.get("target_activation_id") is not None
+        and target_activation_id != snapshot["target_activation_id"]
+    ):
+        raise HandoffError("target activation is not the intended handoff recipient")
 
     expected = expected_reconstruction(store, snapshot)
     checks = []

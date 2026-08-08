@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "substrate_id": "codex-windows-p2",
+  "label": "Codex implementation session on Windows",
+  "adapter": "manual",
+  "capabilities": [
+    "repository_read",
+    "repository_write",
+    "verification_execute"
+  ],
+  "policy_labels": [
+    "local-workspace"
+  ],
+  "context_budget": {
+    "unit": "words",
+    "limit": 32000
+  },
+  "task_affinities": [
+    "implementation"
+  ]
+}
