@@ -34,10 +34,10 @@ unavailable. See `docs/p1a-experimental-readiness-spec.md`.
 
 ## P1b: real two-agent comparison
 
-Status: controlled synthetic series complete; roadmap gate not passed. The
-frozen P1a fixture produced a ceiling-saturated tie on continuity and task
-quality while TORC used more context. A real Lugos task transition was not run;
-see `docs/p1b-results.md`.
+Status: closed. The controlled synthetic series did not pass its comparative
+gate, so the operator declined to repeat it and authorized a bounded real-work
+P2 pilot instead. That pilot succeeded; see `docs/p1b-results.md` and
+`docs/p2-pilot.md`.
 
 - Real task-phase transition
 - Comparison against compiled-prompt and native-persistence when available
@@ -47,14 +47,27 @@ Gate: TORC beats or materially complements the simpler baseline.
 
 ## P2: Lugos contract integration
 
-- Link Autowork assignment and outcome identifiers
+Status: successful for the bounded real-work slice and closed. TORC governed a
+real Codex-to-Claude implementation-review transition, exported operator-facing
+continuity artifacts, prevented authority bypass, and preserved external
+ownership boundaries. Broader Autowork, Sulis, and Bran identifier adapters are
+integration-on-demand work, not remaining P2 exit criteria.
+
+Completed in the bounded slice:
+
 - Express substrate requirements without selecting unauthorized routes
-- Reference Sulis memory and Bran custody records
 - Export operator-facing continuity artifacts
+
+Deferred until a consuming workflow requires them:
+
+- Link Autowork assignment and outcome identifiers
+- Reference Sulis memory and Bran custody records
 
 Gate: no duplicate ownership and no authority bypass.
 
 ## P3: succession and recovery
+
+Status: next roadmap phase. P2 requires no further validation before this work.
 
 - Failure recovery
 - Model or harness succession
