@@ -240,11 +240,11 @@ def _source_experiment(run_dir: Path, adapter_name: str) -> dict[str, object]:
         [source_ref],
         evidence={"adapter": adapter_name, "workspace": visible},
     )
-    if capture["disposition"] == "contaminated":
+    if capture["disposition"] != "accepted":
         return {
             "ok": False,
             "run_id": manifest["run_id"],
-            "disposition": "contaminated",
+            "disposition": capture["disposition"],
             "evidence": capture["harness_evidence"],
         }
     lane = manifest["selected_lane"]
@@ -320,7 +320,11 @@ def _target_experiment(run_dir: Path, adapter_name: str) -> dict[str, object]:
     ]
     adapter = adapter_for(adapter_name)
     started = adapter.start_target(context)
-    collected = adapter.collect_target(context)
+    collected = (
+        adapter.collect_target(context)
+        if started["disposition"] == "accepted"
+        else started
+    )
     attempts = sorted((root / "attempts").glob("attempt-*"))
     attempt_id = f"attempt-{len(attempts) + 1:04d}"
     payload_sha = hashlib.sha256(payload_path.read_bytes()).hexdigest()

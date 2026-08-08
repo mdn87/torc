@@ -1,6 +1,6 @@
 # P1b Comparative Run Procedure
 
-Status: frozen procedure; execution blocked until the P1a gate passes
+Status: frozen procedure; P1a gate passed; execution ready but not started
 
 ## Comparison decision
 
