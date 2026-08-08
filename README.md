@@ -61,11 +61,12 @@ a production TORC runtime or a provider integration.
 
 The evidence and remaining limits are recorded in `docs/p0-results.md`.
 
-P2 now adds a thin, local operator surface for dogfooding one real
-implementation-to-review handoff. It reuses the P0 domain machinery, binds a
-prepared handoff to one target activation, exports a clearly derived brief and
-reconstruction template, and retains the same acceptance-gated lease transfer.
-See `docs/p2-pilot.md` for the bounded workflow and authority limits.
+The bounded P2 pilot completed successfully on a real implementation-to-review
+handoff. Its thin local operator surface reuses the P0 domain machinery, binds
+a prepared handoff to one target activation, exports a clearly derived brief
+and reconstruction template, fails closed on integrity errors, and retains the
+same acceptance-gated lease transfer. See `docs/p2-pilot.md` for the completed
+result and authority limits.
 
 ## Baseline setup
 
