@@ -9,7 +9,11 @@ from jsonschema import Draft202012Validator
 from torc.canonical import canonical_json, payload_sha256
 from torc.cli import _inspect_experiment, main
 from torc.errors import TorcError
-from torc.experiment_adapters import CodexSourceAdapter
+from torc.experiment_adapters import (
+    ClaudeCodeTargetAdapter,
+    CodexSourceAdapter,
+    _decode_object,
+)
 from torc.experiment_lanes import record_torc_reconstruction
 from torc.experiment_runs import (
     append_target_attempt,
@@ -455,30 +459,237 @@ def test_adapter_mismatch_fails_before_invocation(tmp_path: Path) -> None:
     )
 
 
-def test_live_probe_uses_argument_list_without_shell(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+def test_live_json_decoder_accepts_fenced_json_and_rejects_non_objects() -> None:
+    assert _decode_object('```json\n{"ok":true}\n```') == {"ok": True}
+    with pytest.raises(ValueError, match="JSON object"):
+        _decode_object("[]")
+
+
+def test_wsl_resolver_preserves_bash_positional_argument(
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    calls = []
+    adapter = CodexSourceAdapter()
 
     class Completed:
         returncode = 0
-        stdout = "codex 1.0"
+        stdout = "/nvm/bin/codex\n"
         stderr = ""
 
-    monkeypatch.setattr("torc.experiment_adapters.shutil.which", lambda _name: "codex")
-
-    def fake_run(args: list[str], **kwargs: object) -> Completed:
-        calls.append((args, kwargs))
+    def fake_run(args: list[str], **_kwargs: object) -> Completed:
+        assert args[3] == "--exec"
+        assert args[-1] == "codex"
         return Completed()
 
-    monkeypatch.setattr("torc.experiment_adapters.subprocess.run", fake_run)
-    context = {
-        "source_workspace": tmp_path,
-        "source_allowed_paths": ["task.json"],
+    monkeypatch.setattr(adapter, "_wsl", lambda: "wsl.exe")
+    monkeypatch.setattr("torc.experiment_adapters._run", fake_run)
+    assert adapter._resolve("codex") == "/nvm/bin/codex"
+
+
+def test_codex_profile_uses_native_bin_and_toml_inline_table(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    adapter = CodexSourceAdapter()
+
+    class Completed:
+        returncode = 0
+        stdout = "/nvm/codex-linux/vendor/bin\n/home/user/.codex/tmp/arg0"
+        stderr = ""
+
+    def fake_run(args: list[str], **_kwargs: object) -> Completed:
+        assert "codex-linux-" in args[6]
+        assert 'bin/codex"' in args[6]
+        return Completed()
+
+    monkeypatch.setattr(adapter, "_wsl", lambda: "wsl.exe")
+    monkeypatch.setattr(adapter, "_resolve", lambda _name: "/nvm/bin/node")
+    monkeypatch.setattr("torc.experiment_adapters._run", fake_run)
+    profile = adapter._profile("/nvm/bin/codex")
+    assert profile is not None
+    assert '":minimal"="read"' in profile[1]
+    assert '"/nvm/codex-linux/vendor/bin"="read"' in profile[1]
+    assert '":workspace_roots"={"."="read"}' in profile[1]
+
+
+def test_codex_source_capture_accepts_only_contract_output(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    adapter = CodexSourceAdapter()
+    continuity = json.loads(
+        (ROOT / "examples/p1a-fixture/agent-visible/task.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    fields = (
+        "lineage_identity",
+        "current_responsibility",
+        "settled_decisions",
+        "active_commitments",
+        "hard_constraints",
+        "unresolved_work",
+        "uncertainties",
+        "evidence_refs",
+    )
+    payload = {"schema_version": 1, "continuity": {key: continuity[key] for key in fields}}
+    event = {
+        "type": "item.completed",
+        "item": {"type": "agent_message", "text": json.dumps(payload)},
     }
-    evidence = CodexSourceAdapter().probe(context, "source")
-    assert evidence["boundary_enforced"] is False
-    assert calls[0][0] == ["codex", "--version"]
-    assert "shell" not in calls[0][1]
-    capture = CodexSourceAdapter().capture_source(context)
-    assert capture["disposition"] == "contaminated"
+
+    class Completed:
+        returncode = 0
+        stdout = json.dumps(event)
+        stderr = ""
+
+    monkeypatch.setattr(
+        adapter,
+        "probe",
+        lambda _context, _stage: {
+            "available": True,
+            "boundary_enforced": True,
+            "linux_workspace": "/work",
+            "_node": "/node",
+            "_resolved": "/codex",
+            "_profile": "{}",
+        },
+    )
+    monkeypatch.setattr("torc.experiment_adapters._run", lambda _args, **_kwargs: Completed())
+    monkeypatch.setattr(adapter, "_wsl", lambda: "wsl.exe")
+    result = adapter.capture_source({"source_workspace": tmp_path})
+    assert result["disposition"] == "accepted"
+    assert result["continuity"] == payload["continuity"]
+
+
+def test_codex_source_capture_fails_closed_without_boundary(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    adapter = CodexSourceAdapter()
+    monkeypatch.setattr(
+        adapter,
+        "probe",
+        lambda _context, _stage: {
+            "available": True,
+            "boundary_enforced": False,
+            "reason": "negative read remained visible",
+        },
+    )
+    result = adapter.capture_source({"source_workspace": tmp_path})
+    assert result["disposition"] == "contaminated"
+
+
+def test_claude_target_requires_machine_recorded_read_denial(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = tmp_path / "run"
+    workspace = root / "workspaces" / "target"
+    workspace.mkdir(parents=True)
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "AGENTS.md").write_text("oracle boundary", encoding="utf-8")
+    reconstruction = {
+        "lineage_identity": "lineage",
+        "current_responsibility": "review",
+        "settled_decisions": [],
+        "active_commitments": [],
+        "hard_constraints": [],
+        "unresolved_work": [],
+        "uncertainties": [],
+        "handoff_reason": "task_phase_transition",
+        "source_revision_id": "p1a-revision-0002",
+        "new_inferences": [],
+        "assertions": [],
+        "review_areas": [],
+        "completion_status": "complete",
+    }
+    adapter = ClaudeCodeTargetAdapter()
+    monkeypatch.setattr(
+        adapter,
+        "probe",
+        lambda _context, _stage: {
+            "available": True,
+            "linux_workspace": "/run/workspaces/target",
+            "_resolved": "/claude",
+        },
+    )
+    monkeypatch.setattr(adapter, "_wsl", lambda: "wsl.exe")
+    monkeypatch.setattr(adapter, "_path", lambda path: "/mapped/" + Path(path).name)
+
+    class Completed:
+        returncode = 0
+        stderr = ""
+
+        def __init__(self, with_denial: bool) -> None:
+            tool_id = "toolu-canary"
+            events = [
+                {
+                    "type": "assistant",
+                    "message": {
+                        "content": [
+                            {
+                                "type": "tool_use",
+                                "id": tool_id,
+                                "name": "Read",
+                                "input": {"file_path": "/mapped/AGENTS.md"},
+                            }
+                        ]
+                    },
+                },
+                {
+                    "type": "user",
+                    "message": {
+                        "content": [
+                            {
+                                "type": "tool_result",
+                                "tool_use_id": tool_id,
+                                "is_error": with_denial,
+                            }
+                        ]
+                    },
+                },
+                {
+                    "type": "result",
+                    "structured_output": {
+                        "boundary_probe": "denied",
+                        "reconstruction": reconstruction,
+                    },
+                },
+            ]
+            self.stdout = "\n".join(json.dumps(event) for event in events)
+
+    def accepted_run(args: list[str], **_kwargs: object) -> Completed:
+        assert "" not in args
+        assert args[args.index("--setting-sources") + 1] == "local"
+        assert json.loads(args[args.index("--mcp-config") + 1]) == {"mcpServers": {}}
+        assert args[args.index("--output-format") + 1] == "stream-json"
+        assert "--verbose" in args
+        return Completed(True)
+
+    monkeypatch.setattr("torc.experiment_adapters._run", accepted_run)
+    context = {"repo_root": repo, "run_dir": root, "target_workspace": workspace}
+    assert adapter.collect_target(context)["disposition"] == "accepted"
+    monkeypatch.setattr(
+        "torc.experiment_adapters._run", lambda _args, **_kwargs: Completed(False)
+    )
+    assert adapter.collect_target(context)["disposition"] == "contaminated"
+
+
+def test_claude_schema_rejects_unscorable_reconstruction_shapes() -> None:
+    schema = ClaudeCodeTargetAdapter()._schema()
+    invalid = {
+        "boundary_probe": "denied",
+        "reconstruction": {
+            "lineage_identity": "lineage",
+            "current_responsibility": "review",
+            "settled_decisions": [],
+            "active_commitments": [],
+            "hard_constraints": [],
+            "unresolved_work": [],
+            "uncertainties": [],
+            "handoff_reason": "task_phase_transition",
+            "source_revision_id": "p1a-revision-0002",
+            "new_inferences": [],
+            "assertions": [{"claim": "wrong shape"}],
+            "review_areas": [{"area": "authority"}],
+            "completion_status": "partial: free-form",
+        },
+    }
+    assert not Draft202012Validator(schema).is_valid(invalid)

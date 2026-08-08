@@ -36,12 +36,12 @@
     "operator_steps": 24
   },
   "observed": {
-    "elapsed_hours": 2.75,
-    "production_loc": 1319,
-    "test_loc": 452,
+    "elapsed_hours": 4.25,
+    "production_loc": 1793,
+    "test_loc": 643,
     "changed_files": 23,
     "runtime_processes": 0,
-    "operator_steps": 26
+    "operator_steps": 38
   },
   "vertical_slice": {
     "status": "completed",

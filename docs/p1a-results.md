@@ -1,8 +1,8 @@
 # P1a Experimental Readiness Results
 
-Status: implementation complete; P1a gate pending isolated live smoke
+Status: P1a gate passed; P1b procedure ready
 
-Date: 2026-08-06
+Date: 2026-08-08
 
 ## Implemented apparatus
 
@@ -19,7 +19,7 @@ Date: 2026-08-06
 
 ## Automated and Windows replay evidence
 
-`python -m pytest -q` passed 56 tests. `python -m ruff check .` passed.
+`python -m pytest -q` passed 62 tests. `python -m ruff check .` passed.
 
 | Lane | Disposition | Payload SHA-256 | Score-core SHA-256 |
 |---|---|---|---|
@@ -57,25 +57,47 @@ to the Windows evidence, proving the required deterministic bytes match across
 platforms. Lane B completed its verified unavailable path. macOS operator
 steps were five for Lane A, three for Lane B, and five for Lane C.
 
-## Live adapter probe
+## Isolated live smoke
 
-The installed harnesses were:
+The authoritative live smoke ran through WSL2 Ubuntu using native Linux
+`codex-cli 0.147.0` and `2.1.226 (Claude Code)`. Run directories were outside
+the repository hierarchy so neither harness could discover repository-level
+instruction files before its assignment boundary was active.
 
-- `codex-cli 0.146.1`
-- `2.1.195 (Claude Code)`
+Codex used a narrow permission profile. Its preflight proved `task.json`
+readable and the repository `AGENTS.md` unreadable before model invocation;
+network access remained denied to generated commands. Claude Code ran as a
+fresh, non-persistent safe-mode session with an empty strict MCP configuration,
+only the `Read` tool, sandbox fail-closed behavior, and explicit deny rules for
+the repository and runner-only run areas. Stream evidence correlated the
+canary `Read` tool-use ID to an error result while both visible fixture reads
+succeeded. No unrestricted transcript was retained.
 
-Both version probes succeeded using argument-list subprocess invocation from
-the staged role workspace. Neither CLI probe evidenced a filesystem read
-boundary that prevents access to the parent repository. The adapters therefore
-return `contaminated` and do not launch or score a live activation. This is the
-required fail-closed behavior; it is not a completed live smoke.
+| Lane | Run | Disposition | Payload SHA-256 | Score-core SHA-256 |
+|---|---|---|---|---|
+| compiled-prompt | A-04 | accepted | `29b5f0c93aae501ca224f61ff40d8f15f3f6fc51e3cfad19790cc9f77820a5fc` | `b6766240007ac372944a82759b6ade58524db4de9373f62fd5540fb674f19282` |
+| TORC | C-01 | accepted | `57675150ea01a759fb8235622a92be74fd9a7499b5be9b7972f24ef6d76312cf` | `45b35a724a3b2ba648a082a5d0eefdac7124595617dbebec0d97f39418a9e0e9` |
 
-## Remaining P1a gate items
+Both selected runs completed on their first target attempt, used six documented
+operator stages, passed all field-recall and task-quality checks, reported zero
+contradictions, verified their artifact manifests, and had no credential-scan
+findings. Lane C passed all nine frozen continuity requirements; source
+authority remained unchanged until acceptance, then transferred to
+`p1a-target-attempt-0001` at revision `p1a-revision-0003`.
 
-- Supply an operator-authorized assignment mechanism that can enforce and
-  evidence parent-repository read isolation.
-- Explicitly invoke and complete the live Codex-to-Claude Code compiled-prompt
-  and TORC smoke runs under that boundary.
+Earlier A-01 through A-03 apparatus-shakeout runs were preserved rather than
+relabeled. They exposed WSL argument forwarding, Codex profile serialization,
+native Claude authentication, denial-event parsing, and target-schema defects.
+None was included in the readiness evidence or comparative results. The final
+schema rejects unscorable assertion, review-area, and completion-status shapes
+before target selection.
 
-Until those items pass, P1a does not authorize P1b execution. Credential
-scanning remains documented as best-effort rather than proof of secret absence.
+## Gate conclusion
+
+P1a's replay, cross-platform parity, oracle-isolation, live A/C, provenance,
+credential-scan, and verification gates pass. Cross-harness native persistence
+remains explicitly unavailable, so the frozen P1b procedure is the registered
+two-lane compiled-prompt versus TORC comparison. This result proves apparatus
+readiness only; it is not evidence that TORC outperforms the baseline.
+
+Credential scanning remains best-effort rather than proof of secret absence.
