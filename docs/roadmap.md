@@ -74,3 +74,6 @@ Gate: the operator can explain every authority change without reading raw databa
 - Learned fit scoring
 - Automatic lineage merging
 - Autonomous policy or invariant revision
+- Durable-workspace and per-operation backend descriptors, workspace-shaped
+  projections, and explicit reconciliation stages. See
+  `docs/decisions/cloudflare-computer-borrow-boundary.md`.
