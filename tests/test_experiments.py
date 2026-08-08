@@ -19,6 +19,7 @@ from torc.experiment_runs import (
     append_target_attempt,
     build_visible_workspace,
     load_run,
+    prepare_run,
     scan_artifacts_for_credentials,
     verify_experiment_run,
     write_canonical_artifact,
@@ -94,6 +95,27 @@ def test_replay_compiled_prompt_run_completes_and_verifies(tmp_path: Path) -> No
     assert result["valid"]
     assert result["disposition"] == "accepted"
     assert (run_dir / "receipts" / "target-completed.json").is_file()
+
+
+def test_prepare_accepts_unique_run_identifier_and_rejects_invalid_value(
+    tmp_path: Path,
+) -> None:
+    run_dir = tmp_path / "controlled"
+    result = prepare_run(
+        MANIFEST,
+        "compiled-prompt",
+        run_dir,
+        run_id="p1b-series-pair-01-a",
+    )
+    assert result["run_id"] == "p1b-series-pair-01-a"
+    assert load_run(run_dir)["manifest"]["run_id"] == "p1b-series-pair-01-a"
+    with pytest.raises(TorcError, match="run identifier"):
+        prepare_run(
+            MANIFEST,
+            "compiled-prompt",
+            tmp_path / "invalid",
+            run_id="pair 01/a",
+        )
 
 
 def test_inspect_emits_versioned_experiment_run_contract(tmp_path: Path) -> None:
@@ -552,11 +574,36 @@ def test_codex_source_capture_accepts_only_contract_output(
             "_profile": "{}",
         },
     )
-    monkeypatch.setattr("torc.experiment_adapters._run", lambda _args, **_kwargs: Completed())
+
+    def controlled_run(args: list[str], **_kwargs: object) -> Completed:
+        assert args[args.index("--model") + 1] == "gpt-5.6-sol"
+        assert 'model_reasoning_effort="high"' in args
+        assert 'service_tier="fast"' in args
+        return Completed()
+
+    monkeypatch.setattr("torc.experiment_adapters._run", controlled_run)
     monkeypatch.setattr(adapter, "_wsl", lambda: "wsl.exe")
-    result = adapter.capture_source({"source_workspace": tmp_path})
+    result = adapter.capture_source(
+        {
+            "source_workspace": tmp_path,
+            "manifest": {
+                "settings": {
+                    "source": {
+                        "model": "gpt-5.6-sol",
+                        "reasoning_effort": "high",
+                        "service_tier": "fast",
+                    }
+                }
+            },
+        }
+    )
     assert result["disposition"] == "accepted"
     assert result["continuity"] == payload["continuity"]
+    assert result["harness_evidence"]["controlled_settings"] == {
+        "model": "gpt-5.6-sol",
+        "reasoning_effort": "high",
+        "service_tier": "fast",
+    }
 
 
 def test_codex_source_capture_fails_closed_without_boundary(
@@ -657,6 +704,8 @@ def test_claude_target_requires_machine_recorded_read_denial(
 
     def accepted_run(args: list[str], **_kwargs: object) -> Completed:
         assert "" not in args
+        assert args[args.index("--model") + 1] == "claude-opus-4-7"
+        assert args[args.index("--effort") + 1] == "high"
         assert args[args.index("--setting-sources") + 1] == "local"
         assert json.loads(args[args.index("--mcp-config") + 1]) == {"mcpServers": {}}
         assert args[args.index("--output-format") + 1] == "stream-json"
@@ -664,12 +713,60 @@ def test_claude_target_requires_machine_recorded_read_denial(
         return Completed(True)
 
     monkeypatch.setattr("torc.experiment_adapters._run", accepted_run)
-    context = {"repo_root": repo, "run_dir": root, "target_workspace": workspace}
-    assert adapter.collect_target(context)["disposition"] == "accepted"
+    context = {
+        "repo_root": repo,
+        "run_dir": root,
+        "target_workspace": workspace,
+        "manifest": {
+            "settings": {
+                "target": {
+                    "model": "claude-opus-4-7",
+                    "reasoning_effort": "high",
+                }
+            }
+        },
+    }
+    accepted = adapter.collect_target(context)
+    assert accepted["disposition"] == "accepted"
+    assert accepted["task_output"]["harness_evidence"]["controlled_settings"] == {
+        "model": "claude-opus-4-7",
+        "reasoning_effort": "high",
+    }
     monkeypatch.setattr(
         "torc.experiment_adapters._run", lambda _args, **_kwargs: Completed(False)
     )
     assert adapter.collect_target(context)["disposition"] == "contaminated"
+
+
+def test_live_probe_fails_closed_on_frozen_harness_version_mismatch(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    adapter = ClaudeCodeTargetAdapter()
+
+    class Completed:
+        returncode = 0
+        stdout = "2.1.999 (Claude Code)\n"
+        stderr = ""
+
+    monkeypatch.setattr(adapter, "_resolve", lambda _name: "/claude")
+    monkeypatch.setattr(adapter, "_path", lambda _path: "/work")
+    monkeypatch.setattr(adapter, "_wsl", lambda: "wsl.exe")
+    monkeypatch.setattr(
+        "torc.experiment_adapters._run", lambda _args, **_kwargs: Completed()
+    )
+    evidence = adapter.probe(
+        {
+            "target_workspace": tmp_path,
+            "manifest": {
+                "settings": {
+                    "target": {"harness_version": "2.1.226 (Claude Code)"}
+                }
+            },
+        },
+        "target",
+    )
+    assert evidence["available"] is False
+    assert "differs from frozen control" in evidence["reason"]
 
 
 def test_claude_schema_rejects_unscorable_reconstruction_shapes() -> None:

@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "objective": "Run the frozen five-pair Codex-to-Claude Code comparison between compiled-prompt and TORC continuity using enforced, evidence-bearing harness controls.",
+  "success_evidence": [
+    "Every live invocation enforces and records the frozen harness version, model, effort, service tier when applicable, assignment, and tool policy.",
+    "Five paired A/C blocks complete in the preregistered order with unique run identifiers.",
+    "All included runs verify with accepted dispositions, valid artifact manifests, and clean best-effort credential scans.",
+    "The final report includes every registered measure, paired differences, lane medians and ranges, failures, and operator interventions."
+  ],
+  "non_goals": [
+    "Changing the P1a fixture, schemas, scorer, normalization, or acceptance thresholds.",
+    "Adding another harness, model-based judging, provider SDK integration, or native-persistence substitute.",
+    "Claiming statistical significance from five pairs or authorizing P2.",
+    "Adding a daemon, service, watcher, network dependency, or parent Lugos edit."
+  ],
+  "accepted_threats": [
+    "Live model output and provider latency remain nondeterministic under fixed controls.",
+    "The model identifiers are versioned product identifiers but may not expose dated provider snapshots.",
+    "Credential-pattern scanning is best-effort and cannot prove arbitrary text contains no secret.",
+    "Five pairs support only a bounded comparative conclusion."
+  ],
+  "estimates": {
+    "elapsed_hours": 4,
+    "production_loc": 180,
+    "test_loc": 180,
+    "changed_files": 8,
+    "runtime_processes": 0,
+    "operator_steps": 60
+  },
+  "vertical_slice": {
+    "status": "in_progress",
+    "evidence": "docs/p1b-run-procedure.md"
+  },
+  "architecture_triggers": [],
+  "review_rounds_used": 0,
+  "scope_policy_sha256": "9707efccd8426b7b53784bc7752449f5e4a45913c141c990b6a21d8c3bb2cdae",
+  "parent_envelope_sha256": "da82b7d6dd2f0851d866c065cc6f8f6298f223d932fd641edb8c71611f1a6f2f",
+  "operator_override_id": null
+}
