@@ -124,6 +124,7 @@ def build_parser() -> argparse.ArgumentParser:
         choices=("compiled-prompt", "native-persistence", "torc"),
     )
     prepare.add_argument("--run-dir", type=Path, required=True)
+    prepare.add_argument("--run-id")
     prepare.add_argument("--json", action="store_true", dest="as_json")
     source = experiment_commands.add_parser("source")
     source.add_argument("--run-dir", type=Path, required=True)
@@ -507,7 +508,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         if args.command == "experiment":
             action = args.experiment_command
             if action == "prepare":
-                payload = prepare_run(args.manifest, args.lane, args.run_dir)
+                payload = prepare_run(
+                    args.manifest, args.lane, args.run_dir, run_id=args.run_id
+                )
             elif action == "source":
                 payload = _source_experiment(args.run_dir, args.adapter)
             elif action == "target":
