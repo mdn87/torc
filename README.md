@@ -61,6 +61,12 @@ a production TORC runtime or a provider integration.
 
 The evidence and remaining limits are recorded in `docs/p0-results.md`.
 
+P2 now adds a thin, local operator surface for dogfooding one real
+implementation-to-review handoff. It reuses the P0 domain machinery, binds a
+prepared handoff to one target activation, exports a clearly derived brief and
+reconstruction template, and retains the same acceptance-gated lease transfer.
+See `docs/p2-pilot.md` for the bounded workflow and authority limits.
+
 ## Baseline setup
 
 ```powershell
@@ -105,4 +111,6 @@ exports seven immutable JSON artifacts under `.torc/demo/artifacts/`.
 - `docs/integration-boundaries.md` - ownership relative to existing Lugos modules
 - `docs/roadmap.md` - evidence-gated sequence after the first slice
 - `docs/p0-results.md` - P0 proof, observed scope, and remaining unknowns
+- `docs/p2-pilot.md` - minimal real session-handoff dogfood workflow
+- `docs/p2-pilot-scope-envelope.json` - bounded P2 pilot authority and budgets
 - `docs/prompts/CODEX_BOOTSTRAP_PROMPT.md` - implementation task for Codex

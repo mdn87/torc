@@ -29,6 +29,9 @@
     "source_activation_id": {"$ref": "#/$defs/id"},
     "source_lease_id": {"$ref": "#/$defs/id"},
     "target_substrate_id": {"$ref": "#/$defs/id"},
+    "target_activation_id": {
+      "anyOf": [{"$ref": "#/$defs/id"}, {"type": "null"}]
+    },
     "fit_decision_id": {"$ref": "#/$defs/id"},
     "projection_id": {"$ref": "#/$defs/id"},
     "reason_code": {

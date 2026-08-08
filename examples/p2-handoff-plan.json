@@ -1,0 +1,38 @@
+{
+  "target_substrate": {
+    "schema_version": 1,
+    "substrate_id": "claude-wsl-p2",
+    "label": "Claude Code review session in WSL2",
+    "adapter": "manual",
+    "capabilities": [
+      "repository_read",
+      "verification_execute"
+    ],
+    "policy_labels": [
+      "local-workspace"
+    ],
+    "context_budget": {
+      "unit": "words",
+      "limit": 32000
+    },
+    "task_affinities": [
+      "review"
+    ]
+  },
+  "target_activation_id": "activation-p2-review-claude",
+  "task_phase": "independent-review",
+  "requirements": {
+    "capabilities": [
+      "repository_read",
+      "verification_execute"
+    ],
+    "policy_labels": [
+      "local-workspace"
+    ],
+    "minimum_context_units": 1000
+  },
+  "budget_limit": 1600,
+  "target_responsibility": "Independently review the P2 operator handoff implementation and report the smallest required corrections",
+  "reason_code": "task_phase_transition",
+  "rationale": "The bounded implementation batch is ready for independent review."
+}

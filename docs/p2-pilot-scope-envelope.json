@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "objective": "Dogfood TORC on one real implementation-to-review session handoff using a minimal operator CLI over the existing lineage, projection, acceptance, and authority primitives.",
+  "success_evidence": [
+    "An operator can create and checkpoint a real lineage only through its authoritative activation.",
+    "Handoff preparation creates a derived human brief and reconstruction template without transferring authority.",
+    "A rejected reconstruction is preserved and leaves source authority unchanged, while an accepted reconstruction transfers the lease to the intended target activation.",
+    "The implementation-to-review transition for this change is completed through the new surface and the resulting store verifies cleanly."
+  ],
+  "non_goals": [
+    "Adding a benchmark, paired experiment, provider adapter, inference call, daemon, service, watcher, network dependency, or parent Lugos edit.",
+    "Claiming TORC controls Autowork assignments, filesystem or tool permissions, or execution authority outside its lineage store.",
+    "Changing database schemas, acceptance semantics, branching, recovery, or multi-host synchronization.",
+    "Waiting for a multi-handoff study before deciding whether the operator surface is useful."
+  ],
+  "accepted_threats": [
+    "The pilot is self-hosted on TORC development and therefore does not establish general usefulness.",
+    "Exact reconstruction equality is intentionally retained and may reject harmless paraphrases.",
+    "The local SQLite store provides tamper evidence and transactional lineage authority, not authentication against a malicious local process.",
+    "The operator still decides when a checkpoint or handoff boundary occurs."
+  ],
+  "estimates": {
+    "elapsed_hours": 5,
+    "production_loc": 350,
+    "test_loc": 350,
+    "changed_files": 10,
+    "runtime_processes": 0,
+    "operator_steps": 8
+  },
+  "observed": {
+    "elapsed_hours": 0.5,
+    "production_loc": 464,
+    "test_loc": 363,
+    "changed_files": 11,
+    "runtime_processes": 0,
+    "operator_steps": 7
+  },
+  "vertical_slice": {
+    "status": "passed",
+    "evidence": "docs/p2-pilot.md#first-dogfood-result"
+  },
+  "architecture_triggers": [],
+  "review_rounds_used": 1,
+  "scope_policy_sha256": "9707efccd8426b7b53784bc7752449f5e4a45913c141c990b6a21d8c3bb2cdae",
+  "parent_envelope_sha256": "9ba2605233b486071067a5679434c5e8b872ff8ce33ab35e9f785ab347f9f4da",
+  "operator_override_id": null
+}
