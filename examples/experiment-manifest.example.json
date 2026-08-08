@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "experiment_id": "p1a-readiness-001",
+  "fixture": {
+    "fixture_id": "p1a-review-001",
+    "agent_visible": [
+      {
+        "path": "examples/p1a-fixture/agent-visible/task.json",
+        "sha256": "4e11fabc974eafcf87b0ae087f1edfe6049b7bb3dc8b1defffa6566fa5821b4d"
+      }
+    ],
+    "oracle": {
+      "path": "examples/p1a-fixture/oracle/continuity-oracle.json",
+      "sha256": "bb9eb379c6a656003d2b4800f103b59f28b90079d0e11ae3188d4af919f02ef0"
+    },
+    "scoring": {
+      "path": "examples/p1a-fixture/scoring/structural-rules.json",
+      "sha256": "d6bdb8f5934fff578ab4b9252669dc7edf942ea8e12f4cfcafa9442ef0f9cdb3"
+    }
+  },
+  "adapters": {
+    "source": ["replay", "codex"],
+    "target": ["replay", "claude-code"]
+  },
+  "settings": {
+    "effort": "fixed",
+    "tool_policy": "read-only-review"
+  },
+  "scoring": {
+    "scorer_version": "p1a-1",
+    "normalization_version": "unicode-casefold-1"
+  }
+}
