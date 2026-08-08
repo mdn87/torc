@@ -1,6 +1,8 @@
 # P1b Comparative Run Procedure
 
-Status: frozen procedure; P1a gate passed; execution ready but not started
+Status: controls frozen for series `p1b-codex-claude-001`; execution not started
+
+Pre-series control evidence: `docs/p1b-control-preflight.md`
 
 ## Comparison decision
 
@@ -13,19 +15,30 @@ procedure.
 ## Frozen inputs
 
 - Manifest contract: version 1.
+- Series manifest: `examples/p1b-experiment-manifest.json`.
+- Series identifier: `p1b-codex-claude-001`.
 - Fixture: `p1a-review-001`, using the hashes pinned in
-  `examples/experiment-manifest.example.json`.
-- Source harness: Codex.
-- Target harness: Claude Code.
+  `examples/p1b-experiment-manifest.json`.
+- Source harness: `codex-cli 0.147.0`.
+- Source model controls: `gpt-5.6-sol`, reasoning effort `high`, service tier
+  `fast`.
+- Target harness: `2.1.226 (Claude Code)`.
+- Target model controls: `claude-opus-4-7`, effort `high`.
 - Scorer: `p1a-1`.
 - Normalization: `unicode-casefold-1`.
 - Measures: exactly those registered by the P1a schemas and scorer.
 - Target workspace: `task.json`, the selected continuity payload, and its
   visible-workspace manifest only.
+- Tool policy: Codex source has read-only access to its visible workspace and
+  generated-command network denial; Claude target has only `Read`, a strict
+  empty MCP configuration, no session persistence, and fail-closed sandboxing.
+- Assignment text: the exact source assignment and target assignment template
+  embedded in the series manifest.
 
-Harness versions, model settings, effort, tool policy, and assignment text are
-recorded before the first run and remain fixed for the series. A change creates
-a new series; it cannot be mixed into this one.
+The adapters fail closed on a harness-version mismatch and pass the frozen
+model, effort, and service-tier values explicitly. Public harness evidence
+records the effective controls and assignment hash. A change creates a new
+series; it cannot be mixed into this one.
 
 ## Run sequence
 
@@ -37,6 +50,19 @@ activations:
 3. A then C
 4. C then A
 5. A then C
+
+Use these unique run identifiers in that order:
+
+1. `p1b-codex-claude-001-pair-01-a`, then
+   `p1b-codex-claude-001-pair-01-c`
+2. `p1b-codex-claude-001-pair-02-c`, then
+   `p1b-codex-claude-001-pair-02-a`
+3. `p1b-codex-claude-001-pair-03-a`, then
+   `p1b-codex-claude-001-pair-03-c`
+4. `p1b-codex-claude-001-pair-04-c`, then
+   `p1b-codex-claude-001-pair-04-a`
+5. `p1b-codex-claude-001-pair-05-a`, then
+   `p1b-codex-claude-001-pair-05-c`
 
 For every run, execute prepare, source, target, score, and verify as separate
 operator-invoked stages. Do not edit an artifact between stages. Record all
@@ -62,6 +88,23 @@ Stop the series if:
 
 Correct an apparatus defect before restarting the entire five-pair series under
 a new series identifier.
+
+## Operator command pattern
+
+For each preregistered run identifier, create a fresh directory outside the
+repository and invoke the six stages separately. Substitute `compiled-prompt`
+and suffix `a`, or `torc` and suffix `c`, as registered above.
+
+```powershell
+$runId = "p1b-codex-claude-001-pair-01-a"
+$runDir = Join-Path $env:TEMP $runId
+python -m torc experiment prepare --manifest examples/p1b-experiment-manifest.json --lane compiled-prompt --run-id $runId --run-dir $runDir --json
+python -m torc experiment source --run-dir $runDir --adapter codex --json
+python -m torc experiment target --run-dir $runDir --adapter claude-code --json
+python -m torc experiment score --run-dir $runDir --json
+python -m torc experiment inspect --run-dir $runDir --json
+python -m torc experiment verify --run-dir $runDir --json
+```
 
 ## Reporting
 

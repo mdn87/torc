@@ -127,6 +127,7 @@ def prepare_run(
     lane: str,
     run_dir: Path | str,
     *,
+    run_id: str | None = None,
     clock: Clock = utc_now,
 ) -> dict[str, Any]:
     if lane not in {"compiled-prompt", "native-persistence", "torc"}:
@@ -135,12 +136,16 @@ def prepare_run(
     repo_root = _repo_root(source.parent)
     manifest = _read_json(source)
     fixture = _verified_fixture(manifest, repo_root)
+    resolved_run_id = run_id or f"{manifest['experiment_id']}-{lane}"
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", resolved_run_id):
+        raise TorcError(
+            "run identifier must use letters, digits, dots, dashes, or underscores"
+        )
     root = Path(run_dir).resolve()
     root.mkdir(parents=True, exist_ok=True)
-    run_id = f"{manifest['experiment_id']}-{lane}"
     frozen = dict(manifest)
     frozen["selected_lane"] = lane
-    frozen["run_id"] = run_id
+    frozen["run_id"] = resolved_run_id
     if (root / "manifest.json").exists():
         if _read_json(root / "manifest.json") != frozen:
             raise TorcError("run directory is already bound to different inputs")
@@ -150,7 +155,7 @@ def prepare_run(
             if (root / "receipts" / "created.json").exists():
                 return {
                     "ok": True,
-                    "run_id": run_id,
+                    "run_id": resolved_run_id,
                     "lane": lane,
                     "manifest_sha256": _bytes_sha256(
                         (root / "manifest.json").read_bytes()
@@ -169,7 +174,7 @@ def prepare_run(
     write_stage_receipt(root, "created", [], outputs, clock=clock)
     return {
         "ok": True,
-        "run_id": run_id,
+        "run_id": resolved_run_id,
         "lane": lane,
         "manifest_sha256": manifest_ref["sha256"],
         "fixture_manifest_sha256": fixture_ref["sha256"],

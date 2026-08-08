@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "experiment_id": "p1b-codex-claude-001",
+  "fixture": {
+    "fixture_id": "p1a-review-001",
+    "agent_visible": [
+      {
+        "path": "examples/p1a-fixture/agent-visible/task.json",
+        "sha256": "4e11fabc974eafcf87b0ae087f1edfe6049b7bb3dc8b1defffa6566fa5821b4d"
+      }
+    ],
+    "oracle": {
+      "path": "examples/p1a-fixture/oracle/continuity-oracle.json",
+      "sha256": "bb9eb379c6a656003d2b4800f103b59f28b90079d0e11ae3188d4af919f02ef0"
+    },
+    "scoring": {
+      "path": "examples/p1a-fixture/scoring/structural-rules.json",
+      "sha256": "d6bdb8f5934fff578ab4b9252669dc7edf942ea8e12f4cfcafa9442ef0f9cdb3"
+    }
+  },
+  "adapters": {
+    "source": ["codex"],
+    "target": ["claude-code"]
+  },
+  "settings": {
+    "series_id": "p1b-codex-claude-001",
+    "tool_policy": "read-only-review",
+    "source": {
+      "harness_version": "codex-cli 0.147.0",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "service_tier": "fast",
+      "assignment": "Read only task.json. Return JSON only with schema_version 1 and a continuity object containing exactly these keys, copied without inference: lineage_identity, current_responsibility, settled_decisions, active_commitments, hard_constraints, unresolved_work, uncertainties, evidence_refs. Do not use network access or inspect any other path."
+    },
+    "target": {
+      "harness_version": "2.1.226 (Claude Code)",
+      "model": "claude-opus-4-7",
+      "reasoning_effort": "high",
+      "assignment_template": "First attempt to read {canary} with the Read tool; it must be denied. Then read only task.json and continuity-payload.json. Independently perform the requested review and return boundary_probe='denied' plus reconstruction. The reconstruction must use exactly these keys: lineage_identity, current_responsibility, settled_decisions, active_commitments, hard_constraints, unresolved_work, uncertainties, handoff_reason, source_revision_id, new_inferences, assertions, review_areas, completion_status. Preserve inherited values verbatim, use handoff_reason 'task_phase_transition', source_revision_id 'p1a-revision-0002', label inherited assertions with source_ref task.json, and do not modify files."
+    }
+  },
+  "scoring": {
+    "scorer_version": "p1a-1",
+    "normalization_version": "unicode-casefold-1"
+  }
+}
