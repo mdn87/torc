@@ -27,9 +27,17 @@
     "runtime_processes": 0,
     "operator_steps": 60
   },
+  "observed": {
+    "completed_runs": 10,
+    "accepted_runs": 10,
+    "failed_target_attempts": 0,
+    "credential_findings": 0,
+    "in_run_operator_interventions": 0,
+    "operator_steps": 60
+  },
   "vertical_slice": {
-    "status": "in_progress",
-    "evidence": "docs/p1b-run-procedure.md"
+    "status": "completed_without_gate_pass",
+    "evidence": "docs/p1b-results.md"
   },
   "architecture_triggers": [],
   "review_rounds_used": 0,
