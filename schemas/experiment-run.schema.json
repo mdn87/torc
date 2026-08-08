@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://torc.local/schemas/experiment-run.schema.json",
+  "title": "TORC experiment run",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_id", "experiment_id", "lane", "created_at", "disposition", "stage_receipts", "target_attempts", "operator_interventions"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "experiment_id": {"type": "string", "minLength": 1},
+    "lane": {"enum": ["compiled-prompt", "native-persistence", "torc"]},
+    "created_at": {"type": "string", "format": "date-time"},
+    "disposition": {"enum": ["pending", "accepted", "rejected", "unavailable", "contaminated", "failed"]},
+    "stage_receipts": {"type": "array", "items": {"$ref": "#/$defs/ref"}},
+    "target_attempts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["attempt_id", "payload_sha256", "started_at", "ended_at", "disposition", "artifacts"],
+        "properties": {
+          "attempt_id": {"type": "string"},
+          "payload_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "started_at": {"type": "string", "format": "date-time"},
+          "ended_at": {"type": "string", "format": "date-time"},
+          "disposition": {"enum": ["accepted", "rejected", "contaminated", "failed"]},
+          "artifacts": {"type": "array", "items": {"$ref": "#/$defs/ref"}}
+        }
+      }
+    },
+    "operator_interventions": {"type": "array", "items": {"type": "object"}},
+    "adapter_evidence": {"type": "array", "items": {"type": "object"}}
+  },
+  "$defs": {
+    "ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  }
+}

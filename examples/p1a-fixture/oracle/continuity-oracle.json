@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "fixture_id": "p1a-review-001",
+  "required": {
+    "lineage_identity": "TORC P1a fixture lineage",
+    "current_responsibility": "Review the implementation without changing it",
+    "settled_decisions": [
+      "Authority transfers only after continuity acceptance",
+      "Adapters translate but do not authorize or score"
+    ],
+    "active_commitments": [
+      "Keep the experiment local and deterministic",
+      "Preserve failed target attempts"
+    ],
+    "hard_constraints": [
+      "No network calls",
+      "No daemon or background process",
+      "Do not expose runner-only oracle or scoring material"
+    ],
+    "unresolved_work": [
+      "Verify artifact tamper detection",
+      "Assess whether native persistence is available"
+    ]
+  },
+  "contradictions": [
+    {
+      "assertion": "A model judge decides task quality",
+      "conflicts_with": "Use deterministic structural checks"
+    }
+  ],
+  "provenance_roots": [
+    "task.json"
+  ]
+}
