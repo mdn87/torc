@@ -13,6 +13,7 @@ from .fit import evaluate_fit
 from .handoffs import expected_reconstruction, prepare_handoff, resolve_handoff
 from .ids import new_id, valid_id
 from .projections import compile_projection
+from .rollbacks import apply_rollback
 from .store import Store
 from .verify import artifact_metadata, verify_store
 
@@ -80,6 +81,58 @@ def checkpoint_operator_lineage(
         "revision_id": revision["revision_id"],
         "activation_id": activation_id,
         "event_type": event_type,
+    }
+
+
+def rollback_operator_lineage(
+    store: Store,
+    *,
+    lineage_id: str,
+    activation_id: str,
+    expected_head_revision_id: str,
+    target_revision_id: str,
+    operator_ref: str,
+    rationale: str,
+    evidence_refs: list[str],
+) -> dict[str, Any]:
+    """Append an operator-authorized restoration of a strict ancestor state."""
+
+    _require_integrity(store, lineage_id)
+    authority_before = store.current_authority(lineage_id)
+    transition_count_before = store.connection.execute(
+        "SELECT COUNT(*) FROM authority_transitions WHERE lineage_id = ?",
+        (lineage_id,),
+    ).fetchone()[0]
+    revision = apply_rollback(
+        store,
+        lineage_id=lineage_id,
+        activation_id=activation_id,
+        expected_head_revision_id=expected_head_revision_id,
+        target_revision_id=target_revision_id,
+        operator_ref=operator_ref,
+        rationale=rationale,
+        evidence_refs=evidence_refs,
+    )
+    authority_after = store.current_authority(lineage_id)
+    transition_count_after = store.connection.execute(
+        "SELECT COUNT(*) FROM authority_transitions WHERE lineage_id = ?",
+        (lineage_id,),
+    ).fetchone()[0]
+    verification = verify_store(store, lineage_id)
+    return {
+        "ok": verification["valid"],
+        "lineage_id": lineage_id,
+        "from_revision_id": expected_head_revision_id,
+        "target_revision_id": target_revision_id,
+        "revision_id": revision["revision_id"],
+        "activation_id": authority_after["activation_id"],
+        "lease_id": authority_after["lease_id"],
+        "authority_transferred": (
+            authority_before["activation_id"] != authority_after["activation_id"]
+            or authority_before["lease_id"] != authority_after["lease_id"]
+        ),
+        "authority_transition_added": transition_count_after != transition_count_before,
+        "verification": verification,
     }
 
 
