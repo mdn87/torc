@@ -24,5 +24,6 @@ def test_doctor_reports_p0_ready(capsys) -> None:
 
     assert exit_code == 0
     assert payload["status"] == "p0_ready"
-    assert payload["implementation_status"] == "p0_lineage_handoff_implemented"
+    assert payload["implementation_status"] == "p3_succession_recovery_implemented"
+    assert payload["roadmap_phase"] == "p3_complete"
     assert payload["missing_required_paths"] == []

@@ -7,6 +7,7 @@ import re
 from pathlib import Path
 from typing import Any
 
+from .branches import create_lineage_branch
 from .canonical import canonical_json, utc_now
 from .errors import HandoffError, IntegrityError, NotFoundError
 from .fit import evaluate_fit
@@ -133,6 +134,55 @@ def rollback_operator_lineage(
         ),
         "authority_transition_added": transition_count_after != transition_count_before,
         "verification": verification,
+    }
+
+
+def branch_operator_lineage(
+    store: Store,
+    *,
+    source_lineage_id: str,
+    source_activation_id: str,
+    expected_source_revision_id: str,
+    child_lineage_id: str,
+    child_activation_id: str,
+    child_substrate: dict[str, Any],
+    operator_ref: str,
+    target_assignment_ref: str,
+    rationale: str,
+    evidence_refs: list[str],
+) -> dict[str, Any]:
+    """Create and verify an independently authoritative child lineage."""
+
+    _require_integrity(store, source_lineage_id)
+    source_before = store.current_authority(source_lineage_id)
+    revision = create_lineage_branch(
+        store,
+        source_lineage_id=source_lineage_id,
+        source_activation_id=source_activation_id,
+        expected_source_revision_id=expected_source_revision_id,
+        child_lineage_id=child_lineage_id,
+        child_activation_id=child_activation_id,
+        child_substrate=child_substrate,
+        operator_ref=operator_ref,
+        target_assignment_ref=target_assignment_ref,
+        rationale=rationale,
+        evidence_refs=evidence_refs,
+    )
+    source_after = store.current_authority(source_lineage_id)
+    child_authority = store.current_authority(child_lineage_id)
+    source_verification = verify_store(store, source_lineage_id)
+    child_verification = verify_store(store, child_lineage_id)
+    return {
+        "ok": source_verification["valid"] and child_verification["valid"],
+        "source_lineage_id": source_lineage_id,
+        "source_revision_id": expected_source_revision_id,
+        "source_authority_unchanged": source_before == source_after,
+        "child_lineage_id": child_lineage_id,
+        "child_revision_id": revision["revision_id"],
+        "child_activation_id": child_authority["activation_id"],
+        "child_lease_id": child_authority["lease_id"],
+        "source_verification": source_verification,
+        "child_verification": child_verification,
     }
 
 

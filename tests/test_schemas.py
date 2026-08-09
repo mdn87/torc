@@ -113,3 +113,34 @@ def test_revision_schema_requires_context_only_for_rollback() -> None:
     ordinary = dict(example)
     ordinary["rollback_context"] = rollback["rollback_context"]
     assert list(validator.iter_errors(ordinary))
+
+
+def test_revision_schema_requires_origin_only_for_branch_root() -> None:
+    schema = json.loads((ROOT / "schemas" / "lineage-revision.schema.json").read_text(
+        encoding="utf-8"))
+    example = json.loads((ROOT / "examples" / "lineage-revision.example.json").read_text(
+        encoding="utf-8"))
+    validator = Draft202012Validator(schema)
+    branch = dict(example)
+    branch["event_type"] = "branch_created"
+    assert list(validator.iter_errors(branch))
+    branch["branch_origin"] = {
+        "source_lineage_id": "source-lineage",
+        "source_revision_id": "source-revision",
+        "source_revision_sha256": "b" * 64,
+        "source_activation_id": "source-activation",
+        "source_lease_id": "source-lease",
+        "rationale": "Create an independent direction.",
+        "initiated_by": {"kind": "operator", "ref": "operator-decision"},
+        "target_assignment_ref": "assignment-child",
+        "evidence_refs": ["design-finding"],
+        "child_authority": {
+            "activation_id": "child-activation",
+            "lease_id": "child-lease",
+            "substrate_id": "child-substrate",
+        },
+    }
+    validator.validate(branch)
+    ordinary = dict(example)
+    ordinary["branch_origin"] = branch["branch_origin"]
+    assert list(validator.iter_errors(ordinary))

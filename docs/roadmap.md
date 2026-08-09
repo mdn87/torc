@@ -67,15 +67,16 @@ Gate: no duplicate ownership and no authority bypass.
 
 ## P3: succession and recovery
 
-Status: in progress. Bounded operator-initiated failure recovery and explicit
-append-only rollback are implemented without a daemon or database migration.
-New-lineage branch creation remains; model or harness succession uses the
-ordinary handoff path when the source is available and recovery when it is not.
+Status: complete for the bounded local P3 slices. Operator-initiated failure
+recovery, explicit append-only rollback, and new-lineage branch creation are
+implemented without a daemon or database migration. Model or harness succession
+uses the ordinary handoff path when the source is available and recovery when it
+is not.
 
 - Failure recovery (bounded operator-declared slice complete)
 - Model or harness succession (covered by handoff plus recovery semantics)
 - Explicit rollback (bounded append-only restore slice complete)
-- Branch creation with new lineage identity
+- Branch creation with new lineage identity (bounded local slice complete)
 
 Automatic merge remains deferred.
 
