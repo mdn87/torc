@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "objective": "Implement one operator-initiated, acceptance-gated failure-recovery path from an unavailable authoritative activation to a bound replacement activation.",
+  "success_evidence": [
+    "Recovery preparation freezes the current head, activation, lease, failure evidence, target activation, and continuity requirements without transferring authority.",
+    "Rejected recovery preserves the source lease and lineage head while recording the immutable rejection.",
+    "Accepted recovery atomically marks the unavailable source failed, closes its lease, appends a linked revision, activates the bound replacement, and grants exactly one new lease.",
+    "Stale authority, wrong-target, missing-evidence, and integrity-tamper paths fail closed.",
+    "The operator CLI completes one deterministic recovery flow and the resulting store verifies cleanly."
+  ],
+  "non_goals": [
+    "Adding a database migration, separate recovery state machine, lease expiry, watcher, daemon, automatic liveness detection, or network dependency.",
+    "Recovering uncheckpointed model, process, tool, or workspace state.",
+    "Adding provider, harness, Autowork dispatch, Sulis, Bran, parent-repository, or cross-host integration.",
+    "Implementing rollback, branching, merging, or another experiment in this batch."
+  ],
+  "accepted_threats": [
+    "The trusted local operator declares that the current bearer is unavailable; TORC does not independently authenticate or detect that outage.",
+    "The unavailable source remains the formally fenced lease holder until a replacement passes acceptance, preventing lease-less limbo and duplicate authority.",
+    "If the source returns and advances authority before acceptance, the prepared recovery becomes stale and must be prepared again.",
+    "Only the last verified canonical head is recoverable; uncheckpointed transient state is lost."
+  ],
+  "estimates": {
+    "elapsed_hours": 4,
+    "production_loc": 260,
+    "test_loc": 320,
+    "changed_files": 10,
+    "runtime_processes": 0,
+    "operator_steps": 4
+  },
+  "observed": {
+    "elapsed_hours": 0,
+    "production_loc": 0,
+    "test_loc": 0,
+    "changed_files": 1,
+    "runtime_processes": 0,
+    "operator_steps": 0
+  },
+  "vertical_slice": {
+    "status": "pending",
+    "evidence": null
+  },
+  "architecture_triggers": [],
+  "review_rounds_used": 0,
+  "scope_policy_sha256": "9707efccd8426b7b53784bc7752449f5e4a45913c141c990b6a21d8c3bb2cdae",
+  "parent_envelope_sha256": "5af40d625ccd12fe48f38f76b1ea347a0a08db5fea1b25a2945d97ca7eb50574",
+  "operator_override_id": null
+}
