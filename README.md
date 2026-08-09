@@ -68,6 +68,11 @@ and reconstruction template, fails closed on integrity errors, and retains the
 same acceptance-gated lease transfer. See `docs/p2-pilot.md` for the completed
 result and authority limits.
 
+P3 now includes an operator-initiated failure-recovery path. It freezes failure
+evidence and an assigned replacement without prematurely moving authority,
+preserves the old lease on rejection, and atomically marks the old activation
+failed when the bound replacement is accepted. See `docs/p3-recovery.md`.
+
 ## Baseline setup
 
 ```powershell
@@ -114,4 +119,6 @@ exports seven immutable JSON artifacts under `.torc/demo/artifacts/`.
 - `docs/p0-results.md` - P0 proof, observed scope, and remaining unknowns
 - `docs/p2-pilot.md` - minimal real session-handoff dogfood workflow
 - `docs/p2-pilot-scope-envelope.json` - bounded P2 pilot authority and budgets
+- `docs/p3-recovery.md` - bounded operator-initiated failure-recovery workflow
+- `docs/p3-recovery-scope-envelope.json` - failure-recovery authority and budgets
 - `docs/prompts/CODEX_BOOTSTRAP_PROMPT.md` - implementation task for Codex

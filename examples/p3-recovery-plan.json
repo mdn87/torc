@@ -1,0 +1,42 @@
+{
+  "target_substrate": {
+    "schema_version": 1,
+    "substrate_id": "codex-recovery-p3",
+    "label": "Codex replacement activation for P3 recovery",
+    "adapter": "manual",
+    "capabilities": [
+      "repository_read",
+      "repository_write",
+      "verification_execute"
+    ],
+    "policy_labels": [
+      "local-workspace"
+    ],
+    "context_budget": {
+      "unit": "words",
+      "limit": 10000
+    },
+    "task_affinities": [
+      "recovery"
+    ]
+  },
+  "target_activation_id": "activation-p3-recovery",
+  "task_phase": "failure-recovery",
+  "requirements": {
+    "capabilities": [
+      "repository_read",
+      "repository_write",
+      "verification_execute"
+    ],
+    "policy_labels": [
+      "local-workspace"
+    ],
+    "minimum_context_units": 500
+  },
+  "budget_limit": 1000,
+  "target_responsibility": "Continue from the last verified canonical lineage head after the prior activation became unavailable",
+  "reason_code": "failure_recovery",
+  "rationale": "The operator observed that the authoritative activation is unavailable and assigned a replacement.",
+  "operator_ref": "operator-p3-recovery-decision",
+  "target_assignment_ref": "assignment-p3-recovery"
+}

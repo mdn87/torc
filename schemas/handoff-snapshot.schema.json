@@ -65,9 +65,60 @@
         "lease_id": {"$ref": "#/$defs/id"}
       }
     },
+    "recovery_context": {
+      "anyOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "initiator",
+            "failure_kind",
+            "observed_at",
+            "evidence_refs",
+            "target_assignment_ref"
+          ],
+          "properties": {
+            "initiator": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["kind", "ref"],
+              "properties": {
+                "kind": {"const": "operator"},
+                "ref": {"$ref": "#/$defs/id"}
+              }
+            },
+            "failure_kind": {"const": "activation_unavailable"},
+            "observed_at": {"type": "string", "format": "date-time"},
+            "evidence_refs": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {"$ref": "#/$defs/id"}
+            },
+            "target_assignment_ref": {"$ref": "#/$defs/id"}
+          }
+        }
+      ]
+    },
     "prepared_at": {"type": "string", "format": "date-time"},
     "integrity": {"$ref": "#/$defs/integrity"}
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"reason_code": {"const": "failure_recovery"}},
+        "required": ["reason_code"]
+      },
+      "then": {
+        "required": ["recovery_context"],
+        "properties": {"recovery_context": {"type": "object"}}
+      },
+      "else": {
+        "properties": {"recovery_context": {"type": "null"}}
+      }
+    }
+  ],
   "$defs": {
     "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
     "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
