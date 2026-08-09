@@ -147,14 +147,32 @@ BEGIN SELECT RAISE(ABORT, 'immutable artifact metadata cannot be deleted'); END;
 class Store:
     """Owns a single local TORC SQLite database."""
 
-    def __init__(self, state_dir: Path | str):
+    def __init__(self, state_dir: Path | str, *, read_only: bool = False):
         self.state_dir = Path(state_dir).resolve()
-        self.state_dir.mkdir(parents=True, exist_ok=True)
         self.db_path = self.state_dir / "torc.sqlite3"
-        self.connection = sqlite3.connect(self.db_path)
+        self.read_only = read_only
+        if read_only:
+            if not self.db_path.is_file():
+                raise NotFoundError(f"TORC database not found: {self.db_path}")
+            self.connection = sqlite3.connect(
+                f"{self.db_path.as_uri()}?mode=ro", uri=True
+            )
+        else:
+            self.state_dir.mkdir(parents=True, exist_ok=True)
+            self.connection = sqlite3.connect(self.db_path)
         self.connection.row_factory = sqlite3.Row
         self.connection.execute("PRAGMA foreign_keys = ON")
-        self.migrate()
+        if read_only:
+            self.connection.execute("PRAGMA query_only = ON")
+            version = int(
+                self.connection.execute("PRAGMA user_version").fetchone()[0]
+            )
+            if version != 1:
+                raise RuntimeError(
+                    f"unsupported TORC database schema version: {version}"
+                )
+        else:
+            self.migrate()
 
     def close(self) -> None:
         self.connection.close()
@@ -188,6 +206,19 @@ class Store:
             raise
         else:
             self.connection.commit()
+
+    @contextmanager
+    def read_transaction(self) -> Iterator[sqlite3.Connection]:
+        """Hold one consistent SQLite snapshot and always leave it unchanged."""
+
+        if self.connection.in_transaction:
+            yield self.connection
+            return
+        self.connection.execute("BEGIN")
+        try:
+            yield self.connection
+        finally:
+            self.connection.rollback()
 
     @staticmethod
     def _decode(row: sqlite3.Row | None, label: str) -> dict[str, Any]:
