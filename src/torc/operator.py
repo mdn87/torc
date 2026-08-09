@@ -7,11 +7,11 @@ import re
 from pathlib import Path
 from typing import Any
 
-from .canonical import canonical_json
+from .canonical import canonical_json, utc_now
 from .errors import HandoffError, IntegrityError, NotFoundError
 from .fit import evaluate_fit
 from .handoffs import expected_reconstruction, prepare_handoff, resolve_handoff
-from .ids import new_id
+from .ids import new_id, valid_id
 from .projections import compile_projection
 from .store import Store
 from .verify import artifact_metadata, verify_store
@@ -117,6 +117,7 @@ def prepare_operator_handoff(
     lineage_id: str,
     source_activation_id: str,
     plan: dict[str, Any],
+    recovery_context: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Prepare a bound handoff and export its derived operator artifacts."""
 
@@ -124,6 +125,23 @@ def prepare_operator_handoff(
     authority = store.current_authority(lineage_id)
     if authority["activation_id"] != source_activation_id:
         raise HandoffError("source activation does not hold lineage authority")
+    reason_code = str(plan["reason_code"])
+    if reason_code == "failure_recovery" and recovery_context is None:
+        raise HandoffError("use the recovery workflow for failure_recovery handoffs")
+    if reason_code != "failure_recovery" and recovery_context is not None:
+        raise HandoffError("recovery context requires the failure_recovery reason")
+    target_activation_id = plan.get("target_activation_id")
+    if target_activation_id is not None:
+        if not valid_id(target_activation_id):
+            raise HandoffError("target activation identifier is invalid")
+        if target_activation_id == source_activation_id:
+            raise HandoffError("target activation must differ from the source")
+        try:
+            store.get_activation(target_activation_id)
+        except NotFoundError:
+            pass
+        else:
+            raise HandoffError("target activation already exists")
 
     target_substrate = _required_object(plan, "target_substrate")
     requirements = _required_object(plan, "requirements")
@@ -149,14 +167,14 @@ def prepare_operator_handoff(
         source_revision_id=authority["lineage_head_revision_id"],
         target_substrate_id=requested_target,
         budget_limit=int(plan["budget_limit"]),
-        handoff_reason=str(plan["reason_code"]),
+        handoff_reason=reason_code,
         target_responsibility=str(plan["target_responsibility"]),
     )
     target = store.create_activation(
         lineage_id,
         authority["lineage_head_revision_id"],
         requested_target,
-        activation_id=plan.get("target_activation_id"),
+        activation_id=target_activation_id,
     )
     snapshot = prepare_handoff(
         store,
@@ -165,8 +183,9 @@ def prepare_operator_handoff(
         target_activation_id=target["activation_id"],
         fit_decision_id=fit["fit_decision_id"],
         projection_id=projection["projection_id"],
-        reason_code=str(plan["reason_code"]),
+        reason_code=reason_code,
         rationale=str(plan["rationale"]),
+        recovery_context=recovery_context,
         continuity_requirements=plan.get("continuity_requirements"),
     )
     reconstruction = expected_reconstruction(store, snapshot)
@@ -201,6 +220,45 @@ def prepare_operator_handoff(
     }
 
 
+def prepare_operator_recovery(
+    store: Store,
+    *,
+    lineage_id: str,
+    failed_activation_id: str,
+    plan: dict[str, Any],
+    evidence_refs: list[str],
+) -> dict[str, Any]:
+    """Prepare an operator-declared recovery without prematurely moving authority."""
+
+    _require_integrity(store, lineage_id)
+    if plan.get("reason_code") != "failure_recovery":
+        raise HandoffError("recovery plans must use the failure_recovery reason")
+    evidence_refs = _nonempty_unique_strings(evidence_refs, "failure evidence")
+    operator_ref = _nonempty_string(plan.get("operator_ref"), "operator_ref")
+    target_assignment_ref = _nonempty_string(
+        plan.get("target_assignment_ref"), "target_assignment_ref"
+    )
+    authority = store.current_authority(lineage_id)
+    if authority["activation_id"] != failed_activation_id:
+        raise HandoffError("failed activation does not hold lineage authority")
+    recovery_context = {
+        "initiator": {"kind": "operator", "ref": operator_ref},
+        "failure_kind": "activation_unavailable",
+        "observed_at": utc_now(),
+        "evidence_refs": evidence_refs,
+        "target_assignment_ref": target_assignment_ref,
+    }
+    payload = prepare_operator_handoff(
+        store,
+        lineage_id=lineage_id,
+        source_activation_id=failed_activation_id,
+        plan=plan,
+        recovery_context=recovery_context,
+    )
+    payload["recovery_context"] = recovery_context
+    return payload
+
+
 def resolve_operator_handoff(
     store: Store,
     *,
@@ -231,6 +289,26 @@ def resolve_operator_handoff(
         "current_authority": store.current_authority(snapshot["lineage_id"]),
         "verification": verification,
     }
+
+
+def resolve_operator_recovery(
+    store: Store,
+    *,
+    handoff_id: str,
+    target_activation_id: str,
+    reconstruction: dict[str, Any],
+) -> dict[str, Any]:
+    """Resolve one prepared failure recovery through the normal acceptance gate."""
+
+    snapshot = store.get_hashed_record("handoffs", "handoff_id", handoff_id)
+    if snapshot["reason_code"] != "failure_recovery":
+        raise HandoffError("handoff is not a failure recovery")
+    return resolve_operator_handoff(
+        store,
+        handoff_id=handoff_id,
+        target_activation_id=target_activation_id,
+        reconstruction=reconstruction,
+    )
 
 
 def render_handoff_brief(
@@ -289,6 +367,22 @@ def render_handoff_brief(
         for section in projection["omitted_sections"]:
             lines.append(f"- `{section['section_id']}`: {section['reason']}")
         lines.append("")
+    recovery = snapshot.get("recovery_context")
+    if recovery is not None:
+        lines.extend(
+            [
+                "## Recovery declaration",
+                "",
+                f"- Failure: `{recovery['failure_kind']}`",
+                f"- Observed: `{recovery['observed_at']}`",
+                f"- Operator reference: `{recovery['initiator']['ref']}`",
+                f"- Target assignment: `{recovery['target_assignment_ref']}`",
+                "- Evidence: " + ", ".join(
+                    f"`{item}`" for item in recovery["evidence_refs"]
+                ),
+                "",
+            ]
+        )
     return "\n".join(lines)
 
 
@@ -308,6 +402,23 @@ def _required_object(value: dict[str, Any], key: str) -> dict[str, Any]:
     if not isinstance(item, dict):
         raise ValueError(f"handoff plan field must be an object: {key}")
     return item
+
+
+def _nonempty_string(value: Any, field: str) -> str:
+    if not valid_id(value):
+        raise HandoffError(f"recovery plan requires a valid {field}")
+    return value
+
+
+def _nonempty_unique_strings(values: Any, field: str) -> list[str]:
+    if (
+        not isinstance(values, list)
+        or not values
+        or any(not valid_id(item) for item in values)
+        or len(values) != len(set(values))
+    ):
+        raise HandoffError(f"recovery requires unique {field} references")
+    return values
 
 
 def _require_integrity(store: Store, lineage_id: str) -> None:

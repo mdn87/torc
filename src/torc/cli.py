@@ -36,7 +36,9 @@ from .operator import (
     load_json_object,
     operator_lineage_status,
     prepare_operator_handoff,
+    prepare_operator_recovery,
     resolve_operator_handoff,
+    resolve_operator_recovery,
 )
 from .store import Store
 from .verify import verify_store
@@ -162,6 +164,30 @@ def build_parser() -> argparse.ArgumentParser:
     handoff_resolve.add_argument("--target-activation", required=True)
     handoff_resolve.add_argument("--reconstruction-file", type=Path, required=True)
     handoff_resolve.add_argument("--json", action="store_true", dest="as_json")
+
+    recovery = subparsers.add_parser(
+        "recovery", help="Prepare or resolve operator-declared activation recovery."
+    )
+    recovery_commands = recovery.add_subparsers(
+        dest="recovery_command", required=True
+    )
+    recovery_prepare = recovery_commands.add_parser("prepare")
+    recovery_prepare.add_argument("--state-dir", type=Path, required=True)
+    recovery_prepare.add_argument("--lineage", required=True)
+    recovery_prepare.add_argument("--failed-activation", required=True)
+    recovery_prepare.add_argument("--plan-file", type=Path, required=True)
+    recovery_prepare.add_argument(
+        "--evidence-ref", action="append", required=True, dest="evidence_refs"
+    )
+    recovery_prepare.add_argument("--json", action="store_true", dest="as_json")
+    recovery_resolve = recovery_commands.add_parser("resolve")
+    recovery_resolve.add_argument("--state-dir", type=Path, required=True)
+    recovery_resolve.add_argument("--handoff", required=True)
+    recovery_resolve.add_argument("--target-activation", required=True)
+    recovery_resolve.add_argument(
+        "--reconstruction-file", type=Path, required=True
+    )
+    recovery_resolve.add_argument("--json", action="store_true", dest="as_json")
 
     experiment = subparsers.add_parser(
         "experiment", help="Prepare and operate a P1a experiment run."
@@ -601,6 +627,29 @@ def main(argv: Sequence[str] | None = None) -> int:
                     )
                 else:
                     parser.error(f"Unsupported handoff command: {args.handoff_command}")
+            _print_payload(payload, args.as_json)
+            return 0 if payload.get("ok", True) else 1
+        if args.command == "recovery":
+            with Store(args.state_dir) as store:
+                if args.recovery_command == "prepare":
+                    payload = prepare_operator_recovery(
+                        store,
+                        lineage_id=args.lineage,
+                        failed_activation_id=args.failed_activation,
+                        plan=load_json_object(args.plan_file),
+                        evidence_refs=args.evidence_refs,
+                    )
+                elif args.recovery_command == "resolve":
+                    payload = resolve_operator_recovery(
+                        store,
+                        handoff_id=args.handoff,
+                        target_activation_id=args.target_activation,
+                        reconstruction=load_json_object(args.reconstruction_file),
+                    )
+                else:
+                    parser.error(
+                        f"Unsupported recovery command: {args.recovery_command}"
+                    )
             _print_payload(payload, args.as_json)
             return 0 if payload.get("ok", True) else 1
         if args.command == "experiment":
