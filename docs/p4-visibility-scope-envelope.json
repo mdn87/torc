@@ -29,19 +29,23 @@
     "operator_steps": 1
   },
   "observed": {
-    "elapsed_hours": 0,
-    "production_loc": 0,
-    "test_loc": 0,
-    "changed_files": 1,
+    "elapsed_hours": 1.5,
+    "production_loc": 999,
+    "test_loc": 682,
+    "changed_files": 11,
     "runtime_processes": 0,
     "operator_steps": 1
   },
   "vertical_slice": {
-    "status": "pending",
-    "evidence": null
+    "status": "proven_local",
+    "evidence": {
+      "test_command": "python -m pytest -q",
+      "explain_command": "python -m torc lineage explain --state-dir <demo-state> --lineage demo-lineage",
+      "result": "The read-only report explained initial and accepted authority changes, fit and acceptance evidence, and continuity events; invalid, time-inverted, or cross-lineage-tampered provenance failed closed without changing database or artifact bytes."
+    }
   },
   "architecture_triggers": [],
-  "review_rounds_used": 0,
+  "review_rounds_used": 2,
   "scope_policy_sha256": "9707efccd8426b7b53784bc7752449f5e4a45913c141c990b6a21d8c3bb2cdae",
   "parent_envelope_sha256": "90601b90c8be331f4ddfbb1ad67864047b02d683a1b226b499602d9171ba03c7",
   "operator_override_id": null

@@ -44,6 +44,7 @@ from .operator import (
 )
 from .store import Store
 from .verify import verify_store
+from .visibility import build_lineage_explanation, render_lineage_explanation
 from .vocabulary import HANDOFF_REASON_CODES
 
 _REQUIRED_PATHS = (
@@ -60,6 +61,7 @@ _REQUIRED_PATHS = (
     "schemas/fit-decision.schema.json",
     "schemas/handoff-snapshot.schema.json",
     "schemas/handoff-result.schema.json",
+    "schemas/operator-view.schema.json",
 )
 
 
@@ -86,8 +88,8 @@ def _doctor_payload() -> dict[str, object]:
         "project": "torc",
         "version": __version__,
         "status": "p0_ready" if not missing else "incomplete",
-        "implementation_status": "p3_succession_recovery_implemented",
-        "roadmap_phase": "p3_complete",
+        "implementation_status": "p4_operator_visibility_implemented",
+        "roadmap_phase": "p4_complete",
         "repository_root": str(root) if root is not None else None,
         "missing_required_paths": missing,
         "handoff_reason_codes": list(HANDOFF_REASON_CODES),
@@ -150,6 +152,12 @@ def build_parser() -> argparse.ArgumentParser:
     lineage_status.add_argument("--state-dir", type=Path, required=True)
     lineage_status.add_argument("--lineage", required=True)
     lineage_status.add_argument("--json", action="store_true", dest="as_json")
+    lineage_explain = lineage_commands.add_parser(
+        "explain", help="Explain verified authority and continuity provenance."
+    )
+    lineage_explain.add_argument("--state-dir", type=Path, required=True)
+    lineage_explain.add_argument("--lineage", required=True)
+    lineage_explain.add_argument("--json", action="store_true", dest="as_json")
     lineage_rollback = lineage_commands.add_parser("rollback")
     lineage_rollback.add_argument("--state-dir", type=Path, required=True)
     lineage_rollback.add_argument("--lineage", required=True)
@@ -615,6 +623,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             _print_payload(payload, args.as_json)
             return 0 if payload["valid"] else 1
         if args.command == "lineage":
+            if args.lineage_command == "explain":
+                with Store(args.state_dir, read_only=True) as store:
+                    payload = build_lineage_explanation(store, args.lineage)
+                if args.as_json:
+                    print(json.dumps(payload, indent=2, sort_keys=True))
+                else:
+                    print(render_lineage_explanation(payload))
+                return 0 if payload["trusted"] else 1
             with Store(args.state_dir) as store:
                 if args.lineage_command == "create":
                     payload = create_operator_lineage(
