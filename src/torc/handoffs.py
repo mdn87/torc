@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from datetime import UTC, datetime
 from typing import Any
 
 from .canonical import canonical_json, seal_record, utc_now
 from .errors import HandoffError, LeaseConflictError
-from .ids import new_id
+from .ids import new_id, valid_id
 from .store import Store
 from .vocabulary import HANDOFF_REASON_CODES
 
@@ -34,12 +35,17 @@ def prepare_handoff(
     reason_code: str,
     rationale: str,
     target_activation_id: str | None = None,
+    recovery_context: dict[str, Any] | None = None,
     continuity_requirements: list[str] | None = None,
     handoff_id: str | None = None,
     prepared_at: str | None = None,
 ) -> dict[str, Any]:
     if reason_code not in HANDOFF_REASON_CODES:
         raise HandoffError(f"unsupported handoff reason: {reason_code}")
+    if reason_code == "failure_recovery":
+        validate_recovery_context(recovery_context)
+    elif recovery_context is not None:
+        raise HandoffError("recovery context requires the failure_recovery reason")
     authority = store.current_authority(lineage_id)
     if authority["activation_id"] != source_activation_id:
         raise LeaseConflictError("source activation does not hold lineage authority")
@@ -76,6 +82,7 @@ def prepare_handoff(
             "source_lease_id": authority["lease_id"],
             "target_substrate_id": target_substrate_id,
             "target_activation_id": target_activation_id,
+            "recovery_context": recovery_context,
             "fit_decision_id": fit_decision_id,
             "projection_id": projection_id,
             "reason_code": reason_code,
@@ -146,6 +153,8 @@ def resolve_handoff(
     resolved_at: str | None = None,
 ) -> dict[str, Any]:
     snapshot = store.get_hashed_record("handoffs", "handoff_id", handoff_id)
+    if snapshot["reason_code"] == "failure_recovery":
+        validate_recovery_context(snapshot.get("recovery_context"))
     existing = store.connection.execute(
         "SELECT 1 FROM handoff_results WHERE handoff_id = ?", (handoff_id,)
     ).fetchone()
@@ -156,6 +165,7 @@ def resolve_handoff(
         target["lineage_id"] != snapshot["lineage_id"]
         or target["substrate_id"] != snapshot["target_substrate_id"]
         or target["revision_id"] != snapshot["source_revision_id"]
+        or target["state"] != "pending"
     ):
         raise HandoffError("target activation does not match the handoff snapshot")
     if (
@@ -278,9 +288,12 @@ def resolve_handoff(
             "UPDATE leases SET status = 'closed', closed_at = ? WHERE lease_id = ?",
             (resolved_at, snapshot["source_lease_id"]),
         )
+        source_state = (
+            "failed" if snapshot["reason_code"] == "failure_recovery" else "suspended"
+        )
         store.connection.execute(
-            "UPDATE activations SET state = 'suspended', ended_at = ? WHERE activation_id = ?",
-            (resolved_at, snapshot["source_activation_id"]),
+            "UPDATE activations SET state = ?, ended_at = ? WHERE activation_id = ?",
+            (source_state, resolved_at, snapshot["source_activation_id"]),
         )
         store.connection.execute(
             "UPDATE activations SET state = 'active', revision_id = ? WHERE activation_id = ?",
@@ -323,3 +336,45 @@ def resolve_handoff(
             ),
         )
     return result
+
+
+def validate_recovery_context(context: dict[str, Any] | None) -> None:
+    if not isinstance(context, dict):
+        raise HandoffError("failure recovery requires structured recovery context")
+    if set(context) != {
+        "initiator",
+        "failure_kind",
+        "observed_at",
+        "evidence_refs",
+        "target_assignment_ref",
+    }:
+        raise HandoffError("recovery context fields are invalid")
+    initiator = context["initiator"]
+    if (
+        not isinstance(initiator, dict)
+        or set(initiator) != {"kind", "ref"}
+        or initiator["kind"] != "operator"
+        or not valid_id(initiator["ref"])
+    ):
+        raise HandoffError("failure recovery must be initiated by the operator")
+    if context["failure_kind"] != "activation_unavailable":
+        raise HandoffError("unsupported recovery failure kind")
+    observed_at = context["observed_at"]
+    if not isinstance(observed_at, str) or not observed_at.endswith("Z"):
+        raise HandoffError("recovery observation time is required")
+    try:
+        parsed_observed_at = datetime.fromisoformat(observed_at.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise HandoffError("recovery observation time must be UTC RFC 3339") from exc
+    if parsed_observed_at.tzinfo != UTC:
+        raise HandoffError("recovery observation time must be UTC RFC 3339")
+    evidence_refs = context["evidence_refs"]
+    if (
+        not isinstance(evidence_refs, list)
+        or not evidence_refs
+        or any(not valid_id(item) for item in evidence_refs)
+        or len(evidence_refs) != len(set(evidence_refs))
+    ):
+        raise HandoffError("failure recovery requires unique evidence references")
+    if not valid_id(context["target_assignment_ref"]):
+        raise HandoffError("failure recovery requires a target assignment reference")

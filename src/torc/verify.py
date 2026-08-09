@@ -8,6 +8,8 @@ from pathlib import Path
 from typing import Any
 
 from .canonical import record_hash_is_valid
+from .errors import HandoffError, NotFoundError
+from .handoffs import validate_recovery_context
 from .store import Store
 
 
@@ -223,6 +225,16 @@ def _verify_immutable_records(
                 snapshot["handoff_id"],
                 snapshot["projection_id"],
             )
+        if snapshot["reason_code"] == "failure_recovery":
+            try:
+                validate_recovery_context(snapshot.get("recovery_context"))
+            except HandoffError as exc:
+                _error(
+                    errors,
+                    "recovery_context_invalid",
+                    snapshot["handoff_id"],
+                    str(exc),
+                )
 
     results = store.list_hashed_records("handoff_results", lineage_id)
     for result in results:
@@ -272,6 +284,39 @@ def _verify_immutable_records(
                     result["handoff_result_id"],
                     "accepted result has no matching transition",
                 )
+            if snapshot["reason_code"] == "failure_recovery":
+                source_lease = store.connection.execute(
+                    "SELECT status, closed_at FROM leases WHERE lease_id = ?",
+                    (snapshot["source_lease_id"],),
+                ).fetchone()
+                if (
+                    source_lease is None
+                    or source_lease["status"] != "closed"
+                    or source_lease["closed_at"] is None
+                ):
+                    _error(
+                        errors,
+                        "recovery_source_lease_not_closed",
+                        result["handoff_result_id"],
+                        snapshot["source_lease_id"],
+                    )
+                try:
+                    source_activation = store.get_activation(
+                        snapshot["source_activation_id"]
+                    )
+                except NotFoundError:
+                    source_activation = None
+                if (
+                    source_activation is None
+                    or source_activation["state"] != "failed"
+                    or source_activation["ended_at"] is None
+                ):
+                    _error(
+                        errors,
+                        "recovery_source_activation_not_failed",
+                        result["handoff_result_id"],
+                        snapshot["source_activation_id"],
+                    )
         elif result.get("resulting_authority") is not None:
             _error(
                 errors,
