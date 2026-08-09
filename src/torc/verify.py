@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import hashlib
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from .canonical import record_hash_is_valid
-from .errors import HandoffError, NotFoundError
+from .canonical import canonical_json, record_hash_is_valid
+from .errors import HandoffError, NotFoundError, TorcError
 from .handoffs import validate_recovery_context
+from .rollbacks import validate_rollback_context
 from .store import Store
 
 
@@ -92,6 +94,17 @@ def _verify_lineage(
                 "revision_chain_hash_mismatch",
                 record_id,
                 "previous revision hash does not match parent",
+            )
+        if revision["event_type"] == "rollback_applied":
+            _verify_rollback_revision(
+                store, lineage_id, revision, index, revisions, by_id, errors
+            )
+        elif revision.get("rollback_context") is not None:
+            _error(
+                errors,
+                "unexpected_rollback_context",
+                record_id,
+                "only rollback_applied revisions may carry rollback context",
             )
     if not revisions or lineage["head_revision_id"] != revisions[-1]["revision_id"]:
         _error(
@@ -324,6 +337,103 @@ def _verify_immutable_records(
                 result["handoff_result_id"],
                 "rejected result cannot transfer authority",
             )
+
+
+def _verify_rollback_revision(
+    store: Store,
+    lineage_id: str,
+    revision: dict[str, Any],
+    index: int,
+    revisions: list[dict[str, Any]],
+    by_id: dict[str, dict[str, Any]],
+    errors: list[dict[str, str]],
+) -> None:
+    record_id = revision["revision_id"]
+    try:
+        validate_rollback_context(revision.get("rollback_context"))
+    except TorcError as exc:
+        _error(errors, "rollback_context_invalid", record_id, str(exc))
+        return
+    context = revision["rollback_context"]
+    parent_id = revision["parent_revision_ids"][0] if index else None
+    if context["source_authority"]["lineage_head_revision_id"] != parent_id:
+        _error(errors, "rollback_source_head_mismatch", record_id, str(parent_id))
+    target_id = context["target_revision_id"]
+    target = by_id.get(target_id)
+    if target is None:
+        _error(errors, "rollback_target_missing", record_id, target_id)
+        return
+    target_index = next(
+        item_index
+        for item_index, item in enumerate(revisions)
+        if item["revision_id"] == target_id
+    )
+    if target_index >= index - 1:
+        _error(errors, "rollback_target_not_strict_ancestor", record_id, target_id)
+    if (
+        context["target_revision_sha256"]
+        != target["integrity"]["canonical_payload_sha256"]
+    ):
+        _error(errors, "rollback_target_hash_mismatch", record_id, target_id)
+    if canonical_json(revision["canonical_state"]) != canonical_json(
+        target["canonical_state"]
+    ):
+        _error(errors, "rollback_state_mismatch", record_id, target_id)
+    expected_evidence = [
+        target_id,
+        context["initiated_by"]["ref"],
+        *context["evidence_refs"],
+    ]
+    if revision["evidence_refs"] != expected_evidence:
+        _error(errors, "rollback_evidence_mismatch", record_id, "context differs")
+    source_authority = context["source_authority"]
+    if (
+        revision["actor"]["kind"] != "activation"
+        or revision["actor"]["activation_id"] != source_authority["activation_id"]
+    ):
+        _error(errors, "rollback_actor_mismatch", record_id, source_authority["activation_id"])
+    try:
+        activation = store.get_activation(source_authority["activation_id"])
+    except NotFoundError:
+        activation = None
+    if (
+        activation is None
+        or activation["lineage_id"] != lineage_id
+        or activation["substrate_id"] != revision["actor"]["substrate_id"]
+    ):
+        _error(
+            errors,
+            "rollback_activation_mismatch",
+            record_id,
+            source_authority["activation_id"],
+        )
+    lease = store.connection.execute(
+        """SELECT lineage_id, activation_id, issued_at, closed_at
+           FROM leases WHERE lease_id = ?""",
+        (source_authority["lease_id"],),
+    ).fetchone()
+    created_at = datetime.fromisoformat(revision["created_at"].replace("Z", "+00:00"))
+    if (
+        lease is None
+        or lease["lineage_id"] != lineage_id
+        or lease["activation_id"] != source_authority["activation_id"]
+        or datetime.fromisoformat(lease["issued_at"].replace("Z", "+00:00"))
+        > created_at
+        or (
+            lease["closed_at"] is not None
+            and datetime.fromisoformat(lease["closed_at"].replace("Z", "+00:00"))
+            < created_at
+        )
+    ):
+        _error(
+            errors, "rollback_lease_mismatch", record_id, source_authority["lease_id"]
+        )
+    transition = store.connection.execute(
+        "SELECT 1 FROM authority_transitions WHERE resulting_revision_id = ?",
+        (record_id,),
+    ).fetchone()
+    if transition is not None:
+        _error(errors, "rollback_has_authority_transition", record_id, "unexpected")
 
 
 def _error(

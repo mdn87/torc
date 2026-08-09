@@ -39,6 +39,7 @@ from .operator import (
     prepare_operator_recovery,
     resolve_operator_handoff,
     resolve_operator_recovery,
+    rollback_operator_lineage,
 )
 from .store import Store
 from .verify import verify_store
@@ -147,6 +148,18 @@ def build_parser() -> argparse.ArgumentParser:
     lineage_status.add_argument("--state-dir", type=Path, required=True)
     lineage_status.add_argument("--lineage", required=True)
     lineage_status.add_argument("--json", action="store_true", dest="as_json")
+    lineage_rollback = lineage_commands.add_parser("rollback")
+    lineage_rollback.add_argument("--state-dir", type=Path, required=True)
+    lineage_rollback.add_argument("--lineage", required=True)
+    lineage_rollback.add_argument("--activation", required=True)
+    lineage_rollback.add_argument("--expected-head", required=True)
+    lineage_rollback.add_argument("--target-revision", required=True)
+    lineage_rollback.add_argument("--operator-ref", required=True)
+    lineage_rollback.add_argument("--rationale", required=True)
+    lineage_rollback.add_argument(
+        "--evidence-ref", action="append", required=True, dest="evidence_refs"
+    )
+    lineage_rollback.add_argument("--json", action="store_true", dest="as_json")
 
     handoff = subparsers.add_parser(
         "handoff", help="Prepare or resolve an acceptance-gated lineage handoff."
@@ -605,6 +618,17 @@ def main(argv: Sequence[str] | None = None) -> int:
                     )
                 elif args.lineage_command == "status":
                     payload = operator_lineage_status(store, args.lineage)
+                elif args.lineage_command == "rollback":
+                    payload = rollback_operator_lineage(
+                        store,
+                        lineage_id=args.lineage,
+                        activation_id=args.activation,
+                        expected_head_revision_id=args.expected_head,
+                        target_revision_id=args.target_revision,
+                        operator_ref=args.operator_ref,
+                        rationale=args.rationale,
+                        evidence_refs=args.evidence_refs,
+                    )
                 else:
                     parser.error(f"Unsupported lineage command: {args.lineage_command}")
             _print_payload(payload, args.as_json)

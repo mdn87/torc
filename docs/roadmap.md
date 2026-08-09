@@ -67,14 +67,14 @@ Gate: no duplicate ownership and no authority bypass.
 
 ## P3: succession and recovery
 
-Status: in progress. The bounded operator-initiated failure-recovery path is
-implemented without a daemon or schema migration. Rollback and new-lineage
-branching remain; model or harness succession now uses the ordinary handoff path
-when the source is available and recovery when it is not.
+Status: in progress. Bounded operator-initiated failure recovery and explicit
+append-only rollback are implemented without a daemon or database migration.
+New-lineage branch creation remains; model or harness succession uses the
+ordinary handoff path when the source is available and recovery when it is not.
 
 - Failure recovery (bounded operator-declared slice complete)
 - Model or harness succession (covered by handoff plus recovery semantics)
-- Explicit rollback
+- Explicit rollback (bounded append-only restore slice complete)
 - Branch creation with new lineage identity
 
 Automatic merge remains deferred.

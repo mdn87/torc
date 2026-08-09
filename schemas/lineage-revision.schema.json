@@ -35,6 +35,7 @@
         "handoff_prepared",
         "handoff_accepted",
         "handoff_rejected",
+        "rollback_applied",
         "branch_created",
         "lineage_retired"
       ]
@@ -80,8 +81,47 @@
       "uniqueItems": true,
       "items": {"$ref": "#/$defs/id"}
     },
+    "rollback_context": {
+      "anyOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["target_revision_id", "target_revision_sha256", "rationale", "initiated_by", "evidence_refs", "source_authority"],
+          "properties": {
+            "target_revision_id": {"$ref": "#/$defs/id"},
+            "target_revision_sha256": {"$ref": "#/$defs/sha256"},
+            "rationale": {"type": "string", "minLength": 1},
+            "initiated_by": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["kind", "ref"],
+              "properties": {"kind": {"const": "operator"}, "ref": {"$ref": "#/$defs/id"}}
+            },
+            "evidence_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+            "source_authority": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["lineage_head_revision_id", "activation_id", "lease_id"],
+              "properties": {
+                "lineage_head_revision_id": {"$ref": "#/$defs/id"},
+                "activation_id": {"$ref": "#/$defs/id"},
+                "lease_id": {"$ref": "#/$defs/id"}
+              }
+            }
+          }
+        }
+      ]
+    },
     "integrity": {"$ref": "#/$defs/integrity"}
   },
+  "allOf": [
+    {
+      "if": {"properties": {"event_type": {"const": "rollback_applied"}}, "required": ["event_type"]},
+      "then": {"required": ["rollback_context"], "properties": {"rollback_context": {"type": "object"}}},
+      "else": {"properties": {"rollback_context": {"type": "null"}}}
+    }
+  ],
   "$defs": {
     "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
     "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
