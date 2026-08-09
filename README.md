@@ -81,6 +81,12 @@ P3 now also supports atomic creation of a new, independently authoritative
 lineage whose immutable root pins and copies the current source head without
 changing source authority. See `docs/p3-branch.md`.
 
+P4 adds a read-only operator explanation contract. `torc lineage explain`
+derives the current bearer, every authority change, handoff and fit rationale,
+and rollback or branch context from one verified SQLite snapshot. The report is
+explicitly non-canonical and fails closed instead of explaining invalid
+provenance. See `docs/p4-visibility.md`.
+
 ## Baseline setup
 
 ```powershell
@@ -91,6 +97,7 @@ python -m pytest
 python -m torc doctor --json
 python -m torc demo --state-dir .torc/demo --json
 python -m torc inspect --state-dir .torc/demo --lineage demo-lineage --json
+python -m torc lineage explain --state-dir .torc/demo --lineage demo-lineage --json
 python -m torc verify --state-dir .torc/demo --lineage demo-lineage --json
 ```
 
@@ -104,6 +111,7 @@ python -m pytest
 python -m torc doctor --json
 python -m torc demo --state-dir .torc/demo --json
 python -m torc inspect --state-dir .torc/demo --lineage demo-lineage --json
+python -m torc lineage explain --state-dir .torc/demo --lineage demo-lineage --json
 python -m torc verify --state-dir .torc/demo --lineage demo-lineage --json
 ```
 
@@ -133,4 +141,6 @@ exports seven immutable JSON artifacts under `.torc/demo/artifacts/`.
 - `docs/p3-rollback-scope-envelope.json` - rollback authority and budgets
 - `docs/p3-branch.md` - new-lineage branch creation and provenance
 - `docs/p3-branch-scope-envelope.json` - branch-creation authority and budgets
+- `docs/p4-visibility.md` - read-only authority and continuity explanation contract
+- `docs/p4-visibility-scope-envelope.json` - bounded P4 visibility authority and budgets
 - `docs/prompts/CODEX_BOOTSTRAP_PROMPT.md` - implementation task for Codex

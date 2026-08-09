@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lugos.local/torc/schemas/operator-view-v1.json",
+  "title": "TORC derived lineage explanation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "report_kind", "derived", "canonical", "trusted",
+    "lineage", "current_authority", "authority_changes", "handoffs",
+    "fit_decisions", "continuity_events", "relationships", "verification",
+    "explanation_complete", "warnings"
+  ],
+  "properties": {
+    "schema_version": {"const": 1}, "report_kind": {"const": "lineage_explanation"},
+    "derived": {"const": true}, "canonical": {"const": false},
+    "trusted": {"type": "boolean"},
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lineage_id", "status", "head"],
+      "properties": {
+        "lineage_id": {"$ref": "#/$defs/id"}, "status": {"enum": ["active", "retired"]},
+        "head": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["revision_id", "event_type", "created_at"],
+          "properties": {
+            "revision_id": {"$ref": "#/$defs/id"}, "event_type": {"type": "string", "minLength": 1},
+            "created_at": {"type": "string", "format": "date-time"}
+          }
+        }
+      }
+    },
+    "current_authority": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/current_authority"}]},
+    "authority_changes": {"type": "array", "items": {"$ref": "#/$defs/authority_change"}},
+    "handoffs": {"type": "array", "items": {"$ref": "#/$defs/handoff"}}, "fit_decisions": {"type": "array", "items": {"$ref": "#/$defs/fit"}},
+    "continuity_events": {"type": "array", "items": {"$ref": "#/$defs/continuity_event"}},
+    "relationships": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["branch_origin", "child_lineages"],
+      "properties": {
+        "branch_origin": {"type": ["object", "null"]}, "child_lineages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["lineage_id", "root_revision_id", "source_revision_id"],
+            "properties": {
+              "lineage_id": {"$ref": "#/$defs/id"}, "root_revision_id": {"$ref": "#/$defs/id"},
+              "source_revision_id": {"$ref": "#/$defs/id"}
+            }
+          }
+        }
+      }
+    },
+    "verification": {"$ref": "#/$defs/verification"}, "explanation_complete": {"type": "boolean"},
+    "warnings": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  },
+  "allOf": [{
+    "if": {"properties": {"trusted": {"const": true}}, "required": ["trusted"]},
+    "then": {"properties": {
+        "current_authority": {"$ref": "#/$defs/current_authority"},
+        "explanation_complete": {"const": true},
+        "verification": {"properties": {"valid": {"const": true}}}
+    }},
+    "else": {"properties": {
+        "current_authority": {"type": "null"},
+        "authority_changes": {"maxItems": 0},
+        "handoffs": {"maxItems": 0},
+        "fit_decisions": {"maxItems": 0},
+        "continuity_events": {"maxItems": 0},
+        "explanation_complete": {"const": false},
+        "warnings": {"minItems": 1}
+    }}
+  }],
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+    "authority_party": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "activation_id", "activation_current_state", "substrate_id", "substrate_label",
+        "lease_id", "lease_current_status"
+      ],
+      "properties": {
+        "activation_id": {"$ref": "#/$defs/id"}, "activation_current_state": {"type": "string", "minLength": 1},
+        "substrate_id": {"$ref": "#/$defs/id"}, "substrate_label": {"type": "string", "minLength": 1},
+        "lease_id": {"$ref": "#/$defs/id"},
+        "lease_current_status": {"enum": ["active", "closed"]}
+      }
+    },
+    "current_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "activation_id", "activation_state", "substrate_id", "substrate_label",
+        "adapter", "lease_id", "lease_status", "lease_issued_at",
+        "head_revision_id", "acquired_by_transition_id", "explanation"
+      ],
+      "properties": {
+        "activation_id": {"$ref": "#/$defs/id"}, "activation_state": {"const": "active"},
+        "substrate_id": {"$ref": "#/$defs/id"}, "substrate_label": {"type": "string", "minLength": 1},
+        "adapter": {"type": "string", "minLength": 1},
+        "lease_id": {"$ref": "#/$defs/id"}, "lease_status": {"const": "active"},
+        "lease_issued_at": {"type": "string", "format": "date-time"}, "head_revision_id": {"$ref": "#/$defs/id"},
+        "acquired_by_transition_id": {"$ref": "#/$defs/id"}, "explanation": {"type": "string", "minLength": 1}
+      }
+    },
+    "authority_change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sequence", "transition_id", "occurred_at", "kind", "from_authority",
+        "to_authority", "resulting_revision_id", "summary", "detail", "record_refs"
+      ],
+      "properties": {
+        "sequence": {"type": "integer", "minimum": 1}, "transition_id": {"$ref": "#/$defs/id"},
+        "occurred_at": {"type": "string", "format": "date-time"}, "kind": {"enum": ["lineage_created", "branch_created", "handoff", "failure_recovery"]},
+        "from_authority": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/authority_party"}]},
+        "to_authority": {"$ref": "#/$defs/authority_party"},
+        "resulting_revision_id": {"$ref": "#/$defs/id"}, "summary": {"type": "string", "minLength": 1},
+        "detail": {"type": ["object", "null"]}, "record_refs": {"type": "object"}
+      }
+    },
+    "handoff": {
+      "type": "object",
+      "required": [
+        "handoff_id", "state", "can_resolve", "reason_code", "rationale",
+        "fit", "acceptance", "authority_effect"
+      ],
+      "properties": {
+        "handoff_id": {"$ref": "#/$defs/id"}, "state": {"enum": ["pending", "stale", "accepted", "rejected"]},
+        "can_resolve": {"type": "boolean"}, "reason_code": {"type": "string", "minLength": 1},
+        "rationale": {"type": "string", "minLength": 1},
+        "fit": {"$ref": "#/$defs/fit"},
+        "acceptance": {"type": ["object", "null"]}, "authority_effect": {"type": "string", "minLength": 1}
+      }
+    },
+    "fit": {
+      "type": "object",
+      "required": [
+        "fit_decision_id", "task_phase", "requirements", "selected_substrate_id",
+        "selected_candidate", "candidates", "policy_version", "decided_at",
+        "selection_grants_execution_authority"
+      ],
+      "properties": {
+        "fit_decision_id": {"$ref": "#/$defs/id"}, "task_phase": {"type": "string", "minLength": 1},
+        "selected_substrate_id": {"anyOf": [{"$ref": "#/$defs/id"}, {"type": "null"}]},
+        "decided_at": {"type": "string", "format": "date-time"}, "selection_grants_execution_authority": {"const": false}
+      }
+    },
+    "continuity_event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "revision_id", "created_at", "event_type", "authority_changed",
+        "related_revision_id", "summary", "evidence_refs"
+      ],
+      "properties": {
+        "revision_id": {"$ref": "#/$defs/id"}, "created_at": {"type": "string", "format": "date-time"},
+        "event_type": {"type": "string", "minLength": 1}, "authority_changed": {"type": "boolean"},
+        "related_revision_id": {"anyOf": [{"$ref": "#/$defs/id"}, {"type": "null"}]},
+        "summary": {"type": "string", "minLength": 1},
+        "evidence_refs": {"type": "array", "items": {"$ref": "#/$defs/id"}}
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["valid", "schema_version", "lineages_checked", "artifacts_checked", "errors"],
+      "properties": {
+        "valid": {"type": "boolean"}, "schema_version": {"const": 1},
+        "lineages_checked": {"type": "array", "items": {"$ref": "#/$defs/id"}},
+        "artifacts_checked": {"type": "integer", "minimum": 0}, "errors": {"type": "array", "items": {"type": "object"}}
+      }
+    }
+  }
+}
