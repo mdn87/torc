@@ -175,12 +175,19 @@ class Store:
                 self.connection.execute("PRAGMA user_version = 1")
 
     @contextmanager
-    def transaction(self) -> Iterator[sqlite3.Connection]:
+    def transaction(self, *, immediate: bool = False) -> Iterator[sqlite3.Connection]:
         if self.connection.in_transaction:
             yield self.connection
             return
-        with self.connection:
+        if immediate:
+            self.connection.execute("BEGIN IMMEDIATE")
+        try:
             yield self.connection
+        except BaseException:
+            self.connection.rollback()
+            raise
+        else:
+            self.connection.commit()
 
     @staticmethod
     def _decode(row: sqlite3.Row | None, label: str) -> dict[str, Any]:

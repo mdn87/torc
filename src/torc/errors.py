@@ -21,5 +21,9 @@ class HandoffError(TorcError):
     """A handoff cannot be prepared or resolved."""
 
 
+class RollbackError(TorcError):
+    """A requested append-only rollback is invalid."""
+
+
 class NotFoundError(TorcError):
     """A requested TORC record does not exist."""

@@ -1,0 +1,31 @@
+{
+  "identity": {
+    "label": "TORC rollback verification lineage"
+  },
+  "self_model": {
+    "role": "Exercise the explicit rollback path",
+    "settled_decisions": [
+      "Rollback must append rather than rewrite history"
+    ],
+    "methods": [
+      "Require an operator-inspected expected head"
+    ]
+  },
+  "goals": [
+    "Verify canonical restoration while retaining authority"
+  ],
+  "commitments": [
+    "Preserve the complete revision chain"
+  ],
+  "constraints": [
+    "Do not undo external side effects"
+  ],
+  "open_work": [
+    "Restore the earlier accepted P2 canonical state"
+  ],
+  "uncertainties": [],
+  "artifact_refs": [
+    "artifact-p3-rollback-scope"
+  ],
+  "memory_refs": []
+}
