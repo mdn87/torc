@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "objective": "Implement operator-authorized creation of one new lineage whose immutable root copies and pins the current source revision while both lineages retain independent authoritative leases.",
+  "success_evidence": [
+    "Branch creation requires the current source activation, an exact expected source head, a new lineage and activation identity, structured operator and assignment references, and immutable evidence.",
+    "The child branch_created root has no local parent, starts a new hash chain, exactly copies the frozen source canonical state, and pins the source lineage, revision, hash, activation, and lease in branch_origin.",
+    "Source head, activation, and lease remain unchanged while the child receives one independent activation and lease in a single atomic transaction.",
+    "Duplicate identities, stale or non-authoritative source, malformed evidence, integrity tamper, and substrate conflicts fail closed without partial child records.",
+    "Verification proves cross-lineage origin and initial child authority, and both lineages can advance independently through the operator CLI."
+  ],
+  "non_goals": [
+    "Sharing one lease or lineage identity between source and child, transferring source authority, or implementing a branch as a handoff.",
+    "Customizing child canonical state during creation, automatic branch selection, merge, reconciliation, conflict resolution, or branch retirement.",
+    "Granting external filesystem, provider, harness, workflow, or tool authority beyond the separately recorded assignment reference.",
+    "Adding a database migration, branch table, daemon, watcher, network dependency, parent-repository edit, or provider integration."
+  ],
+  "accepted_threats": [
+    "The trusted local operator decides when divergent canonical work merits a new lineage; TORC records but does not independently judge that decision.",
+    "The child begins as an exact canonical copy but does not copy uncheckpointed process, model, tool, or workspace state.",
+    "The external target assignment reference is opaque and not authenticated by TORC.",
+    "Branches remain independent because automatic merge and reconciliation are explicitly deferred."
+  ],
+  "estimates": {
+    "elapsed_hours": 4,
+    "production_loc": 420,
+    "test_loc": 560,
+    "changed_files": 14,
+    "runtime_processes": 0,
+    "operator_steps": 3
+  },
+  "observed": {
+    "elapsed_hours": 0,
+    "production_loc": 0,
+    "test_loc": 0,
+    "changed_files": 1,
+    "runtime_processes": 0,
+    "operator_steps": 0
+  },
+  "vertical_slice": {
+    "status": "pending",
+    "evidence": null
+  },
+  "architecture_triggers": [],
+  "review_rounds_used": 0,
+  "scope_policy_sha256": "9707efccd8426b7b53784bc7752449f5e4a45913c141c990b6a21d8c3bb2cdae",
+  "parent_envelope_sha256": "59e5b98f8284d17f9fce297c495313b7bfaf179426126e784c0534be00d8d7a1",
+  "operator_override_id": null
+}
