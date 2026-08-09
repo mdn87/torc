@@ -77,6 +77,10 @@ P3 also includes explicit append-only rollback. An authoritative activation can
 restore a strict ancestor's canonical state into a new revision while preserving
 the full chain and retaining the same lease. See `docs/p3-rollback.md`.
 
+P3 now also supports atomic creation of a new, independently authoritative
+lineage whose immutable root pins and copies the current source head without
+changing source authority. See `docs/p3-branch.md`.
+
 ## Baseline setup
 
 ```powershell
@@ -127,4 +131,6 @@ exports seven immutable JSON artifacts under `.torc/demo/artifacts/`.
 - `docs/p3-recovery-scope-envelope.json` - failure-recovery authority and budgets
 - `docs/p3-rollback.md` - explicit append-only canonical-state restoration
 - `docs/p3-rollback-scope-envelope.json` - rollback authority and budgets
+- `docs/p3-branch.md` - new-lineage branch creation and provenance
+- `docs/p3-branch-scope-envelope.json` - branch-creation authority and budgets
 - `docs/prompts/CODEX_BOOTSTRAP_PROMPT.md` - implementation task for Codex

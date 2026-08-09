@@ -8,8 +8,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from .branches import validate_branch_origin
 from .canonical import canonical_json, record_hash_is_valid
-from .errors import HandoffError, NotFoundError, TorcError
+from .errors import BranchError, HandoffError, NotFoundError, TorcError
 from .handoffs import validate_recovery_context
 from .rollbacks import validate_rollback_context
 from .store import Store
@@ -105,6 +106,15 @@ def _verify_lineage(
                 "unexpected_rollback_context",
                 record_id,
                 "only rollback_applied revisions may carry rollback context",
+            )
+        if revision["event_type"] == "branch_created":
+            _verify_branch_revision(store, lineage_id, revision, index, errors)
+        elif revision.get("branch_origin") is not None:
+            _error(
+                errors,
+                "unexpected_branch_origin",
+                record_id,
+                "only branch_created revisions may carry branch origin",
             )
     if not revisions or lineage["head_revision_id"] != revisions[-1]["revision_id"]:
         _error(
@@ -434,6 +444,175 @@ def _verify_rollback_revision(
     ).fetchone()
     if transition is not None:
         _error(errors, "rollback_has_authority_transition", record_id, "unexpected")
+
+
+def _verify_branch_revision(
+    store: Store,
+    lineage_id: str,
+    revision: dict[str, Any],
+    index: int,
+    errors: list[dict[str, str]],
+) -> None:
+    record_id = revision["revision_id"]
+    try:
+        validate_branch_origin(revision.get("branch_origin"))
+    except BranchError as exc:
+        _error(errors, "branch_origin_invalid", record_id, str(exc))
+        return
+    origin = revision["branch_origin"]
+    created_at = datetime.fromisoformat(revision["created_at"].replace("Z", "+00:00"))
+    if index != 0 or revision["parent_revision_ids"]:
+        _error(errors, "branch_not_lineage_root", record_id, str(index))
+    if origin["source_lineage_id"] == lineage_id:
+        _error(errors, "branch_source_identity_reused", record_id, lineage_id)
+    try:
+        source_revision = store.get_revision(origin["source_revision_id"])
+    except NotFoundError:
+        source_revision = None
+    if source_revision is None or source_revision["lineage_id"] != origin[
+        "source_lineage_id"
+    ]:
+        _error(
+            errors, "branch_source_revision_missing", record_id, origin["source_revision_id"]
+        )
+        return
+    if not record_hash_is_valid(source_revision):
+        _error(errors, "branch_source_integrity_invalid", record_id, origin["source_revision_id"])
+    source_revisions = store.lineage_revisions(origin["source_lineage_id"])
+    source_index = next(
+        item_index
+        for item_index, item in enumerate(source_revisions)
+        if item["revision_id"] == origin["source_revision_id"]
+    )
+    source_created_at = datetime.fromisoformat(
+        source_revision["created_at"].replace("Z", "+00:00")
+    )
+    later_before_branch = any(
+        datetime.fromisoformat(item["created_at"].replace("Z", "+00:00"))
+        <= created_at
+        for item in source_revisions[source_index + 1 :]
+    )
+    if source_created_at > created_at or later_before_branch:
+        _error(
+            errors,
+            "branch_source_not_head_at_creation",
+            record_id,
+            origin["source_revision_id"],
+        )
+    if origin["source_revision_sha256"] != source_revision["integrity"][
+        "canonical_payload_sha256"
+    ]:
+        _error(errors, "branch_source_hash_mismatch", record_id, origin["source_revision_id"])
+    if canonical_json(revision["canonical_state"]) != canonical_json(
+        source_revision["canonical_state"]
+    ):
+        _error(errors, "branch_state_mismatch", record_id, origin["source_revision_id"])
+    expected_evidence = [
+        origin["source_revision_id"],
+        origin["initiated_by"]["ref"],
+        origin["target_assignment_ref"],
+        *origin["evidence_refs"],
+    ]
+    if revision["evidence_refs"] != expected_evidence:
+        _error(errors, "branch_evidence_mismatch", record_id, "context differs")
+    try:
+        source_activation = store.get_activation(origin["source_activation_id"])
+    except NotFoundError:
+        source_activation = None
+    actor = revision["actor"]
+    if (
+        not _activation_matches_at(
+            source_activation,
+            origin["source_lineage_id"],
+            actor["substrate_id"],
+            created_at,
+        )
+        or actor["kind"] != "activation"
+        or actor["activation_id"] != origin["source_activation_id"]
+    ):
+        _error(errors, "branch_source_activation_mismatch", record_id, actor["kind"])
+    source_lease = store.connection.execute(
+        "SELECT * FROM leases WHERE lease_id = ?", (origin["source_lease_id"],)
+    ).fetchone()
+    if not _lease_matches_at(
+        source_lease,
+        origin["source_lineage_id"],
+        origin["source_activation_id"],
+        created_at,
+    ):
+        _error(errors, "branch_source_lease_mismatch", record_id, origin["source_lease_id"])
+    child = origin["child_authority"]
+    try:
+        child_activation = store.get_activation(child["activation_id"])
+    except NotFoundError:
+        child_activation = None
+    child_lease = store.connection.execute(
+        "SELECT * FROM leases WHERE lease_id = ?", (child["lease_id"],)
+    ).fetchone()
+    if (
+        not _activation_matches_at(
+            child_activation, lineage_id, child["substrate_id"], created_at
+        )
+        or not _lease_matches_at(
+            child_lease, lineage_id, child["activation_id"], created_at
+        )
+    ):
+        _error(errors, "branch_child_authority_mismatch", record_id, child["activation_id"])
+    transition_count = store.connection.execute(
+        """SELECT COUNT(*) FROM authority_transitions
+           WHERE lineage_id = ? AND from_activation_id IS NULL
+             AND from_lease_id IS NULL AND to_activation_id = ?
+             AND to_lease_id = ? AND resulting_revision_id = ?
+             AND handoff_id IS NULL AND handoff_result_id IS NULL
+             AND occurred_at = ?""",
+        (
+            lineage_id,
+            child["activation_id"],
+            child["lease_id"],
+            record_id,
+            revision["created_at"],
+        ),
+    ).fetchone()[0]
+    if transition_count != 1:
+        _error(errors, "branch_initial_transition_missing", record_id, child["lease_id"])
+
+
+def _activation_matches_at(
+    activation: Any, lineage_id: str, substrate_id: str, occurred_at: datetime
+) -> bool:
+    if activation is None:
+        return False
+    started_at = datetime.fromisoformat(activation["started_at"].replace("Z", "+00:00"))
+    ended_at = (
+        datetime.fromisoformat(activation["ended_at"].replace("Z", "+00:00"))
+        if activation["ended_at"] is not None
+        else None
+    )
+    return (
+        activation["lineage_id"] == lineage_id
+        and activation["substrate_id"] == substrate_id
+        and started_at <= occurred_at
+        and (ended_at is None or ended_at >= occurred_at)
+    )
+
+
+def _lease_matches_at(
+    lease: Any, lineage_id: str, activation_id: str, occurred_at: datetime
+) -> bool:
+    if lease is None:
+        return False
+    issued_at = datetime.fromisoformat(lease["issued_at"].replace("Z", "+00:00"))
+    closed_at = (
+        datetime.fromisoformat(lease["closed_at"].replace("Z", "+00:00"))
+        if lease["closed_at"] is not None
+        else None
+    )
+    return (
+        lease["lineage_id"] == lineage_id
+        and lease["activation_id"] == activation_id
+        and issued_at <= occurred_at
+        and (closed_at is None or closed_at >= occurred_at)
+    )
 
 
 def _error(
