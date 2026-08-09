@@ -67,10 +67,13 @@ Gate: no duplicate ownership and no authority bypass.
 
 ## P3: succession and recovery
 
-Status: next roadmap phase. P2 requires no further validation before this work.
+Status: in progress. The bounded operator-initiated failure-recovery path is
+implemented without a daemon or schema migration. Rollback and new-lineage
+branching remain; model or harness succession now uses the ordinary handoff path
+when the source is available and recovery when it is not.
 
-- Failure recovery
-- Model or harness succession
+- Failure recovery (bounded operator-declared slice complete)
+- Model or harness succession (covered by handoff plus recovery semantics)
 - Explicit rollback
 - Branch creation with new lineage identity
 

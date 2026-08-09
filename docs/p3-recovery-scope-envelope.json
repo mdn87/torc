@@ -29,19 +29,25 @@
     "operator_steps": 4
   },
   "observed": {
-    "elapsed_hours": 0,
-    "production_loc": 0,
-    "test_loc": 0,
-    "changed_files": 1,
+    "elapsed_hours": 0.5,
+    "production_loc": 331,
+    "test_loc": 448,
+    "changed_files": 13,
     "runtime_processes": 0,
-    "operator_steps": 0
+    "operator_steps": 4
   },
   "vertical_slice": {
-    "status": "pending",
-    "evidence": null
+    "status": "proven_local",
+    "evidence": {
+      "test_command": "python -m pytest -q",
+      "doctor_command": "python -m torc doctor --json",
+      "demo_command": "python -m torc demo --state-dir <temporary-directory> --json",
+      "recovery_commands": "lineage create; recovery prepare; recovery resolve; verify",
+      "result": "The bound replacement accepted the frozen last verified head, the source activation became failed, exactly one replacement lease became authoritative, and verification reported no errors."
+    }
   },
   "architecture_triggers": [],
-  "review_rounds_used": 0,
+  "review_rounds_used": 1,
   "scope_policy_sha256": "9707efccd8426b7b53784bc7752449f5e4a45913c141c990b6a21d8c3bb2cdae",
   "parent_envelope_sha256": "5af40d625ccd12fe48f38f76b1ea347a0a08db5fea1b25a2945d97ca7eb50574",
   "operator_override_id": null

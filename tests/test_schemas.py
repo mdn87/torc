@@ -52,3 +52,34 @@ def test_score_report_example_pins_canonical_score_core() -> None:
         (ROOT / "examples" / "score-report.example.json").read_text(encoding="utf-8")
     )
     assert report["score_core_sha256"] == payload_sha256(report["score_core"])
+
+
+def test_handoff_schema_requires_context_only_for_failure_recovery() -> None:
+    schema = json.loads(
+        (ROOT / "schemas" / "handoff-snapshot.schema.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    example = json.loads(
+        (ROOT / "examples" / "handoff-snapshot.example.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    validator = Draft202012Validator(schema)
+
+    recovery = dict(example)
+    recovery["reason_code"] = "failure_recovery"
+    assert list(validator.iter_errors(recovery))
+
+    recovery["recovery_context"] = {
+        "initiator": {"kind": "operator", "ref": "operator-decision-001"},
+        "failure_kind": "activation_unavailable",
+        "observed_at": "2026-08-08T20:00:00Z",
+        "evidence_refs": ["process-probe-001"],
+        "target_assignment_ref": "assignment-recovery-001",
+    }
+    validator.validate(recovery)
+
+    ordinary = dict(example)
+    ordinary["recovery_context"] = recovery["recovery_context"]
+    assert list(validator.iter_errors(ordinary))
