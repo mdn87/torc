@@ -31,6 +31,7 @@ from .experiment_runs import (
 )
 from .experiment_scoring import score_run
 from .operator import (
+    branch_operator_lineage,
     checkpoint_operator_lineage,
     create_operator_lineage,
     load_json_object,
@@ -85,7 +86,8 @@ def _doctor_payload() -> dict[str, object]:
         "project": "torc",
         "version": __version__,
         "status": "p0_ready" if not missing else "incomplete",
-        "implementation_status": "p0_lineage_handoff_implemented",
+        "implementation_status": "p3_succession_recovery_implemented",
+        "roadmap_phase": "p3_complete",
         "repository_root": str(root) if root is not None else None,
         "missing_required_paths": missing,
         "handoff_reason_codes": list(HANDOFF_REASON_CODES),
@@ -160,6 +162,21 @@ def build_parser() -> argparse.ArgumentParser:
         "--evidence-ref", action="append", required=True, dest="evidence_refs"
     )
     lineage_rollback.add_argument("--json", action="store_true", dest="as_json")
+    lineage_branch = lineage_commands.add_parser("branch")
+    lineage_branch.add_argument("--state-dir", type=Path, required=True)
+    lineage_branch.add_argument("--source-lineage", required=True)
+    lineage_branch.add_argument("--source-activation", required=True)
+    lineage_branch.add_argument("--expected-head", required=True)
+    lineage_branch.add_argument("--child-lineage", required=True)
+    lineage_branch.add_argument("--child-activation", required=True)
+    lineage_branch.add_argument("--substrate-file", type=Path, required=True)
+    lineage_branch.add_argument("--operator-ref", required=True)
+    lineage_branch.add_argument("--target-assignment-ref", required=True)
+    lineage_branch.add_argument("--rationale", required=True)
+    lineage_branch.add_argument(
+        "--evidence-ref", action="append", required=True, dest="evidence_refs"
+    )
+    lineage_branch.add_argument("--json", action="store_true", dest="as_json")
 
     handoff = subparsers.add_parser(
         "handoff", help="Prepare or resolve an acceptance-gated lineage handoff."
@@ -626,6 +643,20 @@ def main(argv: Sequence[str] | None = None) -> int:
                         expected_head_revision_id=args.expected_head,
                         target_revision_id=args.target_revision,
                         operator_ref=args.operator_ref,
+                        rationale=args.rationale,
+                        evidence_refs=args.evidence_refs,
+                    )
+                elif args.lineage_command == "branch":
+                    payload = branch_operator_lineage(
+                        store,
+                        source_lineage_id=args.source_lineage,
+                        source_activation_id=args.source_activation,
+                        expected_source_revision_id=args.expected_head,
+                        child_lineage_id=args.child_lineage,
+                        child_activation_id=args.child_activation,
+                        child_substrate=load_json_object(args.substrate_file),
+                        operator_ref=args.operator_ref,
+                        target_assignment_ref=args.target_assignment_ref,
                         rationale=args.rationale,
                         evidence_refs=args.evidence_refs,
                     )

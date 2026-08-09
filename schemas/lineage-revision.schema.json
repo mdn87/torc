@@ -113,6 +113,33 @@
         }
       ]
     },
+    "branch_origin": {
+      "anyOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source_lineage_id", "source_revision_id", "source_revision_sha256", "source_activation_id", "source_lease_id", "rationale", "initiated_by", "target_assignment_ref", "evidence_refs", "child_authority"],
+          "properties": {
+            "source_lineage_id": {"$ref": "#/$defs/id"},
+            "source_revision_id": {"$ref": "#/$defs/id"},
+            "source_revision_sha256": {"$ref": "#/$defs/sha256"},
+            "source_activation_id": {"$ref": "#/$defs/id"},
+            "source_lease_id": {"$ref": "#/$defs/id"},
+            "rationale": {"type": "string", "minLength": 1},
+            "initiated_by": {"type": "object", "additionalProperties": false, "required": ["kind", "ref"], "properties": {"kind": {"const": "operator"}, "ref": {"$ref": "#/$defs/id"}}},
+            "target_assignment_ref": {"$ref": "#/$defs/id"},
+            "evidence_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+            "child_authority": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["activation_id", "lease_id", "substrate_id"],
+              "properties": {"activation_id": {"$ref": "#/$defs/id"}, "lease_id": {"$ref": "#/$defs/id"}, "substrate_id": {"$ref": "#/$defs/id"}}
+            }
+          }
+        }
+      ]
+    },
     "integrity": {"$ref": "#/$defs/integrity"}
   },
   "allOf": [
@@ -120,6 +147,11 @@
       "if": {"properties": {"event_type": {"const": "rollback_applied"}}, "required": ["event_type"]},
       "then": {"required": ["rollback_context"], "properties": {"rollback_context": {"type": "object"}}},
       "else": {"properties": {"rollback_context": {"type": "null"}}}
+    },
+    {
+      "if": {"properties": {"event_type": {"const": "branch_created"}}, "required": ["event_type"]},
+      "then": {"required": ["branch_origin"], "properties": {"branch_origin": {"type": "object"}}},
+      "else": {"properties": {"branch_origin": {"type": "null"}}}
     }
   ],
   "$defs": {

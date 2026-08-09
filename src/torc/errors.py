@@ -25,5 +25,9 @@ class RollbackError(TorcError):
     """A requested append-only rollback is invalid."""
 
 
+class BranchError(TorcError):
+    """A requested new lineage branch is invalid."""
+
+
 class NotFoundError(TorcError):
     """A requested TORC record does not exist."""
