@@ -73,6 +73,10 @@ evidence and an assigned replacement without prematurely moving authority,
 preserves the old lease on rejection, and atomically marks the old activation
 failed when the bound replacement is accepted. See `docs/p3-recovery.md`.
 
+P3 also includes explicit append-only rollback. An authoritative activation can
+restore a strict ancestor's canonical state into a new revision while preserving
+the full chain and retaining the same lease. See `docs/p3-rollback.md`.
+
 ## Baseline setup
 
 ```powershell
@@ -121,4 +125,6 @@ exports seven immutable JSON artifacts under `.torc/demo/artifacts/`.
 - `docs/p2-pilot-scope-envelope.json` - bounded P2 pilot authority and budgets
 - `docs/p3-recovery.md` - bounded operator-initiated failure-recovery workflow
 - `docs/p3-recovery-scope-envelope.json` - failure-recovery authority and budgets
+- `docs/p3-rollback.md` - explicit append-only canonical-state restoration
+- `docs/p3-rollback-scope-envelope.json` - rollback authority and budgets
 - `docs/prompts/CODEX_BOOTSTRAP_PROMPT.md` - implementation task for Codex

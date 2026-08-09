@@ -26,22 +26,26 @@
     "test_loc": 360,
     "changed_files": 11,
     "runtime_processes": 0,
-    "operator_steps": 2
+    "operator_steps": 3
   },
   "observed": {
-    "elapsed_hours": 0,
-    "production_loc": 0,
-    "test_loc": 0,
-    "changed_files": 1,
+    "elapsed_hours": 0.5,
+    "production_loc": 412,
+    "test_loc": 539,
+    "changed_files": 14,
     "runtime_processes": 0,
-    "operator_steps": 0
+    "operator_steps": 3
   },
   "vertical_slice": {
-    "status": "pending",
-    "evidence": null
+    "status": "proven_local",
+    "evidence": {
+      "test_command": "python -m pytest -q",
+      "rollback_commands": "lineage create; lineage checkpoint; lineage rollback; lineage status; verify",
+      "result": "Rollback appended an exact earlier canonical state, preserved all revisions, retained the same activation and lease without an authority transition, and verified cleanly."
+    }
   },
   "architecture_triggers": [],
-  "review_rounds_used": 0,
+    "review_rounds_used": 2,
   "scope_policy_sha256": "9707efccd8426b7b53784bc7752449f5e4a45913c141c990b6a21d8c3bb2cdae",
   "parent_envelope_sha256": "9e1322d0453097d6b45178f27860e1bdeab75ff694ba4a404e7f7a995e4382e8",
   "operator_override_id": null

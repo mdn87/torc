@@ -83,3 +83,33 @@ def test_handoff_schema_requires_context_only_for_failure_recovery() -> None:
     ordinary = dict(example)
     ordinary["recovery_context"] = recovery["recovery_context"]
     assert list(validator.iter_errors(ordinary))
+
+
+def test_revision_schema_requires_context_only_for_rollback() -> None:
+    schema = json.loads((ROOT / "schemas" / "lineage-revision.schema.json").read_text(
+        encoding="utf-8"))
+    example = json.loads((ROOT / "examples" / "lineage-revision.example.json").read_text(
+        encoding="utf-8"))
+    validator = Draft202012Validator(schema)
+
+    rollback = dict(example)
+    rollback["event_type"] = "rollback_applied"
+    assert list(validator.iter_errors(rollback))
+
+    rollback["rollback_context"] = {
+        "target_revision_id": "revision-earlier",
+        "target_revision_sha256": "a" * 64,
+        "rationale": "Restore the accepted state.",
+        "initiated_by": {"kind": "operator", "ref": "operator-decision"},
+        "evidence_refs": ["review-finding"],
+        "source_authority": {
+            "lineage_head_revision_id": "revision-current",
+            "activation_id": "activation-current",
+            "lease_id": "lease-current",
+        },
+    }
+    validator.validate(rollback)
+
+    ordinary = dict(example)
+    ordinary["rollback_context"] = rollback["rollback_context"]
+    assert list(validator.iter_errors(ordinary))
