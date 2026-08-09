@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "objective": "Provide one read-only operator explanation contract that derives current authority, every authority change, pending handoffs, fit rationale, rollback context, and branch origin from verified TORC records without exposing raw database tables.",
+  "success_evidence": [
+    "The CLI explains the current lineage head, activation, substrate, and lease and classifies every authority transition as initial acquisition, branch acquisition, accepted handoff, or accepted failure recovery.",
+    "Accepted, rejected, pending, and stale handoffs show their authority effect, reason, fit selection evidence, and acceptance outcome without claiming that fit or an opaque assignment reference grants execution authority.",
+    "Rollback and branch provenance are visible while rollback remains explicitly separate from authority transfer.",
+    "The derived report is deterministic, marked non-canonical, performs no writes, and refuses to assert an authority timeline when stored provenance fails verification.",
+    "The JSON contract and purpose-built text output let an operator explain every authority change without reading SQLite tables."
+  ],
+  "non_goals": [
+    "Adding a HUD, web interface, MCP server, daemon, watcher, alert, network dependency, provider call, or parent-repository integration.",
+    "Adding a database migration, durable report record, report artifact export, mutation command, repair command, or cancellation workflow.",
+    "Recalculating fit decisions, resolving opaque external assignment references, granting execution authority, or duplicating Autowork, Sulis, Bran, or agent-continuity ownership.",
+    "Implementing automatic merge, cross-host aggregation, semantic revision diffs, or an unrestricted general-purpose graph query language."
+  ],
+  "accepted_threats": [
+    "The report explains integrity-checked local records but SHA-256 evidence is not authentication or access control.",
+    "Opaque external evidence and assignment references are displayed but not independently resolved or authenticated by TORC.",
+    "A local CLI report is the P4 contract; richer HUD and MCP consumers remain separately authorized future integrations.",
+    "The first report favors complete authority explanations over pagination for the bounded local prototype."
+  ],
+  "estimates": {
+    "elapsed_hours": 4,
+    "production_loc": 500,
+    "test_loc": 650,
+    "changed_files": 12,
+    "runtime_processes": 0,
+    "operator_steps": 1
+  },
+  "observed": {
+    "elapsed_hours": 0,
+    "production_loc": 0,
+    "test_loc": 0,
+    "changed_files": 1,
+    "runtime_processes": 0,
+    "operator_steps": 1
+  },
+  "vertical_slice": {
+    "status": "pending",
+    "evidence": null
+  },
+  "architecture_triggers": [],
+  "review_rounds_used": 0,
+  "scope_policy_sha256": "9707efccd8426b7b53784bc7752449f5e4a45913c141c990b6a21d8c3bb2cdae",
+  "parent_envelope_sha256": "90601b90c8be331f4ddfbb1ad67864047b02d683a1b226b499602d9171ba03c7",
+  "operator_override_id": null
+}
