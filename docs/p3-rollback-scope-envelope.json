@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "objective": "Implement one explicit operator-authorized rollback that appends the exact canonical state of an earlier revision without deleting history or changing the authoritative activation.",
+  "success_evidence": [
+    "Rollback requires the current authoritative activation, an exact expected head, an earlier revision in the same lineage, and structured immutable operator, reason, evidence, and source-authority context.",
+    "A successful rollback appends a rollback_applied revision whose parent is the prior head and whose canonical state exactly matches the selected earlier revision.",
+    "The current activation and lease remain authoritative while both advance to the appended rollback head.",
+    "Cross-lineage, current-head, malformed-evidence, stale-head, integrity-tamper, and non-authoritative attempts fail closed without appending a revision.",
+    "Verification proves rollback provenance and canonical-state equality, and the operator CLI completes one deterministic rollback flow."
+  ],
+  "non_goals": [
+    "Deleting, rewriting, or moving the lineage head backward to an old revision.",
+    "Undoing external filesystem, tool, provider, deployment, database, or workflow side effects.",
+    "Transferring authority, changing activation state, creating a new lineage, branching, merging, or adding automatic rollback policy.",
+    "Adding a database migration, daemon, watcher, network dependency, parent-repository edit, or provider integration."
+  ],
+  "accepted_threats": [
+    "The trusted local operator decides that an earlier canonical state should be reinstated; TORC records but does not independently judge that decision.",
+    "Rollback restores only canonical TORC state and cannot reverse external or uncheckpointed transient effects.",
+    "The authoritative activation executes the operator decision and remains the bearer after rollback.",
+    "Opaque evidence references are integrity-recorded identifiers, not authenticated external attestations."
+  ],
+  "estimates": {
+    "elapsed_hours": 3,
+    "production_loc": 280,
+    "test_loc": 360,
+    "changed_files": 11,
+    "runtime_processes": 0,
+    "operator_steps": 2
+  },
+  "observed": {
+    "elapsed_hours": 0,
+    "production_loc": 0,
+    "test_loc": 0,
+    "changed_files": 1,
+    "runtime_processes": 0,
+    "operator_steps": 0
+  },
+  "vertical_slice": {
+    "status": "pending",
+    "evidence": null
+  },
+  "architecture_triggers": [],
+  "review_rounds_used": 0,
+  "scope_policy_sha256": "9707efccd8426b7b53784bc7752449f5e4a45913c141c990b6a21d8c3bb2cdae",
+  "parent_envelope_sha256": "9e1322d0453097d6b45178f27860e1bdeab75ff694ba4a404e7f7a995e4382e8",
+  "operator_override_id": null
+}
