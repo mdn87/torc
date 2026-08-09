@@ -82,9 +82,14 @@ Automatic merge remains deferred.
 
 ## P4: operator visibility
 
-- Read-only MCP or CLI contract
-- HUD or mission-control lineage view
-- Active bearer, pending handoff, fit rationale, and provenance graph
+Status: bounded local CLI slice implemented. `torc lineage explain` derives a
+non-canonical explanation from one verified SQLite snapshot. MCP and HUD
+rendering remain integration-on-demand work outside this repository.
+
+- Read-only CLI contract (`lineage explain`)
+- Active bearer, pending handoff, fit rationale, and authority-change history
+- Recovery, rollback, and branch continuity annotations
+- Deferred: thin MCP exposure and HUD or mission-control rendering
 
 Gate: the operator can explain every authority change without reading raw database tables.
 

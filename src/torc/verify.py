@@ -125,6 +125,7 @@ def _verify_lineage(
         )
 
     _verify_immutable_records(store, lineage_id, errors)
+    _verify_authority_ledger(store, lineage_id, revisions, errors)
     active_leases = [
         dict(row)
         for row in store.connection.execute(
@@ -158,6 +159,254 @@ def _verify_lineage(
                 activation["activation_id"],
                 "authoritative activation is not active at the lineage head",
             )
+
+
+def _verify_authority_ledger(
+    store: Store,
+    lineage_id: str,
+    revisions: list[dict[str, Any]],
+    errors: list[dict[str, str]],
+) -> None:
+    """Require the transition ledger to exactly explain acquisition and succession."""
+
+    transitions = [
+        dict(row)
+        for row in store.connection.execute(
+            """SELECT rowid AS sequence, * FROM authority_transitions
+               WHERE lineage_id = ? ORDER BY rowid""",
+            (lineage_id,),
+        )
+    ]
+    if not transitions:
+        _error(errors, "authority_ledger_empty", lineage_id, "no initial transition")
+        return
+
+    root = revisions[0]
+    initial = transitions[0]
+    if (
+        initial["from_activation_id"] is not None
+        or initial["from_lease_id"] is not None
+        or initial["handoff_id"] is not None
+        or initial["handoff_result_id"] is not None
+        or initial["resulting_revision_id"] != root["revision_id"]
+        or root["event_type"] not in {"lineage_created", "branch_created"}
+    ):
+        _error(
+            errors,
+            "authority_initial_transition_invalid",
+            initial["transition_id"],
+            "first transition does not establish root authority",
+        )
+    initial_lease = store.connection.execute(
+        "SELECT * FROM leases WHERE lease_id = ?", (initial["to_lease_id"],)
+    ).fetchone()
+    if (
+        initial_lease is None
+        or initial_lease["lineage_id"] != lineage_id
+        or initial_lease["activation_id"] != initial["to_activation_id"]
+        or initial_lease["issued_at"] != initial["occurred_at"]
+    ):
+        _error(
+            errors,
+            "authority_initial_lease_mismatch",
+            initial["transition_id"],
+            initial["to_lease_id"],
+        )
+    initial_time = datetime.fromisoformat(
+        initial["occurred_at"].replace("Z", "+00:00")
+    )
+    root_time = datetime.fromisoformat(root["created_at"].replace("Z", "+00:00"))
+    try:
+        initial_activation = store.get_activation(initial["to_activation_id"])
+    except NotFoundError:
+        initial_activation = None
+    if initial_time < root_time or not _activation_matches_at(
+        initial_activation,
+        lineage_id,
+        initial_activation["substrate_id"] if initial_activation else "",
+        initial_time,
+    ):
+        _error(
+            errors,
+            "authority_initial_chronology_invalid",
+            initial["transition_id"],
+            "root or activation occurs after initial authority acquisition",
+        )
+
+    accepted_results = {
+        row["handoff_result_id"]: json.loads(row["payload_json"])
+        for row in store.connection.execute(
+            """SELECT handoff_result_id, payload_json FROM handoff_results
+               WHERE lineage_id = ? AND disposition = 'accepted'""",
+            (lineage_id,),
+        )
+    }
+    snapshots = {
+        row["handoff_id"]: json.loads(row["payload_json"])
+        for row in store.connection.execute(
+            "SELECT handoff_id, payload_json FROM handoffs WHERE lineage_id = ?",
+            (lineage_id,),
+        )
+    }
+    explained_results: set[str] = set()
+    previous = initial
+    previous_time = initial_time
+    revision_by_id = {item["revision_id"]: item for item in revisions}
+    revision_positions = {
+        item["revision_id"]: index for index, item in enumerate(revisions)
+    }
+    for transition in transitions[1:]:
+        result = accepted_results.get(transition["handoff_result_id"])
+        snapshot = snapshots.get(transition["handoff_id"])
+        if result is None or snapshot is None:
+            _error(
+                errors,
+                "authority_transition_unexplained",
+                transition["transition_id"],
+                "transition is not backed by an accepted handoff result",
+            )
+            previous = transition
+            continue
+        authority = result.get("resulting_authority") or {}
+        occurred_at = datetime.fromisoformat(
+            transition["occurred_at"].replace("Z", "+00:00")
+        )
+        prepared_at = datetime.fromisoformat(
+            snapshot["prepared_at"].replace("Z", "+00:00")
+        )
+        resulting_revision = revision_by_id.get(transition["resulting_revision_id"])
+        exact = (
+            result["handoff_id"] == transition["handoff_id"]
+            and result["handoff_result_id"] == transition["handoff_result_id"]
+            and snapshot["source_activation_id"] == transition["from_activation_id"]
+            and snapshot["source_lease_id"] == transition["from_lease_id"]
+            and result["target_activation_id"] == transition["to_activation_id"]
+            and authority.get("activation_id") == transition["to_activation_id"]
+            and authority.get("lease_id") == transition["to_lease_id"]
+            and authority.get("lineage_head_revision_id")
+            == transition["resulting_revision_id"]
+            and result["resolved_at"] == transition["occurred_at"]
+            and resulting_revision is not None
+            and resulting_revision["created_at"] == transition["occurred_at"]
+        )
+        if not exact:
+            _error(
+                errors,
+                "authority_transition_shape_mismatch",
+                transition["transition_id"],
+                result["handoff_result_id"],
+            )
+        if (
+            occurred_at < previous_time
+            or prepared_at > occurred_at
+            or revision_positions.get(transition["resulting_revision_id"], -1)
+            <= revision_positions.get(previous["resulting_revision_id"], -1)
+        ):
+            _error(
+                errors,
+                "authority_transition_chronology_invalid",
+                transition["transition_id"],
+                "authority transfer is out of append-only chronological order",
+            )
+        if (
+            transition["from_activation_id"] != previous["to_activation_id"]
+            or transition["from_lease_id"] != previous["to_lease_id"]
+        ):
+            _error(
+                errors,
+                "authority_transition_chain_gap",
+                transition["transition_id"],
+                "source authority does not match the previous bearer",
+            )
+        target_lease = store.connection.execute(
+            "SELECT * FROM leases WHERE lease_id = ?", (transition["to_lease_id"],)
+        ).fetchone()
+        source_lease = store.connection.execute(
+            "SELECT * FROM leases WHERE lease_id = ?", (transition["from_lease_id"],)
+        ).fetchone()
+        try:
+            source_activation = store.get_activation(transition["from_activation_id"])
+            target_activation = store.get_activation(transition["to_activation_id"])
+        except NotFoundError:
+            source_activation = target_activation = None
+        if (
+            target_lease is None
+            or target_lease["lineage_id"] != lineage_id
+            or target_lease["activation_id"] != transition["to_activation_id"]
+            or target_lease["issued_at"] != transition["occurred_at"]
+        ):
+            _error(
+                errors,
+                "authority_transition_lease_mismatch",
+                transition["transition_id"],
+                transition["to_lease_id"],
+            )
+        if (
+            not _lease_matches_at(
+                source_lease,
+                lineage_id,
+                transition["from_activation_id"],
+                occurred_at,
+            )
+            or not _activation_matches_at(
+                source_activation,
+                lineage_id,
+                source_activation["substrate_id"] if source_activation else "",
+                occurred_at,
+            )
+            or not _activation_matches_at(
+                target_activation,
+                lineage_id,
+                target_activation["substrate_id"] if target_activation else "",
+                occurred_at,
+            )
+        ):
+            _error(
+                errors,
+                "authority_transition_lifetime_mismatch",
+                transition["transition_id"],
+                "source or target authority was not live at transfer time",
+            )
+        explained_results.add(result["handoff_result_id"])
+        previous = transition
+        previous_time = occurred_at
+
+    missing_results = sorted(set(accepted_results) - explained_results)
+    for result_id in missing_results:
+        _error(
+            errors,
+            "accepted_result_unexplained",
+            result_id,
+            "accepted result has no unique authority transition",
+        )
+    if len(transitions) != 1 + len(accepted_results):
+        _error(
+            errors,
+            "authority_transition_count_mismatch",
+            lineage_id,
+            f"expected {1 + len(accepted_results)}, found {len(transitions)}",
+        )
+    current = store.connection.execute(
+        """SELECT l.head_revision_id AS lineage_head_revision_id,
+                  a.activation_id, a.substrate_id, x.lease_id
+           FROM lineages l
+           JOIN leases x ON x.lineage_id = l.lineage_id AND x.status = 'active'
+           JOIN activations a ON a.activation_id = x.activation_id
+           WHERE l.lineage_id = ?""",
+        (lineage_id,),
+    ).fetchone()
+    if current is None:
+        return
+    if (
+        previous["to_activation_id"] != current["activation_id"]
+        or previous["to_lease_id"] != current["lease_id"]
+    ):
+        _error(
+            errors,
+            "authority_ledger_current_mismatch",
+            lineage_id,
+            "final transition target is not the current bearer",
+        )
 
 
 def _verify_immutable_records(
