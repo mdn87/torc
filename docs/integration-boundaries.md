@@ -45,6 +45,29 @@ The context lifecycle commands are intentionally distinct from succession:
 - A different authoritative session still uses `torc handoff prepare/resolve`;
   a durable alternate line still uses `torc lineage branch`.
 
+### Read-only child request modes
+
+`torc context hydrate --request-mode MODE` accepts four explicit intents. The
+default `root` mode preserves the root hydration JSON contract. The other modes
+only inspect an exact existing binding and verified Torc records; they never
+create a binding, lineage, activation, handoff, branch, lease, or projection.
+
+- `observer` returns the existing bounded Torc projection as non-authoritative
+  context for an independently scoped child. It declares that lineage authority
+  and checkpointing are unavailable. For an OGMI binding it exposes only the
+  parent checkpoint ID and canonical hash as provenance, never the full
+  assignment-specific checkpoint or orientation body.
+- `successor` returns authoritative context only when the bound activation is
+  the current lease holder and one verified, accepted Torc handoff result names
+  that activation. A prepared, rejected, or mismatched handoff is insufficient.
+- `branch` returns authoritative context only when the bound lineage's immutable
+  root is an explicit `branch_created` revision whose child activation and lease
+  match current authority.
+
+An absent exact binding remains `unbound`; repository mismatch is `stale`; and
+missing or mismatched successor/branch proof is `invalid`. AutoWork assignments
+and subagent-start events are not Torc authority evidence.
+
 ## Assignment and lineage are different
 
 An Autowork `AgentAssignment` is the immutable authority for one dispatch. A TORC lineage is the continuity identity spanning dispatches. TORC may link many assignments over time, but it cannot make one assignment larger or transfer its permissions to another activation.

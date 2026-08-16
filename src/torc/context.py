@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import sqlite3
 from pathlib import Path
 from typing import Any, Protocol
@@ -17,6 +18,7 @@ from .verify import verify_store
 
 HYDRATION_OUTPUT_LIMIT = 65_536
 _MODES = {"ogmi_workgraph", "torc_standalone"}
+_REQUEST_MODES = {"root", "observer", "successor", "branch"}
 
 
 class ContextError(TorcError):
@@ -211,9 +213,13 @@ def hydrate_context(
     harness: str,
     repository_identity: str,
     runtime_session_ref: str,
+    request_mode: str = "root",
     ogmi: _OgmiResolver | None = None,
 ) -> dict[str, Any]:
     """Return a bounded derived view without mutating TORC or OGMI."""
+
+    if request_mode not in _REQUEST_MODES:
+        return _not_ready("invalid", f"unsupported context request mode: {request_mode}")
 
     try:
         binding = store.get_context_binding(
@@ -253,33 +259,55 @@ def hydrate_context(
         ):
             raise IntegrityError("stored context projection provenance does not match binding")
 
+        authority_proof: dict[str, Any] | None = None
+        if request_mode == "successor":
+            authority_proof = _accepted_successor_proof(store, binding, authority)
+        elif request_mode == "branch":
+            authority_proof = _branch_authority_proof(store, binding, authority)
+
         if _is_ogmi(binding):
             resolved = _resolve_bound_ogmi(binding, ogmi)
-            continuity = {
-                "mode": "ogmi_workgraph",
-                "checkpoint_id": binding["ogmi_checkpoint_id"],
-                "checkpoint_sha256": binding["ogmi_checkpoint_sha256"],
-                "orientation_spine_id": binding["ogmi_orientation_spine_id"],
-                "run_id": binding["ogmi_run_id"],
-                "assignment_id": binding["ogmi_assignment_id"],
-            }
-            view = {
-                "label": "prior structured continuity state",
-                "precedence": "Current instructions and repository evidence take precedence.",
-                "torc_projection": projection,
-                "ogmi_checkpoint": resolved["checkpoint"],
-                "ogmi_orientation": resolved["orientation"],
-            }
+            if request_mode == "observer":
+                continuity = {
+                    "mode": "ogmi_workgraph",
+                    "parent_checkpoint_id": binding["ogmi_checkpoint_id"],
+                    "parent_checkpoint_sha256": binding["ogmi_checkpoint_sha256"],
+                }
+                view = _observer_view(projection)
+            else:
+                continuity = {
+                    "mode": "ogmi_workgraph",
+                    "checkpoint_id": binding["ogmi_checkpoint_id"],
+                    "checkpoint_sha256": binding["ogmi_checkpoint_sha256"],
+                    "orientation_spine_id": binding["ogmi_orientation_spine_id"],
+                    "run_id": binding["ogmi_run_id"],
+                    "assignment_id": binding["ogmi_assignment_id"],
+                }
+                view = {
+                    "label": "prior structured continuity state",
+                    "precedence": (
+                        "Current instructions and repository evidence take precedence."
+                    ),
+                    "torc_projection": projection,
+                    "ogmi_checkpoint": resolved["checkpoint"],
+                    "ogmi_orientation": resolved["orientation"],
+                }
         else:
             continuity = {
                 "mode": "torc_standalone",
                 "limitation": "No shared OGMI workgraph checkpoint is attached.",
             }
-            view = {
-                "label": "prior standalone Torc structured state",
-                "precedence": "Current instructions and repository evidence take precedence.",
-                "torc_projection": projection,
-            }
+            view = (
+                _observer_view(projection)
+                if request_mode == "observer"
+                else {
+                    "label": "prior standalone Torc structured state",
+                    "precedence": (
+                        "Current instructions and repository evidence take precedence."
+                    ),
+                    "torc_projection": projection,
+                }
+            )
         additional_context = canonical_json(view)
         if len(additional_context.encode("utf-8")) > HYDRATION_OUTPUT_LIMIT:
             raise ContextError("hydration output exceeds the fixed size limit")
@@ -294,7 +322,7 @@ def hydrate_context(
     ) as exc:
         return _not_ready("invalid", str(exc))
 
-    return {
+    payload = {
         "schema_version": 1,
         "status": "ready",
         "lineage_id": binding["lineage_id"],
@@ -303,6 +331,89 @@ def hydrate_context(
         "projection_id": binding["projection_id"],
         "continuity": continuity,
         "additional_context": additional_context,
+    }
+    if request_mode != "root":
+        payload["request_mode"] = request_mode
+        payload["authority"] = {
+            "kind": request_mode,
+            "lineage_authority": request_mode != "observer",
+            "checkpoint_allowed": request_mode != "observer",
+        }
+        if authority_proof is not None:
+            payload["authority_proof"] = authority_proof
+    return payload
+
+
+def _observer_view(projection: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "label": "non-authoritative observer continuity",
+        "precedence": "Current child instructions and repository evidence take precedence.",
+        "scope_guard": (
+            "Use only within the child's independently authorized task; this view grants "
+            "no tools, scope, lineage authority, lease, or checkpoint permission."
+        ),
+        "torc_projection": projection,
+    }
+
+
+def _accepted_successor_proof(
+    store: Store, binding: dict[str, Any], authority: dict[str, Any]
+) -> dict[str, str]:
+    rows = store.connection.execute(
+        """SELECT h.payload_json AS handoff_json, r.payload_json AS result_json
+           FROM handoffs h
+           JOIN handoff_results r ON r.handoff_id = h.handoff_id
+           WHERE h.lineage_id = ? AND r.target_activation_id = ?
+             AND r.disposition = 'accepted'""",
+        (binding["lineage_id"], binding["activation_id"]),
+    ).fetchall()
+    if len(rows) != 1:
+        raise ContextError(
+            "successor context requires one accepted handoff for the bound activation"
+        )
+    snapshot = json.loads(rows[0]["handoff_json"])
+    result = json.loads(rows[0]["result_json"])
+    resulting = result.get("resulting_authority")
+    if (
+        not record_hash_is_valid(snapshot)
+        or not record_hash_is_valid(result)
+        or snapshot.get("target_activation_id") != binding["activation_id"]
+        or result.get("disposition") != "accepted"
+        or not isinstance(resulting, dict)
+        or resulting.get("activation_id") != binding["activation_id"]
+        or resulting.get("lease_id") != authority["lease_id"]
+        or resulting.get("lineage_head_revision_id")
+        not in {item["revision_id"] for item in store.lineage_revisions(binding["lineage_id"])}
+    ):
+        raise ContextError("accepted successor provenance does not match current authority")
+    return {
+        "handoff_id": snapshot["handoff_id"],
+        "handoff_result_id": result["handoff_result_id"],
+    }
+
+
+def _branch_authority_proof(
+    store: Store, binding: dict[str, Any], authority: dict[str, Any]
+) -> dict[str, str]:
+    revisions = store.lineage_revisions(binding["lineage_id"])
+    root = revisions[0] if revisions else {}
+    origin = root.get("branch_origin")
+    child = origin.get("child_authority") if isinstance(origin, dict) else None
+    if (
+        root.get("event_type") != "branch_created"
+        or not record_hash_is_valid(root)
+        or not isinstance(origin, dict)
+        or not isinstance(child, dict)
+        or child.get("activation_id") != binding["activation_id"]
+        or child.get("lease_id") != authority["lease_id"]
+        or child.get("substrate_id") != authority["substrate_id"]
+        or origin.get("source_lineage_id") == binding["lineage_id"]
+    ):
+        raise ContextError("branch context requires explicit branch authority provenance")
+    return {
+        "source_lineage_id": origin["source_lineage_id"],
+        "source_revision_id": origin["source_revision_id"],
+        "branch_revision_id": root["revision_id"],
     }
 
 

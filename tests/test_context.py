@@ -15,7 +15,12 @@ from torc.context import (
     detach_context,
     hydrate_context,
 )
-from torc.operator import create_operator_lineage
+from torc.operator import (
+    branch_operator_lineage,
+    create_operator_lineage,
+    prepare_operator_handoff,
+    resolve_operator_handoff,
+)
 from torc.store import Store
 
 
@@ -47,6 +52,34 @@ def _substrate() -> dict[str, Any]:
         "policy_labels": ["local-workspace"],
         "context_budget": {"unit": "words", "limit": 10000},
         "task_affinities": ["implementation"],
+    }
+
+
+def _successor_substrate() -> dict[str, Any]:
+    substrate = _substrate()
+    substrate.update(
+        {
+            "substrate_id": "codex-successor",
+            "label": "Codex successor session",
+        }
+    )
+    return substrate
+
+
+def _handoff_plan() -> dict[str, Any]:
+    return {
+        "target_substrate": _successor_substrate(),
+        "target_activation_id": "activation-successor",
+        "task_phase": "implementation-continuation",
+        "requirements": {
+            "capabilities": ["repository_read", "repository_write"],
+            "policy_labels": ["local-workspace"],
+            "minimum_context_units": 100,
+        },
+        "budget_limit": 1000,
+        "target_responsibility": "Continue the accepted implementation handoff",
+        "reason_code": "model_succession",
+        "rationale": "The operator selected a successor activation.",
     }
 
 
@@ -482,6 +515,295 @@ def test_detach_fails_closed_on_unbound_or_repository_mismatch(tmp_path: Path) -
         assert len(store.context_bindings_for_session("codex", "session-root")) == 1
 
 
+def test_observer_hydrate_is_non_authoritative_and_omits_ogmi_assignment_body(
+    tmp_path: Path,
+) -> None:
+    ogmi = StubOgmi()
+    tables = (
+        "lineages",
+        "revisions",
+        "activations",
+        "leases",
+        "handoffs",
+        "handoff_results",
+        "authority_transitions",
+        "context_bindings",
+    )
+    with Store(tmp_path) as store:
+        _bootstrap(store)
+        _attach_ogmi(store, tmp_path, ogmi)
+        checkpoint_context(
+            store,
+            harness="codex",
+            repository_identity="lugos",
+            runtime_session_ref="session-root",
+            canonical_state=_state("observer-parent"),
+            budget_limit=1000,
+            ogmi=ogmi,
+        )
+        counts_before = {
+            table: store.connection.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+            for table in tables
+        }
+
+    with Store(tmp_path, read_only=True) as store:
+        observed = hydrate_context(
+            store,
+            harness="codex",
+            repository_identity="lugos",
+            runtime_session_ref="session-root",
+            request_mode="observer",
+            ogmi=ogmi,
+        )
+        assert store.connection.total_changes == 0
+
+    with Store(tmp_path) as store:
+        counts_after = {
+            table: store.connection.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+            for table in tables
+        }
+
+    assert observed["status"] == "ready"
+    assert observed["request_mode"] == "observer"
+    assert observed["authority"] == {
+        "kind": "observer",
+        "lineage_authority": False,
+        "checkpoint_allowed": False,
+    }
+    assert observed["continuity"] == {
+        "mode": "ogmi_workgraph",
+        "parent_checkpoint_id": "checkpoint-driver-01",
+        "parent_checkpoint_sha256": "a" * 64,
+    }
+    assert '"torc_projection"' in observed["additional_context"]
+    serialized = json.dumps(observed, sort_keys=True)
+    for forbidden in (
+        "assignment-driver-01",
+        '"ogmi_checkpoint"',
+        '"ogmi_orientation"',
+        '"lease_id"',
+    ):
+        assert forbidden not in serialized
+    assert counts_after == counts_before
+
+
+def test_successor_hydrate_requires_an_accepted_handoff_to_current_activation(
+    tmp_path: Path,
+) -> None:
+    with Store(tmp_path) as store:
+        created = _bootstrap(store)
+        attach_context(
+            store,
+            harness="codex",
+            repository_identity="lugos",
+            runtime_session_ref="session-root",
+            lineage_id="lineage-root",
+            activation_id="activation-root",
+            continuity_mode="torc_standalone",
+        )
+        checkpoint_context(
+            store,
+            harness="codex",
+            repository_identity="lugos",
+            runtime_session_ref="session-root",
+            canonical_state=_state("ordinary-root"),
+            budget_limit=1000,
+        )
+    with Store(tmp_path, read_only=True) as store:
+        not_a_successor = hydrate_context(
+            store,
+            harness="codex",
+            repository_identity="lugos",
+            runtime_session_ref="session-root",
+            request_mode="successor",
+        )
+    assert not_a_successor["status"] == "invalid"
+
+    accepted_dir = tmp_path / "accepted"
+    with Store(accepted_dir) as store:
+        source = _bootstrap(store)
+        prepared = prepare_operator_handoff(
+            store,
+            lineage_id="lineage-root",
+            source_activation_id=source["activation_id"],
+            plan=_handoff_plan(),
+        )
+        reconstruction = json.loads(
+            (store.state_dir / prepared["reconstruction_template_path"]).read_text(
+                encoding="utf-8"
+            )
+        )
+        resolved = resolve_operator_handoff(
+            store,
+            handoff_id=prepared["handoff_id"],
+            target_activation_id=prepared["target_activation_id"],
+            reconstruction=reconstruction,
+        )
+        attach_context(
+            store,
+            harness="codex",
+            repository_identity="lugos",
+            runtime_session_ref="session-successor",
+            lineage_id="lineage-root",
+            activation_id="activation-successor",
+            continuity_mode="torc_standalone",
+        )
+        checkpoint_context(
+            store,
+            harness="codex",
+            repository_identity="lugos",
+            runtime_session_ref="session-successor",
+            canonical_state=_state("accepted-successor"),
+            budget_limit=1000,
+        )
+
+    with Store(accepted_dir, read_only=True) as store:
+        successor = hydrate_context(
+            store,
+            harness="codex",
+            repository_identity="lugos",
+            runtime_session_ref="session-successor",
+            request_mode="successor",
+        )
+
+    assert successor["status"] == "ready"
+    assert successor["request_mode"] == "successor"
+    assert successor["authority"] == {
+        "kind": "successor",
+        "lineage_authority": True,
+        "checkpoint_allowed": True,
+    }
+    assert successor["authority_proof"] == {
+        "handoff_id": prepared["handoff_id"],
+        "handoff_result_id": resolved["handoff_result_id"],
+    }
+    assert created["activation_id"] == "activation-root"
+
+
+def test_branch_hydrate_requires_an_explicit_authoritative_branch(tmp_path: Path) -> None:
+    with Store(tmp_path) as store:
+        source = _bootstrap(store)
+        branch = branch_operator_lineage(
+            store,
+            source_lineage_id="lineage-root",
+            source_activation_id=source["activation_id"],
+            expected_source_revision_id=source["revision_id"],
+            child_lineage_id="lineage-branch",
+            child_activation_id="activation-branch",
+            child_substrate=_successor_substrate(),
+            operator_ref="operator-branch",
+            target_assignment_ref="assignment-branch",
+            rationale="Create an explicit durable branch.",
+            evidence_refs=["evidence-branch"],
+        )
+        attach_context(
+            store,
+            harness="codex",
+            repository_identity="lugos",
+            runtime_session_ref="session-branch",
+            lineage_id="lineage-branch",
+            activation_id="activation-branch",
+            continuity_mode="torc_standalone",
+        )
+        checkpoint_context(
+            store,
+            harness="codex",
+            repository_identity="lugos",
+            runtime_session_ref="session-branch",
+            canonical_state=_state("branch"),
+            budget_limit=1000,
+        )
+
+    with Store(tmp_path, read_only=True) as store:
+        branch_context = hydrate_context(
+            store,
+            harness="codex",
+            repository_identity="lugos",
+            runtime_session_ref="session-branch",
+            request_mode="branch",
+        )
+
+    assert branch_context["status"] == "ready"
+    assert branch_context["request_mode"] == "branch"
+    assert branch_context["authority"] == {
+        "kind": "branch",
+        "lineage_authority": True,
+        "checkpoint_allowed": True,
+    }
+    assert branch_context["authority_proof"] == {
+        "source_lineage_id": "lineage-root",
+        "source_revision_id": source["revision_id"],
+        "branch_revision_id": branch["child_revision_id"],
+    }
+
+
+def test_root_request_mode_preserves_default_payload_and_unknown_mode_fails_closed(
+    tmp_path: Path,
+) -> None:
+    with Store(tmp_path) as store:
+        _bootstrap(store)
+        attach_context(
+            store,
+            harness="codex",
+            repository_identity="lugos",
+            runtime_session_ref="session-root",
+            lineage_id="lineage-root",
+            activation_id="activation-root",
+            continuity_mode="torc_standalone",
+        )
+        checkpoint_context(
+            store,
+            harness="codex",
+            repository_identity="lugos",
+            runtime_session_ref="session-root",
+            canonical_state=_state("root"),
+            budget_limit=1000,
+        )
+
+    with Store(tmp_path, read_only=True) as store:
+        default = hydrate_context(
+            store,
+            harness="codex",
+            repository_identity="lugos",
+            runtime_session_ref="session-root",
+        )
+        explicit = hydrate_context(
+            store,
+            harness="codex",
+            repository_identity="lugos",
+            runtime_session_ref="session-root",
+            request_mode="root",
+        )
+        invalid = hydrate_context(
+            store,
+            harness="codex",
+            repository_identity="lugos",
+            runtime_session_ref="session-root",
+            request_mode="invented",
+        )
+
+    assert explicit == default
+    assert invalid["status"] == "invalid"
+
+
+@pytest.mark.parametrize("request_mode", ["root", "observer", "successor", "branch"])
+def test_all_request_modes_remain_non_ready_without_an_exact_binding(
+    tmp_path: Path, request_mode: str
+) -> None:
+    with Store(tmp_path) as store:
+        _bootstrap(store)
+    with Store(tmp_path, read_only=True) as store:
+        result = hydrate_context(
+            store,
+            harness="codex",
+            repository_identity="lugos",
+            runtime_session_ref="session-unbound",
+            request_mode=request_mode,
+        )
+
+    assert result["status"] == "unbound"
+
+
 def test_context_cli_round_trip_uses_exact_lookup_contract(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
@@ -559,6 +881,30 @@ def test_context_cli_round_trip_uses_exact_lookup_contract(
     payload = json.loads(capsys.readouterr().out)
     assert payload["status"] == "ready"
     assert payload["activation_id"] == "activation-root"
+
+    assert (
+        main(
+            [
+                "context",
+                "hydrate",
+                "--state-dir",
+                str(tmp_path),
+                "--harness",
+                "codex",
+                "--repository-id",
+                "lugos",
+                "--runtime-session",
+                "session-root",
+                "--request-mode",
+                "observer",
+                "--json",
+            ]
+        )
+        == 0
+    )
+    observer = json.loads(capsys.readouterr().out)
+    assert observer["request_mode"] == "observer"
+    assert observer["authority"]["lineage_authority"] is False
 
     assert (
         main(

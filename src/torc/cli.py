@@ -283,6 +283,12 @@ def build_parser() -> argparse.ArgumentParser:
         "hydrate", help="Read a bounded verified view for one exact runtime session."
     )
     _add_context_lookup_arguments(context_hydrate)
+    context_hydrate.add_argument(
+        "--request-mode",
+        choices=("root", "observer", "successor", "branch"),
+        default="root",
+        help="Requested authority view; root preserves the existing hydration contract.",
+    )
     context_hydrate.add_argument("--json", action="store_true", dest="as_json")
 
     experiment = subparsers.add_parser(
@@ -796,7 +802,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             }
             if args.context_command == "hydrate":
                 with Store(args.state_dir, read_only=True) as store:
-                    payload = hydrate_context(store, **lookup)
+                    payload = hydrate_context(
+                        store, **lookup, request_mode=args.request_mode
+                    )
                 _print_payload(payload, args.as_json)
                 return 0
             with Store(args.state_dir) as store:
