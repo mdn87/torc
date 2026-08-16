@@ -786,6 +786,64 @@ def test_root_request_mode_preserves_default_payload_and_unknown_mode_fails_clos
     assert invalid["status"] == "invalid"
 
 
+def test_hydrate_uses_one_snapshot_when_another_connection_checkpoints(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    with Store(tmp_path) as store:
+        store.connection.execute("PRAGMA journal_mode = WAL")
+        _bootstrap(store)
+        attach_context(
+            store,
+            harness="codex",
+            repository_identity="lugos",
+            runtime_session_ref="session-root",
+            lineage_id="lineage-root",
+            activation_id="activation-root",
+            continuity_mode="torc_standalone",
+        )
+        original_checkpoint = checkpoint_context(
+            store,
+            harness="codex",
+            repository_identity="lugos",
+            runtime_session_ref="session-root",
+            canonical_state=_state("before-concurrent-write"),
+            budget_limit=1000,
+        )
+
+    with Store(tmp_path) as writer, Store(tmp_path, read_only=True) as reader:
+        get_binding = reader.get_context_binding
+
+        def get_binding_then_checkpoint(
+            harness: str, runtime_session_ref: str, repository_identity: str
+        ) -> dict[str, Any]:
+            binding = get_binding(harness, runtime_session_ref, repository_identity)
+            checkpoint_context(
+                writer,
+                harness="codex",
+                repository_identity="lugos",
+                runtime_session_ref="session-root",
+                canonical_state=_state("after-concurrent-write"),
+                budget_limit=1000,
+            )
+            return binding
+
+        monkeypatch.setattr(reader, "get_context_binding", get_binding_then_checkpoint)
+        hydrated = hydrate_context(
+            reader,
+            harness="codex",
+            repository_identity="lugos",
+            runtime_session_ref="session-root",
+        )
+        latest_binding = writer.get_context_binding("codex", "session-root", "lugos")
+
+        assert reader.connection.in_transaction is False
+
+    assert hydrated["status"] == "ready"
+    assert hydrated["source_revision_id"] == original_checkpoint["revision_id"]
+    assert hydrated["projection_id"] == original_checkpoint["projection_id"]
+    assert latest_binding["source_revision_id"] != hydrated["source_revision_id"]
+
+
 @pytest.mark.parametrize("request_mode", ["root", "observer", "successor", "branch"])
 def test_all_request_modes_remain_non_ready_without_an_exact_binding(
     tmp_path: Path, request_mode: str

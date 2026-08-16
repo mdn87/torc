@@ -23,14 +23,20 @@ activations, and leases. Torc invokes only fixed, non-shell OGMI commands under
 a timeout and output ceiling:
 
 ```text
+python -m ogmi validate PROJECT --json
 python -m ogmi validate CHECKPOINT --json
 python -m ogmi hash CHECKPOINT
 python -m ogmi orient PROJECT SPINE
 ```
 
-Invalid, unavailable, timed-out, oversized, tampered, or identity-mismatched
-OGMI input fails closed. A session outside an OGMI run must opt into
-`torc_standalone`; Torc does not fabricate a workgraph record for it.
+The resolved checkpoint must be a JSON record beneath the resolved project.
+Torc pins one bounded byte snapshot and verifies it remains unchanged after
+project and record validation, canonical hashing, and orientation. It rejects a
+changed file or an OGMI hash that differs from the canonical SHA-256 of the
+parsed snapshot. Invalid,
+unavailable, timed-out, oversized, tampered, or identity-mismatched OGMI input
+fails closed. A session outside an OGMI run must opt into `torc_standalone`;
+Torc does not fabricate a workgraph record for it.
 
 The context lifecycle commands are intentionally distinct from succession:
 
@@ -41,7 +47,8 @@ The context lifecycle commands are intentionally distinct from succession:
 - `torc context detach` retires only an exact external runtime binding, including
   a stale one; it does not mutate lineage history, activation, lease, or OGMI.
 - `torc context hydrate` opens the store read-only and returns only a bounded,
-  verified derived view. `unbound`, `stale`, and `invalid` results are explicit.
+  verified derived view from one SQLite read snapshot. `unbound`, `stale`, and
+  `invalid` results are explicit.
 - A different authoritative session still uses `torc handoff prepare/resolve`;
   a durable alternate line still uses `torc lineage branch`.
 

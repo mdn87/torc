@@ -221,6 +221,26 @@ def hydrate_context(
     if request_mode not in _REQUEST_MODES:
         return _not_ready("invalid", f"unsupported context request mode: {request_mode}")
 
+    with store.read_transaction():
+        return _hydrate_context_snapshot(
+            store,
+            harness=harness,
+            repository_identity=repository_identity,
+            runtime_session_ref=runtime_session_ref,
+            request_mode=request_mode,
+            ogmi=ogmi,
+        )
+
+
+def _hydrate_context_snapshot(
+    store: Store,
+    *,
+    harness: str,
+    repository_identity: str,
+    runtime_session_ref: str,
+    request_mode: str,
+    ogmi: _OgmiResolver | None,
+) -> dict[str, Any]:
     try:
         binding = store.get_context_binding(
             harness, runtime_session_ref, repository_identity

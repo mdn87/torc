@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import subprocess
 import sys
@@ -32,31 +33,46 @@ def _checkpoint(path: Path) -> dict[str, object]:
     return record
 
 
-def test_adapter_uses_fixed_ogmi_argv_and_returns_reference(
+def _canonical_digest(record: dict[str, object]) -> str:
+    content = json.dumps(
+        record, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+    ).encode("utf-8")
+    return hashlib.sha256(content).hexdigest()
+
+
+def _successful_output(
+    argv: list[str], *, digest: str, project_records: int = 4
+) -> tuple[int, bytes, bytes, bool]:
+    command = argv[3]
+    if command == "validate":
+        records = 1 if Path(argv[4]).is_file() else project_records
+        stdout = json.dumps({"records": records, "errors": 0, "warnings": 0}).encode()
+    elif command == "hash":
+        stdout = f"sha256:{digest}\n".encode()
+    else:
+        stdout = json.dumps(
+            {
+                "node": {"id": "project.active"},
+                "validation": {"errors": 0, "warnings": 0, "issues": []},
+            }
+        ).encode()
+    return 0, stdout, b"", False
+
+
+def test_adapter_validates_project_graph_and_exact_checkpoint_record(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    checkpoint_path = tmp_path / "checkpoint.json"
-    _checkpoint(checkpoint_path)
     project_path = tmp_path / "project"
-    project_path.mkdir()
+    checkpoint_path = project_path / "runs" / "checkpoint.json"
+    checkpoint_path.parent.mkdir(parents=True)
+    record = _checkpoint(checkpoint_path)
+    digest = _canonical_digest(record)
     calls: list[list[str]] = []
-    adapter = OgmiAdapter(timeout_seconds=1, max_output_bytes=4096)
+    adapter = OgmiAdapter()
 
     def fake_run(argv: list[str]) -> tuple[int, bytes, bytes, bool]:
         calls.append(argv)
-        command = argv[3]
-        if command == "validate":
-            stdout = json.dumps({"records": 1, "errors": 0, "warnings": 0}).encode()
-        elif command == "hash":
-            stdout = ("sha256:" + "a" * 64 + "\n").encode()
-        else:
-            stdout = json.dumps(
-                {
-                    "node": {"id": "project.active"},
-                    "validation": {"errors": 0, "warnings": 0, "issues": []},
-                }
-            ).encode()
-        return 0, stdout, b"", False
+        return _successful_output(argv, digest=digest)
 
     monkeypatch.setattr(adapter, "_bounded_process", fake_run)
     resolved = adapter.resolve(
@@ -68,13 +84,123 @@ def test_adapter_uses_fixed_ogmi_argv_and_returns_reference(
     )
 
     assert [call[2:] for call in calls] == [
+        ["ogmi", "validate", str(project_path.resolve()), "--json"],
         ["ogmi", "validate", str(checkpoint_path.resolve()), "--json"],
         ["ogmi", "hash", str(checkpoint_path.resolve())],
         ["ogmi", "orient", str(project_path.resolve()), "project.active"],
     ]
     assert resolved["checkpoint_id"] == "checkpoint-driver-01"
-    assert resolved["checkpoint_sha256"] == "a" * 64
+    assert resolved["checkpoint"] == record
+    assert resolved["checkpoint_sha256"] == digest
     assert resolved["orientation"]["node"]["id"] == "project.active"
+
+
+def test_adapter_rejects_checkpoint_outside_selected_project(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    project_path = tmp_path / "project"
+    project_path.mkdir()
+    checkpoint_path = tmp_path / "outside-checkpoint.json"
+    record = _checkpoint(checkpoint_path)
+    adapter = OgmiAdapter()
+    monkeypatch.setattr(
+        adapter,
+        "_bounded_process",
+        lambda argv: _successful_output(argv, digest=_canonical_digest(record)),
+    )
+
+    with pytest.raises(OgmiAdapterError, match="selected project"):
+        adapter.resolve(
+            checkpoint_path=checkpoint_path,
+            project_path=project_path,
+            orientation_spine_id="project.active",
+            expected_run_id="run-01",
+            expected_assignment_id="assignment-driver-01",
+        )
+
+
+def test_adapter_rejects_invalid_selected_project_graph(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    project_path = tmp_path / "project"
+    checkpoint_path = project_path / "checkpoint.json"
+    project_path.mkdir()
+    record = _checkpoint(checkpoint_path)
+    digest = _canonical_digest(record)
+    adapter = OgmiAdapter()
+
+    def invalid_project(argv: list[str]) -> tuple[int, bytes, bytes, bool]:
+        if argv[3] == "validate" and Path(argv[4]).is_dir():
+            return 0, b'{"records": 4, "errors": 1}', b"", False
+        return _successful_output(argv, digest=digest)
+
+    monkeypatch.setattr(adapter, "_bounded_process", invalid_project)
+    with pytest.raises(OgmiAdapterError, match="selected project graph"):
+        adapter.resolve(
+            checkpoint_path=checkpoint_path,
+            project_path=project_path,
+            orientation_spine_id="project.active",
+            expected_run_id="run-01",
+            expected_assignment_id="assignment-driver-01",
+        )
+
+
+def test_adapter_rejects_hash_that_does_not_match_exact_checkpoint_value(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    project_path = tmp_path / "project"
+    checkpoint_path = project_path / "checkpoint.json"
+    project_path.mkdir()
+    _checkpoint(checkpoint_path)
+    adapter = OgmiAdapter()
+    monkeypatch.setattr(
+        adapter,
+        "_bounded_process",
+        lambda argv: _successful_output(argv, digest="b" * 64),
+    )
+
+    with pytest.raises(OgmiAdapterError, match="exact checkpoint value"):
+        adapter.resolve(
+            checkpoint_path=checkpoint_path,
+            project_path=project_path,
+            orientation_spine_id="project.active",
+            expected_run_id="run-01",
+            expected_assignment_id="assignment-driver-01",
+        )
+
+
+def test_adapter_rejects_checkpoint_bytes_changing_during_resolution(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    project_path = tmp_path / "project"
+    checkpoint_path = project_path / "checkpoint.json"
+    project_path.mkdir()
+    record = _checkpoint(checkpoint_path)
+    digest = _canonical_digest(record)
+    adapter = OgmiAdapter()
+    mutated = False
+
+    def mutate_after_first_read(
+        argv: list[str],
+    ) -> tuple[int, bytes, bytes, bool]:
+        nonlocal mutated
+        output = _successful_output(argv, digest=digest)
+        if not mutated:
+            changed = dict(record)
+            changed["objective"] = "Changed while the adapter was resolving."
+            checkpoint_path.write_text(json.dumps(changed), encoding="utf-8")
+            mutated = True
+        return output
+
+    monkeypatch.setattr(adapter, "_bounded_process", mutate_after_first_read)
+    with pytest.raises(OgmiAdapterError, match="changed during resolution"):
+        adapter.resolve(
+            checkpoint_path=checkpoint_path,
+            project_path=project_path,
+            orientation_spine_id="project.active",
+            expected_run_id="run-01",
+            expected_assignment_id="assignment-driver-01",
+        )
 
 
 @pytest.mark.parametrize(
@@ -91,10 +217,10 @@ def test_adapter_rejects_binding_identity_mismatch(
     expected_assignment: str,
     match: str,
 ) -> None:
-    checkpoint_path = tmp_path / "checkpoint.json"
-    _checkpoint(checkpoint_path)
     project_path = tmp_path / "project"
     project_path.mkdir()
+    checkpoint_path = project_path / "checkpoint.json"
+    _checkpoint(checkpoint_path)
 
     adapter = OgmiAdapter()
 
@@ -121,10 +247,10 @@ def test_adapter_rejects_binding_identity_mismatch(
 def test_adapter_fails_closed_on_invalid_timeout_and_oversized_output(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    checkpoint_path = tmp_path / "checkpoint.json"
-    _checkpoint(checkpoint_path)
     project_path = tmp_path / "project"
     project_path.mkdir()
+    checkpoint_path = project_path / "checkpoint.json"
+    _checkpoint(checkpoint_path)
     adapter = OgmiAdapter(timeout_seconds=1, max_output_bytes=4096)
 
     monkeypatch.setattr(
@@ -168,12 +294,12 @@ def test_adapter_fails_closed_on_invalid_timeout_and_oversized_output(
 def test_adapter_rejects_wrong_version_and_orientation(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    checkpoint_path = tmp_path / "checkpoint.json"
+    project_path = tmp_path / "project"
+    project_path.mkdir()
+    checkpoint_path = project_path / "checkpoint.json"
     checkpoint = _checkpoint(checkpoint_path)
     checkpoint["schema_version"] = "9.9"
     checkpoint_path.write_text(json.dumps(checkpoint), encoding="utf-8")
-    project_path = tmp_path / "project"
-    project_path.mkdir()
 
     adapter = OgmiAdapter()
     monkeypatch.setattr(

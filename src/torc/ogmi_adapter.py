@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import subprocess
@@ -48,11 +49,37 @@ class OgmiAdapter:
 
         checkpoint = Path(checkpoint_path).resolve()
         project = Path(project_path).resolve()
-        record = self._read_checkpoint(checkpoint)
+        if not project.is_dir():
+            raise OgmiAdapterError("selected OGMI project is not a directory")
+        try:
+            checkpoint.relative_to(project)
+        except ValueError as exc:
+            raise OgmiAdapterError(
+                "OGMI checkpoint is not a member of the selected project"
+            ) from exc
+        if checkpoint.suffix != ".json":
+            raise OgmiAdapterError(
+                "OGMI checkpoint is not a JSON record in the selected project"
+            )
+        checkpoint_bytes, record = self._read_checkpoint(checkpoint)
+
+        project_validation = self._run_json(
+            "validate", str(project), "--json", label="project validate"
+        )
+        self._require_unchanged(checkpoint, checkpoint_bytes)
+        project_records = project_validation.get("records")
+        if (
+            project_validation.get("errors") != 0
+            or not isinstance(project_records, int)
+            or isinstance(project_records, bool)
+            or project_records < 1
+        ):
+            raise OgmiAdapterError("OGMI validate rejected the selected project graph")
 
         validation = self._run_json(
             "validate", str(checkpoint), "--json", label="validate"
         )
+        self._require_unchanged(checkpoint, checkpoint_bytes)
         if validation.get("errors") != 0 or validation.get("records") != 1:
             raise OgmiAdapterError("OGMI validate rejected the checkpoint record")
 
@@ -71,6 +98,7 @@ class OgmiAdapter:
             raise OgmiAdapterError("OGMI checkpoint identifier is missing")
 
         digest_output = self._run("hash", str(checkpoint), label="hash").strip()
+        self._require_unchanged(checkpoint, checkpoint_bytes)
         try:
             digest_text = digest_output.decode("ascii")
         except UnicodeDecodeError as exc:
@@ -78,10 +106,19 @@ class OgmiAdapter:
         digest_match = _CANONICAL_HASH.fullmatch(digest_text)
         if digest_match is None:
             raise OgmiAdapterError("OGMI hash output is not a canonical SHA-256 digest")
+        canonical_bytes = json.dumps(
+            record, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+        ).encode("utf-8")
+        expected_digest = hashlib.sha256(canonical_bytes).hexdigest()
+        if digest_match.group(1) != expected_digest:
+            raise OgmiAdapterError(
+                "OGMI hash does not match the exact checkpoint value"
+            )
 
         orientation = self._run_json(
             "orient", str(project), orientation_spine_id, label="orient"
         )
+        self._require_unchanged(checkpoint, checkpoint_bytes)
         validation_view = orientation.get("validation")
         node = orientation.get("node")
         if (
@@ -100,18 +137,29 @@ class OgmiAdapter:
             "orientation": orientation,
         }
 
-    def _read_checkpoint(self, path: Path) -> dict[str, Any]:
+    def _read_checkpoint(self, path: Path) -> tuple[bytes, dict[str, Any]]:
+        content = self._read_checkpoint_bytes(path)
         try:
-            if path.stat().st_size > self.max_output_bytes:
-                raise OgmiAdapterError("OGMI checkpoint exceeds the output limit")
-            value = json.loads(path.read_text(encoding="utf-8"))
-        except OgmiAdapterError:
-            raise
-        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            value = json.loads(content.decode("utf-8"))
+        except (UnicodeError, json.JSONDecodeError) as exc:
             raise OgmiAdapterError("OGMI checkpoint could not be read") from exc
         if not isinstance(value, dict):
             raise OgmiAdapterError("OGMI checkpoint must be a JSON object")
-        return value
+        return content, value
+
+    def _read_checkpoint_bytes(self, path: Path) -> bytes:
+        try:
+            with path.open("rb") as stream:
+                content = stream.read(self.max_output_bytes + 1)
+        except OSError as exc:
+            raise OgmiAdapterError("OGMI checkpoint could not be read") from exc
+        if len(content) > self.max_output_bytes:
+            raise OgmiAdapterError("OGMI checkpoint exceeds the output limit")
+        return content
+
+    def _require_unchanged(self, path: Path, expected: bytes) -> None:
+        if self._read_checkpoint_bytes(path) != expected:
+            raise OgmiAdapterError("OGMI checkpoint changed during resolution")
 
     def _run_json(self, *args: str, label: str) -> dict[str, Any]:
         output = self._run(*args, label=label)
