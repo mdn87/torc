@@ -8,6 +8,7 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from . import __version__
+from .context import attach_context, checkpoint_context, detach_context, hydrate_context
 from .demo import inspect_lineage, run_demo
 from .errors import TorcError
 from .experiment_adapters import adapter_for
@@ -136,7 +137,14 @@ def build_parser() -> argparse.ArgumentParser:
     lineage_create.add_argument("--substrate-file", type=Path, required=True)
     lineage_create.add_argument("--activation-id")
     lineage_create.add_argument("--json", action="store_true", dest="as_json")
-    lineage_checkpoint = lineage_commands.add_parser("checkpoint")
+    lineage_checkpoint = lineage_commands.add_parser(
+        "checkpoint",
+        help="Append the canonical lineage revision primitive.",
+        description=(
+            "Append one canonical lineage revision through the authoritative "
+            "activation. Runtime lifecycle callers normally use context checkpoint."
+        ),
+    )
     lineage_checkpoint.add_argument("--state-dir", type=Path, required=True)
     lineage_checkpoint.add_argument("--lineage", required=True)
     lineage_checkpoint.add_argument("--activation", required=True)
@@ -227,6 +235,56 @@ def build_parser() -> argparse.ArgumentParser:
     )
     recovery_resolve.add_argument("--json", action="store_true", dest="as_json")
 
+    context = subparsers.add_parser(
+        "context", help="Bind, checkpoint, detach, or hydrate one exact runtime session."
+    )
+    context_commands = context.add_subparsers(dest="context_command", required=True)
+
+    context_attach = context_commands.add_parser(
+        "attach", help="Bind one exact runtime session to an authoritative activation."
+    )
+    _add_context_lookup_arguments(context_attach)
+    context_attach.add_argument("--lineage", required=True)
+    context_attach.add_argument("--activation", required=True)
+    context_attach.add_argument(
+        "--mode", choices=("ogmi_workgraph", "torc_standalone"), required=True
+    )
+    context_attach.add_argument("--ogmi-project", type=Path)
+    context_attach.add_argument("--ogmi-run")
+    context_attach.add_argument("--ogmi-assignment")
+    context_attach.add_argument("--ogmi-spine")
+    context_attach.add_argument("--ogmi-checkpoint", type=Path)
+    context_attach.add_argument("--json", action="store_true", dest="as_json")
+
+    context_checkpoint = context_commands.add_parser(
+        "checkpoint",
+        help="Validate a runtime binding, append once, and compile its hydration view.",
+        description=(
+            "Lifecycle wrapper: validate the exact runtime binding, delegate once to "
+            "the canonical lineage checkpoint path, then compile a same-session view."
+        ),
+    )
+    _add_context_lookup_arguments(context_checkpoint)
+    context_checkpoint.add_argument("--state-file", type=Path, required=True)
+    context_checkpoint.add_argument("--budget-limit", type=int, required=True)
+    context_checkpoint.add_argument(
+        "--evidence-ref", action="append", default=[], dest="evidence_refs"
+    )
+    context_checkpoint.add_argument("--json", action="store_true", dest="as_json")
+
+    context_detach = context_commands.add_parser(
+        "detach",
+        help="Retire one exact runtime binding without changing lineage authority.",
+    )
+    _add_context_lookup_arguments(context_detach)
+    context_detach.add_argument("--json", action="store_true", dest="as_json")
+
+    context_hydrate = context_commands.add_parser(
+        "hydrate", help="Read a bounded verified view for one exact runtime session."
+    )
+    _add_context_lookup_arguments(context_hydrate)
+    context_hydrate.add_argument("--json", action="store_true", dest="as_json")
+
     experiment = subparsers.add_parser(
         "experiment", help="Prepare and operate a P1a experiment run."
     )
@@ -264,6 +322,13 @@ def build_parser() -> argparse.ArgumentParser:
     experiment_verify.add_argument("--json", action="store_true", dest="as_json")
 
     return parser
+
+
+def _add_context_lookup_arguments(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--state-dir", type=Path, required=True)
+    parser.add_argument("--harness", required=True)
+    parser.add_argument("--repository-id", required=True)
+    parser.add_argument("--runtime-session", required=True)
 
 
 def _run_about(as_json: bool) -> int:
@@ -721,6 +786,45 @@ def main(argv: Sequence[str] | None = None) -> int:
                     parser.error(
                         f"Unsupported recovery command: {args.recovery_command}"
                     )
+            _print_payload(payload, args.as_json)
+            return 0 if payload.get("ok", True) else 1
+        if args.command == "context":
+            lookup = {
+                "harness": args.harness,
+                "repository_identity": args.repository_id,
+                "runtime_session_ref": args.runtime_session,
+            }
+            if args.context_command == "hydrate":
+                with Store(args.state_dir, read_only=True) as store:
+                    payload = hydrate_context(store, **lookup)
+                _print_payload(payload, args.as_json)
+                return 0
+            with Store(args.state_dir) as store:
+                if args.context_command == "attach":
+                    payload = attach_context(
+                        store,
+                        **lookup,
+                        lineage_id=args.lineage,
+                        activation_id=args.activation,
+                        continuity_mode=args.mode,
+                        ogmi_project_path=args.ogmi_project,
+                        ogmi_run_id=args.ogmi_run,
+                        ogmi_assignment_id=args.ogmi_assignment,
+                        ogmi_orientation_spine_id=args.ogmi_spine,
+                        ogmi_checkpoint_path=args.ogmi_checkpoint,
+                    )
+                elif args.context_command == "detach":
+                    payload = detach_context(store, **lookup)
+                elif args.context_command == "checkpoint":
+                    payload = checkpoint_context(
+                        store,
+                        **lookup,
+                        canonical_state=load_json_object(args.state_file),
+                        budget_limit=args.budget_limit,
+                        evidence_refs=args.evidence_refs,
+                    )
+                else:
+                    parser.error(f"Unsupported context command: {args.context_command}")
             _print_payload(payload, args.as_json)
             return 0 if payload.get("ok", True) else 1
         if args.command == "experiment":

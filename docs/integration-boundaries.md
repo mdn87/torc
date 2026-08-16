@@ -13,6 +13,37 @@ TORC must earn a narrow place in Lugos rather than duplicate existing modules.
 | lugos-mcp and CLI | Shared command and tool surfaces | Expose a thin TORC surface after the local contract stabilizes | Reimplement TORC domain logic in every surface |
 | HUD or mission-control | Read-oriented operator visibility | Render lineage head, active bearer, pending handoff, provenance, and fit rationale | Mutate lineage state without an explicitly designed and authorized command path |
 | Harnesses such as Codex or Claude | Actual model execution and tool use | Implement adapters that load projections and return structured checkpoints or reconstructions | Define canonical lineage identity or silently claim authority |
+| OGMI | Shared workgraph records, continuity checkpoints, orientation bundles, run and assignment identity | Validate/hash/orient through OGMI's public CLI and retain a reference from a Torc runtime binding and lineage revision | Copy the OGMI schema, synthesize an OGMI checkpoint, or reinterpret OGMI authority and spine semantics |
+
+## Root-session continuity boundary
+
+For an OGMI-enrolled root session, OGMI owns the checkpoint and orientation
+record shapes while Torc owns lineage revisions, projections, runtime bindings,
+activations, and leases. Torc invokes only fixed, non-shell OGMI commands under
+a timeout and output ceiling:
+
+```text
+python -m ogmi validate CHECKPOINT --json
+python -m ogmi hash CHECKPOINT
+python -m ogmi orient PROJECT SPINE
+```
+
+Invalid, unavailable, timed-out, oversized, tampered, or identity-mismatched
+OGMI input fails closed. A session outside an OGMI run must opt into
+`torc_standalone`; Torc does not fabricate a workgraph record for it.
+
+The context lifecycle commands are intentionally distinct from succession:
+
+- `torc context attach` binds one exact harness, runtime session, and repository
+  identity to an already-authoritative activation.
+- `torc context checkpoint` is a convenience wrapper over the existing
+  `torc lineage checkpoint` append path and compiles a same-substrate view.
+- `torc context detach` retires only an exact external runtime binding, including
+  a stale one; it does not mutate lineage history, activation, lease, or OGMI.
+- `torc context hydrate` opens the store read-only and returns only a bounded,
+  verified derived view. `unbound`, `stale`, and `invalid` results are explicit.
+- A different authoritative session still uses `torc handoff prepare/resolve`;
+  a durable alternate line still uses `torc lineage branch`.
 
 ## Assignment and lineage are different
 

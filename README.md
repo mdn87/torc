@@ -120,6 +120,60 @@ and after preparation, then `activation-target` after acceptance. Its projection
 uses 65 of 70 estimated words, includes all required continuity sections, and
 exports seven immutable JSON artifacts under `.torc/demo/artifacts/`.
 
+## Root-session checkpoint and hydration
+
+`torc lineage checkpoint` is the primitive that appends one authoritative
+canonical-state revision. `torc context checkpoint` is the lifecycle wrapper:
+it verifies an exact runtime binding, delegates once to that primitive, and
+compiles a bounded same-session projection. It never prepares a handoff,
+creates an activation, or transfers the lease.
+
+Use a repository-local `.torc/context` store so a Lugos Orca `SessionStart`
+hook can discover it. A root session outside an OGMI workgraph must opt into
+the explicitly limited standalone mode:
+
+```bash
+python -m torc context attach \
+  --state-dir .torc/context --harness codex \
+  --repository-id "$(pwd -P)" --runtime-session SESSION_ID \
+  --lineage LINEAGE_ID --activation ACTIVATION_ID \
+  --mode torc_standalone --json
+
+python -m torc context checkpoint \
+  --state-dir .torc/context --harness codex \
+  --repository-id "$(pwd -P)" --runtime-session SESSION_ID \
+  --state-file CANONICAL_STATE.json --budget-limit 180 --json
+
+python -m torc context hydrate \
+  --state-dir .torc/context --harness codex \
+  --repository-id "$(pwd -P)" --runtime-session SESSION_ID --json
+```
+
+For an OGMI-enrolled session, first generate or select its schema-valid
+continuity checkpoint and confirm `ogmi validate`, `ogmi hash`, and
+`ogmi orient` succeed. Attach with `--mode ogmi_workgraph` and the exact
+`--ogmi-project`, `--ogmi-run`, `--ogmi-assignment`, `--ogmi-spine`, and
+`--ogmi-checkpoint` values. Torc stores only the reference and canonical hash;
+it does not copy the OGMI checkpoint schema. `context hydrate` is the read-only
+binding/provenance inspection surface and reports `ready`, `unbound`, `stale`,
+or `invalid` rather than guessing.
+
+After checkpointing, compact, clear, or resume the same runtime session and
+let Lugos Orca request the verified projection. Codex 0.147.0 exposed no
+supported pre-compaction event in the 2026-08-16 probe, so capture remains an
+explicit pre-reset step. Retire an obsolete exact binding without touching
+lineage or authority:
+
+```bash
+python -m torc context detach \
+  --state-dir .torc/context --harness codex \
+  --repository-id "$(pwd -P)" --runtime-session SESSION_ID --json
+```
+
+A different session that needs authority must still use
+`torc handoff prepare/resolve`; a durable alternate line must still use
+`torc lineage branch`.
+
 ## Documents
 
 - `docs/project-brief.md` - problem, hypothesis, constraints, and kill criteria

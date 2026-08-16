@@ -14,6 +14,7 @@
 | `handoff_id` | Immutable handoff preparation record |
 | `handoff_result_id` | Separate acceptance or rejection record |
 | `artifact_id` | Content-addressed or otherwise immutable referenced artifact |
+| `binding_id` | Durable exact mapping from an external runtime session to one activation |
 
 Do not overload `agent_id` to mean all of these. A future adapter may map an external `agent_id` to a TORC lineage, but the mapping must be explicit.
 
@@ -114,6 +115,41 @@ An activation records:
 - lease reference when authoritative
 
 An activation without a valid lease may inspect or propose. It may not advance the authoritative lineage head.
+
+## Runtime context binding
+
+A runtime context binding is a durable adapter record, not a second authority
+record. It identifies the harness, repository identity, exact runtime session
+reference, lineage, activation, and continuity mode. Repository identity is a
+guard; a repository-only lookup is never sufficient. The activation's current
+lease remains the sole authority to advance the lineage.
+
+Bindings contain no prompt, transcript, secret, or permission. They use one of
+two explicit modes:
+
+- `ogmi_workgraph` pins an OGMI project, run, assignment, orientation spine,
+  schema-valid checkpoint ID/path, and canonical checkpoint SHA-256. The Torc
+  revision stores only the bounded evidence reference
+  `ogmi-checkpoint:sha256:<digest>`; it does not copy OGMI's checkpoint schema.
+- `torc_standalone` uses Torc's canonical lineage state and is labeled as not
+  providing a shared OGMI workgraph checkpoint.
+
+The binding may point to the latest same-activation revision and derived
+projection. That mutable adapter pointer does not change canonical history or
+authority. Hydration requires the exact binding, current activation, current
+lease holder, current lineage head, projection provenance, and any pinned OGMI
+hash to agree.
+
+A stale session is retired with an exact harness, runtime-session, and
+repository-identity match. Detaching deletes only the adapter binding. It does
+not delete or modify the lineage, revisions, activation, lease, projection, or
+OGMI record, and it does not require the stale activation to remain active.
+
+`torc lineage checkpoint` remains the canonical revision-append operation.
+`torc context checkpoint` validates the external binding, delegates exactly
+once to that operation, and compiles a same-substrate projection with the Torc
+reason `context_degradation`. It neither prepares a handoff nor creates or
+transfers an activation. OGMI's checkpoint reason vocabulary remains separate.
 
 ## Lease
 

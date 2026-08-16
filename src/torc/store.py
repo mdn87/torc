@@ -143,6 +143,59 @@ CREATE TRIGGER artifacts_no_delete BEFORE DELETE ON artifacts
 BEGIN SELECT RAISE(ABORT, 'immutable artifact metadata cannot be deleted'); END;
 """
 
+_MIGRATION_2 = """
+CREATE TABLE context_bindings (
+    binding_id TEXT PRIMARY KEY,
+    harness TEXT NOT NULL,
+    repository_identity TEXT NOT NULL,
+    runtime_session_ref TEXT NOT NULL,
+    lineage_id TEXT NOT NULL REFERENCES lineages(lineage_id),
+    activation_id TEXT NOT NULL REFERENCES activations(activation_id),
+    continuity_mode TEXT NOT NULL CHECK (
+        continuity_mode IN ('ogmi_workgraph', 'torc_standalone')
+    ),
+    ogmi_project_path TEXT,
+    ogmi_run_id TEXT,
+    ogmi_assignment_id TEXT,
+    ogmi_orientation_spine_id TEXT,
+    ogmi_checkpoint_id TEXT,
+    ogmi_checkpoint_path TEXT,
+    ogmi_checkpoint_sha256 TEXT,
+    source_revision_id TEXT REFERENCES revisions(revision_id),
+    projection_id TEXT REFERENCES projections(projection_id),
+    created_at TEXT NOT NULL,
+    UNIQUE (harness, runtime_session_ref),
+    CHECK (
+        (continuity_mode = 'torc_standalone'
+         AND ogmi_project_path IS NULL
+         AND ogmi_run_id IS NULL
+         AND ogmi_assignment_id IS NULL
+         AND ogmi_orientation_spine_id IS NULL
+         AND ogmi_checkpoint_id IS NULL
+         AND ogmi_checkpoint_path IS NULL
+         AND ogmi_checkpoint_sha256 IS NULL)
+        OR
+        (continuity_mode = 'ogmi_workgraph'
+         AND ogmi_project_path IS NOT NULL
+         AND ogmi_run_id IS NOT NULL
+         AND ogmi_assignment_id IS NOT NULL
+         AND ogmi_orientation_spine_id IS NOT NULL
+         AND ogmi_checkpoint_id IS NOT NULL
+         AND ogmi_checkpoint_path IS NOT NULL
+         AND ogmi_checkpoint_sha256 IS NOT NULL)
+    )
+);
+CREATE INDEX context_bindings_lineage_idx ON context_bindings(lineage_id);
+CREATE TRIGGER context_bindings_identity_no_update BEFORE UPDATE OF
+    binding_id, harness, repository_identity, runtime_session_ref,
+    lineage_id, activation_id, continuity_mode, ogmi_project_path,
+    ogmi_run_id, ogmi_assignment_id, ogmi_orientation_spine_id,
+    ogmi_checkpoint_id, ogmi_checkpoint_path, ogmi_checkpoint_sha256,
+    created_at
+ON context_bindings
+BEGIN SELECT RAISE(ABORT, 'context binding identity cannot be updated'); END;
+"""
+
 
 class Store:
     """Owns a single local TORC SQLite database."""
@@ -167,7 +220,7 @@ class Store:
             version = int(
                 self.connection.execute("PRAGMA user_version").fetchone()[0]
             )
-            if version != 1:
+            if version not in {1, 2}:
                 raise RuntimeError(
                     f"unsupported TORC database schema version: {version}"
                 )
@@ -185,12 +238,17 @@ class Store:
 
     def migrate(self) -> None:
         version = int(self.connection.execute("PRAGMA user_version").fetchone()[0])
-        if version > 1:
+        if version > 2:
             raise RuntimeError(f"unsupported TORC database schema version: {version}")
         if version == 0:
             with self.connection:
                 self.connection.executescript(_MIGRATION_1)
                 self.connection.execute("PRAGMA user_version = 1")
+            version = 1
+        if version == 1:
+            with self.connection:
+                self.connection.executescript(_MIGRATION_2)
+                self.connection.execute("PRAGMA user_version = 2")
 
     @contextmanager
     def transaction(self, *, immediate: bool = False) -> Iterator[sqlite3.Connection]:
@@ -308,7 +366,7 @@ class Store:
             },
             previous_revision_sha256=parent["integrity"]["canonical_payload_sha256"],
         )
-        with self.connection:
+        with self.transaction(immediate=True):
             current = self.current_authority(lineage_id)
             if current["activation_id"] != activation_id:
                 raise LeaseConflictError("authority changed before revision append")
@@ -508,10 +566,126 @@ class Store:
         else:
             raise ValueError(f"unsupported immutable record table: {table}")
         placeholders = ", ".join("?" for _ in values)
-        with self.connection:
+        with self.transaction():
             self.connection.execute(
                 f"INSERT INTO {table} ({columns}) VALUES ({placeholders})", values
             )
+
+    def create_context_binding(self, binding: dict[str, Any]) -> dict[str, Any]:
+        """Persist one exact external runtime-to-activation binding."""
+
+        columns = (
+            "binding_id",
+            "harness",
+            "repository_identity",
+            "runtime_session_ref",
+            "lineage_id",
+            "activation_id",
+            "continuity_mode",
+            "ogmi_project_path",
+            "ogmi_run_id",
+            "ogmi_assignment_id",
+            "ogmi_orientation_spine_id",
+            "ogmi_checkpoint_id",
+            "ogmi_checkpoint_path",
+            "ogmi_checkpoint_sha256",
+            "source_revision_id",
+            "projection_id",
+            "created_at",
+        )
+        values = tuple(binding.get(column) for column in columns)
+        placeholders = ", ".join("?" for _ in columns)
+        with self.transaction(immediate=True):
+            self.connection.execute(
+                f"INSERT INTO context_bindings ({', '.join(columns)}) "
+                f"VALUES ({placeholders})",
+                values,
+            )
+        return self.get_context_binding(
+            binding["harness"],
+            binding["runtime_session_ref"],
+            binding["repository_identity"],
+        )
+
+    def get_context_binding(
+        self, harness: str, runtime_session_ref: str, repository_identity: str
+    ) -> dict[str, Any]:
+        """Resolve one binding only when every external identity matches exactly."""
+
+        try:
+            row = self.connection.execute(
+                """SELECT * FROM context_bindings
+                   WHERE harness = ? AND runtime_session_ref = ?
+                     AND repository_identity = ?""",
+                (harness, runtime_session_ref, repository_identity),
+            ).fetchone()
+        except sqlite3.OperationalError as exc:
+            if "no such table" in str(exc):
+                raise NotFoundError("context binding not found") from exc
+            raise
+        if row is None:
+            raise NotFoundError("context binding not found")
+        return dict(row)
+
+    def context_bindings_for_session(
+        self, harness: str, runtime_session_ref: str
+    ) -> list[dict[str, Any]]:
+        """Return repository guards for classifying a mismatched exact lookup."""
+
+        try:
+            rows = self.connection.execute(
+                """SELECT * FROM context_bindings
+                   WHERE harness = ? AND runtime_session_ref = ?
+                   ORDER BY binding_id""",
+                (harness, runtime_session_ref),
+            ).fetchall()
+        except sqlite3.OperationalError as exc:
+            if "no such table" in str(exc):
+                return []
+            raise
+        return [dict(row) for row in rows]
+
+    def update_context_checkpoint(
+        self,
+        binding_id: str,
+        *,
+        source_revision_id: str,
+        projection_id: str,
+    ) -> None:
+        """Point a runtime binding at its latest derived same-activation projection."""
+
+        cursor = self.connection.execute(
+            """UPDATE context_bindings
+               SET source_revision_id = ?, projection_id = ?
+               WHERE binding_id = ?""",
+            (source_revision_id, projection_id, binding_id),
+        )
+        if cursor.rowcount != 1:
+            raise NotFoundError(f"context binding not found: {binding_id}")
+
+    def delete_context_binding(
+        self, harness: str, runtime_session_ref: str, repository_identity: str
+    ) -> dict[str, Any]:
+        """Delete only one exact external adapter binding and return its prior value."""
+
+        with self.transaction(immediate=True):
+            binding = self.get_context_binding(
+                harness, runtime_session_ref, repository_identity
+            )
+            cursor = self.connection.execute(
+                """DELETE FROM context_bindings
+                   WHERE binding_id = ? AND harness = ? AND runtime_session_ref = ?
+                     AND repository_identity = ?""",
+                (
+                    binding["binding_id"],
+                    harness,
+                    runtime_session_ref,
+                    repository_identity,
+                ),
+            )
+            if cursor.rowcount != 1:
+                raise NotFoundError("context binding not found")
+        return binding
 
     def get_hashed_record(
         self, table: str, id_column: str, identifier: str

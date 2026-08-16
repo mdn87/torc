@@ -51,9 +51,9 @@ def verify_store(store: Store, lineage_id: str | None = None) -> dict[str, Any]:
 
     return {
         "valid": not errors,
-        "schema_version": int(
-            store.connection.execute("PRAGMA user_version").fetchone()[0]
-        ),
+        # Verification is its own stable output contract; SQLite migrations do
+        # not change the meaning or shape of this report.
+        "schema_version": 1,
         "lineages_checked": lineage_ids,
         "artifacts_checked": store.connection.execute(
             "SELECT COUNT(*) FROM artifacts"
