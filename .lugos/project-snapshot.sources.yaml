@@ -1,0 +1,19 @@
+version: 1
+repository: mdn87/torc
+recent_commits: 10
+sources:
+  - id: readme
+    path: README.md
+    required: true
+  - id: architecture
+    path: docs/architecture.md
+    required: true
+  - id: project-snapshot-architecture
+    path: docs/project-snapshot-artifacts.md
+    required: true
+  - id: roadmap
+    path: docs/roadmap.md
+    required: true
+  - id: optional-project-status
+    path: STATUS.md
+    required: false
