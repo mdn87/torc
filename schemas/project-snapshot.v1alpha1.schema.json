@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:lugos:artifact:project-snapshot:v1alpha1",
+  "title": "Lugos Project Snapshot v1alpha1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "artifact_id", "kind", "generated_at", "scope", "generator", "evidence_bundle", "projects", "claims", "blockers", "pending_decisions", "recent_activity", "conflicts", "unknowns", "metadata"],
+  "properties": {
+    "schema": {"const": "urn:lugos:artifact:project-snapshot:v1alpha1"},
+    "artifact_id": {"$ref": "#/$defs/digest"},
+    "kind": {"const": "project-snapshot"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "repositories"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "repositories": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/repository"}}
+      }
+    },
+    "generator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["implementation", "version"],
+      "properties": {
+        "implementation": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1},
+        "provider": {"type": "string", "minLength": 1},
+        "model": {"type": "string", "minLength": 1}
+      }
+    },
+    "evidence_bundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bundle_id"],
+      "properties": {"bundle_id": {"$ref": "#/$defs/digest"}}
+    },
+    "projects": {"type": "array", "items": {"$ref": "#/$defs/project"}},
+    "claims": {"type": "array", "items": {"$ref": "#/$defs/claim"}},
+    "blockers": {"type": "array", "items": {"$ref": "#/$defs/blocker"}},
+    "pending_decisions": {"type": "array", "items": {"$ref": "#/$defs/decision"}},
+    "recent_activity": {"type": "array", "items": {"$ref": "#/$defs/activity"}},
+    "conflicts": {"type": "array", "items": {"$ref": "#/$defs/conflict"}},
+    "unknowns": {"type": "array", "items": {"$ref": "#/$defs/unknown"}},
+    "metadata": {"type": "object"}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "commit"],
+      "properties": {
+        "repository": {"type": "string", "minLength": 1},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40,64}$"}
+      }
+    },
+    "evidence_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id"],
+      "properties": {"source_id": {"$ref": "#/$defs/id"}}
+    },
+    "progress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "label"],
+      "properties": {
+        "kind": {"enum": ["gates", "deliverables", "checks", "milestone", "status", "ratio", "authoritative-percentage"]},
+        "label": {"type": "string", "minLength": 1},
+        "completed": {"type": "integer", "minimum": 0},
+        "total": {"type": "integer", "minimum": 1},
+        "percentage": {"type": "number", "minimum": 0, "maximum": 100},
+        "source_id": {"$ref": "#/$defs/id"}
+      },
+      "allOf": [
+        {"if": {"properties": {"kind": {"const": "ratio"}}, "required": ["kind"]}, "then": {"required": ["completed", "total", "source_id"]}},
+        {"if": {"properties": {"kind": {"const": "authoritative-percentage"}}, "required": ["kind"]}, "then": {"required": ["percentage", "source_id"]}}
+      ]
+    },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["project_id", "name", "status", "repositories", "progress"],
+      "properties": {
+        "project_id": {"$ref": "#/$defs/id"},
+        "name": {"type": "string", "minLength": 1},
+        "status": {"type": "string", "minLength": 1},
+        "repositories": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "progress": {"type": "array", "items": {"$ref": "#/$defs/progress"}}
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claim_id", "subject", "predicate", "value", "status", "evidence", "observed_at"],
+      "properties": {
+        "claim_id": {"$ref": "#/$defs/id"},
+        "subject": {"type": "string", "minLength": 1},
+        "predicate": {"type": "string", "minLength": 1},
+        "value": {},
+        "status": {"enum": ["verified", "asserted", "conflicted", "unknown"]},
+        "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence_ref"}},
+        "observed_at": {"type": "string", "format": "date-time"}
+      },
+      "allOf": [
+        {"if": {"properties": {"status": {"const": "verified"}}, "required": ["status"]}, "then": {"properties": {"evidence": {"minItems": 1}}}}
+      ]
+    },
+    "blocker": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["blocker_id", "summary", "status", "evidence"],
+      "properties": {
+        "blocker_id": {"$ref": "#/$defs/id"}, "summary": {"type": "string", "minLength": 1},
+        "status": {"enum": ["open", "resolved"]}, "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence_ref"}}
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision_id", "summary", "status", "evidence"],
+      "properties": {
+        "decision_id": {"$ref": "#/$defs/id"}, "summary": {"type": "string", "minLength": 1},
+        "status": {"enum": ["pending", "decided"]}, "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence_ref"}}
+      }
+    },
+    "activity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["activity_id", "summary", "occurred_at", "evidence"],
+      "properties": {
+        "activity_id": {"$ref": "#/$defs/id"}, "summary": {"type": "string", "minLength": 1},
+        "occurred_at": {"type": "string", "format": "date-time"}, "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence_ref"}}
+      }
+    },
+    "conflict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["conflict_id", "summary", "claim_ids", "evidence"],
+      "properties": {
+        "conflict_id": {"$ref": "#/$defs/id"}, "summary": {"type": "string", "minLength": 1},
+        "claim_ids": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/id"}},
+        "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence_ref"}}
+      }
+    },
+    "unknown": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unknown_id", "summary", "evidence"],
+      "properties": {
+        "unknown_id": {"$ref": "#/$defs/id"}, "summary": {"type": "string", "minLength": 1},
+        "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence_ref"}}
+      }
+    }
+  }
+}

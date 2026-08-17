@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "objective": "Implement a provider-agnostic, content-addressed project snapshot slice that collects bounded Git evidence, validates immutable candidate projections, records separate acceptance receipts, advances a mutable current pointer only after acceptance, and renders an accepted snapshot read-only.",
+  "success_evidence": [
+    "All three v1alpha1 schemas validate their committed fixtures and invalid fixtures fail for the documented reason.",
+    "A local Git repository can produce a content-addressed Evidence Bundle from an explicit source manifest, including dirty state and missing-source diagnostics.",
+    "Candidate validation checks schema, digest, timestamps, evidence-bundle identity, evidence-source resolution, and verified-claim evidence without provider-specific behavior.",
+    "Acceptance writes a separate immutable receipt and advances current.ref only for an accepted artifact.",
+    "The accepted fixture renders as a standalone read-only HTML projection.",
+    "The complete automated test suite, Ruff, doctor, CLI smoke flow, and reference render pass on the implementation host."
+  ],
+  "non_goals": [
+    "Provider SDKs, live model calls, or a production producer adapter.",
+    "A daemon, scheduler, watcher, web server, external database, or network dependency.",
+    "Mission Control mutation controls, task writeback, or a polished dashboard redesign.",
+    "Broad repository crawling, dependency-tree collection, secret discovery, or arbitrary environment capture.",
+    "Changes outside the TORC repository or updates to the Lugos parent submodule pointer.",
+    "Inferred completion percentages or provider-dependent validation, storage, acceptance, or rendering."
+  ],
+  "accepted_threats": [
+    "SHA-256 supplies local tamper evidence but not writer authentication, confidentiality, or protection from a malicious process with filesystem access.",
+    "An explicitly configured non-secret source can still contain sensitive prose; the collector prevents known secret-prone paths but cannot classify all content.",
+    "The first renderer is a disposable standalone HTML projection rather than a Mission Control route.",
+    "The existing TORC canonical JSON implementation is deterministic for JSON values but is not a complete RFC 8785 implementation.",
+    "Windows behavior is contract-tested through portable paths and atomic replace semantics but is not executed on the macOS implementation host."
+  ],
+  "estimates": {
+    "elapsed_hours": 8,
+    "production_loc": 1700,
+    "test_loc": 1200,
+    "changed_files": 32,
+    "runtime_processes": 0,
+    "operator_steps": 6,
+    "design_review_rounds": 1
+  },
+  "observed": {
+    "elapsed_hours": 2.75,
+    "production_loc": 1426,
+    "test_loc": 661,
+    "changed_files": 33,
+    "runtime_processes": 0,
+    "operator_steps": 5,
+    "design_review_rounds": 1
+  },
+  "vertical_slice": {
+    "due_before_elapsed_hours": 1.6,
+    "status": "proven_local",
+    "evidence": {
+      "target": "A committed evidence fixture and candidate fixture pass schema and digest validation, acceptance produces a separate receipt, current.ref advances, and the accepted artifact renders to HTML.",
+      "test_command": "python -m pytest tests/test_project_snapshot_identity.py tests/test_project_snapshot_validation.py tests/test_project_snapshot_acceptance.py",
+      "result": "Stable content identity, complete validation checks, separate accepted and rejected receipts, fail-closed current.ref behavior, accepted storage, and read-only HTML passed 14 focused tests before the 20 percent elapsed-effort gate."
+    }
+  },
+  "platform_matrix": {
+    "authoritative_implementation_host": "macos-primary (macOS)",
+    "supported_hosts": [
+      "macos-primary (macOS)",
+      "macos-secondary (macOS)",
+      "windows-primary (Windows)",
+      "windows-secondary (Windows)"
+    ],
+    "shared_runtime": "Python 3.11+ library and CLI with pathlib paths and no service process",
+    "platform_divergence": "Only shell invocation syntax differs; storage files, JSON contracts, Git commands, portable current.ref, and os.replace-based writes are shared."
+  },
+  "architecture_triggers": [],
+  "review_rounds_used": 1,
+  "scope_policy_sha256": "9707efccd8426b7b53784bc7752449f5e4a45913c141c990b6a21d8c3bb2cdae",
+  "parent_envelope_sha256": null,
+  "operator_override_id": null
+}

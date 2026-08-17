@@ -3,11 +3,19 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import sys
 from collections.abc import Sequence
 from pathlib import Path
 
 from . import __version__
+from .artifacts.acceptance import accept_project_snapshot
+from .artifacts.collection import collect_evidence_bundle
+from .artifacts.producer import CommandProjectSnapshotProducer
+from .artifacts.render import render_snapshot_html
+from .artifacts.storage import ArtifactStore
+from .artifacts.validation import validate_project_snapshot
+from .artifacts.view import build_current_snapshot_view
 from .demo import inspect_lineage, run_demo
 from .errors import TorcError
 from .experiment_adapters import adapter_for
@@ -62,6 +70,10 @@ _REQUIRED_PATHS = (
     "schemas/handoff-snapshot.schema.json",
     "schemas/handoff-result.schema.json",
     "schemas/operator-view.schema.json",
+    "schemas/evidence-bundle.v1alpha1.schema.json",
+    "schemas/project-snapshot.v1alpha1.schema.json",
+    "schemas/acceptance-receipt.v1alpha1.schema.json",
+    "docs/artifacts/cold-agent-refresh.md",
 )
 
 
@@ -262,6 +274,60 @@ def build_parser() -> argparse.ArgumentParser:
     experiment_verify = experiment_commands.add_parser("verify")
     experiment_verify.add_argument("--run-dir", type=Path, required=True)
     experiment_verify.add_argument("--json", action="store_true", dest="as_json")
+
+    artifact = subparsers.add_parser(
+        "artifact", help="Collect, validate, accept, and render project snapshots."
+    )
+    artifact_commands = artifact.add_subparsers(
+        dest="artifact_command", required=True
+    )
+    artifact_collect = artifact_commands.add_parser("collect")
+    artifact_collect.add_argument("--repository", type=Path, default=Path.cwd())
+    artifact_collect.add_argument("--config", type=Path, required=True)
+    artifact_collect.add_argument(
+        "--store", type=Path, default=Path(".lugos/artifacts/project-snapshot")
+    )
+    artifact_collect.add_argument("--out", type=Path)
+    artifact_collect.add_argument("--json", action="store_true", dest="as_json")
+    artifact_validate = artifact_commands.add_parser("validate")
+    artifact_validate.add_argument("candidate", type=Path)
+    artifact_validate.add_argument("--evidence", type=Path, required=True)
+    artifact_validate.add_argument("--json", action="store_true", dest="as_json")
+    artifact_produce = artifact_commands.add_parser("produce")
+    artifact_produce.add_argument("--evidence", type=Path, required=True)
+    artifact_produce.add_argument(
+        "--store", type=Path, default=Path(".lugos/artifacts/project-snapshot")
+    )
+    artifact_produce.add_argument("--out", type=Path)
+    artifact_produce.add_argument("--timeout-seconds", type=float, default=120)
+    artifact_produce.add_argument("--json", action="store_true", dest="as_json")
+    artifact_produce.add_argument("producer_command", nargs=argparse.REMAINDER)
+    artifact_accept = artifact_commands.add_parser("accept")
+    artifact_accept.add_argument("candidate", type=Path)
+    artifact_accept.add_argument("--evidence", type=Path, required=True)
+    artifact_accept.add_argument(
+        "--store", type=Path, default=Path(".lugos/artifacts/project-snapshot")
+    )
+    artifact_accept.add_argument("--json", action="store_true", dest="as_json")
+    artifact_current = artifact_commands.add_parser("current")
+    artifact_current.add_argument(
+        "--store", type=Path, default=Path(".lugos/artifacts/project-snapshot")
+    )
+    artifact_current.add_argument("--json", action="store_true", dest="as_json")
+    artifact_view = artifact_commands.add_parser("view")
+    artifact_view.add_argument(
+        "--store", type=Path, default=Path(".lugos/artifacts/project-snapshot")
+    )
+    artifact_view.add_argument("--json", action="store_true", dest="as_json")
+    artifact_render = artifact_commands.add_parser("render")
+    artifact_render.add_argument("--artifact", required=True)
+    artifact_render.add_argument("--receipt", type=Path)
+    artifact_render.add_argument(
+        "--store", type=Path, default=Path(".lugos/artifacts/project-snapshot")
+    )
+    artifact_render.add_argument("--format", choices=("html",), default="html")
+    artifact_render.add_argument("--out", type=Path, required=True)
+    artifact_render.add_argument("--json", action="store_true", dest="as_json")
 
     return parser
 
@@ -599,6 +665,116 @@ def _inspect_experiment(run_dir: Path) -> dict[str, object]:
     }
 
 
+def _artifact_schema_dir() -> Path:
+    root = _find_repo_root()
+    if root is None:
+        raise TorcError("could not locate TORC artifact schemas")
+    return root / "schemas"
+
+
+def _load_artifact_record(path: Path) -> dict[str, object]:
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
+        raise TorcError(f"artifact record must be a JSON object: {path}")
+    return value
+
+
+def _write_html(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.tmp")
+    with temporary.open("w", encoding="utf-8", newline="\n") as stream:
+        stream.write(content)
+        stream.flush()
+        os.fsync(stream.fileno())
+    os.replace(temporary, path)
+
+
+def _run_artifact(args: argparse.Namespace) -> tuple[dict[str, object], int]:
+    action = args.artifact_command
+    schemas = _artifact_schema_dir()
+    if action == "collect":
+        bundle = collect_evidence_bundle(args.repository, args.config, schemas)
+        if args.out is not None:
+            path = args.out / f"{bundle['bundle_id'].removeprefix('sha256:')}.json"
+            write_canonical_artifact(path, bundle)
+        else:
+            path = ArtifactStore(args.store).write_evidence(bundle)
+        return {
+            "ok": True,
+            "bundle_id": bundle["bundle_id"],
+            "path": str(path),
+            "warnings": bundle["warnings"],
+        }, 0
+    if action == "validate":
+        snapshot = _load_artifact_record(args.candidate)
+        evidence = _load_artifact_record(args.evidence)
+        result = validate_project_snapshot(snapshot, evidence, schemas)
+        return result.as_dict(), 0 if result.valid else 1
+    if action == "produce":
+        evidence = _load_artifact_record(args.evidence)
+        command = list(args.producer_command)
+        if command and command[0] == "--":
+            command = command[1:]
+        producer = CommandProjectSnapshotProducer(
+            command, schemas, timeout_seconds=args.timeout_seconds
+        )
+        snapshot = producer.produce(evidence)
+        if args.out is not None:
+            write_canonical_artifact(args.out, snapshot)
+            path = args.out
+        else:
+            store = ArtifactStore(args.store)
+            store.write_evidence(evidence)
+            path = store.write_candidate(snapshot)
+        return {
+            "ok": True,
+            "artifact_id": snapshot["artifact_id"],
+            "evidence_bundle_id": evidence["bundle_id"],
+            "path": str(path),
+        }, 0
+    if action == "accept":
+        snapshot = _load_artifact_record(args.candidate)
+        evidence = _load_artifact_record(args.evidence)
+        receipt = accept_project_snapshot(
+            snapshot, evidence, ArtifactStore(args.store), schemas
+        )
+        return receipt, 0 if receipt["status"] == "accepted" else 1
+    store = ArtifactStore(args.store)
+    if action == "current":
+        snapshot = store.current_artifact()
+        receipt = store.receipt_for_artifact(snapshot["artifact_id"])
+        return {
+            "ok": True,
+            "artifact_id": snapshot["artifact_id"],
+            "receipt_id": receipt["receipt_id"],
+            "status": receipt["status"],
+        }, 0
+    if action == "view":
+        return build_current_snapshot_view(store, schemas), 0
+    if action == "render":
+        snapshot = (
+            store.current_artifact()
+            if args.artifact == "current"
+            else _load_artifact_record(Path(args.artifact))
+        )
+        receipt = (
+            _load_artifact_record(args.receipt)
+            if args.receipt is not None
+            else store.receipt_for_artifact(snapshot["artifact_id"])
+        )
+        if receipt.get("status") != "accepted":
+            raise TorcError("reference renderer requires an accepted receipt")
+        _write_html(args.out, render_snapshot_html(snapshot, receipt))
+        return {
+            "ok": True,
+            "artifact_id": snapshot["artifact_id"],
+            "receipt_id": receipt["receipt_id"],
+            "format": "html",
+            "path": str(args.out),
+        }, 0
+    raise TorcError(f"unsupported artifact command: {action}")
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -622,6 +798,10 @@ def main(argv: Sequence[str] | None = None) -> int:
                 payload = verify_store(store, args.lineage)
             _print_payload(payload, args.as_json)
             return 0 if payload["valid"] else 1
+        if args.command == "artifact":
+            payload, status = _run_artifact(args)
+            _print_payload(payload, args.as_json)
+            return status
         if args.command == "lineage":
             if args.lineage_command == "explain":
                 with Store(args.state_dir, read_only=True) as store:

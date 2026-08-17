@@ -21,6 +21,7 @@ Thumbs.db
 
 # TORC runtime state
 .torc/
+.lugos/artifacts/
 *.sqlite
 *.sqlite3
 *.db

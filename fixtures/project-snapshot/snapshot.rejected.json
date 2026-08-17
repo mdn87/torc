@@ -1,0 +1,17 @@
+{
+  "schema": "urn:lugos:artifact:project-snapshot:v1alpha1",
+  "artifact_id": "sha256:4d8f0dd0e607d48e35ca8352471c9816e9b8bd041b75220ecc67c7a57014e346",
+  "kind": "project-snapshot",
+  "generated_at": "2026-08-16T12:06:00Z",
+  "scope": {"name": "TORC rejected fixture", "repositories": [{"repository": "mdn87/torc", "commit": "3333333333333333333333333333333333333333"}]},
+  "generator": {"implementation": "invalid-fixture", "version": "1"},
+  "evidence_bundle": {"bundle_id": "sha256:b615763077ab760c426a1de7a198397e18e2ca732fac37cee4ada82675e88779"},
+  "projects": [],
+  "claims": [{"claim_id": "unsupported", "subject": "torc", "predicate": "state", "value": "done", "status": "verified", "evidence": [], "observed_at": "2026-08-16T12:06:00Z"}],
+  "blockers": [],
+  "pending_decisions": [],
+  "recent_activity": [],
+  "conflicts": [],
+  "unknowns": [],
+  "metadata": {"expected_rejection": "verified claim has no evidence"}
+}
