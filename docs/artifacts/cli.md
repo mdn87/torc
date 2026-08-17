@@ -41,6 +41,34 @@ repository.
 
 ## Validate and accept
 
+An optional Phase 2 Scribe adapter can invoke any operator-selected local
+executable that follows the provider-neutral stdio contract. Put the direct
+argv after `--`; TORC does not invoke a shell:
+
+```bash
+python -m torc artifact produce \
+  --evidence evidence-bundle.json \
+  --out candidate.json \
+  --timeout-seconds 120 \
+  --json \
+  -- scribe-wrapper --mode project-snapshot
+```
+
+The executable receives one compact Evidence Bundle JSON object on stdin and
+must write exactly one candidate JSON object to stdout. It may write
+diagnostics to stderr, but TORC does not copy those diagnostics into its error
+payload. A nonzero exit, timeout, invalid JSON, or candidate-validation failure
+returns nonzero and creates no candidate. Omit `--out` to write the validated
+candidate and its Evidence Bundle into the selected `--store`. Producing never
+accepts the candidate or changes `current.ref`.
+
+PowerShell uses the same argv boundary, for example `-- py
+scribe-wrapper.py`. No quoting convention is embedded in the protocol because
+TORC passes each argument directly to the process.
+
+Manual and produced candidates share the unchanged validation and acceptance
+commands:
+
 ```bash
 python -m torc artifact validate candidate.json \
   --evidence evidence-bundle.json \
@@ -63,6 +91,10 @@ python -m torc artifact current \
   --store .lugos/artifacts/project-snapshot \
   --json
 
+python -m torc artifact view \
+  --store .lugos/artifacts/project-snapshot \
+  --json
+
 python -m torc artifact render \
   --artifact current \
   --store .lugos/artifacts/project-snapshot \
@@ -78,6 +110,13 @@ writeback behavior. For an explicit artifact path, pass `--artifact <path>` and
 either keep its accepted receipt in the selected store or add `--receipt
 <path>`.
 
+`artifact current` returns only accepted identities and status. `artifact
+view` is the fail-closed consumer contract: it reloads and validates the
+current Project Snapshot, Evidence Bundle, and accepted Acceptance Receipt,
+checks their cross-record identities, and returns all three in a derived,
+noncanonical, trusted envelope. Mission Control consumes this command; it does
+not read the store or recompute content hashes independently.
+
 ## Storage and retention
 
 Generated state is ignored by Git under
@@ -92,7 +131,6 @@ JSON in place. Produce a new record instead. Pruning is an operator retention
 decision; keep the current accepted artifact, its Evidence Bundle, and its
 Acceptance Receipt together.
 
-Mission Control currently has a read-only TORC lineage contract but no project
-snapshot contract. Phase 1 therefore uses this standalone renderer. A future
-consumer should validate the same artifact and receipt schemas, resolve only
-accepted current state, and remain read-only.
+Mission Control's Phase 2 adapter calls `artifact view` through a configured
+TORC binary and renders only its trusted envelope. The standalone renderer
+remains useful for a portable file with no running dashboard.

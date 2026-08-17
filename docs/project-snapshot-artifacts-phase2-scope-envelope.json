@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "objective": "Add one provider-neutral command producer for Project Snapshot candidates and a read-only Mission Control consumer of TORC-verified accepted snapshots and receipts, without changing artifact acceptance authority.",
+  "success_evidence": [
+    "An operator-selected executable receives one canonical Evidence Bundle JSON object on stdin and returns one Project Snapshot candidate JSON object on stdout without shell interpretation.",
+    "Producer output passes the existing provider-neutral validator before TORC stores or returns it, and invalid output fails without creating a candidate.",
+    "TORC resolves current.ref and revalidates the accepted artifact, its Evidence Bundle, and its Acceptance Receipt before emitting a derived trusted read envelope.",
+    "Mission Control invokes only the TORC read command, validates the fields it renders, exposes a viewer-only GET route, and presents accepted snapshot content and receipt checks without mutation controls.",
+    "Focused contract tests, both relevant repository suites, static checks, and a cross-repository CLI-to-UI contract smoke check pass on the implementation host."
+  ],
+  "non_goals": [
+    "Provider SDK integration, provider selection, prompt construction, credential management, or live model calls inside TORC.",
+    "Scheduling, watching, automatic refresh, daemon processes, queues, retries, or a new durable state machine.",
+    "Mission Control writeback, acceptance, artifact repair, provenance inference, or direct artifact-store reads.",
+    "Changes to Lugos MCP, the Lugos parent repository, provider repositories, or the parent submodule pointers.",
+    "Changing the three immutable v1alpha1 record schemas or the Phase 1 acceptance rules."
+  ],
+  "accepted_threats": [
+    "The operator-selected producer executable inherits the invoking process environment and can perform anything already permitted to that operator; TORC does not sandbox it.",
+    "The command producer protocol is local JSON over stdio and supplies integrity validation, not executable authentication or confidentiality.",
+    "Mission Control availability depends on a configured TORC executable and artifact-store path; unavailable or invalid data is shown as unavailable rather than reconstructed.",
+    "Windows behavior is contract-designed around direct argv, stdin, pathlib, and os.replace but is not executed on the macOS implementation host."
+  ],
+  "estimates": {
+    "elapsed_hours": 6,
+    "production_loc": 850,
+    "test_loc": 650,
+    "changed_files": 24,
+    "runtime_processes": 0,
+    "operator_steps": 5,
+    "design_review_rounds": 1
+  },
+  "observed": {
+    "elapsed_hours": 1.5,
+    "production_loc": 606,
+    "test_loc": 442,
+    "changed_files": 24,
+    "runtime_processes": 0,
+    "operator_steps": 4,
+    "design_review_rounds": 0
+  },
+  "vertical_slice": {
+    "due_before_elapsed_hours": 1.2,
+    "status": "proven_local",
+    "evidence": {
+      "target": "A deterministic command producer emits the accepted fixture through the production adapter and TORC's production read command emits a trusted envelope that the Mission Control Zod contract accepts.",
+      "test_command": ".venv/bin/python -m pytest tests/test_project_snapshot_producer.py tests/test_project_snapshot_view.py && ./node_modules/.bin/vitest run src/integrations/lugos/project-snapshot-contract.test.ts",
+      "result": "The production command adapter produced and validated the accepted fixture, acceptance advanced a temporary current.ref, the production artifact view revalidated all three records, and Mission Control's production Zod contract parsed that live envelope as trusted. Focused suites passed 6 TORC and 11 Mission Control tests."
+    }
+  },
+  "platform_matrix": {
+    "authoritative_implementation_host": "applemac (macOS)",
+    "supported_hosts": [
+      "applemac (macOS)",
+      "intelmac (macOS)",
+      "4070pc (Windows)",
+      "3060pc (Windows)"
+    ],
+    "torc_lane": "Python 3.11+ uses direct subprocess argv, UTF-8 JSON stdin/stdout, pathlib paths, and the existing portable artifact store on macOS and Windows.",
+    "mission_control_lane": "Node.js 22+ invokes the configured TORC executable with an argv array and renders the same JSON contract on macOS and Windows.",
+    "platform_divergence": "Only executable names and operator shell examples differ: POSIX commonly uses python3/torc and Windows commonly uses py/torc.exe. No shell command string is stored or interpreted."
+  },
+  "architecture_triggers": [
+    {
+      "trigger": "custom_protocol",
+      "approval": "The operator explicitly approved Phase 2 after the Phase 1 recommendation called for a provider-neutral Scribe producer adapter. The bounded realization is one Evidence Bundle JSON object on stdin and one candidate JSON object on stdout."
+    }
+  ],
+  "review_rounds_used": 0,
+  "scope_policy_sha256": "9707efccd8426b7b53784bc7752449f5e4a45913c141c990b6a21d8c3bb2cdae",
+  "parent_envelope_sha256": null,
+  "operator_override_id": "phase-2-approval-2026-08-16"
+}

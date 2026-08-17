@@ -85,6 +85,18 @@ class ArtifactStore:
             raise IntegrityError("current accepted artifact failed content verification")
         return record
 
+    def evidence_bundle(self, bundle_id: str) -> dict[str, Any]:
+        path = self.evidence_dir / f"{_digest_name(bundle_id)}.json"
+        if not path.is_file():
+            raise NotFoundError(f"Evidence Bundle not found: {path}")
+        record = json.loads(path.read_text(encoding="utf-8"))
+        if (
+            not content_id_is_valid(record, "bundle_id")
+            or record.get("bundle_id") != bundle_id
+        ):
+            raise IntegrityError("stored Evidence Bundle failed content verification")
+        return record
+
     def receipt_for_artifact(self, artifact_id: str) -> dict[str, Any]:
         for path in sorted(self.receipts_dir.glob("*.json")):
             receipt = json.loads(path.read_text(encoding="utf-8"))

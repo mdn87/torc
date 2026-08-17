@@ -173,6 +173,10 @@ and direct implementation keeps one authority for the early vertical slice.
 
 ## Phase 2 recommendation
 
+Phase 2 is now implemented on the local feature branches described in
+`project-snapshot-artifacts-phase2.md`; the text below remains the decision
+record that authorized its boundary.
+
 After real snapshot refreshes demonstrate stable claims and useful evidence,
 add one narrow Scribe producer adapter implementing the provider-neutral
 producer protocol. Keep provider invocation outside the artifact core and pass
