@@ -1,0 +1,36 @@
+{
+  "schema": "urn:lugos:artifact:evidence-bundle:v1alpha1",
+  "bundle_id": "sha256:b615763077ab760c426a1de7a198397e18e2ca732fac37cee4ada82675e88779",
+  "collected_at": "2026-08-16T12:00:00Z",
+  "collector": {"name": "torc", "version": "0.1.0"},
+  "scope": {
+    "repositories": [
+      {"repository": "mdn87/torc", "commit": "3333333333333333333333333333333333333333", "branch": "main"}
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "fixture-status",
+      "type": "git-file",
+      "repository": "mdn87/torc",
+      "commit": "3333333333333333333333333333333333333333",
+      "path": "STATUS.md",
+      "selector": {"type": "whole-file"},
+      "content_sha256": "sha256:76485bc64bc667a7d4b330a8a8abf5457d46b9a58e063f15c05b5c303241ae09",
+      "collected_at": "2026-08-16T12:00:00Z",
+      "content": "TORC snapshot fixture evidence.\n"
+    }
+  ],
+  "git_state": [
+    {
+      "repository": "mdn87/torc",
+      "commit": "3333333333333333333333333333333333333333",
+      "branch": "main",
+      "clean": true,
+      "modified_paths": [],
+      "untracked_paths": [],
+      "recent_commits": []
+    }
+  ],
+  "warnings": []
+}

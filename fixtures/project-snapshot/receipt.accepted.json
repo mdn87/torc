@@ -1,0 +1,21 @@
+{
+  "schema": "urn:lugos:artifact:acceptance-receipt:v1alpha1",
+  "receipt_id": "sha256:7ed76a9cfaf31bd1b93bb30201bfacb23f72e088a6504fd51b30669d7ab080ed",
+  "artifact_id": "sha256:d6c7fe9921de038fb7d56b9b6fa06b3ae8579872a68d748bb6830c83b6dbbbe5",
+  "evidence_bundle_id": "sha256:b615763077ab760c426a1de7a198397e18e2ca732fac37cee4ada82675e88779",
+  "validated_at": "2026-08-16T12:10:00Z",
+  "validator": {"name": "torc", "version": "0.1.0"},
+  "status": "accepted",
+  "checks": [
+    {"name": "schema_validity", "status": "passed", "detail": "Project Snapshot matches v1alpha1 schema and timestamp formats"},
+    {"name": "timestamps", "status": "passed", "detail": "All Project Snapshot timestamps are timezone-aware ISO-8601 values"},
+    {"name": "canonical_digest", "status": "passed", "detail": "Project Snapshot canonical digest matches content"},
+    {"name": "evidence_bundle_existence", "status": "passed", "detail": "Supplied Evidence Bundle exists"},
+    {"name": "evidence_bundle_integrity", "status": "passed", "detail": "Evidence Bundle schema, timestamps, and digests are valid"},
+    {"name": "evidence_bundle_reference", "status": "passed", "detail": "Artifact references the supplied Evidence Bundle digest"},
+    {"name": "verified_claim_evidence", "status": "passed", "detail": "Every verified claim references evidence"},
+    {"name": "evidence_source_resolution", "status": "passed", "detail": "Every referenced evidence source resolves in the bundle"}
+  ],
+  "warnings": [],
+  "errors": []
+}
