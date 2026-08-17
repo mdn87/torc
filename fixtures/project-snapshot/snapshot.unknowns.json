@@ -1,0 +1,17 @@
+{
+  "schema": "urn:lugos:artifact:project-snapshot:v1alpha1",
+  "artifact_id": "sha256:0b8e19cc00b7549e8d557e54e0181937ec00bcc4f867dfdd8fdcf549d0eca677",
+  "kind": "project-snapshot",
+  "generated_at": "2026-08-16T12:08:00Z",
+  "scope": {"name": "TORC unknown fixture", "repositories": [{"repository": "mdn87/torc", "commit": "3333333333333333333333333333333333333333"}]},
+  "generator": {"implementation": "rules-fixture", "version": "1", "provider": "local"},
+  "evidence_bundle": {"bundle_id": "sha256:b615763077ab760c426a1de7a198397e18e2ca732fac37cee4ada82675e88779"},
+  "projects": [],
+  "claims": [{"claim_id": "unknown-readiness", "subject": "mission-control", "predicate": "integration_readiness", "value": "not established", "status": "unknown", "evidence": [], "observed_at": "2026-08-16T12:08:00Z"}],
+  "blockers": [],
+  "pending_decisions": [],
+  "recent_activity": [],
+  "conflicts": [],
+  "unknowns": [{"unknown_id": "mission-control-contract", "summary": "No project-snapshot consumer contract exists yet", "evidence": []}],
+  "metadata": {"fixture": true}
+}

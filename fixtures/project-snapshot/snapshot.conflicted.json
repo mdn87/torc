@@ -1,0 +1,17 @@
+{
+  "schema": "urn:lugos:artifact:project-snapshot:v1alpha1",
+  "artifact_id": "sha256:d3bc7ff0a7b24623efbfd515a38badf0b33e29fad041bca576281169a44e6640",
+  "kind": "project-snapshot",
+  "generated_at": "2026-08-16T12:07:00Z",
+  "scope": {"name": "TORC conflicted fixture", "repositories": [{"repository": "mdn87/torc", "commit": "3333333333333333333333333333333333333333"}]},
+  "generator": {"implementation": "rules-fixture", "version": "1", "provider": "local"},
+  "evidence_bundle": {"bundle_id": "sha256:b615763077ab760c426a1de7a198397e18e2ca732fac37cee4ada82675e88779"},
+  "projects": [],
+  "claims": [{"claim_id": "conflicted-state", "subject": "torc", "predicate": "state", "value": "conflicting reports", "status": "conflicted", "evidence": [{"source_id": "fixture-status"}], "observed_at": "2026-08-16T12:07:00Z"}],
+  "blockers": [],
+  "pending_decisions": [],
+  "recent_activity": [],
+  "conflicts": [{"conflict_id": "state-conflict", "summary": "Sources require reconciliation", "claim_ids": ["conflicted-state"], "evidence": [{"source_id": "fixture-status"}]}],
+  "unknowns": [],
+  "metadata": {"fixture": true}
+}

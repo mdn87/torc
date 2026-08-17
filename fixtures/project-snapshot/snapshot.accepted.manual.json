@@ -1,0 +1,45 @@
+{
+  "schema": "urn:lugos:artifact:project-snapshot:v1alpha1",
+  "artifact_id": "sha256:d6c7fe9921de038fb7d56b9b6fa06b3ae8579872a68d748bb6830c83b6dbbbe5",
+  "kind": "project-snapshot",
+  "generated_at": "2026-08-16T12:05:00Z",
+  "scope": {
+    "name": "TORC",
+    "repositories": [{"repository": "mdn87/torc", "commit": "3333333333333333333333333333333333333333"}]
+  },
+  "generator": {"implementation": "human-fixture", "version": "1", "provider": "manual"},
+  "evidence_bundle": {"bundle_id": "sha256:b615763077ab760c426a1de7a198397e18e2ca732fac37cee4ada82675e88779"},
+  "projects": [
+    {
+      "project_id": "torc",
+      "name": "TORC",
+      "status": "active",
+      "repositories": ["mdn87/torc"],
+      "progress": [{"kind": "milestone", "label": "provider-neutral snapshot fixture accepted"}]
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "fixture-ready",
+      "subject": "torc",
+      "predicate": "fixture_state",
+      "value": "reference-consumer-ready",
+      "status": "verified",
+      "evidence": [{"source_id": "fixture-status"}],
+      "observed_at": "2026-08-16T12:05:00Z"
+    }
+  ],
+  "blockers": [],
+  "pending_decisions": [],
+  "recent_activity": [
+    {
+      "activity_id": "fixture-created",
+      "summary": "Created a provider-neutral fixture",
+      "occurred_at": "2026-08-16T12:05:00Z",
+      "evidence": [{"source_id": "fixture-status"}]
+    }
+  ],
+  "conflicts": [],
+  "unknowns": [],
+  "metadata": {"fixture": true, "producer_kind": "non-ai"}
+}

@@ -87,6 +87,13 @@ and rollback or branch context from one verified SQLite snapshot. The report is
 explicitly non-canonical and fails closed instead of explaining invalid
 provenance. See `docs/p4-visibility.md`.
 
+TORC also includes the first provider-agnostic project snapshot artifact slice.
+It collects manifest-bounded Git evidence, validates content-addressed
+candidate projections, writes separate acceptance receipts, advances a
+portable current pointer only after acceptance, and renders accepted snapshots
+as standalone read-only HTML. It has no provider SDK dependency. See
+`docs/artifacts/README.md`.
+
 ## Baseline setup
 
 ```powershell
@@ -143,4 +150,6 @@ exports seven immutable JSON artifacts under `.torc/demo/artifacts/`.
 - `docs/p3-branch-scope-envelope.json` - branch-creation authority and budgets
 - `docs/p4-visibility.md` - read-only authority and continuity explanation contract
 - `docs/p4-visibility-scope-envelope.json` - bounded P4 visibility authority and budgets
+- `docs/project-snapshot-artifacts.md` - three-record artifact architecture, reconnaissance, and Phase 2 boundary
+- `docs/artifacts/README.md` - project snapshot schemas, CLI, retention, renderer, and cold-agent refresh index
 - `docs/prompts/CODEX_BOOTSTRAP_PROMPT.md` - implementation task for Codex
