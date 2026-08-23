@@ -39,14 +39,14 @@ P1a records `unavailable` with evidence instead of inventing a substitute.
 
 ## Platform matrix
 
-| Component | Windows 4070pc and 3060pc | macOS applemac and intelmac |
+| Component | Windows windows-primary and windows-secondary | macOS macos-primary and macos-secondary |
 |---|---|---|
 | TORC experiment library and CLI | Required | Required |
 | Lane C TORC state and artifact hashing | Required | Required |
 | Deterministic replay adapters | Required | Required |
-| Codex source adapter | Authoritative P1a smoke on 4070pc | Contract verification where installed |
-| Claude Code target adapter | Authoritative P1a smoke on 4070pc | Contract verification where installed |
-| P1a automated test suite | Authoritative on 4070pc | Separate verification required before P1b |
+| Codex source adapter | Authoritative P1a smoke on windows-primary | Contract verification where installed |
+| Claude Code target adapter | Authoritative P1a smoke on windows-primary | Contract verification where installed |
+| P1a automated test suite | Authoritative on windows-primary | Separate verification required before P1b |
 
 Repository-relative paths are authoritative. Windows commands use PowerShell
 and `.venv\Scripts\python`; macOS commands use a POSIX shell and

@@ -19,8 +19,8 @@ record. The renderer is not a task database and never writes back.
 
 The scope envelope is
 `docs/project-snapshot-artifacts-scope-envelope.json`. The supported platform
-matrix is macOS (`applemac`, `intelmac`) and Windows (`4070pc`, `3060pc`), with
-`applemac` as the authoritative implementation and verification host. The
+matrix is macOS (`macos-primary`, `macos-secondary`) and Windows (`windows-primary`, `windows-secondary`), with
+`macos-primary` as the authoritative implementation and verification host. The
 Python contracts and storage layout are platform-neutral; only shell command
 syntax differs between PowerShell and POSIX shells.
 

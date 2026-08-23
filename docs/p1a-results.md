@@ -42,7 +42,7 @@ Lane C. No background runtime process or manual artifact edit was used.
 ## macOS replay parity
 
 On 2026-08-08, the deterministic replay suite was repeated headlessly on
-`intelmac` with macOS, Python 3.12.4, and the synced P1a apparatus. All 56 tests
+`macos-secondary` with macOS, Python 3.12.4, and the synced P1a apparatus. All 56 tests
 and Ruff passed. Fresh run directories under `.torc/p1a/macos-intel-{a,b,c}`
 verified with no credential-scan findings.
 
