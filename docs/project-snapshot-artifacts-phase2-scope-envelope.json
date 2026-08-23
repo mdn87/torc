@@ -49,12 +49,12 @@
     }
   },
   "platform_matrix": {
-    "authoritative_implementation_host": "applemac (macOS)",
+    "authoritative_implementation_host": "macos-primary (macOS)",
     "supported_hosts": [
-      "applemac (macOS)",
-      "intelmac (macOS)",
-      "4070pc (Windows)",
-      "3060pc (Windows)"
+      "macos-primary (macOS)",
+      "macos-secondary (macOS)",
+      "windows-primary (Windows)",
+      "windows-secondary (Windows)"
     ],
     "torc_lane": "Python 3.11+ uses direct subprocess argv, UTF-8 JSON stdin/stdout, pathlib paths, and the existing portable artifact store on macOS and Windows.",
     "mission_control_lane": "Node.js 22+ invokes the configured TORC executable with an argv array and renders the same JSON contract on macOS and Windows.",

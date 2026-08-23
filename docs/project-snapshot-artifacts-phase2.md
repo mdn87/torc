@@ -13,7 +13,7 @@ Control renders them as a disposable read-only projection.
 
 The scope record is
 `docs/project-snapshot-artifacts-phase2-scope-envelope.json`. The authoritative
-implementation host is `applemac`; the same contracts target both macOS hosts
+implementation host is `macos-primary`; the same contracts target both macOS hosts
 and both Windows hosts in the Lugos inventory.
 
 ## Chosen boundaries

@@ -52,12 +52,12 @@
     }
   },
   "platform_matrix": {
-    "authoritative_implementation_host": "applemac (macOS)",
+    "authoritative_implementation_host": "macos-primary (macOS)",
     "supported_hosts": [
-      "applemac (macOS)",
-      "intelmac (macOS)",
-      "4070pc (Windows)",
-      "3060pc (Windows)"
+      "macos-primary (macOS)",
+      "macos-secondary (macOS)",
+      "windows-primary (Windows)",
+      "windows-secondary (Windows)"
     ],
     "shared_runtime": "Python 3.11+ library and CLI with pathlib paths and no service process",
     "platform_divergence": "Only shell invocation syntax differs; storage files, JSON contracts, Git commands, portable current.ref, and os.replace-based writes are shared."
