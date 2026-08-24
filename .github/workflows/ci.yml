@@ -31,5 +31,9 @@ jobs:
       - name: CLI smoke
         shell: bash
         run: |
+          # doctor is a source-tree health command (walks up from __file__ for the
+          # repo); it can't be a smoke for an installed console script. demo is
+          # self-contained and exercises the real P0 handoff, so it's the smoke.
           torc --help
-          torc doctor --json > /dev/null
+          torc --version
+          torc demo --state-dir "$(mktemp -d)" --json > /dev/null
