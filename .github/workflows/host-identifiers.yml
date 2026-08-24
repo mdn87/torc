@@ -1,0 +1,34 @@
+# Host names, private addresses, and personal filesystem paths must not enter
+# this repo. Once they land they are only removable by rewriting history, which
+# breaks every existing clone and every submodule pin — so this gate runs on
+# the tree, on every push, rather than being a thing anyone remembers to check.
+#
+# Use role names instead: windows-primary, windows-secondary, macos-primary,
+# macos-secondary. For paths, use repo-relative or %USERPROFILE%/$HOME forms.
+name: host identifiers
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scan tracked files for host identifiers
+        run: |
+          set -uo pipefail
+          PATTERN='4070pc|3060pc|intelmac|applemac|lugos-host|10\.0\.1\.[0-9]{1,3}|[/\\]Users[/\\]Matt'
+          # git grep exits 1 when nothing matches, which is the passing case.
+          if git grep -I -n -E -i "$PATTERN" -- . ':(exclude).github/workflows/host-identifiers.yml'; then
+            echo
+            echo "::error::Host identifiers found in tracked files. Replace hostnames with role names (windows-primary, macos-primary, ...) and personal paths with repo-relative or %USERPROFILE%/\$HOME forms."
+            exit 1
+          fi
+          echo "No host identifiers in tracked files."
