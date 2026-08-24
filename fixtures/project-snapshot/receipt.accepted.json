@@ -1,7 +1,7 @@
 {
   "schema": "urn:lugos:artifact:acceptance-receipt:v1alpha1",
-  "receipt_id": "sha256:7ed76a9cfaf31bd1b93bb30201bfacb23f72e088a6504fd51b30669d7ab080ed",
-  "artifact_id": "sha256:d6c7fe9921de038fb7d56b9b6fa06b3ae8579872a68d748bb6830c83b6dbbbe5",
+  "receipt_id": "sha256:111661480defcc8b61753e3a778d17afb3df5cb4aa895e781709797f9e7d16dd",
+  "artifact_id": "sha256:701ecacb3bbbd7d29254a875e06a68147fccf24c47b8f2b7bcebda94eeb33b55",
   "evidence_bundle_id": "sha256:b615763077ab760c426a1de7a198397e18e2ca732fac37cee4ada82675e88779",
   "validated_at": "2026-08-16T12:10:00Z",
   "validator": {"name": "torc", "version": "0.1.0"},
@@ -14,6 +14,7 @@
     {"name": "evidence_bundle_integrity", "status": "passed", "detail": "Evidence Bundle schema, timestamps, and digests are valid"},
     {"name": "evidence_bundle_reference", "status": "passed", "detail": "Artifact references the supplied Evidence Bundle digest"},
     {"name": "verified_claim_evidence", "status": "passed", "detail": "Every verified claim references evidence"},
+    {"name": "claim_conflict_consistency", "status": "passed", "detail": "Claim identities are unique and every conflict references conflicted claims"},
     {"name": "evidence_source_resolution", "status": "passed", "detail": "Every referenced evidence source resolves in the bundle"}
   ],
   "warnings": [],

@@ -1,6 +1,6 @@
 {
   "schema": "urn:lugos:artifact:project-snapshot:v1alpha1",
-  "artifact_id": "sha256:d6c7fe9921de038fb7d56b9b6fa06b3ae8579872a68d748bb6830c83b6dbbbe5",
+  "artifact_id": "sha256:701ecacb3bbbd7d29254a875e06a68147fccf24c47b8f2b7bcebda94eeb33b55",
   "kind": "project-snapshot",
   "generated_at": "2026-08-16T12:05:00Z",
   "scope": {
@@ -14,8 +14,9 @@
       "project_id": "torc",
       "name": "TORC",
       "status": "active",
+      "status_source_id": "fixture-status",
       "repositories": ["mdn87/torc"],
-      "progress": [{"kind": "milestone", "label": "provider-neutral snapshot fixture accepted"}]
+      "progress": [{"kind": "milestone", "label": "provider-neutral snapshot fixture accepted", "source_id": "fixture-status"}]
     }
   ],
   "claims": [

@@ -85,8 +85,15 @@ def project_snapshot(
                     "project_id": "torc",
                     "name": "TORC",
                     "status": "active",
+                    "status_source_id": "status",
                     "repositories": ["local/torc"],
-                    "progress": [{"kind": "milestone", "label": "artifact slice"}],
+                    "progress": [
+                        {
+                            "kind": "milestone",
+                            "label": "artifact slice",
+                            "source_id": "status",
+                        }
+                    ],
                 }
             ],
             "claims": [
@@ -149,6 +156,38 @@ def test_claim_with_nonexistent_source_is_rejected() -> None:
 
     assert result.valid is False
     assert any("unknown evidence source missing" in item for item in result.errors)
+
+
+def test_project_status_and_progress_require_resolvable_evidence() -> None:
+    bundle = evidence_bundle()
+    snapshot = project_snapshot(bundle)
+    snapshot["projects"][0]["status_source_id"] = "missing"
+    snapshot = seal_content_id(snapshot, "artifact_id")
+
+    result = validate_project_snapshot(snapshot, bundle, SCHEMAS)
+
+    assert result.valid is False
+    assert any("unknown evidence source missing" in item for item in result.errors)
+
+
+def test_conflict_must_reference_an_existing_conflicted_claim() -> None:
+    bundle = evidence_bundle()
+    snapshot = project_snapshot(bundle)
+    snapshot["conflicts"] = [
+        {
+            "conflict_id": "state-conflict",
+            "summary": "Sources disagree",
+            "claim_ids": ["claim-status", "missing-claim"],
+            "evidence": [{"source_id": "status"}],
+        }
+    ]
+    snapshot = seal_content_id(snapshot, "artifact_id")
+
+    result = validate_project_snapshot(snapshot, bundle, SCHEMAS)
+
+    assert result.valid is False
+    assert any("claim-status with status verified" in item for item in result.errors)
+    assert any("unknown claim missing-claim" in item for item in result.errors)
 
 
 def test_malformed_timestamp_is_rejected_even_with_a_correct_digest() -> None:

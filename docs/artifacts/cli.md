@@ -106,9 +106,10 @@ python -m torc artifact render \
 The standalone HTML displays snapshot time, repository commits, project
 status, claims, blockers, decisions, activity, conflicts, unknowns, evidence
 provenance, and receipt checks. It contains no edit form, task mutation, or
-writeback behavior. For an explicit artifact path, pass `--artifact <path>` and
-either keep its accepted receipt in the selected store or add `--receipt
-<path>`.
+writeback behavior. For an explicit artifact path, pass `--artifact <path>`,
+`--evidence <path>`, and `--receipt <path>`. Explicit records are revalidated
+and their content identities and cross-record references must agree before
+TORC writes any HTML.
 
 `artifact current` returns only accepted identities and status. `artifact
 view` is the fail-closed consumer contract: it reloads and validates the

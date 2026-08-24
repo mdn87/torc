@@ -66,7 +66,7 @@
     "progress": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "label"],
+      "required": ["kind", "label", "source_id"],
       "properties": {
         "kind": {"enum": ["gates", "deliverables", "checks", "milestone", "status", "ratio", "authoritative-percentage"]},
         "label": {"type": "string", "minLength": 1},
@@ -83,11 +83,12 @@
     "project": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["project_id", "name", "status", "repositories", "progress"],
+      "required": ["project_id", "name", "status", "status_source_id", "repositories", "progress"],
       "properties": {
         "project_id": {"$ref": "#/$defs/id"},
         "name": {"type": "string", "minLength": 1},
         "status": {"type": "string", "minLength": 1},
+        "status_source_id": {"$ref": "#/$defs/id"},
         "repositories": {"type": "array", "items": {"type": "string", "minLength": 1}},
         "progress": {"type": "array", "items": {"$ref": "#/$defs/progress"}}
       }

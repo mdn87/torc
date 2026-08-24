@@ -186,6 +186,8 @@ def _evidence_references(snapshot: dict[str, Any]) -> list[str]:
     for project in snapshot.get("projects", []):
         if not isinstance(project, dict):
             continue
+        if isinstance(project.get("status_source_id"), str):
+            references.append(project["status_source_id"])
         for progress in project.get("progress", []):
             if isinstance(progress, dict) and isinstance(progress.get("source_id"), str):
                 references.append(progress["source_id"])
@@ -303,6 +305,38 @@ def validate_project_snapshot(
         "verified_claim_evidence",
         verified_failures,
         "Every verified claim references evidence",
+    )
+
+    claim_statuses: dict[str, str] = {}
+    conflict_failures: list[str] = []
+    for claim in snapshot.get("claims", []):
+        if not isinstance(claim, dict) or not isinstance(claim.get("claim_id"), str):
+            continue
+        claim_id = claim["claim_id"]
+        if claim_id in claim_statuses:
+            conflict_failures.append(f"duplicate claim identity {claim_id}")
+        elif isinstance(claim.get("status"), str):
+            claim_statuses[claim_id] = claim["status"]
+    for conflict in snapshot.get("conflicts", []):
+        if not isinstance(conflict, dict):
+            continue
+        conflict_id = conflict.get("conflict_id", "<unknown>")
+        for claim_id in conflict.get("claim_ids", []):
+            if claim_id not in claim_statuses:
+                conflict_failures.append(
+                    f"conflict {conflict_id} references unknown claim {claim_id}"
+                )
+            elif claim_statuses[claim_id] != "conflicted":
+                conflict_failures.append(
+                    f"conflict {conflict_id} references claim {claim_id} "
+                    f"with status {claim_statuses[claim_id]}"
+                )
+    _check(
+        checks,
+        errors,
+        "claim_conflict_consistency",
+        conflict_failures,
+        "Claim identities are unique and every conflict references conflicted claims",
     )
 
     resolution_failures = [

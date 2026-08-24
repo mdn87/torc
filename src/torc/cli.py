@@ -15,7 +15,7 @@ from .artifacts.producer import CommandProjectSnapshotProducer
 from .artifacts.render import render_snapshot_html
 from .artifacts.storage import ArtifactStore
 from .artifacts.validation import validate_project_snapshot
-from .artifacts.view import build_current_snapshot_view
+from .artifacts.view import build_current_snapshot_view, build_snapshot_view
 from .demo import inspect_lineage, run_demo
 from .errors import TorcError
 from .experiment_adapters import adapter_for
@@ -321,6 +321,7 @@ def build_parser() -> argparse.ArgumentParser:
     artifact_view.add_argument("--json", action="store_true", dest="as_json")
     artifact_render = artifact_commands.add_parser("render")
     artifact_render.add_argument("--artifact", required=True)
+    artifact_render.add_argument("--evidence", type=Path)
     artifact_render.add_argument("--receipt", type=Path)
     artifact_render.add_argument(
         "--store", type=Path, default=Path(".lugos/artifacts/project-snapshot")
@@ -752,18 +753,21 @@ def _run_artifact(args: argparse.Namespace) -> tuple[dict[str, object], int]:
     if action == "view":
         return build_current_snapshot_view(store, schemas), 0
     if action == "render":
-        snapshot = (
-            store.current_artifact()
-            if args.artifact == "current"
-            else _load_artifact_record(Path(args.artifact))
-        )
-        receipt = (
-            _load_artifact_record(args.receipt)
-            if args.receipt is not None
-            else store.receipt_for_artifact(snapshot["artifact_id"])
-        )
-        if receipt.get("status") != "accepted":
-            raise TorcError("reference renderer requires an accepted receipt")
+        if args.artifact == "current":
+            view = build_current_snapshot_view(store, schemas)
+        else:
+            if args.evidence is None or args.receipt is None:
+                raise TorcError(
+                    "explicit artifact rendering requires --evidence and --receipt"
+                )
+            view = build_snapshot_view(
+                _load_artifact_record(Path(args.artifact)),
+                _load_artifact_record(args.evidence),
+                _load_artifact_record(args.receipt),
+                schemas,
+            )
+        snapshot = view["artifact"]
+        receipt = view["receipt"]
         _write_html(args.out, render_snapshot_html(snapshot, receipt))
         return {
             "ok": True,

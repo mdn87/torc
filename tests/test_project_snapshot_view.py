@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from torc.artifacts.acceptance import accept_project_snapshot
+from torc.artifacts.identity import seal_content_id
 from torc.artifacts.storage import ArtifactStore
 from torc.artifacts.view import build_current_snapshot_view
 from torc.cli import main
@@ -71,3 +72,73 @@ def test_artifact_view_cli_emits_trusted_read_envelope(
     view = json.loads(capsys.readouterr().out)
     assert view["trusted"] is True
     assert view["artifact"]["artifact_id"] == store.current_id()
+
+
+def test_explicit_render_revalidates_and_binds_all_three_records(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    store = _accepted_store(tmp_path / "store")
+    artifact = store.current_artifact()
+    receipt = store.receipt_for_artifact(artifact["artifact_id"])
+    evidence = store.evidence_bundle(receipt["evidence_bundle_id"])
+    paths = {
+        "artifact": tmp_path / "artifact.json",
+        "evidence": tmp_path / "evidence.json",
+        "receipt": tmp_path / "receipt.json",
+    }
+    for name, record in (
+        ("artifact", artifact),
+        ("evidence", evidence),
+        ("receipt", receipt),
+    ):
+        paths[name].write_text(json.dumps(record), encoding="utf-8")
+    output = tmp_path / "valid.html"
+
+    assert (
+        main(
+            [
+                "artifact",
+                "render",
+                "--artifact",
+                str(paths["artifact"]),
+                "--evidence",
+                str(paths["evidence"]),
+                "--receipt",
+                str(paths["receipt"]),
+                "--out",
+                str(output),
+                "--json",
+            ]
+        )
+        == 0
+    )
+    assert json.loads(capsys.readouterr().out)["artifact_id"] == artifact["artifact_id"]
+    assert output.is_file()
+
+    forged_receipt = dict(receipt)
+    forged_receipt["artifact_id"] = "sha256:" + "f" * 64
+    forged_receipt = seal_content_id(forged_receipt, "receipt_id")
+    paths["receipt"].write_text(json.dumps(forged_receipt), encoding="utf-8")
+    forged_output = tmp_path / "forged.html"
+
+    assert (
+        main(
+            [
+                "artifact",
+                "render",
+                "--artifact",
+                str(paths["artifact"]),
+                "--evidence",
+                str(paths["evidence"]),
+                "--receipt",
+                str(paths["receipt"]),
+                "--out",
+                str(forged_output),
+                "--json",
+            ]
+        )
+        == 1
+    )
+    failure = json.loads(capsys.readouterr().out)
+    assert "does not reference the supplied artifact" in failure["detail"]
+    assert not forged_output.exists()

@@ -11,19 +11,19 @@ from .storage import ArtifactStore
 from .validation import validate_acceptance_receipt, validate_project_snapshot
 
 
-def build_current_snapshot_view(
-    store: ArtifactStore, schema_dir: Path | str
+def build_snapshot_view(
+    artifact: dict[str, Any],
+    evidence_bundle: dict[str, Any],
+    receipt: dict[str, Any],
+    schema_dir: Path | str,
 ) -> dict[str, Any]:
-    """Revalidate the current artifact and its immutable supporting records."""
+    """Validate and bind an artifact, Evidence Bundle, and Acceptance Receipt."""
 
-    artifact = store.current_artifact()
     bundle_ref = artifact.get("evidence_bundle")
     bundle_id = bundle_ref.get("bundle_id") if isinstance(bundle_ref, dict) else None
     if not isinstance(bundle_id, str):
         raise IntegrityError("Project Snapshot has no Evidence Bundle identity")
 
-    evidence_bundle = store.evidence_bundle(bundle_id)
-    receipt = store.receipt_for_artifact(str(artifact["artifact_id"]))
     snapshot_result = validate_project_snapshot(artifact, evidence_bundle, schema_dir)
     if not snapshot_result.valid:
         raise IntegrityError(
@@ -35,9 +35,9 @@ def build_current_snapshot_view(
             "Acceptance Receipt failed read validation: " + "; ".join(receipt_result.errors)
         )
     if receipt.get("artifact_id") != artifact.get("artifact_id"):
-        raise IntegrityError("Acceptance Receipt does not reference the current artifact")
+        raise IntegrityError("Acceptance Receipt does not reference the supplied artifact")
     if receipt.get("evidence_bundle_id") != bundle_id:
-        raise IntegrityError("Acceptance Receipt does not reference the current Evidence Bundle")
+        raise IntegrityError("Acceptance Receipt does not reference the supplied Evidence Bundle")
     if receipt.get("status") != "accepted" or receipt.get("errors"):
         raise IntegrityError("Acceptance Receipt does not record an accepted artifact")
     if any(check.get("status") != "passed" for check in receipt.get("checks", [])):
@@ -52,3 +52,19 @@ def build_current_snapshot_view(
         "evidence_bundle": evidence_bundle,
         "receipt": receipt,
     }
+
+
+def build_current_snapshot_view(
+    store: ArtifactStore, schema_dir: Path | str
+) -> dict[str, Any]:
+    """Revalidate the current artifact and its immutable supporting records."""
+
+    artifact = store.current_artifact()
+    bundle_ref = artifact.get("evidence_bundle")
+    bundle_id = bundle_ref.get("bundle_id") if isinstance(bundle_ref, dict) else None
+    if not isinstance(bundle_id, str):
+        raise IntegrityError("Project Snapshot has no Evidence Bundle identity")
+
+    evidence_bundle = store.evidence_bundle(bundle_id)
+    receipt = store.receipt_for_artifact(str(artifact["artifact_id"]))
+    return build_snapshot_view(artifact, evidence_bundle, receipt, schema_dir)

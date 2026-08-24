@@ -80,8 +80,15 @@ def _records() -> tuple[dict[str, object], dict[str, object]]:
                     "project_id": "torc",
                     "name": "TORC",
                     "status": "active",
+                    "status_source_id": "status",
                     "repositories": ["local/torc"],
-                    "progress": [{"kind": "checks", "label": "validation passed"}],
+                    "progress": [
+                        {
+                            "kind": "checks",
+                            "label": "validation passed",
+                            "source_id": "status",
+                        }
+                    ],
                 }
             ],
             "claims": [
