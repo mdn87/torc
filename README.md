@@ -1,6 +1,8 @@
 # TORC Plane
 
-TORC is the proposed lineage and continuity control plane for Lugos agents.
+TORC is the proposed lineage and continuity control plane for agents in
+[Lugos](https://github.com/mdn87), a local-first agent-orchestration and
+developer-tooling system.
 
 The project name is a working codename. `Transient Operations, Retained Continuity` is a useful mnemonic, not a requirement that should shape APIs or component boundaries.
 
@@ -41,7 +43,7 @@ This is explanatory language only. TORC does not need to proxy every model token
 - Persona, skill, or source-pack custody
 - Chat UI, HUD rendering, or operator messaging transport
 
-Those concerns already belong to other Lugos components. See `docs/integration-boundaries.md`.
+Those concerns belong to other Lugos components. See `docs/integration-boundaries.md`.
 
 ## Three representations
 
