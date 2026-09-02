@@ -143,6 +143,61 @@ CREATE TRIGGER artifacts_no_delete BEFORE DELETE ON artifacts
 BEGIN SELECT RAISE(ABORT, 'immutable artifact metadata cannot be deleted'); END;
 """
 
+_MIGRATION_2 = """
+CREATE TABLE thread_lineage_bindings (
+    link_id TEXT PRIMARY KEY,
+    thread_id TEXT NOT NULL UNIQUE,
+    lineage_id TEXT NOT NULL REFERENCES lineages(lineage_id),
+    relationship TEXT NOT NULL CHECK (relationship = 'thread_carried_by_lineage'),
+    payload_json TEXT NOT NULL
+);
+CREATE INDEX thread_lineage_bindings_lineage_idx
+    ON thread_lineage_bindings(lineage_id);
+
+CREATE TABLE thread_checkpoint_decisions (
+    decision_id TEXT PRIMARY KEY,
+    thread_id TEXT NOT NULL REFERENCES thread_lineage_bindings(thread_id),
+    lineage_id TEXT NOT NULL REFERENCES lineages(lineage_id),
+    checkpoint_ref TEXT NOT NULL,
+    checkpoint_sha256 TEXT NOT NULL,
+    disposition TEXT NOT NULL CHECK (disposition IN ('accepted', 'rejected')),
+    payload_json TEXT NOT NULL
+);
+CREATE INDEX thread_checkpoint_decisions_thread_idx
+    ON thread_checkpoint_decisions(thread_id);
+CREATE INDEX thread_checkpoint_decisions_lineage_idx
+    ON thread_checkpoint_decisions(lineage_id);
+
+CREATE TABLE thread_accepted_heads (
+    thread_id TEXT PRIMARY KEY REFERENCES thread_lineage_bindings(thread_id),
+    lineage_id TEXT NOT NULL REFERENCES lineages(lineage_id),
+    decision_id TEXT REFERENCES thread_checkpoint_decisions(decision_id),
+    checkpoint_ref TEXT,
+    checkpoint_sha256 TEXT,
+    updated_at TEXT,
+    CHECK (
+        (decision_id IS NULL AND checkpoint_ref IS NULL AND checkpoint_sha256 IS NULL)
+        OR
+        (decision_id IS NOT NULL AND checkpoint_ref IS NOT NULL AND checkpoint_sha256 IS NOT NULL)
+    )
+);
+
+CREATE TRIGGER thread_lineage_bindings_no_update
+BEFORE UPDATE ON thread_lineage_bindings
+BEGIN SELECT RAISE(ABORT, 'immutable thread lineage bindings cannot be updated'); END;
+CREATE TRIGGER thread_lineage_bindings_no_delete
+BEFORE DELETE ON thread_lineage_bindings
+BEGIN SELECT RAISE(ABORT, 'immutable thread lineage bindings cannot be deleted'); END;
+CREATE TRIGGER thread_checkpoint_decisions_no_update
+BEFORE UPDATE ON thread_checkpoint_decisions
+BEGIN SELECT RAISE(ABORT, 'immutable checkpoint decisions cannot be updated'); END;
+CREATE TRIGGER thread_checkpoint_decisions_no_delete
+BEFORE DELETE ON thread_checkpoint_decisions
+BEGIN SELECT RAISE(ABORT, 'immutable checkpoint decisions cannot be deleted'); END;
+"""
+
+_LATEST_SCHEMA_VERSION = 2
+
 
 class Store:
     """Owns a single local TORC SQLite database."""
@@ -167,7 +222,7 @@ class Store:
             version = int(
                 self.connection.execute("PRAGMA user_version").fetchone()[0]
             )
-            if version != 1:
+            if version != _LATEST_SCHEMA_VERSION:
                 raise RuntimeError(
                     f"unsupported TORC database schema version: {version}"
                 )
@@ -185,12 +240,17 @@ class Store:
 
     def migrate(self) -> None:
         version = int(self.connection.execute("PRAGMA user_version").fetchone()[0])
-        if version > 1:
+        if version > _LATEST_SCHEMA_VERSION:
             raise RuntimeError(f"unsupported TORC database schema version: {version}")
         if version == 0:
             with self.connection:
                 self.connection.executescript(_MIGRATION_1)
                 self.connection.execute("PRAGMA user_version = 1")
+            version = 1
+        if version == 1:
+            with self.connection:
+                self.connection.executescript(_MIGRATION_2)
+                self.connection.execute("PRAGMA user_version = 2")
 
     @contextmanager
     def transaction(self, *, immediate: bool = False) -> Iterator[sqlite3.Connection]:

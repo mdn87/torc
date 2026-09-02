@@ -22,6 +22,7 @@ CASES = (
     ("continuity-payload.schema.json", "continuity-payload.example.json"),
     ("score-report.schema.json", "score-report.example.json"),
     ("artifact-manifest.schema.json", "artifact-manifest.example.json"),
+    ("thread-checkpoint-decision.schema.json", "thread-checkpoint-decision.example.json"),
 )
 
 

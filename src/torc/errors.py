@@ -29,5 +29,13 @@ class BranchError(TorcError):
     """A requested new lineage branch is invalid."""
 
 
+class ThreadCheckpointError(TorcError):
+    """A thread binding or checkpoint decision is invalid."""
+
+
+class CheckpointConflictError(ThreadCheckpointError):
+    """A checkpoint decision started from a stale accepted head."""
+
+
 class NotFoundError(TorcError):
     """A requested TORC record does not exist."""
