@@ -597,6 +597,131 @@ def _verify_immutable_records(
                 "rejected result cannot transfer authority",
             )
 
+    _verify_thread_checkpoint_records(store, lineage_id, errors)
+
+
+def _verify_thread_checkpoint_records(
+    store: Store, lineage_id: str, errors: list[dict[str, str]]
+) -> None:
+    bindings: dict[str, dict[str, Any]] = {}
+    for row in store.connection.execute(
+        """SELECT link_id, thread_id, relationship, payload_json
+           FROM thread_lineage_bindings WHERE lineage_id = ?""",
+        (lineage_id,),
+    ):
+        record = json.loads(row["payload_json"])
+        bindings[row["thread_id"]] = record
+        if not record_hash_is_valid(record):
+            _error(
+                errors,
+                "thread_lineage_binding_hash_mismatch",
+                row["link_id"],
+                "content hash is invalid",
+            )
+        if (
+            record.get("link_id") != row["link_id"]
+            or record.get("thread_id") != row["thread_id"]
+            or record.get("lineage_id") != lineage_id
+            or record.get("relationship") != row["relationship"]
+        ):
+            _error(
+                errors,
+                "thread_lineage_binding_shape_mismatch",
+                row["link_id"],
+                "stored columns differ from the immutable payload",
+            )
+
+    decisions: dict[str, dict[str, Any]] = {}
+    accepted_by_thread: dict[str, list[dict[str, Any]]] = {}
+    for row in store.connection.execute(
+        """SELECT decision_id, thread_id, checkpoint_ref, checkpoint_sha256,
+                  disposition, payload_json
+           FROM thread_checkpoint_decisions WHERE lineage_id = ?""",
+        (lineage_id,),
+    ):
+        record = json.loads(row["payload_json"])
+        decisions[row["decision_id"]] = record
+        if record.get("disposition") == "accepted":
+            accepted_by_thread.setdefault(row["thread_id"], []).append(record)
+        if not record_hash_is_valid(record):
+            _error(
+                errors,
+                "thread_checkpoint_decision_hash_mismatch",
+                row["decision_id"],
+                "content hash is invalid",
+            )
+        if (
+            record.get("decision_id") != row["decision_id"]
+            or record.get("thread_id") != row["thread_id"]
+            or record.get("lineage_id") != lineage_id
+            or record.get("checkpoint_ref") != row["checkpoint_ref"]
+            or record.get("checkpoint_sha256") != row["checkpoint_sha256"]
+            or record.get("disposition") != row["disposition"]
+            or row["thread_id"] not in bindings
+        ):
+            _error(
+                errors,
+                "thread_checkpoint_decision_shape_mismatch",
+                row["decision_id"],
+                "stored columns or binding differ from the immutable payload",
+            )
+
+    for row in store.connection.execute(
+        "SELECT * FROM thread_accepted_heads WHERE lineage_id = ?",
+        (lineage_id,),
+    ):
+        binding = bindings.get(row["thread_id"])
+        if binding is None:
+            _error(
+                errors,
+                "thread_accepted_head_binding_missing",
+                row["thread_id"],
+                "accepted head has no immutable lineage binding",
+            )
+            continue
+        if row["decision_id"] is None:
+            if accepted_by_thread.get(row["thread_id"]):
+                _error(
+                    errors,
+                    "thread_accepted_head_missing",
+                    row["thread_id"],
+                    "accepted decisions exist but the accepted head is empty",
+                )
+            continue
+        decision = decisions.get(row["decision_id"])
+        if (
+            decision is None
+            or decision.get("disposition") != "accepted"
+            or decision.get("thread_id") != row["thread_id"]
+            or decision.get("checkpoint_ref") != row["checkpoint_ref"]
+            or decision.get("checkpoint_sha256") != row["checkpoint_sha256"]
+        ):
+            _error(
+                errors,
+                "thread_accepted_head_mismatch",
+                row["thread_id"],
+                "accepted head is not backed by its accepted decision",
+            )
+            continue
+        chain = accepted_by_thread.get(row["thread_id"], [])
+        previous_ref: str | None = None
+        for accepted in chain:
+            if accepted.get("expected_accepted_checkpoint_ref") != previous_ref:
+                _error(
+                    errors,
+                    "thread_checkpoint_decision_chain_mismatch",
+                    accepted["decision_id"],
+                    "accepted decision does not extend the prior accepted checkpoint",
+                )
+            previous_ref = accepted["checkpoint_ref"]
+        if chain and chain[-1]["decision_id"] != row["decision_id"]:
+            _error(
+                errors,
+                "thread_accepted_head_not_latest",
+                row["thread_id"],
+                "accepted head does not reference the latest accepted decision",
+            )
+
 
 def _verify_rollback_revision(
     store: Store,

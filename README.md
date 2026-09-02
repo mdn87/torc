@@ -89,6 +89,12 @@ and rollback or branch context from one verified SQLite snapshot. The report is
 explicitly non-canonical and fails closed instead of explaining invalid
 provenance. See `docs/p4-visibility.md`.
 
+The LIR integration adds an immutable `thread_carried_by_lineage` binding and
+checkpoint accept/reject decisions. TORC alone advances the accepted checkpoint
+head, under the current lineage lease and an expected-head transaction; it does
+not store the checkpoint body or execute its next operation. See
+`docs/thread-checkpoint-authority.md`.
+
 TORC also includes the first provider-agnostic project snapshot artifact slice.
 It collects manifest-bounded Git evidence, validates content-addressed
 candidate projections, writes separate acceptance receipts, advances a
@@ -152,6 +158,7 @@ exports seven immutable JSON artifacts under `.torc/demo/artifacts/`.
 - `docs/p3-branch-scope-envelope.json` - branch-creation authority and budgets
 - `docs/p4-visibility.md` - read-only authority and continuity explanation contract
 - `docs/p4-visibility-scope-envelope.json` - bounded P4 visibility authority and budgets
+- `docs/thread-checkpoint-authority.md` - LIR binding and checkpoint acceptance contract
 - `docs/project-snapshot-artifacts.md` - three-record artifact architecture, reconnaissance, and Phase 2 boundary
 - `docs/artifacts/README.md` - project snapshot schemas, CLI, retention, renderer, and cold-agent refresh index
 - `docs/prompts/CODEX_BOOTSTRAP_PROMPT.md` - implementation task for Codex

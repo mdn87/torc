@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "decision_id": "checkpoint-decision-lode-001",
+  "thread_id": "plir:thread:01JLODE24GBCUDAVEIN000000",
+  "lineage_id": "lineage-lode",
+  "checkpoint_ref": "ogmi:checkpoint:lode-001",
+  "checkpoint_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "disposition": "accepted",
+  "expected_accepted_checkpoint_ref": null,
+  "authority": {
+    "activation_id": "activation-lode",
+    "lease_id": "lease-lode",
+    "lineage_head_revision_id": "revision-lode-001"
+  },
+  "policy_version": "lir-protocol-v0",
+  "reason_codes": [
+    "tests_passed",
+    "authority_current"
+  ],
+  "evidence_refs": [
+    "evidence:lode-tests"
+  ],
+  "decided_at": "2026-09-02T12:04:00Z",
+  "integrity": {
+    "algorithm": "sha256",
+    "canonical_payload_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  }
+}
