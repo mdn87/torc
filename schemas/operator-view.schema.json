@@ -170,7 +170,7 @@
       "additionalProperties": false,
       "required": ["valid", "schema_version", "lineages_checked", "artifacts_checked", "errors"],
       "properties": {
-        "valid": {"type": "boolean"}, "schema_version": {"const": 2},
+        "valid": {"type": "boolean"}, "schema_version": {"const": 3},
         "lineages_checked": {"type": "array", "items": {"$ref": "#/$defs/id"}},
         "artifacts_checked": {"type": "integer", "minimum": 0}, "errors": {"type": "array", "items": {"type": "object"}}
       }

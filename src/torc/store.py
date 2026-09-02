@@ -196,7 +196,34 @@ BEFORE DELETE ON thread_checkpoint_decisions
 BEGIN SELECT RAISE(ABORT, 'immutable checkpoint decisions cannot be deleted'); END;
 """
 
-_LATEST_SCHEMA_VERSION = 2
+_MIGRATION_3 = """
+CREATE TABLE thread_continuation_grants (
+    grant_id TEXT PRIMARY KEY,
+    thread_id TEXT NOT NULL REFERENCES thread_lineage_bindings(thread_id),
+    lineage_id TEXT NOT NULL REFERENCES lineages(lineage_id),
+    checkpoint_ref TEXT NOT NULL,
+    checkpoint_sha256 TEXT NOT NULL,
+    operation_name TEXT NOT NULL,
+    proposal_sha256 TEXT NOT NULL,
+    activation_id TEXT NOT NULL REFERENCES activations(activation_id),
+    lease_id TEXT NOT NULL REFERENCES leases(lease_id),
+    lineage_head_revision_id TEXT NOT NULL REFERENCES revisions(revision_id),
+    payload_json TEXT NOT NULL
+);
+CREATE INDEX thread_continuation_grants_thread_idx
+    ON thread_continuation_grants(thread_id);
+CREATE INDEX thread_continuation_grants_lineage_idx
+    ON thread_continuation_grants(lineage_id);
+
+CREATE TRIGGER thread_continuation_grants_no_update
+BEFORE UPDATE ON thread_continuation_grants
+BEGIN SELECT RAISE(ABORT, 'immutable continuation grants cannot be updated'); END;
+CREATE TRIGGER thread_continuation_grants_no_delete
+BEFORE DELETE ON thread_continuation_grants
+BEGIN SELECT RAISE(ABORT, 'immutable continuation grants cannot be deleted'); END;
+"""
+
+_LATEST_SCHEMA_VERSION = 3
 
 
 class Store:
@@ -251,6 +278,11 @@ class Store:
             with self.connection:
                 self.connection.executescript(_MIGRATION_2)
                 self.connection.execute("PRAGMA user_version = 2")
+            version = 2
+        if version == 2:
+            with self.connection:
+                self.connection.executescript(_MIGRATION_3)
+                self.connection.execute("PRAGMA user_version = 3")
 
     @contextmanager
     def transaction(self, *, immediate: bool = False) -> Iterator[sqlite3.Connection]:
