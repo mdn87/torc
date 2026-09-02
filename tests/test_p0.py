@@ -390,13 +390,13 @@ def test_empty_database_migration_is_repeatable_and_idempotent(
     tmp_path: Path,
 ) -> None:
     with Store(tmp_path) as first:
-        assert first.connection.execute("PRAGMA user_version").fetchone()[0] == 3
+        assert first.connection.execute("PRAGMA user_version").fetchone()[0] == 4
         table_count = first.connection.execute(
             "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table'"
         ).fetchone()[0]
 
     with Store(tmp_path) as second:
-        assert second.connection.execute("PRAGMA user_version").fetchone()[0] == 3
+        assert second.connection.execute("PRAGMA user_version").fetchone()[0] == 4
         assert (
             second.connection.execute(
                 "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table'"

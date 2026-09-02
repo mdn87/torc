@@ -11,6 +11,7 @@ from .canonical import canonical_json, record_hash_is_valid, seal_record, utc_no
 from .errors import CheckpointConflictError, LeaseConflictError, ThreadCheckpointError
 from .ids import new_id, valid_id
 from .store import Store
+from .thread_closures import _require_thread_open_for_write
 
 _SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 
@@ -45,6 +46,7 @@ def link_thread_to_lineage(
     _validate_timestamp(linked_at, "thread binding time")
 
     with store.transaction(immediate=True):
+        _require_thread_open_for_write(store, thread_id)
         existing_row = store.connection.execute(
             "SELECT payload_json FROM thread_lineage_bindings WHERE thread_id = ?",
             (thread_id,),
@@ -150,6 +152,7 @@ def record_checkpoint_decision(
         _validate_timestamp(decided_at, "checkpoint decision time")
 
     with store.transaction(immediate=True):
+        _require_thread_open_for_write(store, thread_id)
         existing_row = store.connection.execute(
             "SELECT payload_json FROM thread_checkpoint_decisions WHERE decision_id = ?",
             (decision_id,),
@@ -321,6 +324,7 @@ def issue_thread_continuation_grant(
         _validate_timestamp(granted_at, "continuation grant time")
 
     with store.transaction(immediate=True):
+        _require_thread_open_for_write(store, thread_id)
         existing_row = store.connection.execute(
             "SELECT payload_json FROM thread_continuation_grants WHERE grant_id = ?",
             (grant_id,),
@@ -418,6 +422,7 @@ def validate_thread_continuation_grant(
     """Revalidate immutable grant content against current TORC authority."""
 
     grant = get_thread_continuation_grant(store, grant_id)
+    _require_thread_open_for_write(store, str(grant["thread_id"]))
     if not record_hash_is_valid(grant):
         raise ThreadCheckpointError("continuation grant integrity is invalid")
     if grant.get("proposal_sha256") != proposal_sha256:

@@ -40,8 +40,12 @@ checkpoint, or current lineage authority has changed.
 
 ## Integrity and migration
 
-Database schema version 3 adds the continuation-grant table and no service
-process or network dependency. Opening an older writable database applies each
+Database schema version 3 adds the continuation-grant table. Schema version 4
+adds immutable close-intent and close-result records. A live intent lasts at
+most 60 seconds and blocks checkpoint decisions plus continuation grant issue
+or revalidation; a completed result keeps those paths closed after OGMI has
+returned the exact closed-manifest proof. This adds no service process or
+network dependency. Opening an older writable database applies each
 forward migration. Immutable-table triggers reject update and delete, and
 `verify_store` checks record hashes, column-to-payload agreement, the accepted
 decision chain, the current accepted-head pointer, and continuation-grant

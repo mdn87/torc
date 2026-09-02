@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import sqlite3
 from concurrent.futures import ThreadPoolExecutor
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -17,6 +18,12 @@ from torc.thread_checkpoints import (
     link_thread_to_lineage,
     record_checkpoint_decision,
     validate_thread_continuation_grant,
+)
+from torc.thread_closures import (
+    complete_thread_close_intent,
+    get_thread_close_intent,
+    get_thread_close_result,
+    prepare_thread_close_intent,
 )
 from torc.verify import verify_store
 
@@ -298,6 +305,217 @@ def test_continuation_grant_requires_the_accepted_checkpoint_and_exact_proposal(
             )
 
 
+def test_close_intent_blocks_checkpoint_and_continuation_until_ogmi_proof(
+    tmp_path: Path,
+) -> None:
+    _bootstrap(tmp_path)
+    now = datetime.now(UTC)
+    issued_at = now.isoformat(timespec="microseconds").replace("+00:00", "Z")
+    expires_at = (now + timedelta(seconds=60)).isoformat(
+        timespec="microseconds"
+    ).replace("+00:00", "Z")
+    completed_at = (now + timedelta(seconds=1)).isoformat(
+        timespec="microseconds"
+    ).replace("+00:00", "Z")
+    with Store(tmp_path) as store:
+        accepted = _accept(
+            store,
+            CHECKPOINT_ONE,
+            expected=None,
+            decision_id="checkpoint-decision-one",
+            decided_at="2026-09-02T12:04:00Z",
+        )
+        grant = issue_thread_continuation_grant(
+            store,
+            thread_id=THREAD_ID,
+            checkpoint_ref=CHECKPOINT_ONE,
+            checkpoint_sha256="a" * 64,
+            operation_name="lode.vein.propose",
+            proposal_sha256="c" * 64,
+            activation_id=ACTIVATION_ID,
+            evidence_refs=[accepted["decision_id"]],
+            grant_id="continuation-grant-before-close",
+        )
+
+        intent = prepare_thread_close_intent(
+            store,
+            thread_id=THREAD_ID,
+            expected_manifest_id="thread-manifest-active",
+            activation_id=ACTIVATION_ID,
+            evidence_refs=["ogmi:thread-manifest:active"],
+            close_intent_id="thread-close-intent-one",
+            issued_at=issued_at,
+            expires_at=expires_at,
+        )
+
+        assert get_thread_close_intent(store, intent["close_intent_id"]) == intent
+        with pytest.raises(ThreadCheckpointError, match="thread_close_intent"):
+            validate_thread_continuation_grant(
+                store,
+                grant["grant_id"],
+                proposal_sha256="c" * 64,
+            )
+        with pytest.raises(ThreadCheckpointError, match="thread_close_intent"):
+            issue_thread_continuation_grant(
+                store,
+                thread_id=THREAD_ID,
+                checkpoint_ref=CHECKPOINT_ONE,
+                checkpoint_sha256="a" * 64,
+                operation_name="lode.vein.propose",
+                proposal_sha256="d" * 64,
+                activation_id=ACTIVATION_ID,
+                evidence_refs=[accepted["decision_id"]],
+            )
+        with pytest.raises(ThreadCheckpointError, match="thread_close_intent"):
+            _accept(
+                store,
+                CHECKPOINT_TWO,
+                expected=CHECKPOINT_ONE,
+                decision_id="checkpoint-decision-during-close",
+                decided_at=completed_at,
+            )
+
+        result = complete_thread_close_intent(
+            store,
+            close_intent_id=intent["close_intent_id"],
+            manifest_ref="thread-manifest-closed",
+            manifest_sha256="d" * 64,
+            owner_receipt_ref="ogmi:thread-manifest:closed",
+            owner_receipt_sha256="e" * 64,
+            close_result_id="thread-close-result-one",
+            completed_at=completed_at,
+        )
+
+        assert get_thread_close_result(store, intent["close_intent_id"]) == result
+        assert complete_thread_close_intent(
+            store,
+            close_intent_id=intent["close_intent_id"],
+            manifest_ref="thread-manifest-closed",
+            manifest_sha256="d" * 64,
+            owner_receipt_ref="ogmi:thread-manifest:closed",
+            owner_receipt_sha256="e" * 64,
+            close_result_id="thread-close-result-one",
+            completed_at=completed_at,
+        ) == result
+        with pytest.raises(ThreadCheckpointError, match="thread_closed"):
+            validate_thread_continuation_grant(
+                store,
+                grant["grant_id"],
+                proposal_sha256="c" * 64,
+            )
+        with pytest.raises(sqlite3.IntegrityError, match="immutable close results"):
+            store.connection.execute(
+                "UPDATE thread_close_results SET manifest_ref = 'changed'"
+            )
+
+
+def test_expired_close_intent_does_not_block_a_new_continuation(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _bootstrap(tmp_path)
+    base = datetime(2026, 9, 2, 18, 0, tzinfo=UTC)
+    issued_at = base.isoformat(timespec="microseconds").replace("+00:00", "Z")
+    expires_at = (base + timedelta(seconds=30)).isoformat(
+        timespec="microseconds"
+    ).replace("+00:00", "Z")
+    clock = {"now": base}
+    monkeypatch.setattr(
+        "torc.thread_closures.utc_now",
+        lambda: clock["now"].isoformat(timespec="microseconds").replace(
+            "+00:00", "Z"
+        ),
+    )
+    with Store(tmp_path) as store:
+        accepted = _accept(
+            store,
+            CHECKPOINT_ONE,
+            expected=None,
+            decision_id="checkpoint-decision-one",
+            decided_at="2026-09-02T12:04:00Z",
+        )
+        intent = prepare_thread_close_intent(
+            store,
+            thread_id=THREAD_ID,
+            expected_manifest_id="thread-manifest-active",
+            activation_id=ACTIVATION_ID,
+            evidence_refs=["ogmi:thread-manifest:active"],
+            close_intent_id="thread-close-intent-expired",
+            issued_at=issued_at,
+            expires_at=expires_at,
+        )
+        clock["now"] = base + timedelta(seconds=31)
+
+        grant = issue_thread_continuation_grant(
+            store,
+            thread_id=THREAD_ID,
+            checkpoint_ref=CHECKPOINT_ONE,
+            checkpoint_sha256="a" * 64,
+            operation_name="lode.vein.propose",
+            proposal_sha256="c" * 64,
+            activation_id=ACTIVATION_ID,
+            evidence_refs=[accepted["decision_id"]],
+        )
+        assert grant["thread_id"] == THREAD_ID
+        with pytest.raises(ThreadCheckpointError, match="expired"):
+            complete_thread_close_intent(
+                store,
+                close_intent_id=intent["close_intent_id"],
+                manifest_ref="thread-manifest-closed",
+                manifest_sha256="d" * 64,
+                owner_receipt_ref="ogmi:thread-manifest:closed",
+                owner_receipt_sha256="e" * 64,
+            )
+
+
+def test_verifier_detects_tampered_close_result(tmp_path: Path) -> None:
+    _bootstrap(tmp_path)
+    now = datetime.now(UTC)
+    issued_at = now.isoformat(timespec="microseconds").replace("+00:00", "Z")
+    expires_at = (now + timedelta(seconds=60)).isoformat(
+        timespec="microseconds"
+    ).replace("+00:00", "Z")
+    completed_at = (now + timedelta(seconds=1)).isoformat(
+        timespec="microseconds"
+    ).replace("+00:00", "Z")
+    with Store(tmp_path) as store:
+        intent = prepare_thread_close_intent(
+            store,
+            thread_id=THREAD_ID,
+            expected_manifest_id="thread-manifest-active",
+            activation_id=ACTIVATION_ID,
+            evidence_refs=["ogmi:thread-manifest:active"],
+            close_intent_id="thread-close-intent-one",
+            issued_at=issued_at,
+            expires_at=expires_at,
+        )
+        result = complete_thread_close_intent(
+            store,
+            close_intent_id=intent["close_intent_id"],
+            manifest_ref="thread-manifest-closed",
+            manifest_sha256="d" * 64,
+            owner_receipt_ref="ogmi:thread-manifest:closed",
+            owner_receipt_sha256="e" * 64,
+            close_result_id="thread-close-result-one",
+            completed_at=completed_at,
+        )
+        tampered = {**result, "manifest_ref": "thread-manifest-other"}
+        store.connection.execute("DROP TRIGGER thread_close_results_no_update")
+        store.connection.execute(
+            "UPDATE thread_close_results SET payload_json = ? WHERE close_result_id = ?",
+            (json.dumps(tampered), result["close_result_id"]),
+        )
+        store.connection.commit()
+
+        verification = verify_store(store, LINEAGE_ID)
+
+    assert verification["valid"] is False
+    assert any(
+        error["code"] == "thread_close_result_hash_mismatch"
+        for error in verification["errors"]
+    )
+
+
 def test_verifier_detects_tampered_continuation_grant(tmp_path: Path) -> None:
     _bootstrap(tmp_path)
     with Store(tmp_path) as store:
@@ -490,7 +708,7 @@ def test_schema_one_database_upgrades_to_thread_authority_schema(tmp_path: Path)
     connection.close()
 
     with Store(tmp_path) as store:
-        assert store.connection.execute("PRAGMA user_version").fetchone()[0] == 3
+        assert store.connection.execute("PRAGMA user_version").fetchone()[0] == 4
         tables = {
             row["name"]
             for row in store.connection.execute(

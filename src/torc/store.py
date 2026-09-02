@@ -223,7 +223,52 @@ BEFORE DELETE ON thread_continuation_grants
 BEGIN SELECT RAISE(ABORT, 'immutable continuation grants cannot be deleted'); END;
 """
 
-_LATEST_SCHEMA_VERSION = 3
+_MIGRATION_4 = """
+CREATE TABLE thread_close_intents (
+    close_intent_id TEXT PRIMARY KEY,
+    thread_id TEXT NOT NULL REFERENCES thread_lineage_bindings(thread_id),
+    lineage_id TEXT NOT NULL REFERENCES lineages(lineage_id),
+    expected_manifest_id TEXT NOT NULL,
+    activation_id TEXT NOT NULL REFERENCES activations(activation_id),
+    lease_id TEXT NOT NULL REFERENCES leases(lease_id),
+    lineage_head_revision_id TEXT NOT NULL REFERENCES revisions(revision_id),
+    issued_at TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    payload_json TEXT NOT NULL
+);
+CREATE INDEX thread_close_intents_thread_idx
+    ON thread_close_intents(thread_id, issued_at, close_intent_id);
+
+CREATE TABLE thread_close_results (
+    close_result_id TEXT PRIMARY KEY,
+    close_intent_id TEXT NOT NULL UNIQUE REFERENCES thread_close_intents(close_intent_id),
+    thread_id TEXT NOT NULL REFERENCES thread_lineage_bindings(thread_id),
+    lineage_id TEXT NOT NULL REFERENCES lineages(lineage_id),
+    manifest_ref TEXT NOT NULL,
+    manifest_sha256 TEXT NOT NULL,
+    owner_receipt_ref TEXT NOT NULL,
+    owner_receipt_sha256 TEXT NOT NULL,
+    completed_at TEXT NOT NULL,
+    payload_json TEXT NOT NULL
+);
+CREATE INDEX thread_close_results_thread_idx
+    ON thread_close_results(thread_id, completed_at, close_result_id);
+
+CREATE TRIGGER thread_close_intents_no_update
+BEFORE UPDATE ON thread_close_intents
+BEGIN SELECT RAISE(ABORT, 'immutable close intents cannot be updated'); END;
+CREATE TRIGGER thread_close_intents_no_delete
+BEFORE DELETE ON thread_close_intents
+BEGIN SELECT RAISE(ABORT, 'immutable close intents cannot be deleted'); END;
+CREATE TRIGGER thread_close_results_no_update
+BEFORE UPDATE ON thread_close_results
+BEGIN SELECT RAISE(ABORT, 'immutable close results cannot be updated'); END;
+CREATE TRIGGER thread_close_results_no_delete
+BEFORE DELETE ON thread_close_results
+BEGIN SELECT RAISE(ABORT, 'immutable close results cannot be deleted'); END;
+"""
+
+_LATEST_SCHEMA_VERSION = 4
 
 
 class Store:
@@ -283,6 +328,11 @@ class Store:
             with self.connection:
                 self.connection.executescript(_MIGRATION_3)
                 self.connection.execute("PRAGMA user_version = 3")
+            version = 3
+        if version == 3:
+            with self.connection:
+                self.connection.executescript(_MIGRATION_4)
+                self.connection.execute("PRAGMA user_version = 4")
 
     @contextmanager
     def transaction(self, *, immediate: bool = False) -> Iterator[sqlite3.Connection]:

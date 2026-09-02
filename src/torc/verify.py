@@ -759,6 +759,81 @@ def _verify_thread_checkpoint_records(
                 "stored columns or binding differ from the immutable payload",
             )
 
+    close_intents: dict[str, dict[str, Any]] = {}
+    for row in store.connection.execute(
+        """SELECT close_intent_id, thread_id, lineage_id, expected_manifest_id,
+                  activation_id, lease_id, lineage_head_revision_id,
+                  issued_at, expires_at, payload_json
+           FROM thread_close_intents WHERE lineage_id = ?""",
+        (lineage_id,),
+    ):
+        record = json.loads(row["payload_json"])
+        close_intents[row["close_intent_id"]] = record
+        if not record_hash_is_valid(record):
+            _error(
+                errors,
+                "thread_close_intent_hash_mismatch",
+                row["close_intent_id"],
+                "content hash is invalid",
+            )
+        authority = record.get("authority", {})
+        if (
+            record.get("close_intent_id") != row["close_intent_id"]
+            or record.get("thread_id") != row["thread_id"]
+            or record.get("lineage_id") != row["lineage_id"]
+            or record.get("expected_manifest_id") != row["expected_manifest_id"]
+            or authority.get("activation_id") != row["activation_id"]
+            or authority.get("lease_id") != row["lease_id"]
+            or authority.get("lineage_head_revision_id")
+            != row["lineage_head_revision_id"]
+            or record.get("issued_at") != row["issued_at"]
+            or record.get("expires_at") != row["expires_at"]
+            or row["thread_id"] not in bindings
+        ):
+            _error(
+                errors,
+                "thread_close_intent_shape_mismatch",
+                row["close_intent_id"],
+                "stored columns or binding differ from the immutable payload",
+            )
+
+    for row in store.connection.execute(
+        """SELECT close_result_id, close_intent_id, thread_id, lineage_id,
+                  manifest_ref, manifest_sha256, owner_receipt_ref,
+                  owner_receipt_sha256, completed_at, payload_json
+           FROM thread_close_results WHERE lineage_id = ?""",
+        (lineage_id,),
+    ):
+        record = json.loads(row["payload_json"])
+        if not record_hash_is_valid(record):
+            _error(
+                errors,
+                "thread_close_result_hash_mismatch",
+                row["close_result_id"],
+                "content hash is invalid",
+            )
+        intent = close_intents.get(row["close_intent_id"])
+        if (
+            record.get("close_result_id") != row["close_result_id"]
+            or record.get("close_intent_id") != row["close_intent_id"]
+            or record.get("thread_id") != row["thread_id"]
+            or record.get("lineage_id") != row["lineage_id"]
+            or record.get("manifest_ref") != row["manifest_ref"]
+            or record.get("manifest_sha256") != row["manifest_sha256"]
+            or record.get("owner_receipt_ref") != row["owner_receipt_ref"]
+            or record.get("owner_receipt_sha256") != row["owner_receipt_sha256"]
+            or record.get("completed_at") != row["completed_at"]
+            or intent is None
+            or intent.get("thread_id") != row["thread_id"]
+            or intent.get("lineage_id") != row["lineage_id"]
+        ):
+            _error(
+                errors,
+                "thread_close_result_shape_mismatch",
+                row["close_result_id"],
+                "stored columns or close intent differ from the immutable payload",
+            )
+
 
 def _verify_rollback_revision(
     store: Store,
