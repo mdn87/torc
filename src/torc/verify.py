@@ -722,6 +722,43 @@ def _verify_thread_checkpoint_records(
                 "accepted head does not reference the latest accepted decision",
             )
 
+    for row in store.connection.execute(
+        """SELECT grant_id, thread_id, checkpoint_ref, checkpoint_sha256,
+                  operation_name, proposal_sha256, activation_id, lease_id,
+                  lineage_head_revision_id, payload_json
+           FROM thread_continuation_grants WHERE lineage_id = ?""",
+        (lineage_id,),
+    ):
+        record = json.loads(row["payload_json"])
+        if not record_hash_is_valid(record):
+            _error(
+                errors,
+                "thread_continuation_grant_hash_mismatch",
+                row["grant_id"],
+                "content hash is invalid",
+            )
+        authority = record.get("authority", {})
+        if (
+            record.get("grant_id") != row["grant_id"]
+            or record.get("thread_id") != row["thread_id"]
+            or record.get("lineage_id") != lineage_id
+            or record.get("checkpoint_ref") != row["checkpoint_ref"]
+            or record.get("checkpoint_sha256") != row["checkpoint_sha256"]
+            or record.get("operation_name") != row["operation_name"]
+            or record.get("proposal_sha256") != row["proposal_sha256"]
+            or authority.get("activation_id") != row["activation_id"]
+            or authority.get("lease_id") != row["lease_id"]
+            or authority.get("lineage_head_revision_id")
+            != row["lineage_head_revision_id"]
+            or row["thread_id"] not in bindings
+        ):
+            _error(
+                errors,
+                "thread_continuation_grant_shape_mismatch",
+                row["grant_id"],
+                "stored columns or binding differ from the immutable payload",
+            )
+
 
 def _verify_rollback_revision(
     store: Store,

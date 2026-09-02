@@ -12,8 +12,11 @@ from torc.store import _MIGRATION_1, Store
 from torc.thread_checkpoints import (
     accepted_thread_checkpoint,
     get_thread_binding,
+    get_thread_continuation_grant,
+    issue_thread_continuation_grant,
     link_thread_to_lineage,
     record_checkpoint_decision,
+    validate_thread_continuation_grant,
 )
 from torc.verify import verify_store
 
@@ -191,6 +194,148 @@ def test_non_authoritative_activation_cannot_accept_checkpoint(tmp_path: Path) -
         assert accepted_thread_checkpoint(store, THREAD_ID) is None
 
 
+def test_continuation_grant_is_immutable_and_revalidates_live_authority(
+    tmp_path: Path,
+) -> None:
+    _bootstrap(tmp_path)
+    with Store(tmp_path) as store:
+        accepted = _accept(
+            store,
+            CHECKPOINT_ONE,
+            expected=None,
+            decision_id="checkpoint-decision-one",
+            decided_at="2026-09-02T12:04:00Z",
+        )
+        grant = issue_thread_continuation_grant(
+            store,
+            thread_id=THREAD_ID,
+            checkpoint_ref=CHECKPOINT_ONE,
+            checkpoint_sha256="a" * 64,
+            operation_name="lode.vein.propose",
+            proposal_sha256="c" * 64,
+            activation_id=ACTIVATION_ID,
+            evidence_refs=[accepted["decision_id"]],
+            grant_id="continuation-grant-one",
+            granted_at="2026-09-02T12:05:00Z",
+        )
+
+        assert get_thread_continuation_grant(store, grant["grant_id"]) == grant
+        assert validate_thread_continuation_grant(
+            store,
+            grant["grant_id"],
+            proposal_sha256="c" * 64,
+        ) == grant
+        with pytest.raises(sqlite3.IntegrityError, match="immutable continuation grants"):
+            store.connection.execute(
+                "UPDATE thread_continuation_grants SET operation_name = 'other'"
+            )
+
+        store.connection.execute(
+            "UPDATE leases SET status = 'closed', closed_at = ? WHERE lease_id = ?",
+            ("2026-09-02T12:06:00Z", "lease-lode"),
+        )
+        store.connection.commit()
+        with pytest.raises(ThreadCheckpointError, match="active_lineage_authority"):
+            validate_thread_continuation_grant(
+                store,
+                grant["grant_id"],
+                proposal_sha256="c" * 64,
+            )
+
+
+def test_continuation_grant_requires_the_accepted_checkpoint_and_exact_proposal(
+    tmp_path: Path,
+) -> None:
+    _bootstrap(tmp_path)
+    with Store(tmp_path) as store:
+        _accept(
+            store,
+            CHECKPOINT_ONE,
+            expected=None,
+            decision_id="checkpoint-decision-one",
+            decided_at="2026-09-02T12:04:00Z",
+        )
+        with pytest.raises(ThreadCheckpointError, match="accepted_checkpoint"):
+            issue_thread_continuation_grant(
+                store,
+                thread_id=THREAD_ID,
+                checkpoint_ref=CHECKPOINT_TWO,
+                checkpoint_sha256="b" * 64,
+                operation_name="lode.vein.propose",
+                proposal_sha256="c" * 64,
+                activation_id=ACTIVATION_ID,
+                evidence_refs=["evidence:proposal"],
+            )
+
+        grant = issue_thread_continuation_grant(
+            store,
+            thread_id=THREAD_ID,
+            checkpoint_ref=CHECKPOINT_ONE,
+            checkpoint_sha256="a" * 64,
+            operation_name="lode.vein.propose",
+            proposal_sha256="c" * 64,
+            activation_id=ACTIVATION_ID,
+            evidence_refs=["evidence:proposal"],
+            grant_id="continuation-grant-one",
+        )
+        assert issue_thread_continuation_grant(
+            store,
+            thread_id=THREAD_ID,
+            checkpoint_ref=CHECKPOINT_ONE,
+            checkpoint_sha256="a" * 64,
+            operation_name="lode.vein.propose",
+            proposal_sha256="c" * 64,
+            activation_id=ACTIVATION_ID,
+            evidence_refs=["evidence:proposal"],
+            grant_id="continuation-grant-one",
+            granted_at=grant["granted_at"],
+        ) == grant
+        with pytest.raises(ThreadCheckpointError, match="proposal_sha256"):
+            validate_thread_continuation_grant(
+                store,
+                grant["grant_id"],
+                proposal_sha256="d" * 64,
+            )
+
+
+def test_verifier_detects_tampered_continuation_grant(tmp_path: Path) -> None:
+    _bootstrap(tmp_path)
+    with Store(tmp_path) as store:
+        accepted = _accept(
+            store,
+            CHECKPOINT_ONE,
+            expected=None,
+            decision_id="checkpoint-decision-one",
+            decided_at="2026-09-02T12:04:00Z",
+        )
+        grant = issue_thread_continuation_grant(
+            store,
+            thread_id=THREAD_ID,
+            checkpoint_ref=CHECKPOINT_ONE,
+            checkpoint_sha256="a" * 64,
+            operation_name="lode.vein.propose",
+            proposal_sha256="c" * 64,
+            activation_id=ACTIVATION_ID,
+            evidence_refs=[accepted["decision_id"]],
+            grant_id="continuation-grant-one",
+        )
+        tampered = {**grant, "operation_name": "other.operation"}
+        store.connection.execute("DROP TRIGGER thread_continuation_grants_no_update")
+        store.connection.execute(
+            "UPDATE thread_continuation_grants SET payload_json = ? WHERE grant_id = ?",
+            (json.dumps(tampered), grant["grant_id"]),
+        )
+        store.connection.commit()
+
+        result = verify_store(store, LINEAGE_ID)
+
+    assert result["valid"] is False
+    assert any(
+        error["code"] == "thread_continuation_grant_hash_mismatch"
+        for error in result["errors"]
+    )
+
+
 def test_rejected_decision_is_immutable_and_does_not_advance_head(tmp_path: Path) -> None:
     _bootstrap(tmp_path)
     with Store(tmp_path) as store:
@@ -345,7 +490,7 @@ def test_schema_one_database_upgrades_to_thread_authority_schema(tmp_path: Path)
     connection.close()
 
     with Store(tmp_path) as store:
-        assert store.connection.execute("PRAGMA user_version").fetchone()[0] == 2
+        assert store.connection.execute("PRAGMA user_version").fetchone()[0] == 3
         tables = {
             row["name"]
             for row in store.connection.execute(
@@ -357,4 +502,5 @@ def test_schema_one_database_upgrades_to_thread_authority_schema(tmp_path: Path)
         "thread_lineage_bindings",
         "thread_checkpoint_decisions",
         "thread_accepted_heads",
+        "thread_continuation_grants",
     }.issubset(tables)

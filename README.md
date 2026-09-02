@@ -89,10 +89,11 @@ and rollback or branch context from one verified SQLite snapshot. The report is
 explicitly non-canonical and fails closed instead of explaining invalid
 provenance. See `docs/p4-visibility.md`.
 
-The LIR integration adds an immutable `thread_carried_by_lineage` binding and
-checkpoint accept/reject decisions. TORC alone advances the accepted checkpoint
-head, under the current lineage lease and an expected-head transaction; it does
-not store the checkpoint body or execute its next operation. See
+The LIR integration adds an immutable `thread_carried_by_lineage` binding,
+checkpoint accept/reject decisions, and proposal-bound continuation grants.
+TORC alone advances the accepted checkpoint head and revalidates current
+lineage authority for Autowork; it does not store the checkpoint body or execute
+its next operation. See
 `docs/thread-checkpoint-authority.md`.
 
 TORC also includes the first provider-agnostic project snapshot artifact slice.

@@ -31,13 +31,21 @@ A stale expected head appends no decision. A rejected decision is retained but
 does not move the head. Replaying the same decision ID and content returns the
 existing record; reusing the ID for different content fails closed.
 
+`thread_continuation_grants` stores immutable proof that the current activation,
+lease, lineage head, and accepted checkpoint authorize one content-minimized
+proposal. `issue_thread_continuation_grant` binds the operation name and proposal
+SHA-256. Autowork calls `validate_thread_continuation_grant` at admission and
+again immediately before dispatch; validation fails when the proposal, accepted
+checkpoint, or current lineage authority has changed.
+
 ## Integrity and migration
 
-Database schema version 2 adds these three tables and no service process or
-network dependency. Opening an older writable schema-version-1 database applies
-the forward migration. Immutable-table triggers reject update and delete, and
+Database schema version 3 adds the continuation-grant table and no service
+process or network dependency. Opening an older writable database applies each
+forward migration. Immutable-table triggers reject update and delete, and
 `verify_store` checks record hashes, column-to-payload agreement, the accepted
-decision chain, and the current accepted-head pointer.
+decision chain, the current accepted-head pointer, and continuation-grant
+bindings.
 
 These checks protect against accidental or post-hoc corruption under TORC's
 documented local-process threat model. They do not authenticate a malicious
