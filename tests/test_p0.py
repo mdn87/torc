@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import sqlite3
 from pathlib import Path
 from typing import Any
 
@@ -402,4 +403,27 @@ def test_empty_database_migration_is_repeatable_and_idempotent(
                 "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table'"
             ).fetchone()[0]
             == table_count
+        )
+
+
+def test_failed_migration_rolls_back_schema_and_version(tmp_path: Path) -> None:
+    with Store(tmp_path) as store:
+        version = store.connection.execute("PRAGMA user_version").fetchone()[0]
+
+        with pytest.raises(sqlite3.OperationalError):
+            store._apply_migration(
+                """
+                CREATE TABLE migration_atomicity_probe (id INTEGER PRIMARY KEY);
+                INSERT INTO table_that_does_not_exist VALUES (1);
+                """,
+                target_version=version + 1,
+            )
+
+        assert store.connection.execute("PRAGMA user_version").fetchone()[0] == version
+        assert (
+            store.connection.execute(
+                "SELECT COUNT(*) FROM sqlite_master "
+                "WHERE type = 'table' AND name = 'migration_atomicity_probe'"
+            ).fetchone()[0]
+            == 0
         )

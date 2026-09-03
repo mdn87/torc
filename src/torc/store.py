@@ -315,24 +315,28 @@ class Store:
         if version > _LATEST_SCHEMA_VERSION:
             raise RuntimeError(f"unsupported TORC database schema version: {version}")
         if version == 0:
-            with self.connection:
-                self.connection.executescript(_MIGRATION_1)
-                self.connection.execute("PRAGMA user_version = 1")
+            self._apply_migration(_MIGRATION_1, target_version=1)
             version = 1
         if version == 1:
-            with self.connection:
-                self.connection.executescript(_MIGRATION_2)
-                self.connection.execute("PRAGMA user_version = 2")
+            self._apply_migration(_MIGRATION_2, target_version=2)
             version = 2
         if version == 2:
-            with self.connection:
-                self.connection.executescript(_MIGRATION_3)
-                self.connection.execute("PRAGMA user_version = 3")
+            self._apply_migration(_MIGRATION_3, target_version=3)
             version = 3
         if version == 3:
-            with self.connection:
-                self.connection.executescript(_MIGRATION_4)
-                self.connection.execute("PRAGMA user_version = 4")
+            self._apply_migration(_MIGRATION_4, target_version=4)
+
+    def _apply_migration(self, script: str, *, target_version: int) -> None:
+        try:
+            self.connection.executescript(
+                "BEGIN IMMEDIATE;\n"
+                f"{script}\n"
+                f"PRAGMA user_version = {int(target_version)};\n"
+                "COMMIT;"
+            )
+        except BaseException:
+            self.connection.rollback()
+            raise
 
     @contextmanager
     def transaction(self, *, immediate: bool = False) -> Iterator[sqlite3.Connection]:
