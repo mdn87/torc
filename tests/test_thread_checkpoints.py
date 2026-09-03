@@ -21,6 +21,7 @@ from torc.thread_checkpoints import (
 )
 from torc.thread_closures import (
     complete_thread_close_intent,
+    find_thread_close_intent,
     get_thread_close_intent,
     get_thread_close_result,
     prepare_thread_close_intent,
@@ -349,6 +350,18 @@ def test_close_intent_blocks_checkpoint_and_continuation_until_ogmi_proof(
         )
 
         assert get_thread_close_intent(store, intent["close_intent_id"]) == intent
+        assert find_thread_close_intent(
+            store,
+            thread_id=THREAD_ID,
+            expected_manifest_id="thread-manifest-active",
+            effective_at=completed_at,
+        ) == intent
+        assert find_thread_close_intent(
+            store,
+            thread_id=THREAD_ID,
+            expected_manifest_id="thread-manifest-other",
+            effective_at=completed_at,
+        ) is None
         with pytest.raises(ThreadCheckpointError, match="thread_close_intent"):
             validate_thread_continuation_grant(
                 store,

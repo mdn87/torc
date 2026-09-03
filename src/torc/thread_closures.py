@@ -263,6 +263,33 @@ def get_thread_close_intent(store: Store, close_intent_id: str) -> dict[str, Any
     return json.loads(row["payload_json"])
 
 
+def find_thread_close_intent(
+    store: Store,
+    *,
+    thread_id: str,
+    expected_manifest_id: str,
+    effective_at: str,
+) -> dict[str, Any] | None:
+    """Find the exact intent that covered an OGMI manifest closure time."""
+
+    moment = _timestamp(effective_at, "close intent lookup time")
+    rows = store.connection.execute(
+        """SELECT payload_json FROM thread_close_intents
+           WHERE thread_id = ? AND expected_manifest_id = ?
+           ORDER BY issued_at DESC, close_intent_id DESC""",
+        (thread_id, expected_manifest_id),
+    ).fetchall()
+    for row in rows:
+        intent = json.loads(row["payload_json"])
+        if not record_hash_is_valid(intent):
+            raise ThreadCheckpointError("close intent integrity is invalid")
+        issued = _timestamp(str(intent["issued_at"]), "close intent issue time")
+        expires = _timestamp(str(intent["expires_at"]), "close intent expiry")
+        if issued <= moment <= expires:
+            return intent
+    return None
+
+
 def get_thread_close_result(store: Store, close_intent_id: str) -> dict[str, Any]:
     row = store.connection.execute(
         "SELECT payload_json FROM thread_close_results WHERE close_intent_id = ?",
