@@ -11,7 +11,10 @@ from .canonical import canonical_json, record_hash_is_valid, seal_record, utc_no
 from .errors import CheckpointConflictError, LeaseConflictError, ThreadCheckpointError
 from .ids import new_id, valid_id
 from .store import Store
-from .thread_closures import _require_thread_open_for_write
+from .thread_closures import (
+    _require_grant_not_preceding_close_intent,
+    _require_thread_open_for_write,
+)
 
 _SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 
@@ -425,6 +428,11 @@ def validate_thread_continuation_grant(
     _require_thread_open_for_write(store, str(grant["thread_id"]))
     if not record_hash_is_valid(grant):
         raise ThreadCheckpointError("continuation grant integrity is invalid")
+    _require_grant_not_preceding_close_intent(
+        store,
+        thread_id=str(grant["thread_id"]),
+        granted_at=str(grant["granted_at"]),
+    )
     if grant.get("proposal_sha256") != proposal_sha256:
         raise ThreadCheckpointError("proposal_sha256 does not match continuation grant")
     accepted = accepted_thread_checkpoint(store, grant["thread_id"])

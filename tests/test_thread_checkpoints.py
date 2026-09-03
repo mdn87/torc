@@ -447,6 +447,20 @@ def test_expired_close_intent_does_not_block_a_new_continuation(
             decision_id="checkpoint-decision-one",
             decided_at="2026-09-02T12:04:00Z",
         )
+        prior_grant = issue_thread_continuation_grant(
+            store,
+            thread_id=THREAD_ID,
+            checkpoint_ref=CHECKPOINT_ONE,
+            checkpoint_sha256="a" * 64,
+            operation_name="lode.vein.propose",
+            proposal_sha256="b" * 64,
+            activation_id=ACTIVATION_ID,
+            evidence_refs=[accepted["decision_id"]],
+            grant_id="continuation-grant-before-expired-close",
+            granted_at=(base - timedelta(seconds=1)).isoformat(
+                timespec="microseconds"
+            ).replace("+00:00", "Z"),
+        )
         intent = prepare_thread_close_intent(
             store,
             thread_id=THREAD_ID,
@@ -458,6 +472,13 @@ def test_expired_close_intent_does_not_block_a_new_continuation(
             expires_at=expires_at,
         )
         clock["now"] = base + timedelta(seconds=31)
+
+        with pytest.raises(ThreadCheckpointError, match="thread_close_intent_history"):
+            validate_thread_continuation_grant(
+                store,
+                prior_grant["grant_id"],
+                proposal_sha256="b" * 64,
+            )
 
         grant = issue_thread_continuation_grant(
             store,

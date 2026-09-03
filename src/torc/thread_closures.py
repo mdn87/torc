@@ -332,6 +332,32 @@ def _require_thread_open_for_write(
         raise ThreadCheckpointError("missing_gate:thread_close_intent")
 
 
+def _require_grant_not_preceding_close_intent(
+    store: Store,
+    *,
+    thread_id: str,
+    granted_at: str,
+) -> None:
+    """Keep a pre-close grant invalid after its close-intent lease expires."""
+
+    grant_time = _timestamp(granted_at, "continuation grant time")
+    rows = store.connection.execute(
+        """SELECT payload_json FROM thread_close_intents
+           WHERE thread_id = ?
+           ORDER BY issued_at DESC, close_intent_id DESC""",
+        (thread_id,),
+    ).fetchall()
+    for row in rows:
+        intent = json.loads(row["payload_json"])
+        if not record_hash_is_valid(intent):
+            raise ThreadCheckpointError("close intent integrity is invalid")
+        issued = _timestamp(str(intent["issued_at"]), "close intent issue time")
+        if issued >= grant_time:
+            raise ThreadCheckpointError(
+                "missing_gate:thread_close_intent_history"
+            )
+
+
 def _thread_binding(store: Store, thread_id: str) -> dict[str, Any]:
     row = store.connection.execute(
         "SELECT payload_json FROM thread_lineage_bindings WHERE thread_id = ?",
