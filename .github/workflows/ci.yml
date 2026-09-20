@@ -37,3 +37,18 @@ jobs:
           torc --help
           torc --version
           torc demo --state-dir "$(mktemp -d)" --json > /dev/null
+      - name: Installed artifact smoke
+        shell: bash
+        run: |
+          # Artifact commands must find their JSON schemas inside the installed
+          # package, so run one from outside the checkout against a throwaway repo.
+          cd "$(mktemp -d)"
+          git init -q -b main project
+          git -C project config user.name "CI"
+          git -C project config user.email "ci@example.invalid"
+          mkdir project/.lugos
+          printf '# Status\n' > project/STATUS.md
+          printf 'version: 1\nrepository: local/project\nrecent_commits: 2\nsources:\n  - id: status\n    path: STATUS.md\n    required: true\n' > project/.lugos/project-snapshot.sources.yaml
+          git -C project add -A
+          git -C project commit -q -m "init"
+          torc artifact collect --repository project --config project/.lugos/project-snapshot.sources.yaml --store store --json > /dev/null
