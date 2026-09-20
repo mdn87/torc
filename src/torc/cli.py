@@ -17,7 +17,7 @@ from .artifacts.storage import ArtifactStore
 from .artifacts.validation import validate_project_snapshot
 from .artifacts.view import build_current_snapshot_view, build_snapshot_view
 from .demo import inspect_lineage, run_demo
-from .errors import TorcError
+from .errors import InvalidInputError, TorcError
 from .experiment_adapters import adapter_for
 from .experiment_lanes import (
     materialize_compiled_prompt,
@@ -38,20 +38,24 @@ from .experiment_runs import (
     write_stage_receipt,
 )
 from .experiment_scoring import score_run
+from .history import validate_resolution_shape
 from .operator import (
     branch_operator_lineage,
+    carry_operator_lineage,
     checkpoint_operator_lineage,
     create_operator_lineage,
     load_json_object,
     operator_lineage_status,
     prepare_operator_handoff,
     prepare_operator_recovery,
+    render_carry,
     resolve_operator_handoff,
     resolve_operator_recovery,
     rollback_operator_lineage,
     validate_canonical_state,
     validate_handoff_plan,
     validate_lineage_creation,
+    validate_substrate,
 )
 from .store import Store
 from .verify import verify_store
@@ -61,6 +65,7 @@ from .vocabulary import HANDOFF_REASON_CODES
 _REQUIRED_PATHS = (
     "README.md",
     "AGENTS.md",
+    "docs/concepts/0001-torc-original-concept.md",
     "docs/project-brief.md",
     "docs/architecture.md",
     "docs/domain-model.md",
@@ -103,8 +108,8 @@ def _doctor_payload() -> dict[str, object]:
         "project": "torc",
         "version": __version__,
         "status": "p0_ready" if not missing else "incomplete",
-        "implementation_status": "p4_operator_visibility_implemented",
-        "roadmap_phase": "p4_complete",
+        "implementation_status": "p5_receiver_carry_implemented",
+        "roadmap_phase": "p5_complete",
         "repository_root": str(root) if root is not None else None,
         "missing_required_paths": missing,
         "handoff_reason_codes": list(HANDOFF_REASON_CODES),
@@ -162,7 +167,20 @@ def build_parser() -> argparse.ArgumentParser:
     lineage_checkpoint.add_argument(
         "--evidence-ref", action="append", default=[], dest="evidence_refs"
     )
+    lineage_checkpoint.add_argument(
+        "--resolutions-file",
+        type=Path,
+        help="JSON array accounting for items this checkpoint removes.",
+    )
     lineage_checkpoint.add_argument("--json", action="store_true", dest="as_json")
+    lineage_carry = lineage_commands.add_parser(
+        "carry", help="Compile the carry for a receiving substrate at session start."
+    )
+    lineage_carry.add_argument("--state-dir", type=Path, required=True)
+    lineage_carry.add_argument("--lineage", required=True)
+    lineage_carry.add_argument("--substrate-file", type=Path, required=True)
+    lineage_carry.add_argument("--budget-cap", type=int)
+    lineage_carry.add_argument("--json", action="store_true", dest="as_json")
     lineage_status = lineage_commands.add_parser("status")
     lineage_status.add_argument("--state-dir", type=Path, required=True)
     lineage_status.add_argument("--lineage", required=True)
@@ -796,7 +814,7 @@ def _load_operator_documents(args: argparse.Namespace) -> dict[str, dict[str, ob
     if args.command == "lineage":
         if args.lineage_command in {"create", "checkpoint"}:
             documents["state"] = load_json_object(args.state_file)
-        if args.lineage_command in {"create", "branch"}:
+        if args.lineage_command in {"create", "branch", "carry"}:
             documents["substrate"] = load_json_object(args.substrate_file)
         if args.lineage_command == "create":
             validate_lineage_creation(
@@ -807,6 +825,14 @@ def _load_operator_documents(args: argparse.Namespace) -> dict[str, dict[str, ob
             )
         elif args.lineage_command == "checkpoint":
             validate_canonical_state(documents["state"])
+            if args.resolutions_file is not None:
+                resolutions = json.loads(args.resolutions_file.read_text(encoding="utf-8"))
+                validate_resolution_shape(resolutions)
+                documents["resolutions"] = resolutions
+        elif args.lineage_command == "carry":
+            validate_substrate(documents["substrate"])
+            if args.budget_cap is not None and args.budget_cap <= 0:
+                raise InvalidInputError("budget cap must be a positive integer")
         return documents
     action = args.handoff_command if args.command == "handoff" else args.recovery_command
     if action == "prepare":
@@ -877,6 +903,14 @@ def main(argv: Sequence[str] | None = None) -> int:
                         canonical_state=documents["state"],
                         event_type=args.event_type,
                         evidence_refs=args.evidence_refs,
+                        resolutions=documents.get("resolutions"),
+                    )
+                elif args.lineage_command == "carry":
+                    payload = carry_operator_lineage(
+                        store,
+                        lineage_id=args.lineage,
+                        substrate=documents["substrate"],
+                        budget_cap=args.budget_cap,
                     )
                 elif args.lineage_command == "rollback":
                     payload = rollback_operator_lineage(
@@ -905,7 +939,10 @@ def main(argv: Sequence[str] | None = None) -> int:
                     )
                 else:
                     parser.error(f"Unsupported lineage command: {args.lineage_command}")
-            _print_payload(payload, args.as_json)
+            if args.lineage_command == "carry" and not args.as_json:
+                print(render_carry(payload["projection"]))
+            else:
+                _print_payload(payload, args.as_json)
             return 0 if payload.get("ok", True) else 1
         if args.command == "handoff":
             documents = _load_operator_documents(args)

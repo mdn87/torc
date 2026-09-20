@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "substrate_id": "p5-implementer",
+  "label": "Implementation session that wrote the last summary",
+  "adapter": "manual",
+  "capabilities": [
+    "repository_read",
+    "repository_write",
+    "verification_execute"
+  ],
+  "policy_labels": [
+    "local-workspace"
+  ],
+  "context_budget": {
+    "unit": "words",
+    "limit": 32000
+  },
+  "task_affinities": [
+    "implementation"
+  ]
+}

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Collection
 from typing import Any
 
 from .canonical import seal_record, utc_now
@@ -19,6 +20,7 @@ def evaluate_fit(
     source_substrate_id: str,
     task_phase: str,
     requirements: dict[str, Any],
+    candidate_ids: Collection[str] | None = None,
     fit_decision_id: str | None = None,
     decided_at: str | None = None,
 ) -> dict[str, Any]:
@@ -28,6 +30,8 @@ def evaluate_fit(
     candidates: list[dict[str, Any]] = []
 
     for substrate in store.list_substrates():
+        if candidate_ids is not None and substrate["substrate_id"] not in candidate_ids:
+            continue
         capabilities = set(substrate["capabilities"])
         labels = set(substrate["policy_labels"])
         context_limit = int(substrate["context_budget"]["limit"])

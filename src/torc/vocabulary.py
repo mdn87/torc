@@ -13,6 +13,18 @@ HANDOFF_REASON_CODES: tuple[str, ...] = (
     "lineage_branch",
 )
 
+TRACKED_CONTINUITY_SECTIONS: tuple[str, ...] = (
+    "constraints",
+    "commitments",
+    "open_work",
+)
+
+RESOLUTION_DISPOSITIONS: tuple[str, ...] = (
+    "completed",
+    "superseded",
+    "withdrawn",
+)
+
 CONTINUITY_INVARIANTS: tuple[str, ...] = (
     "canonical_history_is_append_only",
     "execution_projections_are_derived",
