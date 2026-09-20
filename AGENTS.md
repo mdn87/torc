@@ -18,12 +18,13 @@ The full architecture is broader than the first implementation slice. Do not mis
 Before substantive work, read:
 
 1. `README.md`
-2. `docs/project-brief.md`
-3. `docs/architecture.md`
-4. `docs/domain-model.md`
-5. `docs/vertical-slice.md`
-6. `docs/integration-boundaries.md`
-7. `docs/scope-envelope.json`
+2. `docs/concepts/0001-torc-original-concept.md`
+3. `docs/project-brief.md`
+4. `docs/architecture.md`
+5. `docs/domain-model.md`
+6. `docs/vertical-slice.md`
+7. `docs/integration-boundaries.md`
+8. `docs/scope-envelope.json`
 
 When the parent Lugos repository is available, also read `../AGENTS.md` and `../config/agent-governance/README.md`. Parent scope and safety rules narrow this repository's rules.
 
