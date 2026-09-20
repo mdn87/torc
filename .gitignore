@@ -29,6 +29,7 @@ Thumbs.db
 # Local agent work
 .autowork/
 .lugos-audit/
+.lugos-wip/
 .worktrees/
 .Codex/handoff.md
 .Codex/handoff-history/
