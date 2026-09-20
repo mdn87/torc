@@ -1,5 +1,7 @@
 # TORC Plane
 
+Every AI agent session ends, whether the model changes, the context fills up or you switch machines, and what the agent had settled with you usually ends with it or survives only as a loose summary. TORC keeps that thread as a tamper-evident record outside any session, lets only one session at a time extend it, and passes that right to a new session only after the newcomer proves it rebuilt the state correctly. It exists to test a bet the project admits is unproven: that a governed record with a controlled handoff keeps an agent's work continuous across model and session changes better than a well-written prompt summary does.
+
 TORC is the proposed lineage and continuity control plane for agents in
 [Lugos](https://github.com/mdn87), a local-first agent-orchestration and
 developer-tooling system.
