@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import sqlite3
+import tomllib
 from pathlib import Path
 from typing import Any
 
@@ -295,3 +296,18 @@ def test_inspection_commands_still_verify_existing_state(
     status = ["lineage", "status", "--state-dir", str(tmp_path), "--lineage", "lineage-a"]
     assert main([*status, "--json"]) == 0
     assert json.loads(capsys.readouterr().out)["revision_count"] == 1
+
+
+def test_pyproject_packages_every_source_package_and_the_schemas() -> None:
+    root = Path(__file__).resolve().parents[1]
+    setuptools = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))[
+        "tool"
+    ]["setuptools"]
+    source_packages = {
+        ".".join(path.parent.relative_to(root / "src").parts)
+        for path in (root / "src").rglob("__init__.py")
+    }
+
+    assert set(setuptools["packages"]) == source_packages | {"torc.schemas"}
+    assert setuptools["package-dir"]["torc.schemas"] == "schemas"
+    assert setuptools["package-data"]["torc.schemas"] == ["*.json"]

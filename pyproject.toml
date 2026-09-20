@@ -22,10 +22,14 @@ dev = [
 torc = "torc.cli:main"
 
 [tool.setuptools]
-package-dir = {"" = "src"}
+packages = ["torc", "torc.artifacts", "torc.schemas"]
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.setuptools.package-dir]
+"" = "src"
+"torc.schemas" = "schemas"
+
+[tool.setuptools.package-data]
+"torc.schemas" = ["*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

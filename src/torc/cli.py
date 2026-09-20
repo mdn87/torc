@@ -667,6 +667,9 @@ def _inspect_experiment(run_dir: Path) -> dict[str, object]:
 
 
 def _artifact_schema_dir() -> Path:
+    packaged = Path(__file__).resolve().parent / "schemas"
+    if packaged.is_dir():
+        return packaged
     root = _find_repo_root()
     if root is None:
         raise TorcError("could not locate TORC artifact schemas")
