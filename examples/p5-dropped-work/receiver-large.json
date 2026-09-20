@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "substrate_id": "p5-receiver-large",
+  "label": "Frontier session with repository access",
+  "adapter": "manual",
+  "capabilities": [
+    "repository_read",
+    "repository_write",
+    "verification_execute"
+  ],
+  "policy_labels": [
+    "local-workspace"
+  ],
+  "context_budget": {
+    "unit": "words",
+    "limit": 200000
+  },
+  "task_affinities": [
+    "implementation"
+  ]
+}

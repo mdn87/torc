@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "substrate_id": "p5-receiver-small",
+  "label": "Small-context reviewer without repository access",
+  "adapter": "manual",
+  "capabilities": [
+    "independent_review"
+  ],
+  "policy_labels": [
+    "local-workspace"
+  ],
+  "context_budget": {
+    "unit": "words",
+    "limit": 4000,
+    "carry_limit": 100
+  },
+  "task_affinities": [
+    "review"
+  ]
+}

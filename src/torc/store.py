@@ -438,6 +438,7 @@ class Store:
         event_type: str,
         activation_id: str,
         evidence_refs: list[str] | None = None,
+        resolutions: list[dict[str, str]] | None = None,
         revision_id: str | None = None,
         created_at: str | None = None,
     ) -> dict[str, Any]:
@@ -446,22 +447,26 @@ class Store:
             raise LeaseConflictError("activation does not hold the authoritative lease")
         parent = self.get_revision(authority["lineage_head_revision_id"])
         activation = self.get_activation(activation_id)
-        record = seal_record(
-            {
-                "schema_version": 1,
-                "lineage_id": lineage_id,
-                "revision_id": revision_id or new_id("revision"),
-                "parent_revision_ids": [parent["revision_id"]],
-                "created_at": created_at or utc_now(),
-                "event_type": event_type,
-                "actor": {
-                    "kind": "activation",
-                    "activation_id": activation_id,
-                    "substrate_id": activation["substrate_id"],
-                },
-                "canonical_state": canonical_state,
-                "evidence_refs": evidence_refs or [],
+        payload = {
+            "schema_version": 1,
+            "lineage_id": lineage_id,
+            "revision_id": revision_id or new_id("revision"),
+            "parent_revision_ids": [parent["revision_id"]],
+            "created_at": created_at or utc_now(),
+            "event_type": event_type,
+            "actor": {
+                "kind": "activation",
+                "activation_id": activation_id,
+                "substrate_id": activation["substrate_id"],
             },
+            "canonical_state": canonical_state,
+            "evidence_refs": evidence_refs or [],
+        }
+        # Absent when empty so records without resolutions keep their existing hashes.
+        if resolutions:
+            payload["resolutions"] = resolutions
+        record = seal_record(
+            payload,
             previous_revision_sha256=parent["integrity"]["canonical_payload_sha256"],
         )
         with self.transaction():

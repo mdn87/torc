@@ -93,6 +93,26 @@ rendering remain integration-on-demand work outside this repository.
 
 Gate: the operator can explain every authority change without reading raw database tables.
 
+## P5: receiver-fitted carry
+
+Status: bounded local slice implemented. ADR 0004 made the carried self TORC's
+own responsibility after a review found that no phase since P0 had returned to
+it. Compiler `p5-1` derives the budget from the receiver's descriptor, fits
+optional state item by item, applies one capability rule, and reads the lineage
+history for continuity that was dropped without a resolution. The boundary asks
+are advisory. See `docs/p5-receiver-carry.md`.
+
+- Receiver-derived sizing and item-level shaping
+- History reading with unaccounted drops and changes since the receiver last bore the lineage
+- Revision resolutions (`completed`, `superseded`, `withdrawn`)
+- Non-blocking boundary asks in checkpoint and status responses
+- `torc lineage carry` at session start; handoffs use the same compiler
+- Deferred: a live comparison of the shaped carry against a compiled prompt,
+  blocking enforcement of the asks, and history across a branch point
+
+Gate: from unchanged canonical history, the carry differs by receiver and an
+omission by the last bearer still reaches the next one.
+
 ## Deferred until evidence requires it
 
 - Always-on TORC daemon
