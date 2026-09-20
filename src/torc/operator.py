@@ -9,7 +9,13 @@ from typing import Any
 
 from .branches import create_lineage_branch
 from .canonical import canonical_json, utc_now
-from .errors import HandoffError, IntegrityError, NotFoundError
+from .errors import (
+    HandoffError,
+    IntegrityError,
+    InvalidInputError,
+    LeaseConflictError,
+    NotFoundError,
+)
 from .fit import evaluate_fit
 from .handoffs import expected_reconstruction, prepare_handoff, resolve_handoff
 from .ids import new_id, valid_id
@@ -36,17 +42,34 @@ def create_operator_lineage(
     substrate: dict[str, Any],
     activation_id: str | None = None,
 ) -> dict[str, Any]:
-    """Create a lineage and immediately establish its first authority."""
+    """Create a lineage and immediately establish its first authority.
 
-    _register_substrate_once(store, substrate)
-    revision = store.create_lineage(lineage_id, canonical_state)
-    activation = store.create_activation(
-        lineage_id,
-        revision["revision_id"],
-        substrate["substrate_id"],
+    Inputs are validated before any write, and the substrate, lineage,
+    activation, and lease are committed together or not at all.
+    """
+
+    validate_lineage_creation(
+        lineage_id=lineage_id,
+        canonical_state=canonical_state,
+        substrate=substrate,
         activation_id=activation_id,
     )
-    lease = store.acquire_lease(lineage_id, activation["activation_id"])
+    with store.transaction(immediate=True):
+        if _row_exists(store, "lineages", "lineage_id", lineage_id):
+            raise LeaseConflictError(f"lineage already exists: {lineage_id}")
+        if activation_id is not None and _row_exists(
+            store, "activations", "activation_id", activation_id
+        ):
+            raise LeaseConflictError(f"activation already exists: {activation_id}")
+        _register_substrate_once(store, substrate)
+        revision = store.create_lineage(lineage_id, canonical_state)
+        activation = store.create_activation(
+            lineage_id,
+            revision["revision_id"],
+            substrate["substrate_id"],
+            activation_id=activation_id,
+        )
+        lease = store.acquire_lease(lineage_id, activation["activation_id"])
     return {
         "ok": True,
         "lineage_id": lineage_id,
@@ -68,6 +91,7 @@ def checkpoint_operator_lineage(
 ) -> dict[str, Any]:
     """Append a full canonical state through the current authority."""
 
+    validate_canonical_state(canonical_state)
     _require_integrity(store, lineage_id)
     revision = store.append_revision(
         lineage_id,
@@ -224,6 +248,7 @@ def prepare_operator_handoff(
 ) -> dict[str, Any]:
     """Prepare a bound handoff and export its derived operator artifacts."""
 
+    validate_handoff_plan(plan)
     _require_integrity(store, lineage_id)
     authority = store.current_authority(lineage_id)
     if authority["activation_id"] != source_activation_id:
@@ -246,8 +271,8 @@ def prepare_operator_handoff(
         else:
             raise HandoffError("target activation already exists")
 
-    target_substrate = _required_object(plan, "target_substrate")
-    requirements = _required_object(plan, "requirements")
+    target_substrate = plan["target_substrate"]
+    requirements = plan["requirements"]
     _register_substrate_once(store, target_substrate)
     fit = evaluate_fit(
         store,
@@ -489,6 +514,115 @@ def render_handoff_brief(
     return "\n".join(lines)
 
 
+_STATE_OBJECT_FIELDS = ("identity", "self_model")
+_STATE_TEXT_LIST_FIELDS = (
+    "goals",
+    "commitments",
+    "constraints",
+    "open_work",
+    "uncertainties",
+)
+_STATE_REF_LIST_FIELDS = ("artifact_refs", "memory_refs")
+_SUBSTRATE_TEXT_LIST_FIELDS = ("capabilities", "policy_labels")
+
+
+def validate_lineage_creation(
+    *,
+    lineage_id: Any,
+    canonical_state: Any,
+    substrate: Any,
+    activation_id: Any = None,
+) -> None:
+    """Reject malformed creation input. Needs no store, so it can run before one opens."""
+
+    if not valid_id(lineage_id):
+        raise InvalidInputError("lineage identifier is invalid")
+    if activation_id is not None and not valid_id(activation_id):
+        raise InvalidInputError("activation identifier is invalid")
+    validate_canonical_state(canonical_state)
+    validate_substrate(substrate)
+
+
+def validate_handoff_plan(plan: Any) -> None:
+    """Reject a handoff or recovery plan whose structured parts are malformed."""
+
+    if not isinstance(plan, dict):
+        raise InvalidInputError("handoff plan must be a JSON object")
+    validate_substrate(_required_object(plan, "target_substrate"))
+    _required_object(plan, "requirements")
+
+
+def validate_canonical_state(state: Any) -> None:
+    """Enforce the canonical_state contract of lineage-revision.schema.json."""
+
+    expected = {
+        *_STATE_OBJECT_FIELDS,
+        *_STATE_TEXT_LIST_FIELDS,
+        *_STATE_REF_LIST_FIELDS,
+    }
+    if not isinstance(state, dict):
+        raise InvalidInputError("canonical state must be a JSON object")
+    if missing := sorted(expected - set(state)):
+        raise InvalidInputError(
+            f"canonical state is missing required fields: {', '.join(missing)}"
+        )
+    if unknown := sorted(set(state) - expected):
+        raise InvalidInputError(
+            f"canonical state has unsupported fields: {', '.join(unknown)}"
+        )
+    for field in _STATE_OBJECT_FIELDS:
+        if not isinstance(state[field], dict):
+            raise InvalidInputError(f"canonical state field must be an object: {field}")
+    for field in _STATE_TEXT_LIST_FIELDS:
+        if not _string_list(state[field]):
+            raise InvalidInputError(
+                f"canonical state field must be a list of strings: {field}"
+            )
+    for field in _STATE_REF_LIST_FIELDS:
+        value = state[field]
+        if not isinstance(value, list) or any(not valid_id(item) for item in value):
+            raise InvalidInputError(
+                f"canonical state field must be a list of identifiers: {field}"
+            )
+
+
+def validate_substrate(substrate: Any) -> None:
+    """Require the descriptor fields that registration and fit evaluation read."""
+
+    if not isinstance(substrate, dict):
+        raise InvalidInputError("substrate descriptor must be a JSON object")
+    if not valid_id(substrate.get("substrate_id")):
+        raise InvalidInputError("substrate descriptor requires a valid substrate_id")
+    for field in _SUBSTRATE_TEXT_LIST_FIELDS:
+        if not _string_list(substrate.get(field)):
+            raise InvalidInputError(
+                f"substrate descriptor field must be a list of strings: {field}"
+            )
+    if not _string_list(substrate.get("task_affinities", [])):
+        raise InvalidInputError(
+            "substrate descriptor field must be a list of strings: task_affinities"
+        )
+    budget = substrate.get("context_budget")
+    limit = budget.get("limit") if isinstance(budget, dict) else None
+    if isinstance(limit, bool) or not isinstance(limit, int) or limit <= 0:
+        raise InvalidInputError(
+            "substrate descriptor requires a positive integer context_budget.limit"
+        )
+
+
+def _string_list(value: Any) -> bool:
+    return isinstance(value, list) and all(isinstance(item, str) for item in value)
+
+
+def _row_exists(store: Store, table: str, column: str, value: str) -> bool:
+    return (
+        store.connection.execute(
+            f"SELECT 1 FROM {table} WHERE {column} = ?", (value,)
+        ).fetchone()
+        is not None
+    )
+
+
 def _register_substrate_once(store: Store, substrate: dict[str, Any]) -> None:
     substrate_id = str(substrate["substrate_id"])
     try:
@@ -501,9 +635,9 @@ def _register_substrate_once(store: Store, substrate: dict[str, Any]) -> None:
 
 
 def _required_object(value: dict[str, Any], key: str) -> dict[str, Any]:
-    item = value[key]
+    item = value.get(key)
     if not isinstance(item, dict):
-        raise ValueError(f"handoff plan field must be an object: {key}")
+        raise InvalidInputError(f"handoff plan field must be an object: {key}")
     return item
 
 

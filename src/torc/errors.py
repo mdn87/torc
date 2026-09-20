@@ -39,3 +39,11 @@ class CheckpointConflictError(ThreadCheckpointError):
 
 class NotFoundError(TorcError):
     """A requested TORC record does not exist."""
+
+
+class InvalidInputError(TorcError, ValueError):
+    """Operator-supplied input is malformed and was rejected before any write."""
+
+
+class SchemaVersionError(TorcError, RuntimeError):
+    """The TORC database schema version is not supported by this operation."""

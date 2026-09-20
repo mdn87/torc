@@ -49,6 +49,9 @@ from .operator import (
     resolve_operator_handoff,
     resolve_operator_recovery,
     rollback_operator_lineage,
+    validate_canonical_state,
+    validate_handoff_plan,
+    validate_lineage_creation,
 )
 from .store import Store
 from .verify import verify_store
@@ -667,6 +670,9 @@ def _inspect_experiment(run_dir: Path) -> dict[str, object]:
 
 
 def _artifact_schema_dir() -> Path:
+    packaged = Path(__file__).resolve().parent / "schemas"
+    if packaged.is_dir():
+        return packaged
     root = _find_repo_root()
     if root is None:
         raise TorcError("could not locate TORC artifact schemas")
@@ -779,6 +785,38 @@ def _run_artifact(args: argparse.Namespace) -> tuple[dict[str, object], int]:
     raise TorcError(f"unsupported artifact command: {action}")
 
 
+def _load_operator_documents(args: argparse.Namespace) -> dict[str, dict[str, object]]:
+    """Load and validate operator documents before a writable store is opened.
+
+    Opening a writable store creates or migrates the database, so malformed
+    input has to be rejected first.
+    """
+
+    documents: dict[str, dict[str, object]] = {}
+    if args.command == "lineage":
+        if args.lineage_command in {"create", "checkpoint"}:
+            documents["state"] = load_json_object(args.state_file)
+        if args.lineage_command in {"create", "branch"}:
+            documents["substrate"] = load_json_object(args.substrate_file)
+        if args.lineage_command == "create":
+            validate_lineage_creation(
+                lineage_id=args.lineage,
+                canonical_state=documents["state"],
+                substrate=documents["substrate"],
+                activation_id=args.activation_id,
+            )
+        elif args.lineage_command == "checkpoint":
+            validate_canonical_state(documents["state"])
+        return documents
+    action = args.handoff_command if args.command == "handoff" else args.recovery_command
+    if action == "prepare":
+        documents["plan"] = load_json_object(args.plan_file)
+        validate_handoff_plan(documents["plan"])
+    elif action == "resolve":
+        documents["reconstruction"] = load_json_object(args.reconstruction_file)
+    return documents
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -793,12 +831,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             _print_payload(payload, args.as_json)
             return 0 if payload["verification"]["valid"] else 1
         if args.command == "inspect":
-            with Store(args.state_dir) as store:
+            with Store(args.state_dir, read_only=True) as store:
                 payload = inspect_lineage(store, args.lineage)
             _print_payload(payload, args.as_json)
             return 0 if payload["integrity"]["valid"] else 1
         if args.command == "verify":
-            with Store(args.state_dir) as store:
+            with Store(args.state_dir, read_only=True) as store:
                 payload = verify_store(store, args.lineage)
             _print_payload(payload, args.as_json)
             return 0 if payload["valid"] else 1
@@ -815,13 +853,20 @@ def main(argv: Sequence[str] | None = None) -> int:
                 else:
                     print(render_lineage_explanation(payload))
                 return 0 if payload["trusted"] else 1
-            with Store(args.state_dir) as store:
-                if args.lineage_command == "create":
+            if args.lineage_command == "status":
+                with Store(args.state_dir, read_only=True) as store:
+                    payload = operator_lineage_status(store, args.lineage)
+                _print_payload(payload, args.as_json)
+                return 0
+            documents = _load_operator_documents(args)
+            creating = args.lineage_command == "create"
+            with Store(args.state_dir, must_exist=not creating) as store:
+                if creating:
                     payload = create_operator_lineage(
                         store,
                         lineage_id=args.lineage,
-                        canonical_state=load_json_object(args.state_file),
-                        substrate=load_json_object(args.substrate_file),
+                        canonical_state=documents["state"],
+                        substrate=documents["substrate"],
                         activation_id=args.activation_id,
                     )
                 elif args.lineage_command == "checkpoint":
@@ -829,12 +874,10 @@ def main(argv: Sequence[str] | None = None) -> int:
                         store,
                         lineage_id=args.lineage,
                         activation_id=args.activation,
-                        canonical_state=load_json_object(args.state_file),
+                        canonical_state=documents["state"],
                         event_type=args.event_type,
                         evidence_refs=args.evidence_refs,
                     )
-                elif args.lineage_command == "status":
-                    payload = operator_lineage_status(store, args.lineage)
                 elif args.lineage_command == "rollback":
                     payload = rollback_operator_lineage(
                         store,
@@ -854,7 +897,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                         expected_source_revision_id=args.expected_head,
                         child_lineage_id=args.child_lineage,
                         child_activation_id=args.child_activation,
-                        child_substrate=load_json_object(args.substrate_file),
+                        child_substrate=documents["substrate"],
                         operator_ref=args.operator_ref,
                         target_assignment_ref=args.target_assignment_ref,
                         rationale=args.rationale,
@@ -865,33 +908,35 @@ def main(argv: Sequence[str] | None = None) -> int:
             _print_payload(payload, args.as_json)
             return 0 if payload.get("ok", True) else 1
         if args.command == "handoff":
-            with Store(args.state_dir) as store:
+            documents = _load_operator_documents(args)
+            with Store(args.state_dir, must_exist=True) as store:
                 if args.handoff_command == "prepare":
                     payload = prepare_operator_handoff(
                         store,
                         lineage_id=args.lineage,
                         source_activation_id=args.source_activation,
-                        plan=load_json_object(args.plan_file),
+                        plan=documents["plan"],
                     )
                 elif args.handoff_command == "resolve":
                     payload = resolve_operator_handoff(
                         store,
                         handoff_id=args.handoff,
                         target_activation_id=args.target_activation,
-                        reconstruction=load_json_object(args.reconstruction_file),
+                        reconstruction=documents["reconstruction"],
                     )
                 else:
                     parser.error(f"Unsupported handoff command: {args.handoff_command}")
             _print_payload(payload, args.as_json)
             return 0 if payload.get("ok", True) else 1
         if args.command == "recovery":
-            with Store(args.state_dir) as store:
+            documents = _load_operator_documents(args)
+            with Store(args.state_dir, must_exist=True) as store:
                 if args.recovery_command == "prepare":
                     payload = prepare_operator_recovery(
                         store,
                         lineage_id=args.lineage,
                         failed_activation_id=args.failed_activation,
-                        plan=load_json_object(args.plan_file),
+                        plan=documents["plan"],
                         evidence_refs=args.evidence_refs,
                     )
                 elif args.recovery_command == "resolve":
@@ -899,7 +944,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                         store,
                         handoff_id=args.handoff,
                         target_activation_id=args.target_activation,
-                        reconstruction=load_json_object(args.reconstruction_file),
+                        reconstruction=documents["reconstruction"],
                     )
                 else:
                     parser.error(

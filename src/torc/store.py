@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from .canonical import canonical_json, seal_record, utc_now
-from .errors import LeaseConflictError, NotFoundError
+from .errors import LeaseConflictError, NotFoundError, SchemaVersionError
 from .ids import new_id
 
 _MIGRATION_1 = """
@@ -274,13 +274,19 @@ _LATEST_SCHEMA_VERSION = 4
 class Store:
     """Owns a single local TORC SQLite database."""
 
-    def __init__(self, state_dir: Path | str, *, read_only: bool = False):
+    def __init__(
+        self,
+        state_dir: Path | str,
+        *,
+        read_only: bool = False,
+        must_exist: bool = False,
+    ):
         self.state_dir = Path(state_dir).resolve()
         self.db_path = self.state_dir / "torc.sqlite3"
         self.read_only = read_only
+        if (read_only or must_exist) and not self.db_path.is_file():
+            raise NotFoundError(f"TORC database not found: {self.db_path}")
         if read_only:
-            if not self.db_path.is_file():
-                raise NotFoundError(f"TORC database not found: {self.db_path}")
             self.connection = sqlite3.connect(
                 f"{self.db_path.as_uri()}?mode=ro", uri=True
             )
@@ -295,8 +301,10 @@ class Store:
                 self.connection.execute("PRAGMA user_version").fetchone()[0]
             )
             if version != _LATEST_SCHEMA_VERSION:
-                raise RuntimeError(
-                    f"unsupported TORC database schema version: {version}"
+                self.connection.close()
+                raise SchemaVersionError(
+                    f"unsupported TORC database schema version: {version} "
+                    f"(expected {_LATEST_SCHEMA_VERSION}; read-only commands never migrate)"
                 )
         else:
             self.migrate()
@@ -313,7 +321,9 @@ class Store:
     def migrate(self) -> None:
         version = int(self.connection.execute("PRAGMA user_version").fetchone()[0])
         if version > _LATEST_SCHEMA_VERSION:
-            raise RuntimeError(f"unsupported TORC database schema version: {version}")
+            raise SchemaVersionError(
+                f"unsupported TORC database schema version: {version}"
+            )
         if version == 0:
             self._apply_migration(_MIGRATION_1, target_version=1)
             version = 1
@@ -400,7 +410,7 @@ class Store:
             },
             previous_revision_sha256=None,
         )
-        with self.connection:
+        with self.transaction():
             self.connection.execute(
                 "INSERT INTO lineages VALUES (?, ?, 'active', ?)",
                 (lineage_id, created_at, revision_id),
@@ -454,7 +464,7 @@ class Store:
             },
             previous_revision_sha256=parent["integrity"]["canonical_payload_sha256"],
         )
-        with self.connection:
+        with self.transaction():
             current = self.current_authority(lineage_id)
             if current["activation_id"] != activation_id:
                 raise LeaseConflictError("authority changed before revision append")
@@ -495,7 +505,7 @@ class Store:
         return [json.loads(row["payload_json"]) for row in rows]
 
     def register_substrate(self, descriptor: dict[str, Any]) -> dict[str, Any]:
-        with self.connection:
+        with self.transaction():
             self.connection.execute(
                 "INSERT INTO substrates VALUES (?, ?)",
                 (descriptor["substrate_id"], canonical_json(descriptor)),
@@ -533,7 +543,7 @@ class Store:
             "started_at": started_at or utc_now(),
             "ended_at": None,
         }
-        with self.connection:
+        with self.transaction():
             self.connection.execute(
                 "INSERT INTO activations VALUES (?, ?, ?, ?, ?, ?, ?)",
                 tuple(activation.values()),
@@ -565,7 +575,7 @@ class Store:
     ) -> dict[str, Any]:
         lease_id = lease_id or new_id("lease")
         issued_at = issued_at or utc_now()
-        with self.connection:
+        with self.transaction():
             lineage = self.get_lineage(lineage_id)
             activation = self.get_activation(activation_id)
             if activation["lineage_id"] != lineage_id:
@@ -654,7 +664,7 @@ class Store:
         else:
             raise ValueError(f"unsupported immutable record table: {table}")
         placeholders = ", ".join("?" for _ in values)
-        with self.connection:
+        with self.transaction():
             self.connection.execute(
                 f"INSERT INTO {table} ({columns}) VALUES ({placeholders})", values
             )
