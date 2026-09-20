@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from .canonical import canonical_json, seal_record, utc_now
-from .errors import LeaseConflictError, NotFoundError
+from .errors import LeaseConflictError, NotFoundError, SchemaVersionError
 from .ids import new_id
 
 _MIGRATION_1 = """
@@ -295,8 +295,10 @@ class Store:
                 self.connection.execute("PRAGMA user_version").fetchone()[0]
             )
             if version != _LATEST_SCHEMA_VERSION:
-                raise RuntimeError(
-                    f"unsupported TORC database schema version: {version}"
+                self.connection.close()
+                raise SchemaVersionError(
+                    f"unsupported TORC database schema version: {version} "
+                    f"(expected {_LATEST_SCHEMA_VERSION}; read-only commands never migrate)"
                 )
         else:
             self.migrate()
@@ -313,7 +315,9 @@ class Store:
     def migrate(self) -> None:
         version = int(self.connection.execute("PRAGMA user_version").fetchone()[0])
         if version > _LATEST_SCHEMA_VERSION:
-            raise RuntimeError(f"unsupported TORC database schema version: {version}")
+            raise SchemaVersionError(
+                f"unsupported TORC database schema version: {version}"
+            )
         if version == 0:
             self._apply_migration(_MIGRATION_1, target_version=1)
             version = 1
@@ -400,7 +404,7 @@ class Store:
             },
             previous_revision_sha256=None,
         )
-        with self.connection:
+        with self.transaction():
             self.connection.execute(
                 "INSERT INTO lineages VALUES (?, ?, 'active', ?)",
                 (lineage_id, created_at, revision_id),
@@ -495,7 +499,7 @@ class Store:
         return [json.loads(row["payload_json"]) for row in rows]
 
     def register_substrate(self, descriptor: dict[str, Any]) -> dict[str, Any]:
-        with self.connection:
+        with self.transaction():
             self.connection.execute(
                 "INSERT INTO substrates VALUES (?, ?)",
                 (descriptor["substrate_id"], canonical_json(descriptor)),
@@ -533,7 +537,7 @@ class Store:
             "started_at": started_at or utc_now(),
             "ended_at": None,
         }
-        with self.connection:
+        with self.transaction():
             self.connection.execute(
                 "INSERT INTO activations VALUES (?, ?, ?, ?, ?, ?, ?)",
                 tuple(activation.values()),
@@ -565,7 +569,7 @@ class Store:
     ) -> dict[str, Any]:
         lease_id = lease_id or new_id("lease")
         issued_at = issued_at or utc_now()
-        with self.connection:
+        with self.transaction():
             lineage = self.get_lineage(lineage_id)
             activation = self.get_activation(activation_id)
             if activation["lineage_id"] != lineage_id:

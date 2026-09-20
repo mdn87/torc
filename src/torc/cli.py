@@ -793,12 +793,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             _print_payload(payload, args.as_json)
             return 0 if payload["verification"]["valid"] else 1
         if args.command == "inspect":
-            with Store(args.state_dir) as store:
+            with Store(args.state_dir, read_only=True) as store:
                 payload = inspect_lineage(store, args.lineage)
             _print_payload(payload, args.as_json)
             return 0 if payload["integrity"]["valid"] else 1
         if args.command == "verify":
-            with Store(args.state_dir) as store:
+            with Store(args.state_dir, read_only=True) as store:
                 payload = verify_store(store, args.lineage)
             _print_payload(payload, args.as_json)
             return 0 if payload["valid"] else 1
@@ -815,6 +815,11 @@ def main(argv: Sequence[str] | None = None) -> int:
                 else:
                     print(render_lineage_explanation(payload))
                 return 0 if payload["trusted"] else 1
+            if args.lineage_command == "status":
+                with Store(args.state_dir, read_only=True) as store:
+                    payload = operator_lineage_status(store, args.lineage)
+                _print_payload(payload, args.as_json)
+                return 0
             with Store(args.state_dir) as store:
                 if args.lineage_command == "create":
                     payload = create_operator_lineage(
@@ -833,8 +838,6 @@ def main(argv: Sequence[str] | None = None) -> int:
                         event_type=args.event_type,
                         evidence_refs=args.evidence_refs,
                     )
-                elif args.lineage_command == "status":
-                    payload = operator_lineage_status(store, args.lineage)
                 elif args.lineage_command == "rollback":
                     payload = rollback_operator_lineage(
                         store,
