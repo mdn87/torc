@@ -274,13 +274,19 @@ _LATEST_SCHEMA_VERSION = 4
 class Store:
     """Owns a single local TORC SQLite database."""
 
-    def __init__(self, state_dir: Path | str, *, read_only: bool = False):
+    def __init__(
+        self,
+        state_dir: Path | str,
+        *,
+        read_only: bool = False,
+        must_exist: bool = False,
+    ):
         self.state_dir = Path(state_dir).resolve()
         self.db_path = self.state_dir / "torc.sqlite3"
         self.read_only = read_only
+        if (read_only or must_exist) and not self.db_path.is_file():
+            raise NotFoundError(f"TORC database not found: {self.db_path}")
         if read_only:
-            if not self.db_path.is_file():
-                raise NotFoundError(f"TORC database not found: {self.db_path}")
             self.connection = sqlite3.connect(
                 f"{self.db_path.as_uri()}?mode=ro", uri=True
             )
@@ -458,7 +464,7 @@ class Store:
             },
             previous_revision_sha256=parent["integrity"]["canonical_payload_sha256"],
         )
-        with self.connection:
+        with self.transaction():
             current = self.current_authority(lineage_id)
             if current["activation_id"] != activation_id:
                 raise LeaseConflictError("authority changed before revision append")
@@ -658,7 +664,7 @@ class Store:
         else:
             raise ValueError(f"unsupported immutable record table: {table}")
         placeholders = ", ".join("?" for _ in values)
-        with self.connection:
+        with self.transaction():
             self.connection.execute(
                 f"INSERT INTO {table} ({columns}) VALUES ({placeholders})", values
             )

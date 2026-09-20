@@ -48,12 +48,12 @@ def create_operator_lineage(
     activation, and lease are committed together or not at all.
     """
 
-    if not valid_id(lineage_id):
-        raise InvalidInputError("lineage identifier is invalid")
-    if activation_id is not None and not valid_id(activation_id):
-        raise InvalidInputError("activation identifier is invalid")
-    _validate_canonical_state(canonical_state)
-    _validate_substrate(substrate)
+    validate_lineage_creation(
+        lineage_id=lineage_id,
+        canonical_state=canonical_state,
+        substrate=substrate,
+        activation_id=activation_id,
+    )
     with store.transaction(immediate=True):
         if _row_exists(store, "lineages", "lineage_id", lineage_id):
             raise LeaseConflictError(f"lineage already exists: {lineage_id}")
@@ -91,7 +91,7 @@ def checkpoint_operator_lineage(
 ) -> dict[str, Any]:
     """Append a full canonical state through the current authority."""
 
-    _validate_canonical_state(canonical_state)
+    validate_canonical_state(canonical_state)
     _require_integrity(store, lineage_id)
     revision = store.append_revision(
         lineage_id,
@@ -248,6 +248,7 @@ def prepare_operator_handoff(
 ) -> dict[str, Any]:
     """Prepare a bound handoff and export its derived operator artifacts."""
 
+    validate_handoff_plan(plan)
     _require_integrity(store, lineage_id)
     authority = store.current_authority(lineage_id)
     if authority["activation_id"] != source_activation_id:
@@ -270,9 +271,8 @@ def prepare_operator_handoff(
         else:
             raise HandoffError("target activation already exists")
 
-    target_substrate = _required_object(plan, "target_substrate")
-    requirements = _required_object(plan, "requirements")
-    _validate_substrate(target_substrate)
+    target_substrate = plan["target_substrate"]
+    requirements = plan["requirements"]
     _register_substrate_once(store, target_substrate)
     fit = evaluate_fit(
         store,
@@ -526,7 +526,33 @@ _STATE_REF_LIST_FIELDS = ("artifact_refs", "memory_refs")
 _SUBSTRATE_TEXT_LIST_FIELDS = ("capabilities", "policy_labels")
 
 
-def _validate_canonical_state(state: Any) -> None:
+def validate_lineage_creation(
+    *,
+    lineage_id: Any,
+    canonical_state: Any,
+    substrate: Any,
+    activation_id: Any = None,
+) -> None:
+    """Reject malformed creation input. Needs no store, so it can run before one opens."""
+
+    if not valid_id(lineage_id):
+        raise InvalidInputError("lineage identifier is invalid")
+    if activation_id is not None and not valid_id(activation_id):
+        raise InvalidInputError("activation identifier is invalid")
+    validate_canonical_state(canonical_state)
+    validate_substrate(substrate)
+
+
+def validate_handoff_plan(plan: Any) -> None:
+    """Reject a handoff or recovery plan whose structured parts are malformed."""
+
+    if not isinstance(plan, dict):
+        raise InvalidInputError("handoff plan must be a JSON object")
+    validate_substrate(_required_object(plan, "target_substrate"))
+    _required_object(plan, "requirements")
+
+
+def validate_canonical_state(state: Any) -> None:
     """Enforce the canonical_state contract of lineage-revision.schema.json."""
 
     expected = {
@@ -560,7 +586,7 @@ def _validate_canonical_state(state: Any) -> None:
             )
 
 
-def _validate_substrate(substrate: Any) -> None:
+def validate_substrate(substrate: Any) -> None:
     """Require the descriptor fields that registration and fit evaluation read."""
 
     if not isinstance(substrate, dict):
@@ -609,9 +635,9 @@ def _register_substrate_once(store: Store, substrate: dict[str, Any]) -> None:
 
 
 def _required_object(value: dict[str, Any], key: str) -> dict[str, Any]:
-    item = value[key]
+    item = value.get(key)
     if not isinstance(item, dict):
-        raise ValueError(f"handoff plan field must be an object: {key}")
+        raise InvalidInputError(f"handoff plan field must be an object: {key}")
     return item
 
 
