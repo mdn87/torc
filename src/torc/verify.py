@@ -452,6 +452,13 @@ def _verify_immutable_records(
         )
     }
 
+    parent_ids = {
+        row["revision_id"]: row["parent_revision_id"]
+        for row in store.connection.execute(
+            "SELECT revision_id, parent_revision_id FROM revisions WHERE lineage_id = ?",
+            (lineage_id,),
+        )
+    }
     projections = store.list_hashed_records("projections", lineage_id)
     for projection in projections:
         if projection["source_revision_id"] not in revision_ids:
@@ -461,11 +468,17 @@ def _verify_immutable_records(
                 projection["projection_id"],
                 projection["source_revision_id"],
             )
-        source_prefix = f"{projection['source_revision_id']}:"
+        source_prefixes = [f"{projection['source_revision_id']}:"]
+        if str(projection["compiler_version"]).startswith("p5-"):
+            # A receiver-fitted projection may cite the source revision's ancestors.
+            ancestor = parent_ids.get(projection["source_revision_id"])
+            while ancestor in parent_ids and f"{ancestor}:" not in source_prefixes:
+                source_prefixes.append(f"{ancestor}:")
+                ancestor = parent_ids[ancestor]
         for section in (
             projection["included_sections"] + projection["omitted_sections"]
         ):
-            if not section["source_ref"].startswith(source_prefix):
+            if not section["source_ref"].startswith(tuple(source_prefixes)):
                 _error(
                     errors,
                     "projection_source_ref_invalid",

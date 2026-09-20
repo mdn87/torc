@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "objective": "Build the center of the TORC concept as one bounded local slice: a deterministic compiler that sizes and shapes a lineage's carry for the receiving substrate from canonical history, a non-blocking boundary step that asks the bearer to account for dropped continuity and to restate the self-model after a change of bearer, a carry command usable at session start as well as at handoff, and a fixture in which the last bearer's summary dropped work that the history kept.",
+  "success_evidence": [
+    "From one unchanged canonical revision, compiler p5-1 produces different carries for a small and a large receiver, with the budget derived from each descriptor and every inclusion and omission recorded.",
+    "On the dropped-work fixture the P0 compiler loses the silently dropped item while the P5 compiler carries it to the receiver with the revision that last held it and the revision that dropped it; an item removed with a resolution is not reported.",
+    "A checkpoint that removes tracked continuity without a resolution is accepted, and its response, lineage status, and every later carry report the unaccounted drop until it is restored or resolved.",
+    "A carry for a receiver whose substrate differs from the self-model's author reports restatement_due, and a self_model_revised checkpoint by the new bearer clears it.",
+    "The carry command changes no canonical revision, lease, activation, or authority transition, and torc verify passes on a store that contains p5-1 projections and detects tampering with one.",
+    "The P0 compiler, the demo, and the frozen experiment lanes produce byte-identical output, and the existing test suite passes unchanged."
+  ],
+  "non_goals": [
+    "Model inference, semantic matching of reworded items, learned or evidence-weighted fit scoring, or any change to who selects the next agent.",
+    "A daemon, watcher, network dependency, provider call, database migration, or a new projection schema version.",
+    "Blocking enforcement of resolutions or self-model restatement, and any change to handoff acceptance checks.",
+    "Reading history across a branch point, automatic merge, or cross-host aggregation.",
+    "Changes to LIR, lugos-mcp, Mission Control, Autowork, or any other repository, including the parent submodule pointer.",
+    "A live-agent comparison of P5 carries against a compiled prompt; that experiment needs its own approval."
+  ],
+  "accepted_threats": [
+    "Exact-string item identity reports a reworded item as one drop and one addition; the bearer records a superseded resolution to say otherwise.",
+    "The boundary asks are advisory in this slice, so a bearer can keep ignoring them; the asks persist in every carry and status report.",
+    "The sizing share, floor, and single capability rule are fixed policy under policy version p5-1 without measured evidence behind the constants.",
+    "SHA-256 integrity evidence and the local-process threat model are unchanged; a process with direct database access can still forge records.",
+    "The carry command registers the receiver's descriptor. The operator handoff now evaluates fit for the source and the named target only, a correction found during execution; fit scoring and the demo and experiment lanes are unchanged."
+  ],
+  "estimates": {
+    "elapsed_hours": 5,
+    "production_loc": 700,
+    "test_loc": 700,
+    "changed_files": 18,
+    "runtime_processes": 0,
+    "operator_steps": 1
+  },
+  "observed": {
+    "elapsed_hours": 2.5,
+    "production_loc": 734,
+    "test_loc": 615,
+    "changed_files": 26,
+    "runtime_processes": 0,
+    "operator_steps": 1
+  },
+  "vertical_slice": {
+    "status": "passed",
+    "evidence": "python -m pytest -q passed 265 tests and ruff passed. Replaying examples/p5-dropped-work through the CLI (lineage create, three checkpoints, one with --resolutions-file), the last checkpoint was accepted and asked about the dropped constraint and open-work item. lineage carry for receiver-small used 99 of 100 declared words, carried both drops with their last-seen and dropped-at revisions, kept one settled decision with the remainder recorded, and omitted artifact-refs as capability_irrelevant; receiver-large derived a 10000-word budget and omitted nothing. torc verify passed, the demo still compiles with p0-1, and four mutations of the history logic were each caught by the new tests."
+  },
+  "architecture_triggers": [],
+  "review_rounds_used": 1,
+  "scope_policy_sha256": "a44baa88f0fb914b144db7c0830bc47f236c122ad0765bd2e5f06c754bc8d4b4",
+  "parent_envelope_sha256": "13171923a75795b3fb26859211eafe13bcf6cea73238e2e1715e00e6a5c480b7",
+  "operator_override_id": null
+}

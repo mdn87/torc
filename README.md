@@ -98,6 +98,18 @@ lineage authority for Autowork; it does not store the checkpoint body or execute
 its next operation. See
 `docs/thread-checkpoint-authority.md`.
 
+P5 builds the center of the concept (`docs/decisions/0004-torc-is-always-in-charge.md`).
+Compiler `p5-1` sizes the carry from the receiving substrate's descriptor, fits
+optional state item by item, and reads the lineage history, so work that one
+bearer silently dropped from its summary still reaches the next one. Checkpoints
+and `lineage status` ask the bearer to account for what it dropped and to
+restate the self-model after a change of bearer. `torc lineage carry` compiles
+the carry at session start without touching authority, and handoffs now use the
+same compiler. The P0 compiler is unchanged for the demo and the frozen
+experiment lanes. P5 proves the mechanism on a deterministic fixture; it does
+not yet show that a receiving agent performs better. See
+`docs/p5-receiver-carry.md`.
+
 TORC also includes the first provider-agnostic project snapshot artifact slice.
 It collects manifest-bounded Git evidence, validates content-addressed
 candidate projections, writes separate acceptance receipts, advances a
@@ -162,6 +174,8 @@ exports seven immutable JSON artifacts under `.torc/demo/artifacts/`.
 - `docs/p3-branch-scope-envelope.json` - branch-creation authority and budgets
 - `docs/p4-visibility.md` - read-only authority and continuity explanation contract
 - `docs/p4-visibility-scope-envelope.json` - bounded P4 visibility authority and budgets
+- `docs/p5-receiver-carry.md` - receiver-fitted carry, history reading, resolutions, and boundary asks
+- `docs/p5-receiver-carry-scope-envelope.json` - bounded P5 authority and budgets
 - `docs/thread-checkpoint-authority.md` - LIR binding and checkpoint acceptance contract
 - `docs/project-snapshot-artifacts.md` - three-record artifact architecture, reconnaissance, and Phase 2 boundary
 - `docs/artifacts/README.md` - project snapshot schemas, CLI, retention, renderer, and cold-agent refresh index
