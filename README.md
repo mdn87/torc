@@ -140,6 +140,7 @@ exports seven immutable JSON artifacts under `.torc/demo/artifacts/`.
 
 ## Documents
 
+- `docs/concepts/0001-torc-original-concept.md` - the original concept in the operator's words, and what TORC is for
 - `docs/project-brief.md` - problem, hypothesis, constraints, and kill criteria
 - `docs/architecture.md` - full plane boundary and component model
 - `docs/domain-model.md` - identifiers, records, and invariants
