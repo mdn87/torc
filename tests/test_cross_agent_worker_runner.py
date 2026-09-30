@@ -30,9 +30,9 @@ def test_codex_command_uses_stdin_and_fresh_session_controls() -> None:
     assert command[-1] == "-"
     assert "--ephemeral" in command
     assert "--ignore-user-config" in command
-    assert command[command.index("--sandbox") + 1] == "workspace-write"
     assert command[command.index("--ask-for-approval") + 1] == "never"
     assert command.index("--ask-for-approval") < command.index("exec")
+    assert 'default_permissions=":workspace"' in command
     disabled = {
         command[index + 1]
         for index, value in enumerate(command)

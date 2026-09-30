@@ -185,8 +185,14 @@ def build_inner_command(
             raise WorkerRunnerError(f"{label} must be a non-empty string")
 
     if provider == "codex":
-        sandbox = "workspace-write" if role == "implementer" else "read-only"
-        prefix = [executable, "--sandbox", sandbox, "--ask-for-approval", "never"]
+        permission_profile = ":workspace" if role == "implementer" else ":read-only"
+        prefix = [
+            executable,
+            "--ask-for-approval",
+            "never",
+            "-c",
+            f"default_permissions={json.dumps(permission_profile)}",
+        ]
         for feature in _CODEX_DISABLED_FEATURES:
             prefix.extend(["--disable", feature])
         if session_mode == "resume":
@@ -346,6 +352,69 @@ def build_command(
         session_id=session_id,
     )
     return [wsl, "-d", distro, "--cd", linux_workspace, "--exec", *inner]
+
+
+def preflight_codex_permissions(
+    executable: str, workspace: Path, role: str
+) -> dict[str, Any]:
+    resolved = shutil.which(executable)
+    if not resolved:
+        raise WorkerRunnerError(f"native executable is unavailable: {executable}")
+    permission_profile = ":workspace" if role == "implementer" else ":read-only"
+    if os.name == "nt":
+        if role == "implementer":
+            probe = (
+                "Set-Content -LiteralPath .torc-permission-probe -Value ok; "
+                "Get-Content -LiteralPath TASK.md | Out-Null; "
+                "Remove-Item -LiteralPath .torc-permission-probe -Force"
+            )
+        else:
+            probe = "Get-Content -LiteralPath TASK.md | Out-Null"
+        command = [
+            resolved,
+            "sandbox",
+            "-P",
+            permission_profile,
+            "-C",
+            str(workspace.resolve()),
+            "powershell.exe",
+            "-NoProfile",
+            "-Command",
+            probe,
+        ]
+    else:
+        probe = "test -r TASK.md"
+        if role == "implementer":
+            probe += " && : > .torc-permission-probe && rm .torc-permission-probe"
+        command = [
+            resolved,
+            "sandbox",
+            "-P",
+            permission_profile,
+            "-C",
+            str(workspace.resolve()),
+            "sh",
+            "-c",
+            probe,
+        ]
+    completed = subprocess.run(
+        command,
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    if completed.returncode:
+        raise WorkerRunnerError(
+            "Codex permission-profile preflight failed: "
+            + (completed.stderr or completed.stdout).strip()[:500]
+        )
+    return {
+        "performed": True,
+        "permission_profile": permission_profile,
+        "read_verified": True,
+        "write_verified": role == "implementer",
+    }
 
 
 def probe_harness_version(command: list[str], transport: str) -> str:
@@ -563,6 +632,13 @@ def execute_worker(
         raise WorkerRunnerError("runner output must remain outside the agent workspace")
     if resolved_output.exists():
         raise WorkerRunnerError(f"runner output directory already exists: {resolved_output}")
+    if provider == "codex" and transport == "native":
+        control_preflight = preflight_codex_permissions(executable, resolved_workspace, role)
+    else:
+        control_preflight = {
+            "performed": False,
+            "reason": "provider sandbox is fail-closed at worker startup",
+        }
     command = build_command(
         provider=provider,
         transport=transport,
@@ -600,6 +676,7 @@ def execute_worker(
         prompt=prompt,
         capture=capture,
     )
+    record["control_preflight"] = control_preflight
     _write_run(resolved_output, record, capture)
     return record
 

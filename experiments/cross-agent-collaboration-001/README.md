@@ -142,7 +142,10 @@ Token counters remain separated by phase and provider. Because Codex and Claude
 use different tokenizers and cache-accounting rules, the apparatus does not
 manufacture a cross-provider total.
 
-The first attempted Codex smoke was retained but excluded: its noninteractive
-approval policy blocked every shell command, and built-in app resources
-contaminated context usage. `runs/smoke-001/01-bug-codex-solo/disposition.json`
-records the failure and corrective action.
+The first two attempted Codex smokes were retained but excluded. The first used
+an unsuitable noninteractive approval policy and inherited built-in app
+resources. The second fixed those controls but still mixed the legacy sandbox
+setting with the host's permission-profile system, so shell reads remained
+blocked. Each run has a `disposition.json`. The current launcher selects the
+built-in `:workspace` or `:read-only` profile and performs a model-free access
+preflight before spending usage.

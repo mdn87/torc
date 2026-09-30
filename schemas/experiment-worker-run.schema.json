@@ -24,7 +24,8 @@
     "stderr_sha256",
     "event_count",
     "malformed_event_count",
-    "usage"
+    "usage",
+    "control_preflight"
   ],
   "properties": {
     "schema_version": {"const": 1},
@@ -83,7 +84,8 @@
         "unreported_fields",
         "provider_usage"
       ]
-    }
+    },
+    "control_preflight": {"type": "object"}
   },
   "$defs": {
     "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
