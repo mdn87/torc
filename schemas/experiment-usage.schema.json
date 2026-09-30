@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lugos.local/schemas/experiment-usage.schema.json",
+  "title": "TORC normalized experiment usage",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "source",
+    "supplied",
+    "input_tokens",
+    "cached_input_tokens",
+    "cache_write_input_tokens",
+    "reasoning_output_tokens",
+    "output_tokens",
+    "reported_fields",
+    "unreported_fields",
+    "provider_usage"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "source": {"type": "string", "minLength": 1},
+    "supplied": {"type": "boolean"},
+    "input_tokens": {"$ref": "#/$defs/nullableCounter"},
+    "cached_input_tokens": {"$ref": "#/$defs/nullableCounter"},
+    "cache_write_input_tokens": {"$ref": "#/$defs/nullableCounter"},
+    "reasoning_output_tokens": {"$ref": "#/$defs/nullableCounter"},
+    "output_tokens": {"$ref": "#/$defs/nullableCounter"},
+    "reported_fields": {"$ref": "#/$defs/fieldList"},
+    "unreported_fields": {"$ref": "#/$defs/fieldList"},
+    "provider_usage": {"type": "object"}
+  },
+  "$defs": {
+    "nullableCounter": {
+      "type": ["integer", "null"],
+      "minimum": 0
+    },
+    "fieldList": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "input_tokens",
+          "cached_input_tokens",
+          "cache_write_input_tokens",
+          "reasoning_output_tokens",
+          "output_tokens"
+        ]
+      }
+    }
+  }
+}

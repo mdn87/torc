@@ -24,6 +24,7 @@ CASES = (
     ("artifact-manifest.schema.json", "artifact-manifest.example.json"),
     ("thread-checkpoint-decision.schema.json", "thread-checkpoint-decision.example.json"),
     ("execution-capsule.schema.json", "execution-capsule.example.json"),
+    ("experiment-usage.schema.json", "experiment-usage.example.json"),
     (
         "claim-control-envelope.schema.json",
         "claim-control-envelope.example.json",
