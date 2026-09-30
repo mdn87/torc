@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "series_id": "cross-agent-smoke-001",
+  "fixtures": ["bug-hidden-regression", "refactor-superseded-path"],
+  "recommended_order": [
+    ["bug-hidden-regression", "codex-solo"],
+    ["refactor-superseded-path", "claude-solo"],
+    ["bug-hidden-regression", "claude-codex"],
+    ["refactor-superseded-path", "codex-claude"],
+    ["bug-hidden-regression", "claude-solo"],
+    ["refactor-superseded-path", "codex-solo"],
+    ["bug-hidden-regression", "codex-claude"],
+    ["refactor-superseded-path", "claude-codex"]
+  ],
+  "timeout_seconds": 900,
+  "providers": {
+    "codex": {
+      "transport": "native",
+      "executable": "codex",
+      "model": "gpt-6-sol",
+      "primary_effort": "xhigh",
+      "critic_effort": "low",
+      "harness_version": "codex-cli 0.155.0-alpha.16"
+    },
+    "claude-code": {
+      "transport": "wsl",
+      "executable": "claude",
+      "model": "claude-opus-4-7",
+      "primary_effort": "xhigh",
+      "critic_effort": "low",
+      "harness_version": "2.1.273 (Claude Code)"
+    }
+  },
+  "workflows": {
+    "codex-solo": {"primary": "codex", "critic": null},
+    "claude-solo": {"primary": "claude-code", "critic": null},
+    "codex-claude": {"primary": "codex", "critic": "claude-code"},
+    "claude-codex": {"primary": "claude-code", "critic": "codex"}
+  }
+}

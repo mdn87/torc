@@ -126,3 +126,18 @@ prompt hash, and installed harness version without starting an agent. An actual
 run additionally requires an output directory outside the worker workspace and
 the exact version returned by the dry plan through
 `--expected-harness-version`.
+
+`workflow_runner.py` plans or executes one fixture/workflow pair at a time. A
+solo workflow makes one model call. A cross-agent workflow makes three calls:
+the primary implementation, a low-effort foreign critique, and a same-session
+primary revision. The committed manifest contains a balanced smoke order, but
+the runner never starts the whole matrix implicitly.
+
+```text
+python experiments/cross-agent-collaboration-001/workflow_runner.py \
+  --fixture bug-hidden-regression --workflow codex-claude
+```
+
+Token counters remain separated by phase and provider. Because Codex and Claude
+use different tokenizers and cache-accounting rules, the apparatus does not
+manufacture a cross-provider total.

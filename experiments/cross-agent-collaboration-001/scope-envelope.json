@@ -22,8 +22,9 @@
     "network_service": false
   },
   "implementation_budget": {
-    "runtime_processes": 0,
+    "concurrent_worker_processes": 1,
     "new_provider_sdks": 0,
+    "persistent_services": 0,
     "background_workers": 0
   },
   "stop_conditions": [

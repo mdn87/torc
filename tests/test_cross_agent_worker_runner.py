@@ -75,6 +75,9 @@ def test_capture_process_records_first_output_and_completion(tmp_path: Path) -> 
         model="fixture",
         effort="low",
         harness_version="fixture 1.0",
+        role="implementer",
+        session_mode="fresh-ephemeral",
+        requested_session_id=None,
         command=command,
         prompt="ignored",
         capture=capture,
@@ -87,6 +90,55 @@ def test_capture_process_records_first_output_and_completion(tmp_path: Path) -> 
     assert record["timing"]["completion_ms"] >= record["timing"]["startup_ms"]
     assert record["usage"]["output_tokens"] == 2
     assert record["malformed_event_count"] == 0
+
+
+def test_persistent_and_resumed_commands_preserve_session_identity() -> None:
+    session_id = "8c2c081f-42e4-4ad4-a250-823449f16995"
+    initial = runner.build_inner_command(
+        provider="claude-code",
+        executable="claude",
+        workspace="/fixture",
+        model="opus",
+        effort="xhigh",
+        session_mode="fresh-persistent",
+        session_id=session_id,
+    )
+    resumed = runner.build_inner_command(
+        provider="codex",
+        executable="codex",
+        workspace="/fixture",
+        model="gpt-6-sol",
+        effort="xhigh",
+        session_mode="resume",
+        session_id=session_id,
+    )
+
+    assert initial[initial.index("--session-id") + 1] == session_id
+    assert "--no-session-persistence" not in initial
+    assert resumed[:3] == ["codex", "exec", "resume"]
+    assert resumed[-2:] == [session_id, "-"]
+    assert runner.session_id_from_events(
+        "codex", [{"type": "thread.started", "thread_id": session_id}]
+    ) == session_id
+
+
+def test_final_agent_text_and_json_decoder_cover_both_harnesses() -> None:
+    codex_events = [
+        {
+            "type": "item.completed",
+            "item": {"type": "agent_message", "text": '```json\n{"ok":true}\n```'},
+        }
+    ]
+    claude_events = [
+        {"type": "result", "structured_output": {"ok": True}, "session_id": "id"}
+    ]
+
+    assert runner.decode_json_object(runner.final_agent_text("codex", codex_events)) == {
+        "ok": True
+    }
+    assert runner.decode_json_object(runner.final_agent_text("claude-code", claude_events)) == {
+        "ok": True
+    }
 
 
 def test_capture_process_preserves_timeout(tmp_path: Path) -> None:

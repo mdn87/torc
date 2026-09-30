@@ -1,0 +1,42 @@
+{
+  "lineage_identity": "cross-agent-smoke/bug-hidden-regression",
+  "current_responsibility": "Independently review the candidate header-merging repair against the frozen requirements.",
+  "sections": [
+    {
+      "section_id": "hard_constraints",
+      "claim_prefix": "x",
+      "values": [
+        "Header names have case-insensitive logical identity.",
+        "Replacing a logical header must not move its first position.",
+        "The last occurrence supplies the emitted spelling and value.",
+        "Neither input mapping may be mutated."
+      ],
+      "source_refs": [
+        "fixtures/bug-hidden-regression/agent-visible/TASK.md#comparison",
+        "fixtures/bug-hidden-regression/agent-visible/TASK.md#requirement-1",
+        "fixtures/bug-hidden-regression/agent-visible/TASK.md#requirement-2",
+        "fixtures/bug-hidden-regression/agent-visible/TASK.md#requirement-5"
+      ]
+    },
+    {
+      "section_id": "active_commitments",
+      "claim_prefix": "c",
+      "values": [
+        "Return a normal insertion-ordered dict.",
+        "Do not add dependencies or change the public signature."
+      ],
+      "source_refs": [
+        "fixtures/bug-hidden-regression/agent-visible/TASK.md#return-contract",
+        "fixtures/bug-hidden-regression/agent-visible/TASK.md#compatibility"
+      ]
+    },
+    {
+      "section_id": "unresolved_work",
+      "claim_prefix": "w",
+      "values": [
+        "Determine whether the candidate satisfies every required behavior and identify concrete defects."
+      ],
+      "source_refs": ["cross-agent-collaboration-001#critic-assignment"]
+    }
+  ]
+}

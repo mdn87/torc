@@ -105,14 +105,7 @@ def verify_all(path: Path = MANIFEST_PATH) -> dict[str, Any]:
     return {"schema_version": 1, "valid": True, "fixtures": results}
 
 
-def stage_fixture(fixture_id: str, destination: Path) -> dict[str, Any]:
-    manifest = load_manifest()
-    evidence = verify_fixture(fixture_id, manifest)
-    resolved_destination = destination.resolve()
-    if resolved_destination.exists():
-        raise FixtureControlError(f"stage destination already exists: {resolved_destination}")
-    source = FIXTURES_ROOT / fixture_id / "agent-visible"
-    shutil.copytree(source, resolved_destination)
+def initialize_git_workspace(workspace: Path) -> str:
     git_commands = (
         ["git", "init", "--quiet"],
         ["git", "add", "--all"],
@@ -131,7 +124,7 @@ def stage_fixture(fixture_id: str, destination: Path) -> dict[str, Any]:
     for command in git_commands:
         completed = subprocess.run(
             command,
-            cwd=resolved_destination,
+            cwd=workspace,
             check=False,
             capture_output=True,
             text=True,
@@ -141,14 +134,25 @@ def stage_fixture(fixture_id: str, destination: Path) -> dict[str, Any]:
             raise FixtureControlError(
                 f"fixture git initialization failed: {completed.stderr.strip()}"
             )
-    revision = subprocess.run(
+    return subprocess.run(
         ["git", "rev-parse", "HEAD"],
-        cwd=resolved_destination,
+        cwd=workspace,
         check=True,
         capture_output=True,
         text=True,
         timeout=10,
     ).stdout.strip()
+
+
+def stage_fixture(fixture_id: str, destination: Path) -> dict[str, Any]:
+    manifest = load_manifest()
+    evidence = verify_fixture(fixture_id, manifest)
+    resolved_destination = destination.resolve()
+    if resolved_destination.exists():
+        raise FixtureControlError(f"stage destination already exists: {resolved_destination}")
+    source = FIXTURES_ROOT / fixture_id / "agent-visible"
+    shutil.copytree(source, resolved_destination)
+    revision = initialize_git_workspace(resolved_destination)
     return {
         **evidence,
         "workspace": str(resolved_destination),
@@ -176,6 +180,20 @@ def _run_test(command: list[str], workspace: Path) -> dict[str, Any]:
     }
 
 
+def baseline_revision(workspace: Path) -> str:
+    roots = subprocess.run(
+        ["git", "rev-list", "--max-parents=0", "HEAD"],
+        cwd=workspace,
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=10,
+    ).stdout.splitlines()
+    if len(roots) != 1:
+        raise FixtureControlError("fixture workspace must have exactly one baseline root")
+    return roots[0]
+
+
 def score_fixture(fixture_id: str, workspace: Path) -> dict[str, Any]:
     manifest = load_manifest()
     integrity = verify_fixture(fixture_id, manifest)
@@ -189,8 +207,9 @@ def score_fixture(fixture_id: str, workspace: Path) -> dict[str, Any]:
         ["python", "-m", "pytest", "-q", str(oracle_root / oracle["hidden_test"])],
         resolved_workspace,
     )
+    baseline = baseline_revision(resolved_workspace)
     diff = subprocess.run(
-        ["git", "diff", "--no-ext-diff", "--binary", "HEAD"],
+        ["git", "diff", "--no-ext-diff", "--binary", baseline],
         cwd=resolved_workspace,
         check=True,
         capture_output=True,
@@ -210,6 +229,7 @@ def score_fixture(fixture_id: str, workspace: Path) -> dict[str, Any]:
         "fixture_id": fixture_id,
         "fixture_integrity": integrity,
         "workspace_tree_sha256": tree_sha256(resolved_workspace),
+        "baseline_revision": baseline,
         "visible": visible,
         "hidden": hidden,
         "workspace_diff_sha256": hashlib.sha256(diff.encode("utf-8")).hexdigest(),

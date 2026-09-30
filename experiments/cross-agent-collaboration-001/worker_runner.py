@@ -15,6 +15,7 @@ import subprocess
 import sys
 import threading
 import time
+import uuid
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -29,6 +30,8 @@ from torc.experiment_usage import latest_codex_usage, normalize_usage  # noqa: E
 
 PROVIDERS = ("codex", "claude-code")
 TRANSPORTS = ("native", "wsl")
+ROLES = ("implementer", "critic")
+SESSION_MODES = ("fresh-ephemeral", "fresh-persistent", "resume")
 
 
 class WorkerRunnerError(RuntimeError):
@@ -71,11 +74,57 @@ def _provider_usage(
     return normalize_usage("claude-code", None)
 
 
-def _claude_settings() -> dict[str, Any]:
+def final_agent_text(provider: str, events: list[dict[str, Any]]) -> str | None:
+    for event in reversed(events):
+        if provider == "codex":
+            item = event.get("item")
+            if (
+                event.get("type") == "item.completed"
+                and isinstance(item, dict)
+                and item.get("type") == "agent_message"
+                and isinstance(item.get("text"), str)
+            ):
+                return item["text"]
+        elif provider == "claude-code" and event.get("type") == "result":
+            structured = event.get("structured_output")
+            if isinstance(structured, dict):
+                return canonical_json(structured)
+            result = event.get("result")
+            if isinstance(result, str):
+                return result
+    return None
+
+
+def decode_json_object(text: str) -> dict[str, Any]:
+    candidate = text.strip()
+    if candidate.startswith("```"):
+        candidate = candidate.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
+    try:
+        value = json.loads(candidate)
+    except json.JSONDecodeError:
+        start, end = candidate.find("{"), candidate.rfind("}")
+        if start < 0 or end <= start:
+            raise WorkerRunnerError("worker output did not contain a JSON object") from None
+        try:
+            value = json.loads(candidate[start : end + 1])
+        except json.JSONDecodeError as exc:
+            raise WorkerRunnerError("worker output contained malformed JSON") from exc
+    if not isinstance(value, dict):
+        raise WorkerRunnerError("worker output must be a JSON object")
+    return value
+
+
+def _claude_settings(role: str) -> dict[str, Any]:
+    if role == "implementer":
+        allowed = ["Read(./**)", "Edit(./**)", "Write(./**)", "Bash"]
+        denied = ["WebFetch", "WebSearch", "Agent"]
+    else:
+        allowed = ["Read(./**)", "Glob", "Grep"]
+        denied = ["Edit", "Write", "Bash", "WebFetch", "WebSearch", "Agent"]
     return {
         "permissions": {
-            "allow": ["Read(./**)", "Edit(./**)", "Write(./**)", "Bash"],
-            "deny": ["WebFetch", "WebSearch", "Agent"],
+            "allow": allowed,
+            "deny": denied,
             "defaultMode": "dontAsk",
             "disableBypassPermissionsMode": "disable",
             "blockReadsOutsideWorkingDirectories": True,
@@ -96,11 +145,27 @@ def build_inner_command(
     workspace: str,
     model: str,
     effort: str,
+    role: str = "implementer",
+    session_mode: str = "fresh-ephemeral",
+    session_id: str | None = None,
 ) -> list[str]:
     """Build a fresh-session worker command with no prompt in argv."""
 
     if provider not in PROVIDERS:
         raise WorkerRunnerError(f"unsupported provider: {provider}")
+    if role not in ROLES:
+        raise WorkerRunnerError(f"unsupported worker role: {role}")
+    if session_mode not in SESSION_MODES:
+        raise WorkerRunnerError(f"unsupported session mode: {session_mode}")
+    if session_mode == "resume" and not session_id:
+        raise WorkerRunnerError("resume mode requires a session id")
+    if provider == "claude-code" and session_mode != "fresh-ephemeral":
+        try:
+            uuid.UUID(str(session_id))
+        except (TypeError, ValueError) as exc:
+            raise WorkerRunnerError(
+                "persistent Claude sessions require a UUID session id"
+            ) from exc
     for label, value in (
         ("executable", executable),
         ("workspace", workspace),
@@ -111,26 +176,47 @@ def build_inner_command(
             raise WorkerRunnerError(f"{label} must be a non-empty string")
 
     if provider == "codex":
-        return [
+        sandbox = "workspace-write" if role == "implementer" else "read-only"
+        if session_mode == "resume":
+            return [
+                executable,
+                "exec",
+                "resume",
+                "--ignore-user-config",
+                "--ignore-rules",
+                "--json",
+                "--model",
+                model,
+                "-c",
+                f"model_reasoning_effort={json.dumps(effort)}",
+                "-c",
+                f"sandbox_mode={json.dumps(sandbox)}",
+                str(session_id),
+                "-",
+            ]
+        command = [
             executable,
             "exec",
             "--ignore-user-config",
             "--ignore-rules",
-            "--ephemeral",
             "--json",
             "--model",
             model,
             "--sandbox",
-            "workspace-write",
+            sandbox,
             "-C",
             workspace,
             "-c",
             f"model_reasoning_effort={json.dumps(effort)}",
-            "-",
         ]
+        if session_mode == "fresh-ephemeral":
+            command.append("--ephemeral")
+        command.append("-")
+        return command
 
-    settings = json.dumps(_claude_settings(), separators=(",", ":"))
-    return [
+    settings = json.dumps(_claude_settings(role), separators=(",", ":"))
+    tools = "Read,Edit,Write,Bash" if role == "implementer" else "Read,Glob,Grep"
+    command = [
         executable,
         "--model",
         model,
@@ -146,19 +232,25 @@ def build_inner_command(
         "--mcp-config",
         '{"mcpServers":{}}',
         "--tools",
-        "Read,Edit,Write,Bash",
+        tools,
         "--permission-mode",
         "dontAsk",
         "--permission-prompts",
         "none",
         "--disable-slash-commands",
         "--no-chrome",
-        "--no-session-persistence",
         "--output-format",
         "stream-json",
         "--verbose",
         "--print",
     ]
+    if session_mode == "fresh-ephemeral":
+        command.insert(-4, "--no-session-persistence")
+    elif session_mode == "fresh-persistent":
+        command[1:1] = ["--session-id", str(session_id)]
+    else:
+        command[1:1] = ["--resume", str(session_id)]
+    return command
 
 
 def _wsl_path(path: Path, distro: str) -> str:
@@ -210,6 +302,9 @@ def build_command(
     model: str,
     effort: str,
     distro: str = "Ubuntu",
+    role: str = "implementer",
+    session_mode: str = "fresh-ephemeral",
+    session_id: str | None = None,
 ) -> list[str]:
     if transport not in TRANSPORTS:
         raise WorkerRunnerError(f"unsupported transport: {transport}")
@@ -223,6 +318,9 @@ def build_command(
             workspace=str(workspace.resolve()),
             model=model,
             effort=effort,
+            role=role,
+            session_mode=session_mode,
+            session_id=session_id,
         )
 
     wsl = shutil.which("wsl.exe")
@@ -235,6 +333,9 @@ def build_command(
         workspace=linux_workspace,
         model=model,
         effort=effort,
+        role=role,
+        session_mode=session_mode,
+        session_id=session_id,
     )
     return [wsl, "-d", distro, "--cd", linux_workspace, "--exec", *inner]
 
@@ -353,6 +454,19 @@ def capture_process(
     }
 
 
+def session_id_from_events(provider: str, events: list[dict[str, Any]]) -> str | None:
+    for event in events:
+        if provider == "codex" and event.get("type") == "thread.started":
+            value = event.get("thread_id") or event.get("threadId")
+        elif provider == "claude-code" and event.get("type") == "result":
+            value = event.get("session_id") or event.get("sessionId")
+        else:
+            continue
+        if isinstance(value, str) and value:
+            return value
+    return None
+
+
 def build_run_record(
     *,
     provider: str,
@@ -360,11 +474,21 @@ def build_run_record(
     model: str,
     effort: str,
     harness_version: str,
+    role: str,
+    session_mode: str,
+    requested_session_id: str | None,
     command: list[str],
     prompt: str,
     capture: dict[str, Any],
 ) -> dict[str, Any]:
     events, malformed = _json_lines(capture["stdout"])
+    observed_session_id = session_id_from_events(provider, events)
+    if requested_session_id and observed_session_id != requested_session_id:
+        raise WorkerRunnerError(
+            "worker returned a different session id from the frozen request"
+        )
+    if session_mode != "fresh-ephemeral" and not observed_session_id:
+        raise WorkerRunnerError("persistent worker run did not report a session id")
     return {
         "schema_version": 1,
         "provider": provider,
@@ -372,6 +496,12 @@ def build_run_record(
         "model": model,
         "effort": effort,
         "harness_version": harness_version,
+        "role": role,
+        "session": {
+            "mode": session_mode,
+            "requested_id": requested_session_id,
+            "observed_id": observed_session_id,
+        },
         "command": command,
         "prompt_sha256": _sha256(prompt),
         "started_at": capture["started_at"],
@@ -400,6 +530,72 @@ def _write_run(output_dir: Path, record: dict[str, Any], capture: dict[str, Any]
     (output_dir / "stderr.log").write_text(capture["stderr"], encoding="utf-8")
 
 
+def execute_worker(
+    *,
+    provider: str,
+    transport: str,
+    executable: str,
+    distro: str,
+    workspace: Path,
+    prompt: str,
+    model: str,
+    effort: str,
+    role: str,
+    session_mode: str,
+    session_id: str | None,
+    expected_harness_version: str,
+    timeout_seconds: float,
+    output_dir: Path,
+) -> dict[str, Any]:
+    resolved_workspace = workspace.resolve()
+    resolved_output = output_dir.resolve()
+    if resolved_output == resolved_workspace or resolved_output.is_relative_to(
+        resolved_workspace
+    ):
+        raise WorkerRunnerError("runner output must remain outside the agent workspace")
+    if resolved_output.exists():
+        raise WorkerRunnerError(f"runner output directory already exists: {resolved_output}")
+    command = build_command(
+        provider=provider,
+        transport=transport,
+        executable=executable,
+        workspace=resolved_workspace,
+        model=model,
+        effort=effort,
+        distro=distro,
+        role=role,
+        session_mode=session_mode,
+        session_id=session_id,
+    )
+    harness_version = probe_harness_version(command, transport)
+    if harness_version != expected_harness_version:
+        raise WorkerRunnerError(
+            "worker harness version differs from the frozen control: "
+            f"expected {expected_harness_version!r}, got {harness_version!r}"
+        )
+    capture = capture_process(
+        command=command,
+        workspace=resolved_workspace,
+        prompt=prompt,
+        timeout_seconds=timeout_seconds,
+    )
+    record = build_run_record(
+        provider=provider,
+        transport=transport,
+        model=model,
+        effort=effort,
+        harness_version=harness_version,
+        role=role,
+        session_mode=session_mode,
+        requested_session_id=session_id,
+        command=command,
+        prompt=prompt,
+        capture=capture,
+    )
+    _write_run(resolved_output, record, capture)
+    return record
+
+
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--provider", choices=PROVIDERS, required=True)
@@ -410,6 +606,9 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--prompt-file", type=Path, required=True)
     parser.add_argument("--model", required=True)
     parser.add_argument("--effort", required=True)
+    parser.add_argument("--role", choices=ROLES, default="implementer")
+    parser.add_argument("--session-mode", choices=SESSION_MODES, default="fresh-ephemeral")
+    parser.add_argument("--session-id")
     parser.add_argument("--expected-harness-version")
     parser.add_argument("--timeout-seconds", type=float, default=900)
     parser.add_argument("--output-dir", type=Path)
@@ -434,12 +633,18 @@ def main(argv: list[str] | None = None) -> int:
             model=args.model,
             effort=args.effort,
             distro=args.distro,
+            role=args.role,
+            session_mode=args.session_mode,
+            session_id=args.session_id,
         )
         plan = {
             "provider": args.provider,
             "transport": args.transport,
             "model": args.model,
             "effort": args.effort,
+            "role": args.role,
+            "session_mode": args.session_mode,
+            "session_id": args.session_id,
             "command": command,
             "prompt_sha256": _sha256(prompt),
             "execute": args.execute,
@@ -456,29 +661,22 @@ def main(argv: list[str] | None = None) -> int:
             raise WorkerRunnerError("runner output must remain outside the agent workspace")
         if not args.expected_harness_version:
             raise WorkerRunnerError("--expected-harness-version is required with --execute")
-        harness_version = probe_harness_version(command, args.transport)
-        if harness_version != args.expected_harness_version:
-            raise WorkerRunnerError(
-                "worker harness version differs from the frozen control: "
-                f"expected {args.expected_harness_version!r}, got {harness_version!r}"
-            )
-        capture = capture_process(
-            command=command,
-            workspace=workspace,
-            prompt=prompt,
-            timeout_seconds=args.timeout_seconds,
-        )
-        record = build_run_record(
+        record = execute_worker(
             provider=args.provider,
             transport=args.transport,
+            executable=executable,
+            distro=args.distro,
+            workspace=args.workspace,
+            prompt=prompt,
             model=args.model,
             effort=args.effort,
-            harness_version=harness_version,
-            command=command,
-            prompt=prompt,
-            capture=capture,
+            role=args.role,
+            session_mode=args.session_mode,
+            session_id=args.session_id,
+            expected_harness_version=args.expected_harness_version,
+            timeout_seconds=args.timeout_seconds,
+            output_dir=args.output_dir,
         )
-        _write_run(output_dir, record, capture)
         print(canonical_json(record))
         return 0 if record["exit_status"] == 0 and not record["timed_out"] else 1
     except (OSError, subprocess.SubprocessError, WorkerRunnerError) as exc:

@@ -5,6 +5,12 @@
   "model": "opus",
   "effort": "low",
   "harness_version": "2.1.273 (Claude Code)",
+  "role": "critic",
+  "session": {
+    "mode": "fresh-ephemeral",
+    "requested_id": null,
+    "observed_id": null
+  },
   "command": ["wsl.exe", "--exec", "claude", "--print"],
   "prompt_sha256": "08eaf86c1dd9197362fcd8a2cfb8e57fe27d6cefc678ab5611729ea9b60d6e82",
   "started_at": "2026-09-30T01:00:00.000Z",
