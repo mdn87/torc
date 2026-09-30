@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "run_id": "03-bug-claude-solo",
+  "valid_attempt": false,
+  "category": "harness_sandbox_unavailable",
+  "comparative_use": "excluded",
+  "usage": {
+    "input_tokens": 0,
+    "output_tokens": 0
+  },
+  "evidence": [
+    "The WSL command resolved Claude to a Windows-mounted npm shim rather than a native Linux executable.",
+    "Claude selected the Windows sandbox, which was unavailable, and failIfUnavailable stopped before inference.",
+    "The provider result recorded zero input and output tokens."
+  ],
+  "corrective_action": "Install a native Linux Claude Code executable plus its WSL sandbox dependencies, then require the dry plan to reject any /mnt/... shim."
+}

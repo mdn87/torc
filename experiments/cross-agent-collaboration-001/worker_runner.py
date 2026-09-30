@@ -304,7 +304,13 @@ def _wsl_executable(name: str, distro: str) -> str:
     lines = completed.stdout.strip().splitlines()
     if completed.returncode or not lines:
         raise WorkerRunnerError(f"{name} is unavailable in WSL distro {distro!r}")
-    return lines[-1]
+    resolved = lines[-1]
+    if resolved.startswith("/mnt/"):
+        raise WorkerRunnerError(
+            f"{name} resolves to a Windows-mounted shim; install a native Linux "
+            f"executable in WSL distro {distro!r}"
+        )
+    return resolved
 
 
 def build_command(

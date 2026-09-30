@@ -1,0 +1,4 @@
+
+Error: sandbox required but unavailable: sandbox is enabled but the Windows sandbox is not active on this session (feature gate off)
+  sandbox.failIfUnavailable is set — refusing to start without a working sandbox.
+

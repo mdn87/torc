@@ -150,6 +150,21 @@ def test_final_agent_text_and_json_decoder_cover_both_harnesses() -> None:
     }
 
 
+def test_wsl_worker_rejects_a_windows_mounted_executable(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class Completed:
+        returncode = 0
+        stdout = "/mnt/c/Users/test/AppData/Roaming/npm/claude\n"
+        stderr = ""
+
+    monkeypatch.setattr(runner.shutil, "which", lambda _name: "wsl.exe")
+    monkeypatch.setattr(runner.subprocess, "run", lambda *_args, **_kwargs: Completed())
+
+    with pytest.raises(runner.WorkerRunnerError, match="Windows-mounted shim"):
+        runner._wsl_executable("claude", "Ubuntu")
+
+
 def test_capture_process_preserves_timeout(tmp_path: Path) -> None:
     capture = runner.capture_process(
         command=[sys.executable, "-c", "import time; time.sleep(2)"],

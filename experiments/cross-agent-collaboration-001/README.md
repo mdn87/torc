@@ -149,3 +149,9 @@ setting with the host's permission-profile system, so shell reads remained
 blocked. Each run has a `disposition.json`. The current launcher selects the
 built-in `:workspace` or `:read-only` profile and performs a model-free access
 preflight before spending usage.
+
+The first Claude smoke also stopped before inference and is excluded. WSL
+resolved `claude` to a Windows-mounted npm shim, so no Linux sandbox was
+available; the provider recorded zero tokens. The launcher now rejects mounted
+Windows shims during planning. Claude cells require a native Linux Claude Code
+installation and its WSL sandbox dependencies (`bubblewrap` and `socat`).
