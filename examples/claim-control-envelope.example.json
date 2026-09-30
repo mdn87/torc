@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "format": "torc-claim-control-v1",
+  "projection_id": "projection-demo-claim",
+  "source_revision_id": "revision-demo-0002",
+  "target_substrate": "claude-independent-review",
+  "capsule_sha256": "b6eb31fb35ccb6a6c5d6a9f217a53768b2eca84a9da052894f0e1e13913dd8fc",
+  "claim_sources": {
+    "c1": {
+      "section_id": "active_commitments",
+      "position": 0,
+      "source_ref": "revision-demo-0002:commitments/0"
+    },
+    "x1": {
+      "section_id": "hard_constraints",
+      "position": 0,
+      "source_ref": "revision-demo-0002:constraints/0"
+    }
+  }
+}

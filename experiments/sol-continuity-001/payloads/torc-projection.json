@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "mechanism": "torc-projection",
+  "projection_id": "sol-pilot-projection-0001",
+  "source_revision_id": "sol-pilot-revision-0002",
+  "target_substrate": "gpt-6-sol-independent-review",
+  "handoff_reason": "task_phase_transition",
+  "required_sections": {
+    "identity": {
+      "value": "northstar-ledger-release",
+      "source_ref": "canonical-state.json#lineage_identity"
+    },
+    "responsibility": {
+      "value": "Independently review the Ledger V2 cutover candidate and block release unless every inherited gate is satisfied",
+      "source_ref": "canonical-state.json#current_responsibility"
+    },
+    "settled_decisions": [
+      {"value": "Assign UUIDv7 ledger identifiers at ingest and retain the legacy invoice identifier as external_ref", "source_ref": "ADR-014"},
+      {"value": "Use the append-only outbox backfill; dual writes are rejected because replay is not proven idempotent", "source_ref": "ADR-018"},
+      {"value": "Cut over through shadow reads followed by tenant cohorts rather than a big-bang switch", "source_ref": "ADR-021"},
+      {"value": "Rollback disables Ledger V2 reads and preserves all Ledger V2 rows", "source_ref": "RUNBOOK-07"}
+    ],
+    "active_commitments": [
+      {"value": "Do not enable Ledger V2 reads for a tenant until row count, cent total, and checksum all match", "source_ref": "GATE-RECON-3"},
+      {"value": "Retain invoice audit records for seven years", "source_ref": "POLICY-RET-7Y"},
+      {"value": "Keep Ledger V2 p95 read latency within 15 milliseconds of the legacy path", "source_ref": "SLO-LEDGER-15MS"},
+      {"value": "Stop rollout when the reconciliation mismatch rate exceeds 0.01 percent", "source_ref": "GATE-RECON-3"},
+      {"value": "Publish the reconciliation report before release approval", "source_ref": "GATE-RECON-3"}
+    ],
+    "hard_constraints": [
+      {"value": "The reviewer must not execute production writes", "source_ref": "canonical-state.json#hard_constraints/0"},
+      {"value": "No destructive SQL is permitted", "source_ref": "canonical-state.json#hard_constraints/1"},
+      {"value": "No schema changes are permitted during release review", "source_ref": "canonical-state.json#hard_constraints/2"},
+      {"value": "Customer PII must remain in the local approved environment", "source_ref": "canonical-state.json#hard_constraints/3"},
+      {"value": "Original invoice timestamps are immutable", "source_ref": "canonical-state.json#hard_constraints/4"}
+    ],
+    "unresolved_work": [
+      {"value": "Prove the retry worker cannot duplicate outbox rows after a crash", "source_ref": "INCIDENT-009"},
+      {"value": "Finalize the reconciliation checksum formula for partial refunds", "source_ref": "ISSUE-442"},
+      {"value": "Resolve missing timezone mappings for tenants amber-grove and cedar-labs", "source_ref": "ISSUE-451"},
+      {"value": "Run the representative load test against the release candidate", "source_ref": "TEST-LOAD-PENDING"},
+      {"value": "Add cache invalidation ordering to the rollback runbook", "source_ref": "RUNBOOK-07-GAP"}
+    ],
+    "uncertainties": [
+      {"value": "Whether observed duplicate rows came from the retry worker or pre-existing source data", "source_ref": "INCIDENT-009"},
+      {"value": "Whether the synthetic latency result predicts tenant-cohort performance", "source_ref": "SLO-LEDGER-15MS"},
+      {"value": "Whether either missing timezone mapping changes invoice-day grouping", "source_ref": "ISSUE-451"}
+    ]
+  },
+  "excluded_sections": [],
+  "superseded": [
+    {"value": "Use Redis as the canonical legacy-to-ledger identifier map", "status": "superseded", "source_ref": "ADR-018"},
+    {"value": "Switch every tenant to Ledger V2 reads in one big-bang cutover", "status": "superseded", "source_ref": "ADR-021"}
+  ],
+  "authority": {
+    "source_activation": "sol-pilot-source",
+    "target_status": "pending_reconstruction",
+    "transfer_condition": "accepted_reconstruction"
+  }
+}

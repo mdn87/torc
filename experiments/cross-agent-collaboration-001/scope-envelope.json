@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "objective": "Build a repeatable experiment that compares solo Codex, solo Claude, Codex-to-Claude critique, and Claude-to-Codex critique workflows using governed TORC handoffs and deterministic task evidence.",
+  "success_evidence": [
+    "Every workflow uses a pinned task fixture, harness version, model, effort, tool policy, assignment, and output contract.",
+    "Cross-provider targets receive a model-visible claim capsule while full provenance and authority metadata remain in a hash-bound control envelope.",
+    "Codex and Claude usage is normalized into input, cached-input, cache-write, reasoning-output, and output token fields when the harness supplies them.",
+    "Wall-clock stages, failed attempts, operator interventions, test results, and claim-resolution failures are preserved.",
+    "No comparative claim is made until independent fixtures and repeat runs complete."
+  ],
+  "non_goals": [
+    "A universal ranking of Codex and Claude.",
+    "Provider routing, credential custody, or model inference inside TORC core.",
+    "Automatic production delegation or edits outside isolated experiment worktrees.",
+    "Treating model votes as stronger evidence than tests, policy checks, or provenance.",
+    "Parsing or recreating provider-native opaque compaction artifacts."
+  ],
+  "authority": {
+    "live_calls": "operator_initiated_only",
+    "production_writes": false,
+    "parent_repository_changes": false,
+    "network_service": false
+  },
+  "implementation_budget": {
+    "runtime_processes": 0,
+    "new_provider_sdks": 0,
+    "background_workers": 0
+  },
+  "stop_conditions": [
+    "The harness cannot isolate the fixture oracle or hidden tests.",
+    "A workflow cannot report effective model and effort controls.",
+    "The foreign critic does not improve deterministic task quality over native review.",
+    "The claim capsule loses a required constraint or cannot resolve every cited claim.",
+    "Live usage cannot be attributed to a frozen workflow attempt."
+  ]
+}

@@ -1,0 +1,16 @@
+Use only the supplied assignment, literal JSON continuity payload, literal JSON
+candidate release, and output schema. Do not call tools, inspect files, access
+a workspace, use the network, or use outside information.
+
+The payload deliberately separates inherited values from evidence references.
+In every reconstruction array and in `assertions[].text`, copy only the value
+string, byte for byte. Put its evidence reference only in
+`assertions[].source_ref`; never append a citation, bracket, period, prefix, or
+other text to an inherited value.
+
+Include every settled decision, active commitment, hard constraint, unresolved
+work item, and uncertainty as an inherited assertion. New review conclusions
+belong in `new_inferences`; they must not be added to inherited arrays.
+
+Return exactly one JSON object conforming to the supplied schema, with no
+Markdown or surrounding explanation.

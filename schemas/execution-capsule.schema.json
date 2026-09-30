@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lugos.local/schemas/execution-capsule.schema.json",
+  "title": "TORC model-visible execution capsule",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "format",
+    "lineage_identity",
+    "current_responsibility",
+    "source_revision_id",
+    "handoff_reason",
+    "claims"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "format": {"const": "torc-claim-capsule-v1"},
+    "lineage_identity": {"type": "string", "minLength": 1},
+    "current_responsibility": {"type": "string", "minLength": 1},
+    "source_revision_id": {"type": "string", "minLength": 1},
+    "handoff_reason": {"type": "string", "minLength": 1},
+    "claims": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "patternProperties": {
+          "^[a-z][a-z0-9]*[1-9][0-9]*$": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

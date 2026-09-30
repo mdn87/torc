@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "lineage_identity",
+    "current_responsibility",
+    "settled_decisions",
+    "active_commitments",
+    "hard_constraints",
+    "unresolved_work",
+    "uncertainties",
+    "handoff_reason",
+    "source_revision_id",
+    "assertions",
+    "new_inferences",
+    "release_decision",
+    "blocking_findings",
+    "completion_status"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "lineage_identity": {"type": "string"},
+    "current_responsibility": {"type": "string"},
+    "settled_decisions": {"$ref": "#/$defs/string_array"},
+    "active_commitments": {"$ref": "#/$defs/string_array"},
+    "hard_constraints": {"$ref": "#/$defs/string_array"},
+    "unresolved_work": {"$ref": "#/$defs/string_array"},
+    "uncertainties": {"$ref": "#/$defs/string_array"},
+    "handoff_reason": {"type": "string"},
+    "source_revision_id": {"type": "string"},
+    "assertions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["text", "label", "source_ref"],
+        "properties": {
+          "text": {"type": "string"},
+          "label": {"enum": ["inherited", "new"]},
+          "source_ref": {"type": "string"}
+        }
+      }
+    },
+    "new_inferences": {"$ref": "#/$defs/string_array"},
+    "release_decision": {"enum": ["block", "conditional", "approve"]},
+    "blocking_findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["area", "rationale", "evidence_refs"],
+        "properties": {
+          "area": {
+            "enum": [
+              "cutover-sequencing",
+              "reconciliation",
+              "idempotency",
+              "timezone-mapping",
+              "latency",
+              "rollback",
+              "audit-retention"
+            ]
+          },
+          "rationale": {"type": "string"},
+          "evidence_refs": {"$ref": "#/$defs/string_array"}
+        }
+      }
+    },
+    "completion_status": {"enum": ["complete", "incomplete"]}
+  },
+  "$defs": {
+    "string_array": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    }
+  }
+}

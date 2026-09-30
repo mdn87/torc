@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "lineage_identity": "northstar-ledger-release",
+  "current_responsibility": "independently reviewing the Ledger V2 cutover candidate and blocking release unless every inherited gate is satisfied",
+  "settled_decisions": [
+    "Assign UUIDv7 ledger identifiers at ingest and retain the legacy invoice identifier as external_ref [ADR-014].",
+    "Use the append-only outbox backfill; dual writes are rejected because replay is not proven idempotent [ADR-018].",
+    "Cut over through shadow reads followed by tenant cohorts rather than a big-bang switch [ADR-021].",
+    "Rollback disables Ledger V2 reads and preserves all Ledger V2 rows [RUNBOOK-07]."
+  ],
+  "active_commitments": [
+    "Do not enable Ledger V2 reads for a tenant until row count, cent total, and checksum all match [GATE-RECON-3].",
+    "Retain invoice audit records for seven years [POLICY-RET-7Y].",
+    "Keep Ledger V2 p95 read latency within 15 milliseconds of the legacy path [SLO-LEDGER-15MS].",
+    "Stop rollout when the reconciliation mismatch rate exceeds 0.01 percent [GATE-RECON-3].",
+    "Publish the reconciliation report before release approval [GATE-RECON-3]."
+  ],
+  "hard_constraints": [
+    "The reviewer must not execute production writes.",
+    "No destructive SQL is permitted.",
+    "No schema changes are permitted during release review.",
+    "Customer PII must remain in the local approved environment.",
+    "Original invoice timestamps are immutable."
+  ],
+  "unresolved_work": [
+    "Prove the retry worker cannot duplicate outbox rows after a crash [INCIDENT-009].",
+    "Finalize the reconciliation checksum formula for partial refunds [ISSUE-442].",
+    "Resolve missing timezone mappings for tenants amber-grove and cedar-labs [ISSUE-451].",
+    "Run the representative load test against the release candidate [TEST-LOAD-PENDING].",
+    "Add cache invalidation ordering to the rollback runbook [RUNBOOK-07-GAP]."
+  ],
+  "uncertainties": [
+    "Whether observed duplicate rows came from the retry worker or pre-existing source data.",
+    "Whether the synthetic latency result predicts tenant-cohort performance.",
+    "Whether either missing timezone mapping changes invoice-day grouping."
+  ],
+  "handoff_reason": "task_phase_transition",
+  "source_revision_id": "sol-pilot-revision-0002",
+  "assertions": [
+    {"text":"Assign UUIDv7 ledger identifiers at ingest and retain the legacy invoice identifier as external_ref [ADR-014].","label":"inherited","source_ref":"ADR-014"},
+    {"text":"Use the append-only outbox backfill; dual writes are rejected because replay is not proven idempotent [ADR-018].","label":"inherited","source_ref":"ADR-018"},
+    {"text":"Cut over through shadow reads followed by tenant cohorts rather than a big-bang switch [ADR-021].","label":"inherited","source_ref":"ADR-021"},
+    {"text":"Rollback disables Ledger V2 reads and preserves all Ledger V2 rows [RUNBOOK-07].","label":"inherited","source_ref":"RUNBOOK-07"},
+    {"text":"Do not enable Ledger V2 reads for a tenant until row count, cent total, and checksum all match [GATE-RECON-3].","label":"inherited","source_ref":"GATE-RECON-3"},
+    {"text":"Retain invoice audit records for seven years [POLICY-RET-7Y].","label":"inherited","source_ref":"POLICY-RET-7Y"},
+    {"text":"Keep Ledger V2 p95 read latency within 15 milliseconds of the legacy path [SLO-LEDGER-15MS].","label":"inherited","source_ref":"SLO-LEDGER-15MS"},
+    {"text":"Stop rollout when the reconciliation mismatch rate exceeds 0.01 percent [GATE-RECON-3].","label":"inherited","source_ref":"GATE-RECON-3"},
+    {"text":"Publish the reconciliation report before release approval [GATE-RECON-3].","label":"inherited","source_ref":"GATE-RECON-3"},
+    {"text":"The reviewer must not execute production writes.","label":"inherited","source_ref":"canonical-state.json#hard_constraints"},
+    {"text":"No destructive SQL is permitted.","label":"inherited","source_ref":"canonical-state.json#hard_constraints"},
+    {"text":"No schema changes are permitted during release review.","label":"inherited","source_ref":"canonical-state.json#hard_constraints"},
+    {"text":"Customer PII must remain in the local approved environment.","label":"inherited","source_ref":"canonical-state.json#hard_constraints"},
+    {"text":"Original invoice timestamps are immutable.","label":"inherited","source_ref":"canonical-state.json#hard_constraints"},
+    {"text":"Prove the retry worker cannot duplicate outbox rows after a crash [INCIDENT-009].","label":"inherited","source_ref":"INCIDENT-009"},
+    {"text":"Finalize the reconciliation checksum formula for partial refunds [ISSUE-442].","label":"inherited","source_ref":"ISSUE-442"},
+    {"text":"Resolve missing timezone mappings for tenants amber-grove and cedar-labs [ISSUE-451].","label":"inherited","source_ref":"ISSUE-451"},
+    {"text":"Run the representative load test against the release candidate [TEST-LOAD-PENDING].","label":"inherited","source_ref":"TEST-LOAD-PENDING"},
+    {"text":"Add cache invalidation ordering to the rollback runbook [RUNBOOK-07-GAP].","label":"inherited","source_ref":"RUNBOOK-07-GAP"},
+    {"text":"The proposed cohort cutover omits the required shadow-read interval.","label":"new","source_ref":"ADR-021"},
+    {"text":"Matching row counts alone do not satisfy the reconciliation gate.","label":"new","source_ref":"GATE-RECON-3"},
+    {"text":"Deleting Ledger V2 rows on rollback contradicts the settled rollback decision.","label":"new","source_ref":"RUNBOOK-07"}
+  ],
+  "new_inferences": [
+    "The proposed cohort cutover omits the required shadow-read interval.",
+    "Matching row counts alone do not satisfy the reconciliation gate.",
+    "Excluding partial refunds prevents a complete checksum-based reconciliation.",
+    "The unreproduced duplicate observation leaves outbox idempotency unproven.",
+    "A temporary Redis identifier map does not resolve the missing timezone mappings.",
+    "Deferring the representative load test leaves the latency commitment unverified for this release candidate.",
+    "Deleting Ledger V2 rows on rollback contradicts the settled rollback decision, and delayed cache invalidation leaves the runbook gap unresolved.",
+    "The supplied candidate does not establish that a reconciliation report has been published before approval."
+  ],
+  "release_decision": "block",
+  "blocking_findings": [
+    {"area":"cutover-sequencing","rationale":"The candidate enables a tenant cohort without the required shadow-read interval.","evidence_refs":["ADR-021","ledger-v2-rc7"]},
+    {"area":"reconciliation","rationale":"Row counts alone cannot satisfy the required row-count, cent-total, and checksum match. Excluding partial refunds leaves the checksum formula unresolved, and the candidate supplies no published reconciliation report.","evidence_refs":["GATE-RECON-3","ISSUE-442","ledger-v2-rc7"]},
+    {"area":"idempotency","rationale":"The candidate accepts an observed duplicate without reproducing it or proving crash retry cannot duplicate outbox rows.","evidence_refs":["INCIDENT-009","ledger-v2-rc7"]},
+    {"area":"timezone-mapping","rationale":"The missing mappings remain unresolved; an identifier map does not establish the invoice-day grouping for either affected tenant.","evidence_refs":["ISSUE-451","ledger-v2-rc7"]},
+    {"area":"latency","rationale":"Deferring the representative load test leaves the p95 latency commitment unverified before the first cohort goes live.","evidence_refs":["SLO-LEDGER-15MS","TEST-LOAD-PENDING","ledger-v2-rc7"]},
+    {"area":"rollback","rationale":"Deleting Ledger V2 rows contradicts the requirement to preserve them. The proposed later cache invalidation also leaves ordering unresolved.","evidence_refs":["RUNBOOK-07","RUNBOOK-07-GAP","ledger-v2-rc7"]}
+  ],
+  "completion_status": "complete"
+}

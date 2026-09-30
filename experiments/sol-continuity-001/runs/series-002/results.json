@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "series_id": "sol-continuity-002-calibration",
+  "disposition": "calibration_complete",
+  "runs": [
+    {
+      "run_id": "cal2-v1-compiled-low",
+      "mechanism": "compiled-handoff",
+      "effort": "low",
+      "target_output_sha256": "d78574e53015f7ff4bcb6517a9ed46e09dcec06f5265d6eb0bf46d77379d69f6",
+      "score_core_sha256": "b3452d4db0a22c78115083867699655062a992bcb0d16c4baa02d5e0be6e62de",
+      "continuity_recall": 1.0,
+      "blocking_area_recall": 0.857143,
+      "release_decision_correct": true,
+      "contradiction_count": 0
+    },
+    {
+      "run_id": "cal2-v1-compiled-xhigh",
+      "mechanism": "compiled-handoff",
+      "effort": "xhigh",
+      "target_output_sha256": "fcbd283828a6c6ef3ce2411471dea3d1249881a21ed0ad3da7ed19553f1bdec8",
+      "score_core_sha256": "6f3302b696759f37af7e2a0c79fa602da32d6cbb1db7082a8563f55a47639a77",
+      "continuity_recall": 1.0,
+      "blocking_area_recall": 0.857143,
+      "release_decision_correct": true,
+      "contradiction_count": 0
+    },
+    {
+      "run_id": "cal2-v1-torc-low",
+      "mechanism": "torc-projection",
+      "effort": "low",
+      "target_output_sha256": "133f41bba6c0e11b7e0aaf2a473f101400c400b4d8c7bd5eaaab9c8aae2db75d",
+      "score_core_sha256": "6f3302b696759f37af7e2a0c79fa602da32d6cbb1db7082a8563f55a47639a77",
+      "continuity_recall": 1.0,
+      "blocking_area_recall": 0.857143,
+      "release_decision_correct": true,
+      "contradiction_count": 0
+    },
+    {
+      "run_id": "cal2-v1-torc-xhigh",
+      "mechanism": "torc-projection",
+      "effort": "xhigh",
+      "target_output_sha256": "d0d8d6383d69fce276a5c0d313b5cdffc44a153e831d59564f3c65d285aba129",
+      "score_core_sha256": "74e72c54d04ce8d9fd79f8180554a7a474e660f2939c589361465ad8ea278ad0",
+      "continuity_recall": 1.0,
+      "blocking_area_recall": 1.0,
+      "release_decision_correct": true,
+      "contradiction_count": 0
+    }
+  ],
+  "payload_overhead": {
+    "compiled_canonical_bytes": 2930,
+    "torc_canonical_bytes": 3563,
+    "torc_byte_ratio": 1.216041
+  },
+  "calibration_gate": {
+    "passed": true,
+    "reason": "Both low-effort runs were usable but non-perfect at 6 of 7 blocking areas, while every run exceeded the 0.75 continuity and review thresholds"
+  },
+  "known_measurement_issue": {
+    "metric": "inherited_new_label_accuracy",
+    "disposition": "exclude_from_comparison",
+    "reason": "Scorer version 1 penalizes correct inherited identity, responsibility, and superseded assertions because its expected-value set includes only five list fields"
+  },
+  "usage_observations": {
+    "before_all_live_shakeout_and_calibration_calls": {
+      "five_hour_percent_left": 94,
+      "weekly_percent_left": 99
+    },
+    "after_all_live_shakeout_and_calibration_calls": {
+      "five_hour_percent_left": 52,
+      "weekly_percent_left": 92
+    },
+    "source": "codex-cli /status",
+    "warning": "The change includes invalidated shakeout calls and artifact-recording follow-ups and is not a per-run cost estimate"
+  },
+  "comparative_claim_authorized": false
+}

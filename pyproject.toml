@@ -39,6 +39,10 @@ addopts = "-q"
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+extend-exclude = [
+    # This scorer is a hash-pinned experiment artifact; preserve its exact bytes.
+    "experiments/sol-continuity-001/score.py",
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
