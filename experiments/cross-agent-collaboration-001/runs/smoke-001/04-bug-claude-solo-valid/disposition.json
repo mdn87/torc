@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "run_id": "04-bug-claude-solo-valid",
+  "valid_attempt": false,
+  "category": "harness_auth_unavailable",
+  "comparative_use": "excluded",
+  "usage": {
+    "input_tokens": 0,
+    "output_tokens": 0
+  },
+  "evidence": [
+    "The native Linux Claude harness and fail-closed sandbox initialized successfully.",
+    "The harness reported that its WSL installation was not logged in and stopped before inference.",
+    "The provider result recorded zero input and output tokens."
+  ],
+  "corrective_action": "Provision the existing local Claude subscription credential in the native WSL installation, then retry as a new immutable attempt."
+}
