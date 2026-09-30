@@ -289,6 +289,9 @@ def _wsl_executable(name: str, distro: str) -> str:
     if not wsl:
         raise WorkerRunnerError("wsl.exe is unavailable")
     script = (
+        'for candidate in "$HOME/.local/bin/$1" "$HOME/.claude/local/$1"; do '
+        '[ ! -x "$candidate" ] || { readlink -f "$candidate"; exit 0; }; '
+        "done; "
         'export NVM_DIR="$HOME/.nvm"; '
         '[ ! -s "$NVM_DIR/nvm.sh" ] || . "$NVM_DIR/nvm.sh" >/dev/null; '
         "nvm use default >/dev/null 2>&1 || nvm use 22 >/dev/null 2>&1 || true; "

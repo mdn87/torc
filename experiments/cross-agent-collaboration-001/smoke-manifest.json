@@ -28,7 +28,7 @@
       "model": "claude-opus-4-7",
       "primary_effort": "xhigh",
       "critic_effort": "low",
-      "harness_version": "2.1.273 (Claude Code)"
+      "harness_version": "2.1.285 (Claude Code)"
     }
   },
   "workflows": {

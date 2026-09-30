@@ -165,6 +165,29 @@ def test_wsl_worker_rejects_a_windows_mounted_executable(
         runner._wsl_executable("claude", "Ubuntu")
 
 
+def test_wsl_worker_prefers_native_linux_install_locations(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    captured: dict[str, object] = {}
+
+    class Completed:
+        returncode = 0
+        stdout = "/home/test/.local/bin/claude\n"
+        stderr = ""
+
+    def fake_run(args: list[str], **_kwargs: object) -> Completed:
+        captured["args"] = args
+        return Completed()
+
+    monkeypatch.setattr(runner.shutil, "which", lambda _name: "wsl.exe")
+    monkeypatch.setattr(runner.subprocess, "run", fake_run)
+
+    resolved = runner._wsl_executable("claude", "Ubuntu")
+
+    assert resolved == "/home/test/.local/bin/claude"
+    assert '$HOME/.local/bin/$1' in str(captured["args"])
+
+
 def test_capture_process_preserves_timeout(tmp_path: Path) -> None:
     capture = runner.capture_process(
         command=[sys.executable, "-c", "import time; time.sleep(2)"],
