@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "fixtures": {
+    "bug-hidden-regression": {
+      "agent_visible_sha256": "3c31795108a5a1b2ec1ae5521169044135ad05e1a5882389d6fbde95083ac660",
+      "oracle_sha256": "965265603fb706a5d69dfc648222d8148300750e1f44143328dcc57392cb1fd8"
+    },
+    "refactor-superseded-path": {
+      "agent_visible_sha256": "685d15603c8061f463be9820af36849078cdd65993e624155f36b503e90a8e2c",
+      "oracle_sha256": "f38d88d9ce7a5978d5277bd1de349acf6ce8d7587dfa4897dd2efe66484fee7d"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 # Cross-agent collaboration experiment 001
 
-Status: apparatus design; no live runs authorized
+Status: smoke apparatus implemented; no live runs completed
 
 Scope envelope: `scope-envelope.json`
 
@@ -20,6 +20,10 @@ The experiment runner or the Lugos orchestrator launches each harness. TORC
 records fit evidence, compiles the handoff capsule, checks reconstruction, and
 governs lineage authority. TORC does not become the provider router or worker
 orchestrator.
+
+The single-worker launcher therefore lives in this experiment directory, not
+in the `torc` package. It requires an explicit `--execute` switch before it can
+make a model call.
 
 ## Candidate workflows
 
@@ -55,7 +59,7 @@ Use four repository-backed tasks with deterministic acceptance evidence:
 4. A design decision with competing options, explicit constraints, and a
    required implementation plan.
 
-Each task is pinned to one commit and staged in isolated worktrees. Agent-visible
+Each task is hash-pinned and staged in an isolated Git workspace. Agent-visible
 inputs exclude hidden tests, scoring rules, other agents' output, and the
 fixture oracle.
 
@@ -91,10 +95,34 @@ native review at lower cost.
 ## Runtime controls
 
 - Claude uses `-p`, structured streaming output, an explicit model and effort,
-  bounded turns, restricted tools, and an isolated workspace.
+  a bounded process timeout, restricted tools, and an isolated workspace.
 - Codex uses non-interactive structured output or the app-server protocol with
   equivalent model, effort, sandbox, and workspace controls.
 - Internal subagent spawning is disabled for the first comparison so the unit
   under test is the explicit Codex/Claude workflow.
 - Live runs record usage before synthesis. A root-agent summary is not part of
   the scored target output.
+
+## Implemented smoke apparatus
+
+- `fixture_control.py` verifies the hash-pinned fixture and oracle trees,
+  stages only agent-visible files into a new Git repository, and scores visible
+  and hidden tests separately.
+- `worker_runner.py` builds fresh-session Codex and Claude Code commands,
+  verifies the installed harness version, records raw JSONL, normalizes supplied
+  token counters, and measures startup, first-output, and completion time.
+- `fixtures/bug-hidden-regression` starts with both visible and hidden failures.
+- `fixtures/refactor-superseded-path` passes its visible behavior tests while a
+  hidden structural test catches the superseded production path.
+
+Verify the fixtures without making a model call:
+
+```text
+python experiments/cross-agent-collaboration-001/fixture_control.py verify
+```
+
+Running `worker_runner.py` without `--execute` prints the resolved command,
+prompt hash, and installed harness version without starting an agent. An actual
+run additionally requires an output directory outside the worker workspace and
+the exact version returned by the dry plan through
+`--expected-harness-version`.

@@ -1,0 +1,5 @@
+Work only in the current fixture workspace. Read AGENTS.md, TASK.md, and any
+task document they reference. Implement the requested change, run the visible
+tests, and leave the completed edits in the workspace. Do not use the network,
+inspect parent or sibling directories, or spawn subagents. Do not merely
+describe a solution: make and verify the change.
