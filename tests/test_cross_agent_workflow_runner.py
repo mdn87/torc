@@ -142,6 +142,7 @@ def test_solo_workflow_scores_without_model_synthesis(
     assert result["accepted_final"] is True
     assert result["operator_interventions"] == 0
     assert len(result["phases"]) == 1
+    assert (tmp_path / "solo-run" / "final.diff").is_file()
 
 
 def test_cross_workflow_uses_capsule_critic_and_same_session_revision(
@@ -188,3 +189,5 @@ def test_cross_workflow_uses_capsule_critic_and_same_session_revision(
     assert calls[2]["session_mode"] == "resume"
     assert calls[2]["session_id"] == "primary-session"
     assert (tmp_path / "cross-run" / "claim-control-envelope.json").is_file()
+    assert (tmp_path / "cross-run" / "candidate.diff").is_file()
+    assert (tmp_path / "cross-run" / "final.diff").is_file()

@@ -335,6 +335,9 @@ def run_workflow(
 
     phases = [_phase_summary(primary_dir / "worker-run.json", primary_record)]
     if not cross_agent:
+        (resolved_run / "final.diff").write_text(
+            _candidate_diff(primary_workspace), encoding="utf-8"
+        )
         result = {
             "schema_version": 1,
             "series_id": manifest["series_id"],
@@ -397,6 +400,10 @@ def run_workflow(
     )
     final_score = fixture_control.score_fixture(fixture_id, primary_workspace)
     _write_json(resolved_run / "score-final.json", final_score)
+    (resolved_run / "candidate.diff").write_text(candidate_diff, encoding="utf-8")
+    (resolved_run / "final.diff").write_text(
+        _candidate_diff(primary_workspace), encoding="utf-8"
+    )
     phases.append(_phase_summary(revision_dir / "worker-run.json", revision_record))
     result = {
         "schema_version": 1,
