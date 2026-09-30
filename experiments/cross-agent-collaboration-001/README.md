@@ -141,3 +141,8 @@ python experiments/cross-agent-collaboration-001/workflow_runner.py \
 Token counters remain separated by phase and provider. Because Codex and Claude
 use different tokenizers and cache-accounting rules, the apparatus does not
 manufacture a cross-provider total.
+
+The first attempted Codex smoke was retained but excluded: its noninteractive
+approval policy blocked every shell command, and built-in app resources
+contaminated context usage. `runs/smoke-001/01-bug-codex-solo/disposition.json`
+records the failure and corrective action.

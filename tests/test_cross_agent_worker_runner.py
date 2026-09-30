@@ -31,6 +31,14 @@ def test_codex_command_uses_stdin_and_fresh_session_controls() -> None:
     assert "--ephemeral" in command
     assert "--ignore-user-config" in command
     assert command[command.index("--sandbox") + 1] == "workspace-write"
+    assert command[command.index("--ask-for-approval") + 1] == "never"
+    assert command.index("--ask-for-approval") < command.index("exec")
+    disabled = {
+        command[index + 1]
+        for index, value in enumerate(command)
+        if value == "--disable"
+    }
+    assert {"apps", "plugins", "multi_agent", "skill_search"} <= disabled
     assert 'model_reasoning_effort="xhigh"' in command
 
 
@@ -115,7 +123,8 @@ def test_persistent_and_resumed_commands_preserve_session_identity() -> None:
 
     assert initial[initial.index("--session-id") + 1] == session_id
     assert "--no-session-persistence" not in initial
-    assert resumed[:3] == ["codex", "exec", "resume"]
+    exec_index = resumed.index("exec")
+    assert resumed[exec_index : exec_index + 2] == ["exec", "resume"]
     assert resumed[-2:] == [session_id, "-"]
     assert runner.session_id_from_events(
         "codex", [{"type": "thread.started", "thread_id": session_id}]

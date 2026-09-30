@@ -32,6 +32,15 @@ PROVIDERS = ("codex", "claude-code")
 TRANSPORTS = ("native", "wsl")
 ROLES = ("implementer", "critic")
 SESSION_MODES = ("fresh-ephemeral", "fresh-persistent", "resume")
+_CODEX_DISABLED_FEATURES = (
+    "apps",
+    "browser_use",
+    "in_app_browser",
+    "multi_agent",
+    "plugins",
+    "remote_plugin",
+    "skill_search",
+)
 
 
 class WorkerRunnerError(RuntimeError):
@@ -177,9 +186,12 @@ def build_inner_command(
 
     if provider == "codex":
         sandbox = "workspace-write" if role == "implementer" else "read-only"
+        prefix = [executable, "--sandbox", sandbox, "--ask-for-approval", "never"]
+        for feature in _CODEX_DISABLED_FEATURES:
+            prefix.extend(["--disable", feature])
         if session_mode == "resume":
             return [
-                executable,
+                *prefix,
                 "exec",
                 "resume",
                 "--ignore-user-config",
@@ -189,21 +201,17 @@ def build_inner_command(
                 model,
                 "-c",
                 f"model_reasoning_effort={json.dumps(effort)}",
-                "-c",
-                f"sandbox_mode={json.dumps(sandbox)}",
                 str(session_id),
                 "-",
             ]
         command = [
-            executable,
+            *prefix,
             "exec",
             "--ignore-user-config",
             "--ignore-rules",
             "--json",
             "--model",
             model,
-            "--sandbox",
-            sandbox,
             "-C",
             workspace,
             "-c",
