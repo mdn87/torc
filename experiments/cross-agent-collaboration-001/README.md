@@ -131,10 +131,12 @@ Generate a machine-readable evidence summary with:
 python experiments/cross-agent-collaboration-001/experiment_report.py
 ```
 
-The report keeps usage grouped by provider and interface. In the current smoke
-ledger, eight excluded direct-tool Codex phases report 851,208 input tokens,
-while the two valid artifact phases report 26,316. That large gap is diagnostic
-evidence from failed harness attempts, not a controlled quality comparison.
+The report keeps usage grouped by provider and interface and emits matched
+solo-versus-review comparisons when both use the same fixture, provider, and
+artifact interface. In the current smoke ledger, eight excluded direct-tool
+Codex phases report 851,208 input tokens, while eight valid artifact phases
+report 121,014. That large interface gap is diagnostic evidence from failed
+harness attempts, not a controlled quality comparison.
 
 The first native-review control (`14-bug-codex-artifact-review`) also passed,
 but its primary had already passed before a zero-finding approval. The forced

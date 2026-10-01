@@ -57,18 +57,44 @@ def test_report_separates_valid_runs_and_provider_usage(tmp_path: Path) -> None:
             "comparative_use": "excluded",
         },
     )
+    reviewed = tmp_path / "03-reviewed"
+    _write(
+        reviewed / "phases" / "01-primary" / "worker-run.json",
+        _record("codex", 150),
+    )
+    _write(
+        reviewed / "phases" / "02-critic" / "worker-run.json",
+        _record("codex", 50),
+    )
+    _write(
+        reviewed / "workflow-result.json",
+        {
+            "fixture_id": "fixture-a",
+            "workflow_id": "codex-review",
+            "worker_interface": "patch-artifact-v1",
+            "accepted_final": True,
+            "phases": [
+                {"record": "phases/01-primary/worker-run.json"},
+                {"record": "phases/02-critic/worker-run.json"},
+            ],
+        },
+    )
 
     result = report.build_report(tmp_path)
 
-    assert result["run_count"] == 2
-    assert result["valid_run_count"] == 1
-    assert result["accepted_valid_run_count"] == 1
+    assert result["run_count"] == 3
+    assert result["valid_run_count"] == 2
+    assert result["accepted_valid_run_count"] == 2
     assert result["excluded_run_count"] == 1
     usage = result["usage_by_interface_and_provider"]
     assert {item["provider"] for item in usage} == {"codex", "claude-code"}
     assert not any("total_tokens" in item for item in usage)
     codex = next(item for item in usage if item["provider"] == "codex")
     assert codex["mean_input_tokens_per_reported_phase"] == 100.0
+    comparison = result["matched_workflow_comparisons"][0]
+    assert comparison["quality_delta"] == 0
+    assert comparison["input_ratio"] == 2.0
+    assert comparison["completion_ratio"] == 2.0
 
 
 def test_report_rejects_evidence_free_run(tmp_path: Path) -> None:

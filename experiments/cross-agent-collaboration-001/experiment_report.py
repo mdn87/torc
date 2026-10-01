@@ -147,6 +147,80 @@ def build_report(runs_dir: Path = DEFAULT_RUNS_DIR) -> dict[str, Any]:
         for (interface, provider), values in sorted(usage.items())
     ]
     valid_runs = [run for run in runs if run["valid_attempt"]]
+    comparisons: list[dict[str, Any]] = []
+    fixtures = sorted(
+        {
+            run["fixture_id"]
+            for run in valid_runs
+            if isinstance(run["fixture_id"], str)
+        }
+    )
+    for fixture_id in fixtures:
+        solo = [
+            run
+            for run in valid_runs
+            if run["fixture_id"] == fixture_id
+            and run["workflow_id"] == "codex-solo"
+            and run["worker_interface"] == "patch-artifact-v1"
+        ]
+        reviewed = [
+            run
+            for run in valid_runs
+            if run["fixture_id"] == fixture_id
+            and run["workflow_id"] == "codex-review"
+            and run["worker_interface"] == "patch-artifact-v1"
+        ]
+        if not solo or not reviewed:
+            continue
+        baseline = max(solo, key=lambda run: run["run_id"])
+        candidate = max(reviewed, key=lambda run: run["run_id"])
+        if {
+            phase["provider"] for phase in baseline["phases"] + candidate["phases"]
+        } != {"codex"}:
+            continue
+
+        def total(run: dict[str, Any], field: str) -> float | int | None:
+            values = [phase[field] for phase in run["phases"]]
+            if not values or not all(isinstance(value, (int, float)) for value in values):
+                return None
+            return sum(values)
+
+        solo_input = total(baseline, "input_tokens")
+        reviewed_input = total(candidate, "input_tokens")
+        solo_time = total(baseline, "completion_ms")
+        reviewed_time = total(candidate, "completion_ms")
+        comparisons.append(
+            {
+                "fixture_id": fixture_id,
+                "provider": "codex",
+                "solo_run_id": baseline["run_id"],
+                "reviewed_run_id": candidate["run_id"],
+                "solo_accepted": baseline["accepted_final"],
+                "reviewed_accepted": candidate["accepted_final"],
+                "quality_delta": int(candidate["accepted_final"] is True)
+                - int(baseline["accepted_final"] is True),
+                "solo_phase_count": len(baseline["phases"]),
+                "reviewed_phase_count": len(candidate["phases"]),
+                "solo_input_tokens": solo_input,
+                "reviewed_input_tokens": reviewed_input,
+                "input_ratio": (
+                    round(reviewed_input / solo_input, 3)
+                    if isinstance(solo_input, (int, float))
+                    and solo_input
+                    and isinstance(reviewed_input, (int, float))
+                    else None
+                ),
+                "solo_completion_ms": solo_time,
+                "reviewed_completion_ms": reviewed_time,
+                "completion_ratio": (
+                    round(reviewed_time / solo_time, 3)
+                    if isinstance(solo_time, (int, float))
+                    and solo_time
+                    and isinstance(reviewed_time, (int, float))
+                    else None
+                ),
+            }
+        )
     return {
         "schema_version": 1,
         "runs_dir": str(runs_dir.resolve()),
@@ -157,6 +231,7 @@ def build_report(runs_dir: Path = DEFAULT_RUNS_DIR) -> dict[str, Any]:
             run["accepted_final"] is True for run in valid_runs
         ),
         "usage_by_interface_and_provider": by_interface_provider,
+        "matched_workflow_comparisons": comparisons,
         "runs": runs,
         "token_accounting_note": (
             "Token counts are aggregated only within the same provider and worker interface; "
