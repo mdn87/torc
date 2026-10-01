@@ -650,6 +650,8 @@ def build_run_record(
         },
         "command": command,
         "prompt_sha256": _sha256(prompt),
+        "prompt_bytes": len(prompt.encode("utf-8")),
+        "prompt_characters": len(prompt),
         "started_at": capture["started_at"],
         "completed_at": capture["completed_at"],
         "timing": {
@@ -814,6 +816,8 @@ def main(argv: list[str] | None = None) -> int:
             "session_id": args.session_id,
             "command": command,
             "prompt_sha256": _sha256(prompt),
+            "prompt_bytes": len(prompt.encode("utf-8")),
+            "prompt_characters": len(prompt),
             "execute": args.execute,
         }
         if not args.execute:

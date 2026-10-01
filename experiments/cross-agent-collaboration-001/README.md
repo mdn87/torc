@@ -120,6 +120,17 @@ The bug fixture finished in 11.7 seconds with 13,013 input tokens; the refactor
 fixture finished in 8.1 seconds with 13,303. These are valid smoke evidence,
 not yet a cross-provider comparative result.
 
+Generate a machine-readable evidence summary with:
+
+```text
+python experiments/cross-agent-collaboration-001/experiment_report.py
+```
+
+The report keeps usage grouped by provider and interface. In the current smoke
+ledger, eight excluded direct-tool Codex phases report 851,208 input tokens,
+while the two valid artifact phases report 26,316. That large gap is diagnostic
+evidence from failed harness attempts, not a controlled quality comparison.
+
 ## Implemented smoke apparatus
 
 - `fixture_control.py` verifies the hash-pinned fixture and oracle trees,

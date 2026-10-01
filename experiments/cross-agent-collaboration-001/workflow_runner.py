@@ -433,6 +433,7 @@ def _phase_summary(path: Path, record: dict[str, Any]) -> dict[str, Any]:
         "provider": record["provider"],
         "role": record["role"],
         "tool_mode": record.get("tool_mode", "workspace"),
+        "prompt_bytes": record.get("prompt_bytes"),
         "usage": record["usage"],
         "timing": record["timing"],
     }

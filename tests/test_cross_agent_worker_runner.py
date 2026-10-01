@@ -155,6 +155,8 @@ def test_capture_process_records_first_output_and_completion(tmp_path: Path) -> 
     assert record["timing"]["completion_ms"] >= record["timing"]["startup_ms"]
     assert record["usage"]["output_tokens"] == 2
     assert record["malformed_event_count"] == 0
+    assert record["prompt_bytes"] == len(b"ignored")
+    assert record["prompt_characters"] == len("ignored")
     assert record["environment_control"]["cleared_variables"] == []
 
 
