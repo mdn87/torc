@@ -29,8 +29,10 @@ make a model call.
 
 1. Codex completes the task alone.
 2. Claude completes the task alone.
-3. Codex implements, Claude critiques, and the same Codex thread revises.
-4. Claude implements, Codex critiques, and the same Claude session revises.
+3. Codex implements, a fresh low-effort Codex critic reviews the TORC capsule,
+   and the same primary thread revises. This is the native-review control.
+4. Codex implements, Claude critiques, and the same Codex thread revises.
+5. Claude implements, Codex critiques, and the same Claude session revises.
 
 The primary and reviser use the same frozen high-capability settings. The
 foreign critic begins at low effort. A later series may vary critic effort only

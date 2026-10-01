@@ -41,6 +41,7 @@
   "workflows": {
     "codex-solo": {"primary": "codex", "critic": null},
     "claude-solo": {"primary": "claude-code", "critic": null},
+    "codex-review": {"primary": "codex", "critic": "codex"},
     "codex-claude": {"primary": "codex", "critic": "claude-code"},
     "claude-codex": {"primary": "claude-code", "critic": "codex"}
   }

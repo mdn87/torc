@@ -106,11 +106,16 @@ def test_workflow_plans_make_call_cost_explicit() -> None:
     manifest = workflow.load_manifest()
 
     solo = workflow.workflow_plan(manifest, "bug-hidden-regression", "codex-solo")
+    native_review = workflow.workflow_plan(
+        manifest, "bug-hidden-regression", "codex-review"
+    )
     cross = workflow.workflow_plan(manifest, "bug-hidden-regression", "codex-claude")
 
     assert solo["model_call_count"] == 1
     assert solo["phases"] == ["codex"]
     assert solo["worker_interface"] == "patch-artifact-v1"
+    assert native_review["model_call_count"] == 3
+    assert native_review["phases"] == ["codex", "codex", "codex"]
     assert cross["model_call_count"] == 3
     assert cross["phases"] == ["codex", "claude-code", "codex"]
 
