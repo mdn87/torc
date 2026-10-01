@@ -1,6 +1,13 @@
 {
   "schema_version": 1,
   "series_id": "cross-agent-smoke-001",
+  "worker_interface": {
+    "name": "patch-artifact-v1",
+    "editable_paths": {
+      "bug-hidden-regression": ["header_merge.py"],
+      "refactor-superseded-path": ["routing.py"]
+    }
+  },
   "fixtures": ["bug-hidden-regression", "refactor-superseded-path"],
   "recommended_order": [
     ["bug-hidden-regression", "codex-solo"],

@@ -22,6 +22,7 @@ def _record(
     return {
         "provider": provider,
         "role": role,
+        "tool_mode": "none",
         "session": {
             "mode": session_mode,
             "requested_id": session_id,
@@ -54,9 +55,13 @@ def _record(
     }
 
 
-def _solve_bug(workspace: Path) -> None:
-    (workspace / "header_merge.py").write_text(
-        """from collections.abc import Mapping
+def _solution_artifact() -> dict[str, Any]:
+    return {
+        "schema_version": 1,
+        "changes": [
+            {
+                "path": "header_merge.py",
+                "content": """from collections.abc import Mapping
 
 
 def merge_headers(defaults: Mapping[str, str], overrides: Mapping[str, str]) -> dict[str, str]:
@@ -70,7 +75,30 @@ def merge_headers(defaults: Mapping[str, str], overrides: Mapping[str, str]) -> 
             values[identity] = (name, value)
     return {values[identity][0]: values[identity][1] for identity in order}
 """,
-        encoding="utf-8",
+            }
+        ],
+        "summary": "Merge headers case-insensitively while preserving first position.",
+        "test_plan": ["python -m pytest -q"],
+    }
+
+
+def _write_worker_output(
+    provider: str, output_dir: Path, value: dict[str, Any]
+) -> None:
+    output_dir.mkdir(parents=True)
+    if provider == "codex":
+        event = {
+            "type": "item.completed",
+            "item": {"type": "agent_message", "text": json.dumps(value)},
+        }
+    else:
+        event = {
+            "type": "result",
+            "result": json.dumps(value),
+            "session_id": "critic-session",
+        }
+    (output_dir / "stdout.jsonl").write_text(
+        json.dumps(event) + "\n", encoding="utf-8"
     )
 
 
@@ -82,6 +110,7 @@ def test_workflow_plans_make_call_cost_explicit() -> None:
 
     assert solo["model_call_count"] == 1
     assert solo["phases"] == ["codex"]
+    assert solo["worker_interface"] == "patch-artifact-v1"
     assert cross["model_call_count"] == 3
     assert cross["phases"] == ["codex", "claude-code", "codex"]
 
@@ -123,7 +152,11 @@ def test_solo_workflow_scores_without_model_synthesis(
     monkeypatch.setattr(workflow, "_apparatus_revision", lambda: "a" * 40)
 
     def fake_worker(**kwargs: Any) -> dict[str, Any]:
-        _solve_bug(kwargs["workspace"])
+        _write_worker_output(
+            kwargs["settings"]["provider"],
+            kwargs["output_dir"],
+            _solution_artifact(),
+        )
         return _record(
             kwargs["settings"]["provider"],
             kwargs["role"],
@@ -155,22 +188,21 @@ def test_cross_workflow_uses_capsule_critic_and_same_session_revision(
     def fake_worker(**kwargs: Any) -> dict[str, Any]:
         calls.append(kwargs)
         output_dir = kwargs["output_dir"]
-        output_dir.mkdir(parents=True)
         provider = kwargs["settings"]["provider"]
         if kwargs["role"] == "implementer" and kwargs["session_mode"].startswith(
             "fresh"
         ):
-            _solve_bug(kwargs["workspace"])
-        if kwargs["role"] == "critic":
-            critique = {"schema_version": 1, "verdict": "approve", "findings": []}
-            event = {
-                "type": "result",
-                "result": json.dumps(critique),
-                "session_id": "critic-session",
+            output = _solution_artifact()
+        elif kwargs["role"] == "critic":
+            output = {"schema_version": 1, "verdict": "approve", "findings": []}
+        else:
+            output = {
+                "schema_version": 1,
+                "changes": [],
+                "summary": "The approved candidate needs no further changes.",
+                "test_plan": ["python -m pytest -q"],
             }
-            (output_dir / "stdout.jsonl").write_text(
-                json.dumps(event) + "\n", encoding="utf-8"
-            )
+        _write_worker_output(provider, output_dir, output)
         session_id = kwargs["session_id"] or "primary-session"
         return _record(provider, kwargs["role"], kwargs["session_mode"], session_id)
 
@@ -191,3 +223,18 @@ def test_cross_workflow_uses_capsule_critic_and_same_session_revision(
     assert (tmp_path / "cross-run" / "claim-control-envelope.json").is_file()
     assert (tmp_path / "cross-run" / "candidate.diff").is_file()
     assert (tmp_path / "cross-run" / "final.diff").is_file()
+
+
+def test_patch_artifact_rejects_unfrozen_paths(tmp_path: Path) -> None:
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    (workspace / "allowed.py").write_text("old\n", encoding="utf-8")
+    artifact = {
+        "schema_version": 1,
+        "changes": [{"path": "tests/test_hidden.py", "content": "pass\n"}],
+        "summary": "Attempted test edit.",
+        "test_plan": ["pytest"],
+    }
+
+    with pytest.raises(workflow.WorkflowRunnerError, match="unauthorized"):
+        workflow._apply_patch_artifact(workspace, artifact, ["allowed.py"])

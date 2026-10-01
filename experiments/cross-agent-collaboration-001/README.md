@@ -1,6 +1,6 @@
 # Cross-agent collaboration experiment 001
 
-Status: smoke apparatus implemented; no live runs completed
+Status: smoke apparatus implemented; direct-tool harness excluded; artifact smoke pending
 
 Scope envelope: `scope-envelope.json`
 
@@ -103,6 +103,18 @@ native review at lower cost.
 - Live runs record usage before synthesis. A root-agent summary is not part of
   the scored target output.
 
+## Worker interface
+
+The smoke series uses `patch-artifact-v1`. The runner serializes only the
+agent-visible fixture files, their hashes, and a frozen editable-path allowlist.
+Workers receive that bundle in their prompt with local tools disabled and return
+complete UTF-8 replacements in a small JSON contract. The runner validates path,
+shape, uniqueness, and size before applying replacements and running tests.
+
+This interface keeps file authority and test execution outside both providers,
+avoids host-specific nested tool routing, and makes the portable context bytes
+directly measurable. It is an experiment transport, not a TORC provider router.
+
 ## Implemented smoke apparatus
 
 - `fixture_control.py` verifies the hash-pinned fixture and oracle trees,
@@ -152,6 +164,12 @@ parent-session controls, disables daemon reuse, selects an explicit
 preflight before spending usage. Native Windows runs also freeze the
 `unelevated` sandbox backend so ignoring unrelated user configuration does not
 erase the platform implementation.
+
+Later Codex retries proved that the nested host still rejects every direct
+worker command even when the standalone stable CLI reports a writable managed
+profile and every filesystem preflight passes. Those immutable attempts remain
+excluded. Further smoke cells use the tool-free artifact interface instead of
+spending usage on the same host-specific failure.
 
 The first Claude smoke also stopped before inference and is excluded. WSL
 resolved `claude` to a Windows-mounted npm shim, so no Linux sandbox was

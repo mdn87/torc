@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import shutil
 import subprocess
 import sys
 import uuid
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -27,6 +28,10 @@ from torc.execution_capsules import (  # noqa: E402
 
 EXPERIMENT_ROOT = Path(__file__).resolve().parent
 DEFAULT_MANIFEST = EXPERIMENT_ROOT / "smoke-manifest.json"
+PATCH_ARTIFACT_INTERFACE = "patch-artifact-v1"
+_BUNDLE_IGNORED_PARTS = {".git", ".pytest_cache", "__pycache__"}
+_MAX_BUNDLE_BYTES = 500_000
+_MAX_REPLACEMENT_BYTES = 200_000
 
 
 class WorkflowRunnerError(RuntimeError):
@@ -51,6 +56,13 @@ def load_manifest(path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
         manifest.get("workflows"), dict
     ):
         raise WorkflowRunnerError("workflow manifest is incomplete")
+    interface = manifest.get("worker_interface")
+    if (
+        not isinstance(interface, dict)
+        or interface.get("name") != PATCH_ARTIFACT_INTERFACE
+        or not isinstance(interface.get("editable_paths"), dict)
+    ):
+        raise WorkflowRunnerError("workflow manifest has no supported worker interface")
     return manifest
 
 
@@ -93,6 +105,7 @@ def _run_worker(
     prompt: str,
     effort: str,
     role: str,
+    tool_mode: str,
     session_mode: str,
     session_id: str | None,
     timeout_seconds: float,
@@ -108,6 +121,7 @@ def _run_worker(
         model=settings["model"],
         effort=effort,
         role=role,
+        tool_mode=tool_mode,
         session_mode=session_mode,
         session_id=session_id,
         expected_harness_version=settings["harness_version"],
@@ -126,6 +140,146 @@ def _provider_settings(manifest: dict[str, Any], provider: str) -> dict[str, Any
     if not isinstance(settings, dict):
         raise WorkflowRunnerError(f"provider has no frozen settings: {provider}")
     return {"provider": provider, **settings}
+
+
+def _editable_paths(manifest: dict[str, Any], fixture_id: str) -> list[str]:
+    paths = manifest["worker_interface"]["editable_paths"].get(fixture_id)
+    if not isinstance(paths, list) or not paths or not all(
+        isinstance(path, str) and path for path in paths
+    ):
+        raise WorkflowRunnerError(f"fixture has no frozen editable paths: {fixture_id}")
+    if len(paths) != len(set(paths)):
+        raise WorkflowRunnerError("editable paths must be unique")
+    for value in paths:
+        path = PurePosixPath(value)
+        if path.is_absolute() or ".." in path.parts or path.as_posix() != value:
+            raise WorkflowRunnerError(f"invalid editable path: {value}")
+    return paths
+
+
+def _visible_file_bundle(workspace: Path) -> dict[str, Any]:
+    files: list[dict[str, Any]] = []
+    total_bytes = 0
+    for path in sorted(workspace.rglob("*")):
+        relative = path.relative_to(workspace)
+        if not path.is_file() or any(part in _BUNDLE_IGNORED_PARTS for part in relative.parts):
+            continue
+        if path.suffix == ".pyc":
+            continue
+        try:
+            content = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError as exc:
+            raise WorkflowRunnerError(f"agent-visible file is not UTF-8: {relative}") from exc
+        size = len(content.encode("utf-8"))
+        total_bytes += size
+        if total_bytes > _MAX_BUNDLE_BYTES:
+            raise WorkflowRunnerError("agent-visible file bundle exceeds the frozen limit")
+        files.append(
+            {
+                "path": relative.as_posix(),
+                "sha256": hashlib.sha256(content.encode("utf-8")).hexdigest(),
+                "content": content,
+            }
+        )
+    return {"schema_version": 1, "files": files, "total_bytes": total_bytes}
+
+
+def _patch_artifact_prompt(
+    workspace: Path, editable_paths: list[str], instruction: str
+) -> str:
+    contract = {
+        "schema_version": 1,
+        "changes": [{"path": "one editable path", "content": "complete UTF-8 file"}],
+        "summary": "short implementation summary",
+        "test_plan": ["tests the runner should execute"],
+    }
+    return (
+        "You are in tool-free patch artifact mode. Do not call any tool: every visible input is "
+        "included below. Solve the task by reasoning over those inputs. Return one JSON object "
+        "only, with no Markdown, matching this contract: "
+        + canonical_json(contract)
+        + ". Each change must contain the complete replacement content, not a diff. Change only "
+        "a path in editable_paths. Do not claim tests were run; test_plan states what the runner "
+        "should run. An empty changes list is allowed only if no edit is warranted.\n\n"
+        "Phase instruction:\n"
+        + instruction
+        + "\n\neditable_paths:\n"
+        + canonical_json(editable_paths)
+        + "\n\nagent_visible_bundle:\n"
+        + canonical_json(_visible_file_bundle(workspace))
+    )
+
+
+def _phase_output_object(provider: str, phase_dir: Path) -> dict[str, Any]:
+    stdout = (phase_dir / "stdout.jsonl").read_text(encoding="utf-8")
+    events, _ = worker_runner._json_lines(stdout)
+    text = worker_runner.final_agent_text(provider, events)
+    if text is None:
+        raise WorkflowRunnerError("worker produced no final agent message")
+    return worker_runner.decode_json_object(text)
+
+
+def _validate_patch_artifact(
+    artifact: dict[str, Any], editable_paths: list[str]
+) -> list[dict[str, str]]:
+    if set(artifact) != {"schema_version", "changes", "summary", "test_plan"}:
+        raise WorkflowRunnerError("patch artifact keys do not match the frozen contract")
+    if artifact["schema_version"] != 1:
+        raise WorkflowRunnerError("patch artifact schema version is unsupported")
+    if not isinstance(artifact["summary"], str) or not artifact["summary"]:
+        raise WorkflowRunnerError("patch artifact summary is invalid")
+    test_plan = artifact["test_plan"]
+    if not isinstance(test_plan, list) or not all(
+        isinstance(item, str) and item for item in test_plan
+    ):
+        raise WorkflowRunnerError("patch artifact test plan is invalid")
+    changes = artifact["changes"]
+    if not isinstance(changes, list):
+        raise WorkflowRunnerError("patch artifact changes must be a list")
+    allowed = set(editable_paths)
+    seen: set[str] = set()
+    validated: list[dict[str, str]] = []
+    for change in changes:
+        if not isinstance(change, dict) or set(change) != {"path", "content"}:
+            raise WorkflowRunnerError("patch artifact change is invalid")
+        path = change["path"]
+        content = change["content"]
+        if path not in allowed or path in seen:
+            raise WorkflowRunnerError(f"patch artifact path is unauthorized or repeated: {path}")
+        if not isinstance(content, str) or "\x00" in content:
+            raise WorkflowRunnerError(f"patch artifact content is invalid: {path}")
+        if len(content.encode("utf-8")) > _MAX_REPLACEMENT_BYTES:
+            raise WorkflowRunnerError(f"patch artifact replacement is too large: {path}")
+        seen.add(path)
+        validated.append({"path": path, "content": content})
+    return validated
+
+
+def _apply_patch_artifact(
+    workspace: Path, artifact: dict[str, Any], editable_paths: list[str]
+) -> dict[str, Any]:
+    changes = _validate_patch_artifact(artifact, editable_paths)
+    applied: list[dict[str, Any]] = []
+    for change in changes:
+        path = workspace / PurePosixPath(change["path"])
+        if not path.is_file() or not path.resolve().is_relative_to(workspace.resolve()):
+            raise WorkflowRunnerError(f"editable artifact path is unavailable: {change['path']}")
+        before = path.read_bytes()
+        after = change["content"].encode("utf-8")
+        path.write_bytes(after)
+        applied.append(
+            {
+                "path": change["path"],
+                "before_sha256": hashlib.sha256(before).hexdigest(),
+                "after_sha256": hashlib.sha256(after).hexdigest(),
+                "bytes": len(after),
+            }
+        )
+    return {
+        "schema_version": 1,
+        "interface": PATCH_ARTIFACT_INTERFACE,
+        "applied": applied,
+    }
 
 
 def _candidate_diff(workspace: Path) -> str:
@@ -167,11 +321,11 @@ def _compile_handoff(
     )
 
 
-def _critic_prompt(capsule: dict[str, Any]) -> str:
+def _critic_prompt(capsule: dict[str, Any], workspace: Path) -> str:
     return (
-        "Act as an independent critic. Do not edit files. Read TASK.md and any referenced "
-        "architecture document, inspect the candidate source, tests, and CANDIDATE.diff, then "
-        "return JSON only. Use this exact shape: "
+        "Act as an independent critic in tool-free mode. Do not call any tool: every visible "
+        "input is included below. Inspect the task, candidate source, tests, and CANDIDATE.diff, "
+        "then return JSON only. Use this exact shape: "
         '{"schema_version":1,"verdict":"approve|changes_requested","findings":['
         '{"finding_id":"f1","severity":"blocking|non_blocking","summary":"...",'
         '"evidence":"path:line or testable observation","claim_ids":["x1"]}]}. '
@@ -179,16 +333,13 @@ def _critic_prompt(capsule: dict[str, Any]) -> str:
         "use an empty claim_ids list only for a code defect unrelated to a stated claim. Do not "
         "invent a finding to avoid approving correct work.\n\nExecution capsule:\n"
         + canonical_json(capsule)
+        + "\n\nAgent-visible bundle:\n"
+        + canonical_json(_visible_file_bundle(workspace))
     )
 
 
 def _critique_from_output(provider: str, phase_dir: Path) -> dict[str, Any]:
-    stdout = (phase_dir / "stdout.jsonl").read_text(encoding="utf-8")
-    events, _ = worker_runner._json_lines(stdout)
-    text = worker_runner.final_agent_text(provider, events)
-    if text is None:
-        raise WorkflowRunnerError("critic produced no final agent message")
-    return worker_runner.decode_json_object(text)
+    return _phase_output_object(provider, phase_dir)
 
 
 def _validate_critique(
@@ -250,7 +401,12 @@ def _claim_text(capsule: dict[str, Any], claim_id: str) -> str:
     raise WorkflowRunnerError(f"validated claim disappeared from capsule: {claim_id}")
 
 
-def _revision_prompt(critique: dict[str, Any], capsule: dict[str, Any]) -> str:
+def _revision_prompt(
+    critique: dict[str, Any],
+    capsule: dict[str, Any],
+    workspace: Path,
+    editable_paths: list[str],
+) -> str:
     cited = sorted(
         {
             claim_id
@@ -259,15 +415,16 @@ def _revision_prompt(critique: dict[str, Any], capsule: dict[str, Any]) -> str:
         }
     )
     cited_claims = {claim_id: _claim_text(capsule, claim_id) for claim_id in cited}
-    return (
+    instruction = (
         "An independent foreign-agent critic reviewed your candidate. Evaluate each finding "
-        "against the code and requirements, apply every warranted correction, reject unsupported "
-        "advice, and rerun the visible tests. Do not use the network or spawn subagents.\n\n"
+        "against the code and requirements, apply every warranted correction in the returned "
+        "artifact, and reject unsupported advice.\n\n"
         "Critique:\n"
         + canonical_json(critique)
         + "\n\nCited claim text:\n"
         + canonical_json(cited_claims)
     )
+    return _patch_artifact_prompt(workspace, editable_paths, instruction)
 
 
 def _phase_summary(path: Path, record: dict[str, Any]) -> dict[str, Any]:
@@ -275,6 +432,7 @@ def _phase_summary(path: Path, record: dict[str, Any]) -> dict[str, Any]:
         "record": path.relative_to(path.parents[2]).as_posix(),
         "provider": record["provider"],
         "role": record["role"],
+        "tool_mode": record.get("tool_mode", "workspace"),
         "usage": record["usage"],
         "timing": record["timing"],
     }
@@ -307,6 +465,7 @@ def run_workflow(
     primary_workspace = resolved_run / "workspaces" / "primary"
     stage = fixture_control.stage_fixture(fixture_id, primary_workspace)
     _write_json(resolved_run / "fixture-stage.json", stage)
+    editable_paths = _editable_paths(manifest, fixture_id)
 
     cross_agent = isinstance(critic_name, str)
     initial_session_id = (
@@ -315,8 +474,11 @@ def run_workflow(
         else None
     )
     initial_mode = "fresh-persistent" if cross_agent else "fresh-ephemeral"
-    implement_prompt = (EXPERIMENT_ROOT / "prompts" / "implement.txt").read_text(
-        encoding="utf-8"
+    implement_prompt = _patch_artifact_prompt(
+        primary_workspace,
+        editable_paths,
+        "Implement the task described by the bundled TASK.md. Preserve every stated constraint, "
+        "satisfy the visible tests, and account for likely edge cases without seeing hidden tests.",
     )
     primary_dir = resolved_run / "phases" / "01-primary"
     primary_record = _run_worker(
@@ -325,11 +487,18 @@ def run_workflow(
         prompt=implement_prompt,
         effort=primary_settings["primary_effort"],
         role="implementer",
+        tool_mode="none",
         session_mode=initial_mode,
         session_id=initial_session_id,
         timeout_seconds=manifest["timeout_seconds"],
         output_dir=primary_dir,
     )
+    primary_artifact = _phase_output_object(primary_name, primary_dir)
+    primary_application = _apply_patch_artifact(
+        primary_workspace, primary_artifact, editable_paths
+    )
+    _write_json(resolved_run / "primary-artifact.json", primary_artifact)
+    _write_json(resolved_run / "primary-application.json", primary_application)
     primary_score = fixture_control.score_fixture(fixture_id, primary_workspace)
     _write_json(resolved_run / "score-after-primary.json", primary_score)
 
@@ -345,6 +514,7 @@ def run_workflow(
             "apparatus_revision": apparatus_revision,
             "fixture_id": fixture_id,
             "workflow_id": workflow_id,
+            "worker_interface": PATCH_ARTIFACT_INTERFACE,
             "phases": phases,
             "accepted_after_primary": primary_score["accepted"],
             "accepted_final": primary_score["accepted"],
@@ -369,9 +539,10 @@ def run_workflow(
     critic_record = _run_worker(
         settings=critic_settings,
         workspace=critic_workspace,
-        prompt=_critic_prompt(capsule),
+        prompt=_critic_prompt(capsule, critic_workspace),
         effort=critic_settings["critic_effort"],
         role="critic",
+        tool_mode="none",
         session_mode="fresh-ephemeral",
         session_id=None,
         timeout_seconds=manifest["timeout_seconds"],
@@ -390,14 +561,21 @@ def run_workflow(
     revision_record = _run_worker(
         settings=primary_settings,
         workspace=primary_workspace,
-        prompt=_revision_prompt(critique, capsule),
+        prompt=_revision_prompt(critique, capsule, primary_workspace, editable_paths),
         effort=primary_settings["primary_effort"],
         role="implementer",
+        tool_mode="none",
         session_mode="resume",
         session_id=observed_session_id,
         timeout_seconds=manifest["timeout_seconds"],
         output_dir=revision_dir,
     )
+    revision_artifact = _phase_output_object(primary_name, revision_dir)
+    revision_application = _apply_patch_artifact(
+        primary_workspace, revision_artifact, editable_paths
+    )
+    _write_json(resolved_run / "revision-artifact.json", revision_artifact)
+    _write_json(resolved_run / "revision-application.json", revision_application)
     final_score = fixture_control.score_fixture(fixture_id, primary_workspace)
     _write_json(resolved_run / "score-final.json", final_score)
     (resolved_run / "candidate.diff").write_text(candidate_diff, encoding="utf-8")
@@ -412,6 +590,7 @@ def run_workflow(
         "apparatus_revision": apparatus_revision,
         "fixture_id": fixture_id,
         "workflow_id": workflow_id,
+        "worker_interface": PATCH_ARTIFACT_INTERFACE,
         "phases": phases,
         "candidate_diff_bytes": len(candidate_diff.encode("utf-8")),
         "critic_verdict": critique["verdict"],
@@ -443,6 +622,7 @@ def workflow_plan(
         "series_id": manifest["series_id"],
         "fixture_id": fixture_id,
         "workflow_id": workflow_id,
+        "worker_interface": manifest["worker_interface"]["name"],
         "model_call_count": len(providers),
         "phases": providers,
         "provider_controls": {

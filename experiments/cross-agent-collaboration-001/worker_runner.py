@@ -32,6 +32,7 @@ PROVIDERS = ("codex", "claude-code")
 TRANSPORTS = ("native", "wsl")
 ROLES = ("implementer", "critic")
 SESSION_MODES = ("fresh-ephemeral", "fresh-persistent", "resume")
+TOOL_MODES = ("workspace", "none")
 _CODEX_DISABLED_FEATURES = (
     "apps",
     "browser_use",
@@ -40,6 +41,11 @@ _CODEX_DISABLED_FEATURES = (
     "plugins",
     "remote_plugin",
     "skill_search",
+)
+_CODEX_ARTIFACT_DISABLED_FEATURES = (
+    "code_mode_host",
+    "shell_tool",
+    "unified_exec",
 )
 
 
@@ -123,8 +129,21 @@ def decode_json_object(text: str) -> dict[str, Any]:
     return value
 
 
-def _claude_settings(role: str) -> dict[str, Any]:
-    if role == "implementer":
+def _claude_settings(role: str, tool_mode: str = "workspace") -> dict[str, Any]:
+    if tool_mode == "none":
+        allowed: list[str] = []
+        denied = [
+            "Read",
+            "Glob",
+            "Grep",
+            "Edit",
+            "Write",
+            "Bash",
+            "WebFetch",
+            "WebSearch",
+            "Agent",
+        ]
+    elif role == "implementer":
         allowed = ["Read(./**)", "Edit(./**)", "Write(./**)", "Bash"]
         denied = ["WebFetch", "WebSearch", "Agent"]
     else:
@@ -155,6 +174,7 @@ def build_inner_command(
     model: str,
     effort: str,
     role: str = "implementer",
+    tool_mode: str = "workspace",
     session_mode: str = "fresh-ephemeral",
     session_id: str | None = None,
 ) -> list[str]:
@@ -164,6 +184,8 @@ def build_inner_command(
         raise WorkerRunnerError(f"unsupported provider: {provider}")
     if role not in ROLES:
         raise WorkerRunnerError(f"unsupported worker role: {role}")
+    if tool_mode not in TOOL_MODES:
+        raise WorkerRunnerError(f"unsupported tool mode: {tool_mode}")
     if session_mode not in SESSION_MODES:
         raise WorkerRunnerError(f"unsupported session mode: {session_mode}")
     if session_mode == "resume" and not session_id:
@@ -185,7 +207,11 @@ def build_inner_command(
             raise WorkerRunnerError(f"{label} must be a non-empty string")
 
     if provider == "codex":
-        sandbox_mode = "workspace-write" if role == "implementer" else "read-only"
+        sandbox_mode = (
+            "workspace-write"
+            if role == "implementer" and tool_mode == "workspace"
+            else "read-only"
+        )
         prefix = [
             executable,
             "--no-daemon",
@@ -198,6 +224,9 @@ def build_inner_command(
             prefix.extend(["-c", 'windows.sandbox="unelevated"'])
         for feature in _CODEX_DISABLED_FEATURES:
             prefix.extend(["--disable", feature])
+        if tool_mode == "none":
+            for feature in _CODEX_ARTIFACT_DISABLED_FEATURES:
+                prefix.extend(["--disable", feature])
         if session_mode == "resume":
             return [
                 *prefix,
@@ -229,8 +258,14 @@ def build_inner_command(
         command.append("-")
         return command
 
-    settings = json.dumps(_claude_settings(role), separators=(",", ":"))
-    tools = "Read,Edit,Write,Bash" if role == "implementer" else "Read,Glob,Grep"
+    settings = json.dumps(_claude_settings(role, tool_mode), separators=(",", ":"))
+    tools = (
+        ""
+        if tool_mode == "none"
+        else "Read,Edit,Write,Bash"
+        if role == "implementer"
+        else "Read,Glob,Grep"
+    )
     command = [
         executable,
         "--model",
@@ -327,6 +362,7 @@ def build_command(
     effort: str,
     distro: str = "Ubuntu",
     role: str = "implementer",
+    tool_mode: str = "workspace",
     session_mode: str = "fresh-ephemeral",
     session_id: str | None = None,
 ) -> list[str]:
@@ -343,6 +379,7 @@ def build_command(
             model=model,
             effort=effort,
             role=role,
+            tool_mode=tool_mode,
             session_mode=session_mode,
             session_id=session_id,
         )
@@ -358,6 +395,7 @@ def build_command(
         model=model,
         effort=effort,
         role=role,
+        tool_mode=tool_mode,
         session_mode=session_mode,
         session_id=session_id,
     )
@@ -581,6 +619,7 @@ def build_run_record(
     effort: str,
     harness_version: str,
     role: str,
+    tool_mode: str = "workspace",
     session_mode: str,
     requested_session_id: str | None,
     command: list[str],
@@ -603,6 +642,7 @@ def build_run_record(
         "effort": effort,
         "harness_version": harness_version,
         "role": role,
+        "tool_mode": tool_mode,
         "session": {
             "mode": session_mode,
             "requested_id": requested_session_id,
@@ -648,6 +688,7 @@ def execute_worker(
     model: str,
     effort: str,
     role: str,
+    tool_mode: str = "workspace",
     session_mode: str,
     session_id: str | None,
     expected_harness_version: str,
@@ -662,8 +703,13 @@ def execute_worker(
         raise WorkerRunnerError("runner output must remain outside the agent workspace")
     if resolved_output.exists():
         raise WorkerRunnerError(f"runner output directory already exists: {resolved_output}")
-    if provider == "codex" and transport == "native":
+    if provider == "codex" and transport == "native" and tool_mode == "workspace":
         control_preflight = preflight_codex_permissions(executable, resolved_workspace, role)
+    elif tool_mode == "none":
+        control_preflight = {
+            "performed": False,
+            "reason": "tool-free artifact contract does not grant worker filesystem tools",
+        }
     else:
         control_preflight = {
             "performed": False,
@@ -678,6 +724,7 @@ def execute_worker(
         effort=effort,
         distro=distro,
         role=role,
+        tool_mode=tool_mode,
         session_mode=session_mode,
         session_id=session_id,
     )
@@ -701,6 +748,7 @@ def execute_worker(
         effort=effort,
         harness_version=harness_version,
         role=role,
+        tool_mode=tool_mode,
         session_mode=session_mode,
         requested_session_id=session_id,
         command=command,
@@ -723,6 +771,7 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--model", required=True)
     parser.add_argument("--effort", required=True)
     parser.add_argument("--role", choices=ROLES, default="implementer")
+    parser.add_argument("--tool-mode", choices=TOOL_MODES, default="workspace")
     parser.add_argument("--session-mode", choices=SESSION_MODES, default="fresh-ephemeral")
     parser.add_argument("--session-id")
     parser.add_argument("--expected-harness-version")
@@ -750,6 +799,7 @@ def main(argv: list[str] | None = None) -> int:
             effort=args.effort,
             distro=args.distro,
             role=args.role,
+            tool_mode=args.tool_mode,
             session_mode=args.session_mode,
             session_id=args.session_id,
         )
@@ -759,6 +809,7 @@ def main(argv: list[str] | None = None) -> int:
             "model": args.model,
             "effort": args.effort,
             "role": args.role,
+            "tool_mode": args.tool_mode,
             "session_mode": args.session_mode,
             "session_id": args.session_id,
             "command": command,
@@ -787,6 +838,7 @@ def main(argv: list[str] | None = None) -> int:
             model=args.model,
             effort=args.effort,
             role=args.role,
+            tool_mode=args.tool_mode,
             session_mode=args.session_mode,
             session_id=args.session_id,
             expected_harness_version=args.expected_harness_version,

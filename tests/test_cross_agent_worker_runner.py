@@ -61,6 +61,43 @@ def test_codex_critic_uses_read_only_sandbox() -> None:
     assert command[command.index("--sandbox") + 1] == "read-only"
 
 
+def test_tool_free_codex_command_disables_local_execution() -> None:
+    command = runner.build_inner_command(
+        provider="codex",
+        executable="codex",
+        workspace="/fixture",
+        model="gpt-6-sol",
+        effort="xhigh",
+        tool_mode="none",
+    )
+
+    disabled = {
+        command[index + 1]
+        for index, value in enumerate(command)
+        if value == "--disable"
+    }
+    assert {"code_mode_host", "shell_tool", "unified_exec"} <= disabled
+    assert command[command.index("--sandbox") + 1] == "read-only"
+
+
+def test_tool_free_claude_command_denies_local_execution() -> None:
+    command = runner.build_inner_command(
+        provider="claude-code",
+        executable="claude",
+        workspace="/fixture",
+        model="claude-opus-4-7",
+        effort="xhigh",
+        tool_mode="none",
+    )
+
+    assert command[command.index("--tools") + 1] == ""
+    settings = json.loads(command[command.index("--settings") + 1])
+    assert settings["permissions"]["allow"] == []
+    assert {"Read", "Edit", "Write", "Bash", "Agent"} <= set(
+        settings["permissions"]["deny"]
+    )
+
+
 def test_claude_command_disables_customizations_network_and_subagents() -> None:
     command = runner.build_inner_command(
         provider="claude-code",
