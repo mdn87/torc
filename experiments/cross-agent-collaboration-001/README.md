@@ -143,6 +143,13 @@ worker time from 11.7 to 27.4 seconds on the matched bug fixture. This single
 smoke result motivates skipping revision after an approval; it is not a general
 quality or latency estimate.
 
+The conditional control (`15-refactor-codex-artifact-review-conditional`)
+stopped after approval and passed all tests with 27,024 reported input tokens
+and 12.0 seconds of summed worker time. The matched solo used 13,303 tokens and
+8.1 seconds, so review cost about 2.0x input and 1.5x time without improving this
+ceiling-saturated fixture. Harder calibration fixtures are required to measure
+whether review earns that overhead.
+
 ## Implemented smoke apparatus
 
 - `fixture_control.py` verifies the hash-pinned fixture and oracle trees,
