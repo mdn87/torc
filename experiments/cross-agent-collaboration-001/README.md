@@ -149,7 +149,9 @@ setting with the host's permission-profile system, so shell reads remained
 blocked. Each run has a `disposition.json`. The current launcher clears
 parent-session controls, disables daemon reuse, selects an explicit
 `workspace-write` or `read-only` sandbox, and performs a model-free access
-preflight before spending usage.
+preflight before spending usage. Native Windows runs also freeze the
+`unelevated` sandbox backend so ignoring unrelated user configuration does not
+erase the platform implementation.
 
 The first Claude smoke also stopped before inference and is excluded. WSL
 resolved `claude` to a Windows-mounted npm shim, so no Linux sandbox was

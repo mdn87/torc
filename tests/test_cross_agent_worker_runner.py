@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -35,6 +36,8 @@ def test_codex_command_uses_stdin_and_fresh_session_controls() -> None:
     assert "--no-daemon" in command
     assert command[command.index("--sandbox") + 1] == "workspace-write"
     assert not any("default_permissions" in value for value in command)
+    if os.name == "nt":
+        assert 'windows.sandbox="unelevated"' in command
     disabled = {
         command[index + 1]
         for index, value in enumerate(command)

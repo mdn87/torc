@@ -194,6 +194,8 @@ def build_inner_command(
             "--sandbox",
             sandbox_mode,
         ]
+        if os.name == "nt":
+            prefix.extend(["-c", 'windows.sandbox="unelevated"'])
         for feature in _CODEX_DISABLED_FEATURES:
             prefix.extend(["--disable", feature])
         if session_mode == "resume":
