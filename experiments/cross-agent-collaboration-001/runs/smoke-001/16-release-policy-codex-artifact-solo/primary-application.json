@@ -1,0 +1,1 @@
+{"applied":[{"after_sha256":"24077acbc77144b48c873ad5f3b96137725754a68b7d584d02f521fa1477f0ae","before_sha256":"5a52adbd5ff3e760911bd2482d2ef73ddf5c2da1d48c5363ef35b66d19f7a344","bytes":1941,"path":"release_policy.py"}],"interface":"patch-artifact-v1","schema_version":1}

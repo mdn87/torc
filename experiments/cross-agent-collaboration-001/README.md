@@ -150,6 +150,11 @@ and 12.0 seconds of summed worker time. The matched solo used 13,303 tokens and
 ceiling-saturated fixture. Harder calibration fixtures are required to measure
 whether review earns that overhead.
 
+The release-policy solo baseline (`16-release-policy-codex-artifact-solo`)
+passed all 17 visible and hidden checks with 13,278 input tokens. Its 81.2-second
+worker time and 2,896 reasoning tokens show that the compact prompt size stayed
+stable while the harder task moved cost into reasoning and output.
+
 ## Implemented smoke apparatus
 
 - `fixture_control.py` verifies the hash-pinned fixture and oracle trees,
