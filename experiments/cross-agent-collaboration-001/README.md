@@ -161,6 +161,9 @@ whether review earns that overhead.
 - `fixtures/bug-hidden-regression` starts with both visible and hidden failures.
 - `fixtures/refactor-superseded-path` passes its visible behavior tests while a
   hidden structural test catches the superseded production path.
+- `fixtures/release-policy-interaction` passes visible behavior tests while
+  hidden security checks cover path normalization, segment boundaries, rename
+  sources, constant-time digest comparison, and fail-closed malformed inputs.
 
 Verify the fixtures without making a model call:
 

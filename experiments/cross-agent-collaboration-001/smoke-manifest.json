@@ -5,10 +5,15 @@
     "name": "patch-artifact-v1",
     "editable_paths": {
       "bug-hidden-regression": ["header_merge.py"],
-      "refactor-superseded-path": ["routing.py"]
+      "refactor-superseded-path": ["routing.py"],
+      "release-policy-interaction": ["release_policy.py"]
     }
   },
-  "fixtures": ["bug-hidden-regression", "refactor-superseded-path"],
+  "fixtures": [
+    "bug-hidden-regression",
+    "refactor-superseded-path",
+    "release-policy-interaction"
+  ],
   "recommended_order": [
     ["bug-hidden-regression", "codex-solo"],
     ["refactor-superseded-path", "claude-solo"],
@@ -17,7 +22,9 @@
     ["bug-hidden-regression", "claude-solo"],
     ["refactor-superseded-path", "codex-solo"],
     ["bug-hidden-regression", "codex-claude"],
-    ["refactor-superseded-path", "claude-codex"]
+    ["refactor-superseded-path", "claude-codex"],
+    ["release-policy-interaction", "codex-solo"],
+    ["release-policy-interaction", "codex-review"]
   ],
   "timeout_seconds": 900,
   "providers": {

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "fixture_id": "release-policy-interaction",
+  "visible_command": ["python", "-m", "pytest", "-q"],
+  "hidden_test": "test_release_policy_hidden.py",
+  "required_constraints": [
+    "constant-time digest comparison",
+    "normalized relative POSIX paths",
+    "segment-aware root containment",
+    "both rename endpoints are in scope",
+    "malformed and unknown records fail closed",
+    "inputs remain unchanged"
+  ]
+}
