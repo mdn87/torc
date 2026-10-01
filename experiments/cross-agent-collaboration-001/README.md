@@ -146,8 +146,9 @@ The first two attempted Codex smokes were retained but excluded. The first used
 an unsuitable noninteractive approval policy and inherited built-in app
 resources. The second fixed those controls but still mixed the legacy sandbox
 setting with the host's permission-profile system, so shell reads remained
-blocked. Each run has a `disposition.json`. The current launcher selects the
-built-in `:workspace` or `:read-only` profile and performs a model-free access
+blocked. Each run has a `disposition.json`. The current launcher clears
+parent-session controls, disables daemon reuse, selects an explicit
+`workspace-write` or `read-only` sandbox, and performs a model-free access
 preflight before spending usage.
 
 The first Claude smoke also stopped before inference and is excluded. WSL

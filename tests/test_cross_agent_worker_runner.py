@@ -32,7 +32,9 @@ def test_codex_command_uses_stdin_and_fresh_session_controls() -> None:
     assert "--ignore-user-config" in command
     assert command[command.index("--ask-for-approval") + 1] == "never"
     assert command.index("--ask-for-approval") < command.index("exec")
-    assert 'default_permissions=":workspace"' in command
+    assert "--no-daemon" in command
+    assert command[command.index("--sandbox") + 1] == "workspace-write"
+    assert not any("default_permissions" in value for value in command)
     disabled = {
         command[index + 1]
         for index, value in enumerate(command)
@@ -40,6 +42,19 @@ def test_codex_command_uses_stdin_and_fresh_session_controls() -> None:
     }
     assert {"apps", "plugins", "multi_agent", "skill_search"} <= disabled
     assert 'model_reasoning_effort="xhigh"' in command
+
+
+def test_codex_critic_uses_read_only_sandbox() -> None:
+    command = runner.build_inner_command(
+        provider="codex",
+        executable="codex",
+        workspace="/fixture",
+        model="gpt-6-sol",
+        effort="low",
+        role="critic",
+    )
+
+    assert command[command.index("--sandbox") + 1] == "read-only"
 
 
 def test_claude_command_disables_customizations_network_and_subagents() -> None:

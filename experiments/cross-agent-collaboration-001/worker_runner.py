@@ -185,13 +185,14 @@ def build_inner_command(
             raise WorkerRunnerError(f"{label} must be a non-empty string")
 
     if provider == "codex":
-        permission_profile = ":workspace" if role == "implementer" else ":read-only"
+        sandbox_mode = "workspace-write" if role == "implementer" else "read-only"
         prefix = [
             executable,
+            "--no-daemon",
             "--ask-for-approval",
             "never",
-            "-c",
-            f"default_permissions={json.dumps(permission_profile)}",
+            "--sandbox",
+            sandbox_mode,
         ]
         for feature in _CODEX_DISABLED_FEATURES:
             prefix.extend(["--disable", feature])
