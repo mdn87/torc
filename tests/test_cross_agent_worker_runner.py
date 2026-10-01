@@ -31,6 +31,7 @@ def test_codex_command_uses_stdin_and_fresh_session_controls() -> None:
     assert command[-1] == "-"
     assert "--ephemeral" in command
     assert "--ignore-user-config" in command
+    assert "--ignore-rules" not in command
     assert command[command.index("--ask-for-approval") + 1] == "never"
     assert command.index("--ask-for-approval") < command.index("exec")
     assert "--no-daemon" in command

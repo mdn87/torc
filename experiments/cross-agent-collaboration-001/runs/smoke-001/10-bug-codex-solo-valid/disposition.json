@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "run_id": "10-bug-codex-solo-valid",
+  "valid_attempt": false,
+  "category": "harness_exec_policy_failure",
+  "comparative_use": "excluded",
+  "usage": {
+    "input_tokens": 66885,
+    "cached_input_tokens": 63360,
+    "reasoning_output_tokens": 544,
+    "output_tokens": 985
+  },
+  "evidence": [
+    "The stable Codex CLI received an explicit workspace-write sandbox and native-Windows unelevated backend.",
+    "The operating-system permission preflight passed, but the tool router rejected every command as blocked by policy.",
+    "The worker made no edits, so visible and hidden acceptance tests remained failing."
+  ],
+  "corrective_action": "Stop suppressing execpolicy rule loading, verify the effective rule surface has no deny entries, and retry as a new immutable attempt."
+}
