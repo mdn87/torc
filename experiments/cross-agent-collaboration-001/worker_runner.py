@@ -448,8 +448,24 @@ def probe_harness_version(command: list[str], transport: str) -> str:
     return version[:200]
 
 
+def _worker_environment(provider: str) -> tuple[dict[str, str], dict[str, Any]]:
+    environment = dict(os.environ)
+    cleared: list[str] = []
+    if provider == "codex":
+        for name in tuple(environment):
+            if name.startswith("CODEX_") and name != "CODEX_HOME":
+                cleared.append(name)
+                del environment[name]
+    return environment, {
+        "strategy": "inherit-with-provider-session-isolation",
+        "cleared_variables": sorted(cleared),
+        "codex_home_preserved": "CODEX_HOME" in environment,
+    }
+
+
 def capture_process(
     *,
+    provider: str,
     command: list[str],
     workspace: Path,
     prompt: str,
@@ -467,9 +483,11 @@ def capture_process(
 
     started_at = _utc_now()
     started = time.perf_counter()
+    environment, environment_control = _worker_environment(provider)
     process = subprocess.Popen(
         command,
         cwd=resolved_workspace,
+        env=environment,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -537,6 +555,7 @@ def capture_process(
         "timed_out": timed_out,
         "stdout": stdout,
         "stderr": stderr,
+        "environment_control": environment_control,
     }
 
 
@@ -604,6 +623,7 @@ def build_run_record(
         "event_count": len(events),
         "malformed_event_count": malformed,
         "usage": _provider_usage(provider, events),
+        "environment_control": capture["environment_control"],
     }
 
 
@@ -667,6 +687,7 @@ def execute_worker(
             f"expected {expected_harness_version!r}, got {harness_version!r}"
         )
     capture = capture_process(
+        provider=provider,
         command=command,
         workspace=resolved_workspace,
         prompt=prompt,

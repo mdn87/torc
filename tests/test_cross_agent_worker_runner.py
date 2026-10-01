@@ -72,6 +72,7 @@ def test_capture_process_records_first_output_and_completion(tmp_path: Path) -> 
     ]
 
     capture = runner.capture_process(
+        provider="claude-code",
         command=command,
         workspace=tmp_path,
         prompt="ignored",
@@ -98,6 +99,26 @@ def test_capture_process_records_first_output_and_completion(tmp_path: Path) -> 
     assert record["timing"]["completion_ms"] >= record["timing"]["startup_ms"]
     assert record["usage"]["output_tokens"] == 2
     assert record["malformed_event_count"] == 0
+    assert record["environment_control"]["cleared_variables"] == []
+
+
+def test_codex_worker_clears_parent_session_controls(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("CODEX_PERMISSION_PROFILE", "disabled")
+    monkeypatch.setenv("CODEX_SESSION_ID", "parent-session")
+    monkeypatch.setenv("CODEX_HOME", "controlled-auth-home")
+
+    environment, control = runner._worker_environment("codex")
+
+    assert "CODEX_PERMISSION_PROFILE" not in environment
+    assert "CODEX_SESSION_ID" not in environment
+    assert environment["CODEX_HOME"] == "controlled-auth-home"
+    assert {"CODEX_PERMISSION_PROFILE", "CODEX_SESSION_ID"} <= set(
+        control["cleared_variables"]
+    )
+    assert "CODEX_HOME" not in control["cleared_variables"]
+    assert control["codex_home_preserved"] is True
 
 
 def test_persistent_and_resumed_commands_preserve_session_identity() -> None:
@@ -190,6 +211,7 @@ def test_wsl_worker_prefers_native_linux_install_locations(
 
 def test_capture_process_preserves_timeout(tmp_path: Path) -> None:
     capture = runner.capture_process(
+        provider="codex",
         command=[sys.executable, "-c", "import time; time.sleep(2)"],
         workspace=tmp_path,
         prompt="",
