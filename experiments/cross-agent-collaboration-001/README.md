@@ -29,10 +29,13 @@ make a model call.
 
 1. Codex completes the task alone.
 2. Claude completes the task alone.
-3. Codex implements, a fresh low-effort Codex critic reviews the TORC capsule,
-   and the same primary thread revises. This is the native-review control.
-4. Codex implements, Claude critiques, and the same Codex thread revises.
-5. Claude implements, Codex critiques, and the same Claude session revises.
+3. Codex implements and a fresh low-effort Codex critic reviews the TORC capsule.
+   The same primary thread revises only after `changes_requested`. This is the
+   native-review control.
+4. Codex implements and Claude critiques; the same Codex thread revises only
+   after `changes_requested`.
+5. Claude implements and Codex critiques; the same Claude session revises only
+   after `changes_requested`.
 
 The primary and reviser use the same frozen high-capability settings. The
 foreign critic begins at low effort. A later series may vary critic effort only
@@ -165,10 +168,11 @@ the exact version returned by the dry plan through
 `--expected-harness-version`.
 
 `workflow_runner.py` plans or executes one fixture/workflow pair at a time. A
-solo workflow makes one model call. A cross-agent workflow makes three calls:
-the primary implementation, a low-effort foreign critique, and a same-session
-primary revision. The committed manifest contains a balanced smoke order, but
-the runner never starts the whole matrix implicitly.
+solo workflow makes one model call. A reviewed workflow makes two calls when
+the critic approves and three when it requests changes: primary implementation,
+low-effort critique, and only then a same-session primary revision. The
+committed manifest contains a balanced smoke order, but the runner never starts
+the whole matrix implicitly.
 
 ```text
 python experiments/cross-agent-collaboration-001/workflow_runner.py \

@@ -115,6 +115,8 @@ def test_workflow_plans_make_call_cost_explicit() -> None:
     assert solo["phases"] == ["codex"]
     assert solo["worker_interface"] == "patch-artifact-v1"
     assert native_review["model_call_count"] == 3
+    assert native_review["model_call_count_range"] == [2, 3]
+    assert native_review["revision_policy"] == "changes_requested_only"
     assert native_review["phases"] == ["codex", "codex", "codex"]
     assert cross["model_call_count"] == 3
     assert cross["phases"] == ["codex", "claude-code", "codex"]
@@ -199,7 +201,19 @@ def test_cross_workflow_uses_capsule_critic_and_same_session_revision(
         ):
             output = _solution_artifact()
         elif kwargs["role"] == "critic":
-            output = {"schema_version": 1, "verdict": "approve", "findings": []}
+            output = {
+                "schema_version": 1,
+                "verdict": "changes_requested",
+                "findings": [
+                    {
+                        "finding_id": "f1",
+                        "severity": "blocking",
+                        "summary": "Recheck case-insensitive identity.",
+                        "evidence": "header_merge.py",
+                        "claim_ids": ["x1"],
+                    }
+                ],
+            }
         else:
             output = {
                 "schema_version": 1,
@@ -221,13 +235,49 @@ def test_cross_workflow_uses_capsule_critic_and_same_session_revision(
 
     assert result["accepted_after_primary"] is True
     assert result["accepted_final"] is True
-    assert result["critic_verdict"] == "approve"
+    assert result["critic_verdict"] == "changes_requested"
+    assert result["revision_performed"] is True
     assert [call["role"] for call in calls] == ["implementer", "critic", "implementer"]
     assert calls[2]["session_mode"] == "resume"
     assert calls[2]["session_id"] == "primary-session"
     assert (tmp_path / "cross-run" / "claim-control-envelope.json").is_file()
     assert (tmp_path / "cross-run" / "candidate.diff").is_file()
     assert (tmp_path / "cross-run" / "final.diff").is_file()
+
+
+def test_approved_critique_skips_revision(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    manifest = workflow.load_manifest()
+    monkeypatch.setattr(workflow, "_apparatus_revision", lambda: "c" * 40)
+    calls: list[dict[str, Any]] = []
+
+    def fake_worker(**kwargs: Any) -> dict[str, Any]:
+        calls.append(kwargs)
+        provider = kwargs["settings"]["provider"]
+        output = (
+            {"schema_version": 1, "verdict": "approve", "findings": []}
+            if kwargs["role"] == "critic"
+            else _solution_artifact()
+        )
+        _write_worker_output(provider, kwargs["output_dir"], output)
+        session_id = kwargs["session_id"] or "primary-session"
+        return _record(provider, kwargs["role"], kwargs["session_mode"], session_id)
+
+    monkeypatch.setattr(workflow, "_run_worker", fake_worker)
+    result = workflow.run_workflow(
+        manifest=manifest,
+        fixture_id="bug-hidden-regression",
+        workflow_id="codex-review",
+        run_dir=tmp_path / "approved-run",
+    )
+
+    assert len(calls) == 2
+    assert result["revision_performed"] is False
+    assert result["revision_skipped_reason"] == "critic_approved"
+    assert result["accepted_final"] is True
+    assert (tmp_path / "approved-run" / "revision-skipped.json").is_file()
+    assert not (tmp_path / "approved-run" / "revision-artifact.json").exists()
 
 
 def test_patch_artifact_rejects_unfrozen_paths(tmp_path: Path) -> None:

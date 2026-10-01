@@ -555,35 +555,49 @@ def run_workflow(
     _write_json(resolved_run / "resolved-claim-sources.json", resolved_claims)
     phases.append(_phase_summary(critic_dir / "worker-run.json", critic_record))
 
-    observed_session_id = primary_record["session"]["observed_id"]
-    if not isinstance(observed_session_id, str) or not observed_session_id:
-        raise WorkflowRunnerError("primary persistent session identity is unavailable")
-    revision_dir = resolved_run / "phases" / "03-revision"
-    revision_record = _run_worker(
-        settings=primary_settings,
-        workspace=primary_workspace,
-        prompt=_revision_prompt(critique, capsule, primary_workspace, editable_paths),
-        effort=primary_settings["primary_effort"],
-        role="implementer",
-        tool_mode="none",
-        session_mode="resume",
-        session_id=observed_session_id,
-        timeout_seconds=manifest["timeout_seconds"],
-        output_dir=revision_dir,
-    )
-    revision_artifact = _phase_output_object(primary_name, revision_dir)
-    revision_application = _apply_patch_artifact(
-        primary_workspace, revision_artifact, editable_paths
-    )
-    _write_json(resolved_run / "revision-artifact.json", revision_artifact)
-    _write_json(resolved_run / "revision-application.json", revision_application)
-    final_score = fixture_control.score_fixture(fixture_id, primary_workspace)
+    revision_performed = critique["verdict"] == "changes_requested"
+    if revision_performed:
+        observed_session_id = primary_record["session"]["observed_id"]
+        if not isinstance(observed_session_id, str) or not observed_session_id:
+            raise WorkflowRunnerError("primary persistent session identity is unavailable")
+        revision_dir = resolved_run / "phases" / "03-revision"
+        revision_record = _run_worker(
+            settings=primary_settings,
+            workspace=primary_workspace,
+            prompt=_revision_prompt(
+                critique, capsule, primary_workspace, editable_paths
+            ),
+            effort=primary_settings["primary_effort"],
+            role="implementer",
+            tool_mode="none",
+            session_mode="resume",
+            session_id=observed_session_id,
+            timeout_seconds=manifest["timeout_seconds"],
+            output_dir=revision_dir,
+        )
+        revision_artifact = _phase_output_object(primary_name, revision_dir)
+        revision_application = _apply_patch_artifact(
+            primary_workspace, revision_artifact, editable_paths
+        )
+        _write_json(resolved_run / "revision-artifact.json", revision_artifact)
+        _write_json(resolved_run / "revision-application.json", revision_application)
+        phases.append(_phase_summary(revision_dir / "worker-run.json", revision_record))
+        final_score = fixture_control.score_fixture(fixture_id, primary_workspace)
+    else:
+        final_score = primary_score
+        _write_json(
+            resolved_run / "revision-skipped.json",
+            {
+                "schema_version": 1,
+                "reason": "critic_approved",
+                "primary_score_reused": True,
+            },
+        )
     _write_json(resolved_run / "score-final.json", final_score)
     (resolved_run / "candidate.diff").write_text(candidate_diff, encoding="utf-8")
     (resolved_run / "final.diff").write_text(
         _candidate_diff(primary_workspace), encoding="utf-8"
     )
-    phases.append(_phase_summary(revision_dir / "worker-run.json", revision_record))
     result = {
         "schema_version": 1,
         "series_id": manifest["series_id"],
@@ -596,6 +610,8 @@ def run_workflow(
         "candidate_diff_bytes": len(candidate_diff.encode("utf-8")),
         "critic_verdict": critique["verdict"],
         "critic_finding_count": len(critique["findings"]),
+        "revision_performed": revision_performed,
+        "revision_skipped_reason": None if revision_performed else "critic_approved",
         "valid_claim_citation_count": sum(
             len(finding["claim_ids"]) for finding in critique["findings"]
         ),
@@ -625,6 +641,12 @@ def workflow_plan(
         "workflow_id": workflow_id,
         "worker_interface": manifest["worker_interface"]["name"],
         "model_call_count": len(providers),
+        "model_call_count_range": (
+            [2, len(providers)] if workflow.get("critic") else [1, 1]
+        ),
+        "revision_policy": (
+            "changes_requested_only" if workflow.get("critic") else "not_applicable"
+        ),
         "phases": providers,
         "provider_controls": {
             name: manifest["providers"][name] for name in sorted(set(providers))
