@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "run_id": "11-bug-codex-solo-valid",
+  "valid_attempt": false,
+  "category": "harness_exec_policy_failure",
+  "comparative_use": "excluded",
+  "usage": {
+    "input_tokens": 83533,
+    "cached_input_tokens": 78592,
+    "reasoning_output_tokens": 1157,
+    "output_tokens": 1931
+  },
+  "evidence": [
+    "The stable Codex CLI loaded the effective execpolicy rules, which contain no deny entries.",
+    "The model-visible control prompt granted workspace-write access, but the tool router still rejected every command.",
+    "The same failure survived executable, daemon, permission-profile, legacy-sandbox, Windows-backend, environment, and rule-loading changes."
+  ],
+  "corrective_action": "Stop direct-tool retries in this nested host and use a provider-neutral, tool-free patch artifact contract with runner-side validation and application."
+}
