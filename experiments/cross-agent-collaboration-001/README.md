@@ -1,6 +1,6 @@
 # Cross-agent collaboration experiment 001
 
-Status: smoke apparatus implemented; direct-tool harness excluded; artifact smoke pending
+Status: artifact smoke active; first Codex solo cell valid
 
 Scope envelope: `scope-envelope.json`
 
@@ -114,6 +114,10 @@ shape, uniqueness, and size before applying replacements and running tests.
 This interface keeps file authority and test execution outside both providers,
 avoids host-specific nested tool routing, and makes the portable context bytes
 directly measurable. It is an experiment transport, not a TORC provider router.
+
+The first live artifact cell (`12-bug-codex-artifact-solo`) passed all visible
+and hidden tests in 11.7 seconds with 13,013 input tokens. It is valid smoke
+evidence, not yet a comparative result.
 
 ## Implemented smoke apparatus
 

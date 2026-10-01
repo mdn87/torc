@@ -1,0 +1,20 @@
+diff --git a/header_merge.py b/header_merge.py
+index 89a36c0..e81cb08 100644
+--- a/header_merge.py
++++ b/header_merge.py
+@@ -6,8 +6,11 @@ from collections.abc import Mapping
+ def merge_headers(
+     defaults: Mapping[str, str], overrides: Mapping[str, str]
+ ) -> dict[str, str]:
+-    """Return defaults updated with request-specific overrides."""
++    """Merge headers by name, preserving each name's first position."""
+ 
+-    merged = dict(defaults)
+-    merged.update(overrides)
+-    return merged
++    merged: dict[str, tuple[str, str]] = {}
++    for headers in (defaults, overrides):
++        for name, value in headers.items():
++            merged[name.casefold()] = (name, value)
++
++    return dict(merged.values())
