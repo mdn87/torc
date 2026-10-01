@@ -133,6 +133,13 @@ ledger, eight excluded direct-tool Codex phases report 851,208 input tokens,
 while the two valid artifact phases report 26,316. That large gap is diagnostic
 evidence from failed harness attempts, not a controlled quality comparison.
 
+The first native-review control (`14-bug-codex-artifact-review`) also passed,
+but its primary had already passed before a zero-finding approval. The forced
+no-op revision raised reported input from 13,013 to 54,396 tokens and summed
+worker time from 11.7 to 27.4 seconds on the matched bug fixture. This single
+smoke result motivates skipping revision after an approval; it is not a general
+quality or latency estimate.
+
 ## Implemented smoke apparatus
 
 - `fixture_control.py` verifies the hash-pinned fixture and oracle trees,
