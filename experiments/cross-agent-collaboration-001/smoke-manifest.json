@@ -20,7 +20,7 @@
       "model": "gpt-6-sol",
       "primary_effort": "xhigh",
       "critic_effort": "low",
-      "harness_version": "codex-cli 0.155.0-alpha.16"
+      "harness_version": "codex-cli 0.159.3"
     },
     "claude-code": {
       "transport": "wsl",

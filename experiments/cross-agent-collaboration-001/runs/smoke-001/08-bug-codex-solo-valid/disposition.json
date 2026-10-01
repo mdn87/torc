@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "run_id": "08-bug-codex-solo-valid",
+  "valid_attempt": false,
+  "category": "harness_permission_failure",
+  "comparative_use": "excluded",
+  "usage": {
+    "input_tokens": 66905,
+    "cached_input_tokens": 52352,
+    "reasoning_output_tokens": 386,
+    "output_tokens": 710
+  },
+  "evidence": [
+    "The IDE-bundled alpha Codex CLI ran without daemon reuse and with an explicit workspace-write sandbox.",
+    "Its operating-system permission preflight passed, but the agent tool router still rejected every command before execution.",
+    "The worker made no edits, so visible and hidden acceptance tests remained failing."
+  ],
+  "corrective_action": "Replace the IDE-bundled alpha executable with the official standalone stable Codex CLI, freeze that harness version, and retry as a new immutable attempt."
+}
