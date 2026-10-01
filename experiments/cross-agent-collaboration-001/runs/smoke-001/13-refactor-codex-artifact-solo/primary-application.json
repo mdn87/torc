@@ -1,0 +1,1 @@
+{"applied":[{"after_sha256":"4a23f6f4c746061359b8772b98324905023dbe33148ce1aa3943e636bec49f29","before_sha256":"3b180e25b9635111348c3514632db71313fd34f6349b4f7eba6e515968ae9ff0","bytes":600,"path":"routing.py"}],"interface":"patch-artifact-v1","schema_version":1}

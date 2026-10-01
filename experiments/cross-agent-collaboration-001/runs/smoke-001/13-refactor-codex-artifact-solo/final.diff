@@ -1,0 +1,24 @@
+diff --git a/routing.py b/routing.py
+index 05c1d7e..1ac744d 100644
+--- a/routing.py
++++ b/routing.py
+@@ -12,16 +12,12 @@ def route_request(kind: str) -> str:
+ 
+ 
+ def legacy_route(kind: str) -> str:
+-    routes = {"create": "writer", "read": "reader", "delete": "writer"}
+-    try:
+-        return routes[kind]
+-    except KeyError:
+-        raise ValueError(f"unsupported request kind: {kind}") from None
++    return route_request(kind)
+ 
+ 
+ def dispatch(event: dict[str, str]) -> str:
+-    return legacy_route(event["kind"])
++    return route_request(event["kind"])
+ 
+ 
+ def dispatch_batch(events: Iterable[dict[str, str]]) -> list[str]:
+-    return [legacy_route(event["kind"]) for event in events]
++    return [route_request(event["kind"]) for event in events]

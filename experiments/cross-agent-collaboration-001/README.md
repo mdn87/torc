@@ -115,9 +115,10 @@ This interface keeps file authority and test execution outside both providers,
 avoids host-specific nested tool routing, and makes the portable context bytes
 directly measurable. It is an experiment transport, not a TORC provider router.
 
-The first live artifact cell (`12-bug-codex-artifact-solo`) passed all visible
-and hidden tests in 11.7 seconds with 13,013 input tokens. It is valid smoke
-evidence, not yet a comparative result.
+The first two live Codex artifact cells passed all visible and hidden tests.
+The bug fixture finished in 11.7 seconds with 13,013 input tokens; the refactor
+fixture finished in 8.1 seconds with 13,303. These are valid smoke evidence,
+not yet a cross-provider comparative result.
 
 ## Implemented smoke apparatus
 
