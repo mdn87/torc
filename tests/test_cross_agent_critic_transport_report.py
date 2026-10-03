@@ -14,16 +14,23 @@ import critic_transport_report as report  # noqa: E402
 def test_confirmation_report_rescores_committed_evidence() -> None:
     result = report.build_report()
 
-    assert result["status"] == "candidate_1_complete"
-    assert result["completed_call_count"] == 6
+    assert result["status"] == "in_progress"
+    assert result["completed_call_count"] == 7
     assert result["expected_call_count"] == 12
-    assert result["remaining_call_count"] == 6
+    assert result["remaining_call_count"] == 5
     assert result["groups"][0]["critic_context"] == (
         "claim-capsule-candidate-v1"
     )
     assert result["groups"][0]["median_defect_area_recall"] == 1.0
     assert result["comparisons"][0]["compact_call_count"] == 3
     assert result["comparisons"][0]["full_call_count"] == 3
+    release_group = next(
+        group
+        for group in result["groups"]
+        if group["candidate_id"] == "release-policy-baseline-v1"
+    )
+    assert release_group["call_count"] == 1
+    assert release_group["median_defect_area_recall"] == 1.0
     assert {
         checkpoint["primary"]["used_percent"]
         for checkpoint in result["usage_checkpoints"]
