@@ -122,7 +122,7 @@ def build_report(runs_dir: Path = DEFAULT_RUNS_DIR) -> dict[str, Any]:
         for path in sorted(runs_dir.iterdir())
         if path.is_dir()
     ]
-    usage: dict[tuple[str, str], dict[str, int]] = defaultdict(
+    usage: dict[tuple[str, str, bool], dict[str, int]] = defaultdict(
         lambda: {
             "phase_count": 0,
             "reported_input_phase_count": 0,
@@ -135,7 +135,7 @@ def build_report(runs_dir: Path = DEFAULT_RUNS_DIR) -> dict[str, Any]:
             provider = phase["provider"]
             if not isinstance(provider, str):
                 continue
-            key = (run["worker_interface"], provider)
+            key = (run["worker_interface"], provider, run["valid_attempt"])
             usage[key]["phase_count"] += 1
             if isinstance(phase["input_tokens"], int):
                 usage[key]["reported_input_phase_count"] += 1
@@ -147,6 +147,7 @@ def build_report(runs_dir: Path = DEFAULT_RUNS_DIR) -> dict[str, Any]:
         {
             "worker_interface": interface,
             "provider": provider,
+            "valid_attempt": valid_attempt,
             **values,
             "mean_input_tokens_per_reported_phase": (
                 round(
@@ -156,7 +157,7 @@ def build_report(runs_dir: Path = DEFAULT_RUNS_DIR) -> dict[str, Any]:
                 else None
             ),
         }
-        for (interface, provider), values in sorted(usage.items())
+        for (interface, provider, valid_attempt), values in sorted(usage.items())
     ]
     valid_runs = [run for run in runs if run["valid_attempt"]]
     comparisons: list[dict[str, Any]] = []
