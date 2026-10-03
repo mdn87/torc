@@ -112,6 +112,15 @@ def test_report_separates_valid_runs_and_provider_usage(tmp_path: Path) -> None:
     assert comparison["review_revision_performed"] is False
     assert comparison["input_ratio"] == 2.0
     assert comparison["completion_ratio"] == 2.0
+    assert result["approved_without_revision_summary"] == {
+        "comparison_count": 1,
+        "fixture_ids": ["fixture-a"],
+        "quality_improvement_count": 0,
+        "quality_regression_count": 0,
+        "quality_unchanged_count": 1,
+        "median_input_ratio": 2.0,
+        "median_completion_ratio": 2.0,
+    }
 
 
 def test_report_rejects_evidence_free_run(tmp_path: Path) -> None:

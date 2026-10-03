@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import statistics
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -237,6 +238,41 @@ def build_report(runs_dir: Path = DEFAULT_RUNS_DIR) -> dict[str, Any]:
                 ),
             }
         )
+    approved_without_revision = [
+        comparison
+        for comparison in comparisons
+        if comparison["review_critic_verdict"] == "approve"
+        and comparison["review_revision_performed"] is False
+    ]
+
+    def median_ratio(field: str) -> float | None:
+        values = [
+            comparison[field]
+            for comparison in approved_without_revision
+            if isinstance(comparison[field], (int, float))
+        ]
+        return round(statistics.median(values), 3) if values else None
+
+    approval_summary = {
+        "comparison_count": len(approved_without_revision),
+        "fixture_ids": [
+            comparison["fixture_id"] for comparison in approved_without_revision
+        ],
+        "quality_improvement_count": sum(
+            comparison["quality_delta"] > 0
+            for comparison in approved_without_revision
+        ),
+        "quality_regression_count": sum(
+            comparison["quality_delta"] < 0
+            for comparison in approved_without_revision
+        ),
+        "quality_unchanged_count": sum(
+            comparison["quality_delta"] == 0
+            for comparison in approved_without_revision
+        ),
+        "median_input_ratio": median_ratio("input_ratio"),
+        "median_completion_ratio": median_ratio("completion_ratio"),
+    }
     return {
         "schema_version": 1,
         "runs_dir": str(runs_dir.resolve()),
@@ -248,6 +284,7 @@ def build_report(runs_dir: Path = DEFAULT_RUNS_DIR) -> dict[str, Any]:
         ),
         "usage_by_interface_and_provider": by_interface_provider,
         "matched_workflow_comparisons": comparisons,
+        "approved_without_revision_summary": approval_summary,
         "runs": runs,
         "token_accounting_note": (
             "Token counts are aggregated only within the same provider and worker interface; "

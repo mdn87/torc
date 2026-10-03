@@ -134,8 +134,8 @@ python experiments/cross-agent-collaboration-001/experiment_report.py
 The report keeps usage grouped by provider, interface, and attempt validity; it
 also emits matched solo-versus-review comparisons when both use the same
 fixture, provider, and artifact interface. In the current smoke ledger, eight
-excluded direct-tool Codex phases report 851,208 input tokens, while eleven
-valid artifact phases report 163,198. That large interface gap is diagnostic
+excluded direct-tool Codex phases report 851,208 input tokens, while thirteen
+valid artifact phases report 194,132. That large interface gap is diagnostic
 evidence from failed harness attempts, not a controlled quality comparison.
 
 The first native-review control (`14-bug-codex-artifact-review`) also passed,
@@ -168,6 +168,14 @@ The first valid design baseline (`20-design-cutover-codex-artifact-solo`) passed
 all visible and hidden checks with 14,405 input tokens and 54.6 seconds of worker
 time. Runs 18 and 19 remain excluded calibration evidence and their 28,808 input
 tokens are reported separately from valid artifact usage.
+
+The matched design review (`21-design-cutover-codex-artifact-review-conditional`)
+also passed after a zero-finding approval and skipped revision. It used 30,934
+input tokens and 56.8 seconds of summed worker time: 2.15x the solo input and
+1.04x the solo time, with no quality change. Across the three current-policy
+approval controls, median review overhead is 2.09x input and 1.14x worker time;
+none changed deterministic acceptance. The report emits this approval-only
+aggregate separately from the earlier forced-revision control.
 
 ## Implemented smoke apparatus
 
