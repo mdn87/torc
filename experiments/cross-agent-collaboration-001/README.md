@@ -223,6 +223,8 @@ are implemented and tested; no calls from that series have begun.
   usage, and timing without model judgment.
 - `critic_transport_report.py` deterministically rescores the frozen confirmation
   series, enforces its counterbalanced order, and summarizes progress and costs.
+- `codex_usage_snapshot.py` reads a sanitized, read-only local Codex usage
+  snapshot and returns exit status 3 when the configured stop threshold is met.
 - `fixtures/bug-hidden-regression` starts with both visible and hidden failures.
 - `fixtures/refactor-superseded-path` passes its visible behavior tests while a
   hidden structural test catches the superseded production path.
@@ -280,6 +282,9 @@ python experiments/cross-agent-collaboration-001/critic_probe_score.py \
   --candidate refactor-baseline-v1
 
 python experiments/cross-agent-collaboration-001/critic_transport_report.py
+
+python experiments/cross-agent-collaboration-001/codex_usage_snapshot.py \
+  --stop-threshold 75
 ```
 
 The first two attempted Codex smokes were retained but excluded. The first used
