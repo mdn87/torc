@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import queue
+import shutil
 import subprocess
 import sys
 import threading
@@ -128,10 +129,15 @@ def read_snapshot(
     stop_threshold_percent: int = 75,
     timeout_seconds: float = 15.0,
 ) -> dict[str, Any]:
+    resolved_executable = shutil.which(executable)
+    if not resolved_executable:
+        raise CodexUsageSnapshotError(
+            f"Codex executable is unavailable: {executable}"
+        )
     creation_flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
     try:
         process = subprocess.Popen(
-            [executable, "app-server", "--stdio"],
+            [resolved_executable, "app-server", "--stdio"],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,

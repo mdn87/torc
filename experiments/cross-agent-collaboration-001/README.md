@@ -233,9 +233,13 @@ first live probe is held until the current usage window resets.
 `codex_native_probe_runner.py` is guarded by the committed plan status, exact
 version and content hashes, a clean apparatus, and a fresh usage check; failed
 capability evidence is preserved without an automatic retry.
+The model-free `--preflight` mode exercises the exact app-server launch,
+initialization, and ephemeral thread creation, but deliberately sends no
+`turn/start` request.
 
 The live capability probe has a one-call runbook. First run
-`codex_usage_snapshot.py --stop-threshold 60`. Only after it exits zero, change
+`codex_native_probe_runner.py --preflight`, then run
+`codex_usage_snapshot.py --stop-threshold 60`. Only after the usage check exits zero, change
 the capability plan status from `waiting_usage_reset` to `ready` and commit that
 change. Then, from PowerShell, derive every guard value from the committed dry
 plan and target its single frozen run directory:

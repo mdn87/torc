@@ -70,3 +70,15 @@ def test_usage_snapshot_cli_distinguishes_stop_from_failure(
     monkeypatch.setattr(usage_snapshot, "read_snapshot", fake_read_snapshot)
 
     assert usage_snapshot.main([]) == 3
+
+
+def test_usage_snapshot_rejects_an_unresolved_executable(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(usage_snapshot.shutil, "which", lambda _value: None)
+
+    with pytest.raises(
+        usage_snapshot.CodexUsageSnapshotError,
+        match="executable is unavailable",
+    ):
+        usage_snapshot.read_snapshot(executable="missing-codex")

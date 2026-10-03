@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 import queue
+import shutil
 import subprocess
 import sys
 import threading
@@ -151,6 +152,111 @@ def _process_environment() -> dict[str, str]:
         if name.startswith("CODEX_") and name != "CODEX_HOME":
             del environment[name]
     return environment
+
+
+def _resolved_executable(executable: str) -> str:
+    resolved = shutil.which(executable)
+    if not resolved:
+        raise CodexNativeProbeError(f"Codex executable is unavailable: {executable}")
+    return str(Path(resolved).resolve())
+
+
+def preflight_probe(
+    probe: dict[str, Any], *, timeout_seconds: float
+) -> dict[str, Any]:
+    """Validate the exact launch and thread request without starting a turn."""
+    if timeout_seconds <= 0:
+        raise CodexNativeProbeError("probe timeout must be positive")
+    observed_at = _utc_now()
+    started = time.perf_counter()
+    creation_flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+    try:
+        process = subprocess.Popen(
+            probe["launch"],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            bufsize=1,
+            cwd=probe["workspace"],
+            env=_process_environment(),
+            creationflags=creation_flags,
+        )
+    except OSError as exc:
+        raise CodexNativeProbeError(f"cannot start Codex app-server: {exc}") from exc
+    if process.stdout is None or process.stderr is None:
+        process.kill()
+        raise CodexNativeProbeError("app-server output streams are unavailable")
+    lines: queue.Queue[str] = queue.Queue()
+    raw_stdout: list[str] = []
+    raw_stderr: list[str] = []
+    stdout_reader = threading.Thread(
+        target=_pump_lines,
+        args=(process.stdout, lines, raw_stdout),
+        daemon=True,
+    )
+    stderr_queue: queue.Queue[str] = queue.Queue()
+    stderr_reader = threading.Thread(
+        target=_pump_lines,
+        args=(process.stderr, stderr_queue, raw_stderr),
+        daemon=True,
+    )
+    stdout_reader.start()
+    stderr_reader.start()
+    messages: list[dict[str, Any]] = []
+    deadline = time.monotonic() + timeout_seconds
+    try:
+        _request(
+            process,
+            lines,
+            messages,
+            request_id=1,
+            method="initialize",
+            params=probe["initialize"],
+            deadline=deadline,
+        )
+        _send(process, {"method": "initialized", "params": {}})
+        thread_result = _request(
+            process,
+            lines,
+            messages,
+            request_id=2,
+            method="thread/start",
+            params=probe["thread_start"],
+            deadline=deadline,
+        )
+        thread = thread_result.get("thread")
+        if not isinstance(thread, dict) or not isinstance(thread.get("id"), str):
+            raise CodexNativeProbeError("thread/start returned no root thread id")
+    except CodexNativeProbeError as exc:
+        stderr = "".join(raw_stderr).strip()
+        detail = f"; stderr: {stderr}" if stderr else ""
+        raise CodexNativeProbeError(f"app-server preflight failed: {exc}{detail}") from exc
+    finally:
+        if process.stdin is not None:
+            process.stdin.close()
+        process.terminate()
+        try:
+            process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            process.wait(timeout=5)
+        stdout_reader.join(timeout=2)
+        stderr_reader.join(timeout=2)
+    return {
+        "schema_version": 1,
+        "status": "preflight_passed",
+        "observed_at": observed_at,
+        "completion_ms": round((time.perf_counter() - started) * 1000, 3),
+        "message_count": len(messages),
+        "stdout_sha256": hashlib.sha256("".join(raw_stdout).encode()).hexdigest(),
+        "stderr_sha256": hashlib.sha256("".join(raw_stderr).encode()).hexdigest(),
+        "harness_version": probe["harness_version"],
+        "plan_sha256": probe["plan_sha256"],
+        "root_prompt_sha256": probe["root_prompt_sha256"],
+    }
 
 
 def capture_probe(
@@ -620,6 +726,7 @@ def execute_probe(
         raise CodexNativeProbeError(
             "probe is not ready; record a below-threshold usage checkpoint and commit status ready"
         )
+    executable = _resolved_executable(executable)
     probe_plan = capability.build_probe(executable=executable)
     expected = plan["provider_controls"]["harness_version"]
     actual_version = _installed_version(executable)
@@ -646,6 +753,7 @@ def execute_probe(
     if resolved_run_dir == workspace or resolved_run_dir.is_relative_to(workspace):
         raise CodexNativeProbeError("run directory must be outside the worker workspace")
     apparatus_revision = workflow._apparatus_revision()
+    preflight_probe(probe_plan, timeout_seconds=min(timeout_seconds, 30.0))
     threshold = plan["call_budget"]["stop_threshold_percent"]
     checkpoint = codex_usage_snapshot.read_snapshot(
         executable=executable,
@@ -702,15 +810,34 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--expected-plan-sha256")
     parser.add_argument("--expected-root-prompt-sha256")
     parser.add_argument("--timeout", type=float, default=300.0)
-    parser.add_argument("--execute", action="store_true")
+    action = parser.add_mutually_exclusive_group()
+    action.add_argument("--preflight", action="store_true")
+    action.add_argument("--execute", action="store_true")
     return parser.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
     args = _parse_args(argv)
     try:
+        if args.preflight:
+            executable = _resolved_executable(args.executable)
+            probe_plan = capability.build_probe(executable=executable)
+            expected_version = capability._object(capability.PLAN_PATH)[
+                "provider_controls"
+            ]["harness_version"]
+            if _installed_version(executable) != expected_version:
+                raise CodexNativeProbeError(
+                    "Codex harness version does not match the frozen plan"
+                )
+            print(
+                canonical_json(
+                    preflight_probe(probe_plan, timeout_seconds=args.timeout)
+                )
+            )
+            return 0
         if not args.execute:
-            print(canonical_json(capability.public_plan(executable=args.executable)))
+            executable = _resolved_executable(args.executable)
+            print(canonical_json(capability.public_plan(executable=executable)))
             return 0
         required = {
             "--run-dir": args.run_dir,

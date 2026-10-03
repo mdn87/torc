@@ -215,6 +215,56 @@ def test_capture_probe_exercises_json_rpc_lifecycle(tmp_path: Path) -> None:
     )
 
 
+def test_preflight_stops_before_turn_start(tmp_path: Path) -> None:
+    fake_server = tmp_path / "fake_preflight_server.py"
+    fake_server.write_text(
+        textwrap.dedent(
+            """
+            import json
+            import sys
+
+            def emit(value):
+                print(json.dumps(value, separators=(",", ":")), flush=True)
+
+            for line in sys.stdin:
+                request = json.loads(line)
+                method = request.get("method")
+                if method == "initialize":
+                    emit({"id": request["id"], "result": {"userAgent": "fake"}})
+                elif method == "initialized":
+                    continue
+                elif method == "thread/start":
+                    emit({"id": request["id"], "result": {"thread": {"id": "root"}}})
+                elif method == "turn/start":
+                    emit({"id": request["id"], "error": "turn must not start"})
+            """
+        ).lstrip(),
+        encoding="utf-8",
+    )
+    probe = capability.build_probe()
+    probe["launch"] = [sys.executable, str(fake_server)]
+    probe["workspace"] = str(tmp_path)
+
+    result = runner.preflight_probe(probe, timeout_seconds=5)
+
+    assert result["status"] == "preflight_passed"
+    assert result["message_count"] == 2
+    assert result["harness_version"] == "codex-cli 0.159.3"
+
+
+def test_executable_resolution_is_frozen_before_subprocess_launch(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    executable = tmp_path / "codex.cmd"
+    executable.write_text("synthetic", encoding="utf-8")
+    monkeypatch.setattr(runner.shutil, "which", lambda _value: str(executable))
+
+    resolved = runner._resolved_executable("codex")
+
+    assert resolved == str(executable.resolve())
+
+
 def test_early_failed_root_completion_is_not_accepted() -> None:
     message = {
         "method": "turn/completed",
@@ -355,6 +405,11 @@ def test_armed_execution_reserves_frozen_path_before_single_capture(
         lambda _executable: probe["harness_version"],
     )
     monkeypatch.setattr(runner.workflow, "_apparatus_revision", lambda: "c" * 40)
+    monkeypatch.setattr(
+        runner,
+        "preflight_probe",
+        lambda *_args, **_kwargs: {"status": "preflight_passed"},
+    )
     usage_calls = 0
 
     def usage_snapshot(**_kwargs: Any) -> dict[str, Any]:
