@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -194,7 +195,13 @@ def test_confirmation_plan_references_pinned_candidates_and_claims() -> None:
         (EXPERIMENT / "fixtures-manifest.json").read_text(encoding="utf-8")
     )
 
-    assert plan["status"] == "planned_not_frozen"
+    assert plan["status"] == "frozen_before_live_runs"
+    assert plan["apparatus_revision"] == (
+        "188568bf4b8dddf02e7b1fcd4ea012785bda5881"
+    )
+    for apparatus_input in plan["apparatus_inputs"]:
+        path = ROOT / apparatus_input["path"]
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == apparatus_input["sha256"]
     assert len(plan["counterbalanced_order_per_candidate"]) == 6
     assert set(plan["counterbalanced_order_per_candidate"]) == set(
         plan["transports"]
@@ -217,3 +224,35 @@ def test_confirmation_plan_references_pinned_candidates_and_claims() -> None:
         }
         for area in candidate["required_defect_areas"]:
             assert set(area["acceptable_claim_ids"]) <= claim_ids
+
+
+def test_confirmation_critic_prompts_exclude_oracle_and_scoring_contract(
+    tmp_path: Path,
+) -> None:
+    manifest = workflow.load_manifest()
+    plan = json.loads(SERIES_PLAN.read_text(encoding="utf-8"))
+    forbidden = (
+        "oracle.json",
+        "critic_probe_score.py",
+        "required_defect_areas",
+        "evidence_term_groups",
+    )
+
+    for candidate in plan["candidates"]:
+        fixture_id = candidate["fixture_id"]
+        workspace = tmp_path / fixture_id
+        replay.fixture_control.stage_fixture(fixture_id, workspace)
+        capsule, _ = workflow._compile_handoff(
+            fixture_id,
+            "isolation-validation",
+            "candidate-isolation-validation",
+            "codex/gpt-6-sol",
+        )
+        for transport in plan["transports"]:
+            prompt = workflow._critic_prompt(
+                capsule,
+                workspace,
+                workflow._editable_paths(manifest, fixture_id),
+                transport,
+            )
+            assert all(marker not in prompt for marker in forbidden)

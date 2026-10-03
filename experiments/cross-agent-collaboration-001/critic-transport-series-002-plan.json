@@ -1,7 +1,55 @@
 {
   "schema_version": 1,
   "series_id": "critic-transport-002-confirmation",
-  "status": "planned_not_frozen",
+  "status": "frozen_before_live_runs",
+  "frozen_at": "2026-10-03T03:05:41Z",
+  "apparatus_revision": "188568bf4b8dddf02e7b1fcd4ea012785bda5881",
+  "apparatus_inputs": [
+    {
+      "path": "experiments/cross-agent-collaboration-001/critic_replay.py",
+      "sha256": "fa7c1fea5ddde22bb296bd0a11f6f646946d3c90d3dd7a4c465cd1d130cb7223"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/critic_probe_score.py",
+      "sha256": "3a0bea22e6db70d775b316801454ef9bd190f317554c0a21460499472eaaa2a7"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/workflow_runner.py",
+      "sha256": "e8b5c9657472dd4ab73a40c9ec33ae3346d6d6dbd30cec539f1614e7e508e448"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/worker_runner.py",
+      "sha256": "6888871ef69a63979db5a07530879ddef1c0a8a0209c978bde7ef16d61da6054"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/fixture_control.py",
+      "sha256": "1c4534a1ae2446bf8f4e13a3abeb1b295227b3e8213e4bd0fd2a36f5666d8625"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/smoke-manifest.json",
+      "sha256": "410df6ae9e8b2a7950180b0905034a8881561a5fbcfc056de5004a40ef9fb6c0"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/fixtures-manifest.json",
+      "sha256": "81feb1eff70ab1d81a4e9f38fc4454c534e42d7cf40fbdcd58e04404406dca11"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/handoffs/refactor-superseded-path.json",
+      "sha256": "25161061ada68cf85fcff0b15c7bd92c8d1fd0f7c707911c329f088630b64606"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/handoffs/release-policy-interaction.json",
+      "sha256": "d9ccafa9866423f81bc737d866f2f303db7cbc0d7b0d75e6bb42bab12ff058cd"
+    },
+    {
+      "path": "src/torc/execution_capsules.py",
+      "sha256": "3ebb1874f4a8a35ffea6dc1893ae9bdfaea9ca5c053ff51260766c626a76b986"
+    },
+    {
+      "path": "src/torc/canonical.py",
+      "sha256": "424fe3640a094f6dd34fa2b4c7b3ce374eada88685243c6a4dbf01b3b8653838"
+    }
+  ],
   "question": "Does claim-capsule-candidate-v1 reduce critic context without reducing deterministic defect recall relative to full-visible-bundle-v1?",
   "provider_controls": {
     "provider": "codex",
@@ -105,6 +153,28 @@
     "Add a deterministic finding scorer and tests for both candidates.",
     "Freeze this plan with apparatus and candidate hashes before the first call.",
     "Verify that neither critic transport contains hidden tests or scoring rules."
+  ],
+  "gate_evidence": [
+    {
+      "gate": "baseline_source_support",
+      "status": "passed",
+      "evidence": "tests/test_cross_agent_critic_replay.py exercises dry planning and one-call execution from a pinned fixture baseline."
+    },
+    {
+      "gate": "deterministic_scoring",
+      "status": "passed",
+      "evidence": "tests/test_cross_agent_critic_probe_score.py covers both candidates and fail-closed hash drift."
+    },
+    {
+      "gate": "apparatus_and_candidate_freeze",
+      "status": "passed",
+      "evidence": "This plan pins the tested apparatus revision, apparatus input hashes, candidate tree hashes, defect areas, and scoring terms before any series call."
+    },
+    {
+      "gate": "critic_input_isolation",
+      "status": "passed",
+      "evidence": "Fixture staging copies only agent-visible trees; prompt tests verify scoring-contract markers and oracle files are absent from both transports."
+    }
   ],
   "usage_plan": {
     "estimated_reported_input_tokens_per_candidate": 89900,
