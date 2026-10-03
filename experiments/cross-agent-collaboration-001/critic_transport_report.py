@@ -295,6 +295,7 @@ def build_report(
         _object(path)
         for path in sorted(resolved_runs.glob("usage-checkpoint-*.json"))
     ]
+    checkpoints.sort(key=lambda checkpoint: checkpoint.get("observed_at", ""))
     return {
         "schema_version": 1,
         "series_id": plan["series_id"],
