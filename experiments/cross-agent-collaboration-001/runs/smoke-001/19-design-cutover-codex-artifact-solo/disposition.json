@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "valid_attempt": false,
+  "category": "oracle_semantic_overconstraint",
+  "comparative_use": "excluded",
+  "reason": "The hidden oracle required extra constraint labels on individual plan steps and rejected strategies even when the artifact assigned those constraints to the correct controlling steps. Calibration showed that these checks matched one reference annotation rather than the visible safety semantics."
+}

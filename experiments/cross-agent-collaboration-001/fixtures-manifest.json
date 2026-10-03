@@ -15,7 +15,7 @@
     },
     "design-cutover-plan": {
       "agent_visible_sha256": "ecbf9ea2c9c6cd178d29853832cffd93d4d91076227eaacc0440c5a2b29255de",
-      "oracle_sha256": "7c4d51c308457ddd8e9aeed1566bc3630647d48ff89d16e08c0d0d2c7157697f"
+      "oracle_sha256": "90509df9a17955023b5d054b4f2f4d95892601c7edfa98567e5fcb1f88881757"
     }
   }
 }

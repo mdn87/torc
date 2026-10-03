@@ -231,7 +231,11 @@ The first design-fixture solo (`18-design-cutover-codex-artifact-solo`) is also
 excluded. It exposed an underspecified representation check: the hidden oracle
 required `compare_and_swap` while the visible task accepted a descriptive mode,
 and the worker returned the equivalent `compare-and-swap`. The task now freezes
-the exact enum before any comparative design-fixture run.
+the exact enum before any comparative design-fixture run. The next calibration
+(`19-design-cutover-codex-artifact-solo`) is excluded because the oracle required
+extra constraint labels on specific steps even though the candidate attached
+them to the actual controlling operations. Those reference-answer annotations
+were relaxed before the next run; the safety ordering and coverage checks remain.
 
 The first Claude smoke also stopped before inference and is excluded. WSL
 resolved `claude` to a Windows-mounted npm shim, so no Linux sandbox was
