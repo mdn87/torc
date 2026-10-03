@@ -6,13 +6,15 @@
     "editable_paths": {
       "bug-hidden-regression": ["header_merge.py"],
       "refactor-superseded-path": ["routing.py"],
-      "release-policy-interaction": ["release_policy.py"]
+      "release-policy-interaction": ["release_policy.py"],
+      "design-cutover-plan": ["decision.json"]
     }
   },
   "fixtures": [
     "bug-hidden-regression",
     "refactor-superseded-path",
-    "release-policy-interaction"
+    "release-policy-interaction",
+    "design-cutover-plan"
   ],
   "recommended_order": [
     ["bug-hidden-regression", "codex-solo"],
@@ -24,7 +26,9 @@
     ["bug-hidden-regression", "codex-claude"],
     ["refactor-superseded-path", "claude-codex"],
     ["release-policy-interaction", "codex-solo"],
-    ["release-policy-interaction", "codex-review"]
+    ["release-policy-interaction", "codex-review"],
+    ["design-cutover-plan", "codex-solo"],
+    ["design-cutover-plan", "codex-review"]
   ],
   "timeout_seconds": 900,
   "providers": {

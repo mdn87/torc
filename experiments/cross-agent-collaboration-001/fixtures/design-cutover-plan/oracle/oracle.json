@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "fixture_id": "design-cutover-plan",
+  "visible_command": ["python", "-m", "pytest", "-q"],
+  "hidden_test": "test_decision_hidden.py",
+  "required_constraints": [
+    "choose the only strategy compatible with all hard constraints",
+    "order the shadow copy and tenant-local cutover safely",
+    "guard the route change with compare-and-swap evidence",
+    "preserve single-writer authority before and after cutover",
+    "define phase-appropriate recovery behavior"
+  ]
+}

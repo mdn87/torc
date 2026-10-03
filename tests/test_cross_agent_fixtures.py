@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -24,6 +25,7 @@ def test_fixture_manifest_pins_visible_and_hidden_trees() -> None:
     assert result["valid"] is True
     assert {item["fixture_id"] for item in result["fixtures"]} == {
         "bug-hidden-regression",
+        "design-cutover-plan",
         "refactor-superseded-path",
         "release-policy-interaction",
     }
@@ -33,6 +35,7 @@ def test_fixture_manifest_pins_visible_and_hidden_trees() -> None:
     "fixture_id",
     [
         "bug-hidden-regression",
+        "design-cutover-plan",
         "refactor-superseded-path",
         "release-policy-interaction",
     ],
@@ -84,6 +87,17 @@ def test_release_fixture_hides_policy_interactions(tmp_path: Path) -> None:
     control.stage_fixture("release-policy-interaction", workspace)
 
     result = control.score_fixture("release-policy-interaction", workspace)
+
+    assert result["visible"]["exit_status"] == 0
+    assert result["hidden"]["exit_status"] != 0
+    assert result["accepted"] is False
+
+
+def test_design_fixture_hides_decision_and_plan_failures(tmp_path: Path) -> None:
+    workspace = tmp_path / "workspace"
+    control.stage_fixture("design-cutover-plan", workspace)
+
+    result = control.score_fixture("design-cutover-plan", workspace)
 
     assert result["visible"]["exit_status"] == 0
     assert result["hidden"]["exit_status"] != 0
@@ -201,3 +215,64 @@ def release_allowed(
     assert result["accepted"] is True
     assert result["workspace_diff_bytes"] > 0
     assert result["workspace_status"] == [" M release_policy.py"]
+
+
+def test_design_fixture_accepts_a_constraint_complete_plan(tmp_path: Path) -> None:
+    workspace = tmp_path / "workspace"
+    control.stage_fixture("design-cutover-plan", workspace)
+    operations = [
+        ("capture_initial_watermark", ["C3", "C7"]),
+        ("shadow_copy", ["C3", "C6", "C7"]),
+        ("verify_shadow", ["C4"]),
+        ("freeze_tenant_writes", ["C1", "C2", "C7"]),
+        ("capture_final_watermark", ["C2", "C4"]),
+        ("copy_delta", ["C3"]),
+        ("verify_final", ["C4"]),
+        ("cas_route", ["C2", "C4", "C5"]),
+        ("unfreeze_tenant_writes", ["C1", "C5", "C7"]),
+        ("monitor", ["C5"]),
+    ]
+    plan = []
+    for index, (operation, satisfies) in enumerate(operations, start=1):
+        plan.append(
+            {
+                "step_id": f"p{index}",
+                "operation": operation,
+                "depends_on": [] if index == 1 else [f"p{index - 1}"],
+                "satisfies": satisfies,
+            }
+        )
+    decision = {
+        "schema_version": 1,
+        "selected_strategy": "shadow-copy-cas",
+        "rationale": "It preserves one writer and cuts over one tenant atomically.",
+        "constraints_addressed": [f"C{number}" for number in range(1, 8)],
+        "rejected_strategies": {
+            "global-stop-rewrite": "Violates C1 and C7.",
+            "dual-write-backfill": "Violates C2 and C5.",
+            "cdc-mirror-cutover": "Violates C6.",
+        },
+        "plan": plan,
+        "cutover_gate": {
+            "mode": "compare_and_swap",
+            "requires": [
+                "legacy_route_version",
+                "final_watermark",
+                "verification_passed",
+            ],
+        },
+        "rollback": {
+            "before_cutover": "resume_legacy_and_reuse_checkpoint",
+            "after_cutover": "forward_repair_on_new_store",
+        },
+        "max_tenant_write_pause_seconds": 30,
+    }
+    (workspace / "decision.json").write_text(
+        json.dumps(decision, indent=2) + "\n", encoding="utf-8"
+    )
+
+    result = control.score_fixture("design-cutover-plan", workspace)
+
+    assert result["accepted"] is True
+    assert result["workspace_diff_bytes"] > 0
+    assert result["workspace_status"] == [" M decision.json"]

@@ -12,6 +12,10 @@
     "release-policy-interaction": {
       "agent_visible_sha256": "93213ff481c8b41b7a500a9b7f04bf7388d88e06b06811d6ca39da86f77b2cc1",
       "oracle_sha256": "b3c00b331fe8d4092b84a23b433690e452bdfa12fbff3ac9995d12d331869c70"
+    },
+    "design-cutover-plan": {
+      "agent_visible_sha256": "63d455f994e39096d8d56f5cc95c9bd44e24537952f1049390cf4d44b8fca7ff",
+      "oracle_sha256": "7c4d51c308457ddd8e9aeed1566bc3630647d48ff89d16e08c0d0d2c7157697f"
     }
   }
 }

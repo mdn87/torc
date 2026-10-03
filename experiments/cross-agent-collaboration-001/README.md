@@ -1,6 +1,6 @@
 # Cross-agent collaboration experiment 001
 
-Status: artifact smoke active; first Codex solo cell valid
+Status: artifact smoke active; three Codex solo cells and two review controls valid
 
 Scope envelope: `scope-envelope.json`
 
@@ -171,6 +171,9 @@ stable while the harder task moved cost into reasoning and output.
 - `fixtures/release-policy-interaction` passes visible behavior tests while
   hidden security checks cover path normalization, segment boundaries, rename
   sources, constant-time digest comparison, and fail-closed malformed inputs.
+- `fixtures/design-cutover-plan` passes visible schema checks while hidden
+  acceptance checks require the only feasible strategy, a safe dependency
+  order, atomic cutover evidence, and authority-preserving recovery behavior.
 
 Verify the fixtures without making a model call:
 
