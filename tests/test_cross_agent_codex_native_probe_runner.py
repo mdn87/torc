@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import sys
+import textwrap
 from pathlib import Path
 from typing import Any
 
@@ -165,6 +166,71 @@ def test_summarizer_proves_topology_usage_and_quality(monkeypatch: pytest.Monkey
     assert result["score"]["defect_area_recall"] == 1.0
 
 
+def test_capture_probe_exercises_json_rpc_lifecycle(tmp_path: Path) -> None:
+    fake_server = tmp_path / "fake_app_server.py"
+    fake_server.write_text(
+        textwrap.dedent(
+            """
+            import json
+            import sys
+
+            def emit(value):
+                print(json.dumps(value, separators=(",", ":")), flush=True)
+
+            for line in sys.stdin:
+                request = json.loads(line)
+                method = request.get("method")
+                if method == "initialize":
+                    emit({"id": request["id"], "result": {"userAgent": "fake"}})
+                elif method == "initialized":
+                    continue
+                elif method == "thread/start":
+                    emit({"id": request["id"], "result": {"thread": {"id": "root"}}})
+                elif method == "turn/start":
+                    emit({"id": request["id"], "result": {"turn": {"id": "turn"}}})
+                    emit({
+                        "method": "turn/completed",
+                        "params": {
+                            "threadId": "root",
+                            "turn": {"id": "turn", "status": "completed"},
+                        },
+                    })
+            """
+        ).lstrip(),
+        encoding="utf-8",
+    )
+    probe = capability.build_probe()
+    probe["launch"] = [sys.executable, str(fake_server)]
+    probe["workspace"] = str(tmp_path)
+
+    capture = runner.capture_probe(probe, timeout_seconds=5)
+
+    assert "capture_error" not in capture
+    assert capture["root_thread_id"] == "root"
+    assert capture["root_turn_id"] == "turn"
+    assert any(
+        message.get("method") == "turn/completed"
+        for message in capture["messages"]
+    )
+
+
+def test_early_failed_root_completion_is_not_accepted() -> None:
+    message = {
+        "method": "turn/completed",
+        "params": {
+            "threadId": ROOT_THREAD,
+            "turn": {"id": ROOT_TURN, "status": "failed"},
+        },
+    }
+
+    with pytest.raises(runner.CodexNativeProbeError, match="did not complete"):
+        runner._is_completed_root_turn(
+            message,
+            root_thread_id=ROOT_THREAD,
+            root_turn_id=ROOT_TURN,
+        )
+
+
 def test_summarizer_uses_pre_call_apparatus_revision(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -217,13 +283,17 @@ def test_summarizer_rejects_forbidden_tool_item() -> None:
 
 def test_opaque_event_content_is_reduced_to_hash_evidence() -> None:
     sanitized = runner._sanitize_opaque(
-        {"content": {"encrypted_content": "enc_secret_value"}}
+        {
+            "content": {"encrypted_content": "enc_secret_value"},
+            "encryptedContent": "camel_secret_value",
+        }
     )
 
     encrypted = sanitized["content"]["encrypted_content"]
     assert encrypted["bytes"] == len("enc_secret_value")
     assert len(encrypted["sha256"]) == 64
     assert "enc_secret_value" not in json.dumps(sanitized)
+    assert "camel_secret_value" not in json.dumps(sanitized)
 
 
 def test_evidence_preserves_exact_supplied_plan_without_prompt(tmp_path: Path) -> None:

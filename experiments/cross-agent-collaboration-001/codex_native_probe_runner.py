@@ -125,6 +125,26 @@ def _drain_grace(
             messages.append(message)
 
 
+def _is_completed_root_turn(
+    message: dict[str, Any], *, root_thread_id: str, root_turn_id: str
+) -> bool:
+    params = message.get("params")
+    if (
+        message.get("method") != "turn/completed"
+        or not isinstance(params, dict)
+        or params.get("threadId") != root_thread_id
+    ):
+        return False
+    turn = params.get("turn")
+    if (
+        not isinstance(turn, dict)
+        or turn.get("id") != root_turn_id
+        or turn.get("status") != "completed"
+    ):
+        raise CodexNativeProbeError("root turn did not complete successfully")
+    return True
+
+
 def _process_environment() -> dict[str, str]:
     environment = dict(os.environ)
     for name in tuple(environment):
@@ -220,27 +240,21 @@ def capture_probe(
         if not isinstance(turn, dict) or not isinstance(turn.get("id"), str):
             raise CodexNativeProbeError("turn/start returned no root turn id")
         root_turn_id = turn["id"]
-        completed = False
-        for message in messages:
-            params = message.get("params")
-            if (
-                message.get("method") == "turn/completed"
-                and isinstance(params, dict)
-                and params.get("threadId") == root_thread_id
-            ):
-                completed = True
+        completed = any(
+            _is_completed_root_turn(
+                message,
+                root_thread_id=root_thread_id,
+                root_turn_id=root_turn_id,
+            )
+            for message in messages
+        )
         while not completed:
             message = _next_message(lines, messages, deadline=deadline)
-            params = message.get("params")
-            if (
-                message.get("method") == "turn/completed"
-                and isinstance(params, dict)
-                and params.get("threadId") == root_thread_id
-            ):
-                turn_value = params.get("turn")
-                if not isinstance(turn_value, dict) or turn_value.get("status") != "completed":
-                    raise CodexNativeProbeError("root turn did not complete successfully")
-                completed = True
+            completed = _is_completed_root_turn(
+                message,
+                root_thread_id=root_thread_id,
+                root_turn_id=root_turn_id,
+            )
         _drain_grace(lines, messages, seconds=1.0)
     except Exception as exc:  # preserve capture evidence before re-raising
         error = exc
@@ -478,7 +492,7 @@ def _sanitize_opaque(value: Any) -> Any:
         return value
     sanitized = {}
     for key, item in value.items():
-        if key == "encrypted_content" and isinstance(item, str):
+        if key in {"encrypted_content", "encryptedContent"} and isinstance(item, str):
             sanitized[key] = {
                 "bytes": len(item.encode("utf-8")),
                 "sha256": hashlib.sha256(item.encode("utf-8")).hexdigest(),
