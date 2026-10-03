@@ -221,6 +221,8 @@ are implemented and tested; no calls from that series have begun.
 - `critic_probe_score.py` fails closed on candidate or worker-control drift and
   scores critic verdict, preregistered defect-area recall, unsupported findings,
   usage, and timing without model judgment.
+- `critic_transport_report.py` deterministically rescores the frozen confirmation
+  series, enforces its counterbalanced order, and summarizes progress and costs.
 - `fixtures/bug-hidden-regression` starts with both visible and hidden failures.
 - `fixtures/refactor-superseded-path` passes its visible behavior tests while a
   hidden structural test catches the superseded production path.
@@ -276,6 +278,8 @@ For the planned confirmation series, replace `--source-run ...` with
 python experiments/cross-agent-collaboration-001/critic_probe_score.py \
   --run-dir <immutable-run-directory> \
   --candidate refactor-baseline-v1
+
+python experiments/cross-agent-collaboration-001/critic_transport_report.py
 ```
 
 The first two attempted Codex smokes were retained but excluded. The first used
