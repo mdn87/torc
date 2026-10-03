@@ -218,7 +218,8 @@ The preregistered native-context follow-up is documented in
 `native-context-follow-up.md` and `native-context-series-003-plan.json`. It is
 budget-gated because Responses API charges are separate from a ChatGPT
 subscription. The first authorized step is a three-call pilot, not the full
-series.
+series. `native_context_request.py` reconstructs and hashes any of those three
+request arms without a network call.
 
 ## Implemented smoke apparatus
 

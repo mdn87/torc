@@ -23,6 +23,20 @@ subagent turn usage is documented for the distinct Agents API. The pilot must
 therefore validate that the response usage represents the complete hosted run;
 the experiment will not combine accounting from the two APIs.
 
+Before authorization, inspect a request plan without making a model call:
+
+```text
+python experiments/cross-agent-collaboration-001/native_context_request.py \
+  --candidate refactor-baseline-v1 \
+  --arm portable_direct \
+  --model gpt-6.1-sol
+```
+
+Use `native_isolated` and `native_inherited` for the other arms. The planner
+verifies the candidate fixture against Series 002, reconstructs the selected
+capsule and visible bundle, and prints only hashes, byte counts, and a redacted
+request shape by default. It has no execution mode.
+
 OpenAI documents encrypted agent messages and independently compacted root and
 subagent contexts in its [Responses multi-agent guide](https://developers.openai.com/api/docs/guides/responses-multi-agent).
 Its [compaction guide](https://developers.openai.com/api/docs/guides/compaction)

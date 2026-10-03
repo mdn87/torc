@@ -7,7 +7,8 @@
     "run_status": "planned_requires_api_budget"
   },
   "candidate_policy": {
-    "initial_pilot": "choose one existing hash-pinned flawed baseline before randomization",
+    "initial_pilot": "use the existing hash-pinned refactor baseline",
+    "pilot_candidate_id": "refactor-baseline-v1",
     "scorer": "reuse the frozen deterministic defect-area scorer without changing its primary scores",
     "series": "a full series must freeze at least two independent candidates before its first call"
   },
@@ -73,6 +74,13 @@
       "wall-clock timing and retry count",
       "raw critic result and deterministic score"
     ]
+  },
+  "request_planning": {
+    "network_behavior": "native_context_request.py never makes a network call",
+    "surface": "beta.responses.create",
+    "beta": "responses_multi_agent=v1 for native arms",
+    "reasoning_effort": "low",
+    "store": false
   },
   "limitations": [
     "Native encrypted items are provider artifacts, not a provider-neutral TORC handoff format.",
