@@ -15,14 +15,14 @@ def test_confirmation_report_rescores_committed_evidence() -> None:
     result = report.build_report()
 
     assert result["status"] == "in_progress"
-    assert result["completed_call_count"] == 4
+    assert result["completed_call_count"] == 5
     assert result["expected_call_count"] == 12
-    assert result["remaining_call_count"] == 8
+    assert result["remaining_call_count"] == 7
     assert result["groups"][0]["critic_context"] == (
         "claim-capsule-candidate-v1"
     )
     assert result["groups"][0]["median_defect_area_recall"] == 1.0
-    assert result["comparisons"][0]["compact_call_count"] == 2
+    assert result["comparisons"][0]["compact_call_count"] == 3
     assert result["comparisons"][0]["full_call_count"] == 2
     assert {
         checkpoint["primary"]["used_percent"]
