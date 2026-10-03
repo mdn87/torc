@@ -200,11 +200,19 @@ performed more reasoning and emitted findings. `critic-transport-analysis.json`
 records the qualitative adjudication and limitations. This is a strong
 feasibility signal on one candidate, not a general causal quality claim.
 
-`critic-transport-series-002-plan.json` preregisters the next confirmation step:
-three compact and three full critics on each of two independent, hash-pinned
-flawed baselines, with deterministic defect-area recall and a counterbalanced
-order. It remains `planned_not_frozen` until baseline replay and scoring support
-are implemented and tested; no calls from that series have begun.
+`critic-transport-series-002-plan.json` preregistered a confirmation on two
+independent, hash-pinned flawed baselines. The completed 12-call series produced
+the correct changes-requested verdict in every run. Compact and full transports
+both had 1.0 median deterministic defect recall on both candidates; compact had
+full recall in 6/6 runs and full context in 5/6. A post-hoc audit found that the
+single mechanical miss still described the required defect but used synonyms
+outside the frozen lexical scorer.
+
+Compact transport cut total explicit prompt bytes by 56.1% but provider-reported
+input by only 7.0%, showing that fixed CLI/model context dominates the serialized
+payload savings. Compact median completion was 8.0% to 14.2% slower by candidate.
+`critic-transport-series-002-analysis.json` preserves the exact aggregate,
+scorer caveat, usage checkpoints, and limits on interpretation.
 
 ## Implemented smoke apparatus
 
