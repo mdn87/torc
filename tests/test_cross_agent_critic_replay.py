@@ -19,6 +19,7 @@ SOURCE_RUN = (
     / "smoke-001"
     / "22-design-cutover-codex-artifact-review-compact"
 )
+SERIES_PLAN = EXPERIMENT / "critic-transport-series-002-plan.json"
 
 
 def _record() -> dict[str, Any]:
@@ -112,3 +113,34 @@ def test_replay_reconstructs_exact_candidate_and_calls_only_critic(
         (tmp_path / "replay" / "score-candidate.json").read_text(encoding="utf-8")
     )
     assert score["workspace_tree_sha256"] == source["workspace_tree_sha256"]
+
+
+def test_confirmation_plan_references_pinned_candidates_and_claims() -> None:
+    plan = json.loads(SERIES_PLAN.read_text(encoding="utf-8"))
+    fixture_manifest = json.loads(
+        (EXPERIMENT / "fixtures-manifest.json").read_text(encoding="utf-8")
+    )
+
+    assert plan["status"] == "planned_not_frozen"
+    assert len(plan["counterbalanced_order_per_candidate"]) == 6
+    assert set(plan["counterbalanced_order_per_candidate"]) == set(
+        plan["transports"]
+    )
+    for candidate in plan["candidates"]:
+        fixture_id = candidate["fixture_id"]
+        assert candidate["candidate_workspace_tree_sha256"] == fixture_manifest[
+            "fixtures"
+        ][fixture_id]["agent_visible_sha256"]
+        capsule, _ = workflow._compile_handoff(
+            fixture_id,
+            "plan-validation",
+            "candidate-plan-validation",
+            "codex/gpt-6-sol",
+        )
+        claim_ids = {
+            claim_id
+            for section in capsule["claims"].values()
+            for claim_id in section
+        }
+        for area in candidate["required_defect_areas"]:
+            assert set(area["acceptable_claim_ids"]) <= claim_ids

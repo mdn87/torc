@@ -200,6 +200,12 @@ performed more reasoning and emitted findings. `critic-transport-analysis.json`
 records the qualitative adjudication and limitations. This is a strong
 feasibility signal on one candidate, not a general causal quality claim.
 
+`critic-transport-series-002-plan.json` preregisters the next confirmation step:
+three compact and three full critics on each of two independent, hash-pinned
+flawed baselines, with deterministic defect-area recall and a counterbalanced
+order. It remains `planned_not_frozen` until baseline replay and scoring support
+are implemented and tested; no calls from that series have begun.
+
 ## Implemented smoke apparatus
 
 - `fixture_control.py` verifies the hash-pinned fixture and oracle trees,

@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "series_id": "critic-transport-002-confirmation",
+  "status": "planned_not_frozen",
+  "question": "Does claim-capsule-candidate-v1 reduce critic context without reducing deterministic defect recall relative to full-visible-bundle-v1?",
+  "provider_controls": {
+    "provider": "codex",
+    "model": "gpt-6-sol",
+    "effort": "low",
+    "tool_mode": "none",
+    "harness_version": "codex-cli 0.159.3"
+  },
+  "transports": [
+    "claim-capsule-candidate-v1",
+    "full-visible-bundle-v1"
+  ],
+  "candidates": [
+    {
+      "candidate_id": "refactor-baseline-v1",
+      "fixture_id": "refactor-superseded-path",
+      "source": "hash-pinned agent-visible fixture baseline",
+      "candidate_workspace_tree_sha256": "8adde67f95bbeec5342ba29880e982dcb30adade419a471e6509c31e8b9f5a00",
+      "expected_accepted": false,
+      "required_defect_areas": [
+        {
+          "area_id": "production_uses_superseded_route",
+          "acceptable_claim_ids": ["d1", "s1", "c1"]
+        },
+        {
+          "area_id": "legacy_route_duplicates_current_logic",
+          "acceptable_claim_ids": ["d1", "x1"]
+        }
+      ]
+    },
+    {
+      "candidate_id": "release-policy-baseline-v1",
+      "fixture_id": "release-policy-interaction",
+      "source": "hash-pinned agent-visible fixture baseline",
+      "candidate_workspace_tree_sha256": "93213ff481c8b41b7a500a9b7f04bf7388d88e06b06811d6ca39da86f77b2cc1",
+      "expected_accepted": false,
+      "required_defect_areas": [
+        {
+          "area_id": "digest_comparison_not_constant_time",
+          "acceptable_claim_ids": ["x1"]
+        },
+        {
+          "area_id": "paths_not_validated_or_segment_matched",
+          "acceptable_claim_ids": ["x2", "x3"]
+        },
+        {
+          "area_id": "rename_source_not_checked",
+          "acceptable_claim_ids": ["x4"]
+        },
+        {
+          "area_id": "malformed_and_unknown_records_not_fail_closed",
+          "acceptable_claim_ids": ["x5"]
+        }
+      ]
+    }
+  ],
+  "repeats_per_transport_per_candidate": 3,
+  "counterbalanced_order_per_candidate": [
+    "claim-capsule-candidate-v1",
+    "full-visible-bundle-v1",
+    "full-visible-bundle-v1",
+    "claim-capsule-candidate-v1",
+    "claim-capsule-candidate-v1",
+    "full-visible-bundle-v1"
+  ],
+  "measures": [
+    "changes_requested rate",
+    "required defect-area recall",
+    "unsupported finding count",
+    "valid claim citation count",
+    "prompt bytes",
+    "provider-reported input and output tokens",
+    "completion time"
+  ],
+  "gates_before_live_runs": [
+    "Add model-free baseline source support to critic_replay.py.",
+    "Add a deterministic finding scorer and tests for both candidates.",
+    "Freeze this plan with apparatus and candidate hashes before the first call.",
+    "Verify that neither critic transport contains hidden tests or scoring rules."
+  ],
+  "usage_plan": {
+    "estimated_reported_input_tokens_per_candidate": 89900,
+    "basis": "Three compact calls at about 13.4k and three full calls at about 16.6k from series 001.",
+    "session_split": "Run at most one six-call candidate block per usage window and recheck the provider snapshot after three calls.",
+    "credits": "Do not consume reset credits without explicit operator approval."
+  },
+  "stop_rules": [
+    "Preserve and exclude any run with a candidate, claim capsule, model, effort, or transport hash mismatch.",
+    "Stop the block if a harness failure repeats or current-window usage reaches 75 percent.",
+    "Do not edit candidates, expected defect areas, or scoring after live output is observed.",
+    "Do not make a general quality claim from these two candidates alone."
+  ],
+  "cross_provider_follow_up": "After Claude organization policy permits inference, repeat only the compact arm as a separately frozen series; do not merge tokenizer totals."
+}
