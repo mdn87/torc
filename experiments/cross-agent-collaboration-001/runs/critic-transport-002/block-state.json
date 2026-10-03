@@ -20,14 +20,14 @@
   "completed_order": [
     "claim-capsule-candidate-v1",
     "full-visible-bundle-v1",
-    "full-visible-bundle-v1"
+    "full-visible-bundle-v1",
+    "claim-capsule-candidate-v1"
   ],
   "remaining_order": [
     "claim-capsule-candidate-v1",
-    "claim-capsule-candidate-v1",
     "full-visible-bundle-v1"
   ],
-  "last_completed_run": "09-release-full",
+  "last_completed_run": "10-release-compact",
   "resumed_after_usage_checkpoint": "usage-checkpoint-before-02.json",
   "reset_credits_consumed": 0
 }
