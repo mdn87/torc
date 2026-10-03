@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import sys
 import textwrap
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
@@ -300,10 +301,13 @@ def test_evidence_preserves_exact_supplied_plan_without_prompt(tmp_path: Path) -
     probe_plan = capability.build_probe(executable="pinned-codex")
     run_dir = tmp_path / "run"
 
-    runner._write_evidence(
+    runner._reserve_evidence(
         run_dir,
         probe_plan=probe_plan,
         usage_checkpoint={"decision": "proceed"},
+    )
+    runner._write_capture_evidence(
+        run_dir,
         capture={"messages": [], "stderr": ""},
         result=None,
         error="synthetic exclusion",
@@ -314,6 +318,11 @@ def test_evidence_preserves_exact_supplied_plan_without_prompt(tmp_path: Path) -
     assert stored["plan_sha256"] == probe_plan["plan_sha256"]
     assert stored["turn_start"]["input"].startswith("<redacted")
     assert probe_plan["turn_start"]["input"][0]["text"] not in json.dumps(stored)
+    disposition = json.loads(
+        (run_dir / "disposition.json").read_text(encoding="utf-8")
+    )
+    assert disposition["retry_allowed"] is False
+    assert disposition["model_call_may_have_started"] is False
 
 
 def test_execution_refuses_while_usage_reset_is_pending(tmp_path: Path) -> None:
@@ -329,3 +338,68 @@ def test_execution_refuses_while_usage_reset_is_pending(tmp_path: Path) -> None:
             timeout_seconds=1,
         )
     assert not (tmp_path / "must-not-exist").exists()
+
+
+def test_armed_execution_reserves_frozen_path_before_single_capture(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    plan = deepcopy(capability._object(capability.PLAN_PATH))
+    plan["status"] = "ready"
+    monkeypatch.setattr(capability, "_object", lambda _path: plan)
+    monkeypatch.setattr(capability, "EXPERIMENT_ROOT", tmp_path)
+    probe = capability.build_probe()
+    monkeypatch.setattr(
+        runner,
+        "_installed_version",
+        lambda _executable: probe["harness_version"],
+    )
+    monkeypatch.setattr(runner.workflow, "_apparatus_revision", lambda: "c" * 40)
+    usage_calls = 0
+
+    def usage_snapshot(**_kwargs: Any) -> dict[str, Any]:
+        nonlocal usage_calls
+        usage_calls += 1
+        return {"decision": "proceed"}
+
+    monkeypatch.setattr(runner.codex_usage_snapshot, "read_snapshot", usage_snapshot)
+    capture_calls = 0
+
+    def capture_once(_probe: dict[str, Any], **_kwargs: Any) -> dict[str, Any]:
+        nonlocal capture_calls
+        capture_calls += 1
+        return _capture()
+
+    monkeypatch.setattr(runner, "capture_probe", capture_once)
+    monkeypatch.setattr(
+        runner,
+        "summarize_capture",
+        lambda *_args, **_kwargs: {"status": "capability_confirmed"},
+    )
+    run_dir = tmp_path / plan["runner"]["run_directory"]
+
+    result = runner.execute_probe(
+        executable="codex",
+        run_dir=run_dir,
+        expected_harness_version=probe["harness_version"],
+        expected_plan_sha256=probe["plan_sha256"],
+        expected_root_prompt_sha256=probe["root_prompt_sha256"],
+        timeout_seconds=5,
+    )
+
+    assert result["status"] == "capability_confirmed"
+    assert capture_calls == 1
+    assert usage_calls == 1
+    assert (run_dir / "attempt.json").is_file()
+    assert (run_dir / "result.json").is_file()
+    with pytest.raises(runner.CodexNativeProbeError, match="already exists"):
+        runner.execute_probe(
+            executable="codex",
+            run_dir=run_dir,
+            expected_harness_version=probe["harness_version"],
+            expected_plan_sha256=probe["plan_sha256"],
+            expected_root_prompt_sha256=probe["root_prompt_sha256"],
+            timeout_seconds=5,
+        )
+    assert capture_calls == 1
+    assert usage_calls == 1

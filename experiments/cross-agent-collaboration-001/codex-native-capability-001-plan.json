@@ -53,6 +53,7 @@
   ],
   "runner": {
     "path": "codex_native_probe_runner.py",
+    "run_directory": "runs/codex-native-capability-001/01-native-isolated",
     "default_behavior": "print the redacted model-free request plan",
     "live_gate": "requires status ready, exact plan/prompt/version arguments, clean apparatus, and a fresh below-60-percent usage snapshot",
     "failure_behavior": "preserve sanitized immutable evidence and mark the only call excluded; do not retry automatically"

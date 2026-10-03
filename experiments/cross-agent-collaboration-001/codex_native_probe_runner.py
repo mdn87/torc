@@ -200,6 +200,7 @@ def capture_probe(
     messages: list[dict[str, Any]] = []
     root_thread_id: str | None = None
     root_turn_id: str | None = None
+    turn_start_sent = False
     deadline = time.monotonic() + timeout_seconds
     error: Exception | None = None
     try:
@@ -227,6 +228,7 @@ def capture_probe(
             raise CodexNativeProbeError("thread/start returned no root thread id")
         root_thread_id = thread["id"]
         turn_params = {"threadId": root_thread_id, **probe["turn_start"]}
+        turn_start_sent = True
         turn_result = _request(
             process,
             lines,
@@ -277,6 +279,7 @@ def capture_probe(
         "completion_ms": round((completed - started) * 1000, 3),
         "root_thread_id": root_thread_id,
         "root_turn_id": root_turn_id,
+        "turn_start_sent": turn_start_sent,
         "messages": messages,
         "stderr": "".join(raw_stderr),
         "raw_stdout_sha256": hashlib.sha256("".join(raw_stdout).encode()).hexdigest(),
@@ -502,30 +505,55 @@ def _sanitize_opaque(value: Any) -> Any:
     return sanitized
 
 
-def _write_evidence(
-    run_dir: Path,
-    *,
-    probe_plan: dict[str, Any],
-    usage_checkpoint: dict[str, Any],
-    capture: dict[str, Any],
-    result: dict[str, Any] | None,
-    error: str | None,
-) -> None:
-    resolved = run_dir.resolve()
-    if resolved.exists():
-        raise CodexNativeProbeError(f"run directory already exists: {resolved}")
-    resolved.mkdir(parents=True)
+def _redacted_probe_plan(probe_plan: dict[str, Any]) -> dict[str, Any]:
     stored_plan = dict(probe_plan)
     stored_plan["turn_start"] = {
         **probe_plan["turn_start"],
         "input": "<redacted; see root prompt hash and bytes>",
     }
+    return stored_plan
+
+
+def _reserve_evidence(
+    run_dir: Path,
+    *,
+    probe_plan: dict[str, Any],
+    usage_checkpoint: dict[str, Any],
+) -> None:
+    resolved = run_dir.resolve()
+    if resolved.exists():
+        raise CodexNativeProbeError(f"run directory already exists: {resolved}")
+    resolved.mkdir(parents=True)
     (resolved / "probe-plan.json").write_text(
-        canonical_json(stored_plan) + "\n", encoding="utf-8"
+        canonical_json(_redacted_probe_plan(probe_plan)) + "\n", encoding="utf-8"
     )
     (resolved / "usage-checkpoint.json").write_text(
         canonical_json(usage_checkpoint) + "\n", encoding="utf-8"
     )
+    (resolved / "attempt.json").write_text(
+        canonical_json(
+            {
+                "schema_version": 1,
+                "status": "reserved",
+                "reserved_at": _utc_now(),
+                "retry_requires_plan_change": True,
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+
+def _write_capture_evidence(
+    run_dir: Path,
+    *,
+    capture: dict[str, Any],
+    result: dict[str, Any] | None,
+    error: str | None,
+) -> None:
+    resolved = run_dir.resolve()
+    if not resolved.is_dir():
+        raise CodexNativeProbeError(f"run directory was not reserved: {resolved}")
     sanitized_messages = _sanitize_opaque(capture["messages"])
     (resolved / "events.jsonl").write_text(
         "".join(canonical_json(message) + "\n" for message in sanitized_messages),
@@ -552,7 +580,10 @@ def _write_evidence(
                     "schema_version": 1,
                     "status": "excluded",
                     "reason": error,
-                    "model_call_preserved": True,
+                    "model_call_may_have_started": bool(
+                        capture.get("turn_start_sent")
+                    ),
+                    "evidence_preserved": True,
                     "retry_allowed": False,
                 }
             )
@@ -600,6 +631,14 @@ def execute_probe(
         raise CodexNativeProbeError("root prompt hash does not match")
     resolved_run_dir = run_dir.resolve()
     workspace = Path(probe_plan["workspace"]).resolve()
+    configured_run = Path(plan["runner"]["run_directory"])
+    if configured_run.is_absolute() or ".." in configured_run.parts:
+        raise CodexNativeProbeError("frozen run directory is invalid")
+    expected_run_dir = (capability.EXPERIMENT_ROOT / configured_run).resolve()
+    if resolved_run_dir != expected_run_dir:
+        raise CodexNativeProbeError(
+            f"run directory does not match the frozen plan: {expected_run_dir}"
+        )
     if resolved_run_dir.exists():
         raise CodexNativeProbeError(
             f"run directory already exists: {resolved_run_dir}"
@@ -614,9 +653,27 @@ def execute_probe(
     )
     if checkpoint["decision"] != "proceed":
         raise CodexNativeProbeError("current usage reached the probe stop threshold")
-    capture = capture_probe(probe_plan, timeout_seconds=timeout_seconds)
+    _reserve_evidence(
+        resolved_run_dir,
+        probe_plan=probe_plan,
+        usage_checkpoint=checkpoint,
+    )
     result: dict[str, Any] | None = None
     error: str | None = None
+    try:
+        capture = capture_probe(probe_plan, timeout_seconds=timeout_seconds)
+    except CodexNativeProbeError as exc:
+        capture = {
+            "schema_version": 1,
+            "started_at": _utc_now(),
+            "completed_at": _utc_now(),
+            "root_thread_id": None,
+            "root_turn_id": None,
+            "turn_start_sent": False,
+            "messages": [],
+            "stderr": "",
+            "capture_error": str(exc),
+        }
     try:
         result = summarize_capture(
             capture,
@@ -625,10 +682,8 @@ def execute_probe(
         )
     except CodexNativeProbeError as exc:
         error = str(exc)
-    _write_evidence(
-        run_dir,
-        probe_plan=probe_plan,
-        usage_checkpoint=checkpoint,
+    _write_capture_evidence(
+        resolved_run_dir,
         capture=capture,
         result=result,
         error=error,

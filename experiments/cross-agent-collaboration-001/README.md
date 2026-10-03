@@ -234,6 +234,28 @@ first live probe is held until the current usage window resets.
 version and content hashes, a clean apparatus, and a fresh usage check; failed
 capability evidence is preserved without an automatic retry.
 
+The live capability probe has a one-call runbook. First run
+`codex_usage_snapshot.py --stop-threshold 60`. Only after it exits zero, change
+the capability plan status from `waiting_usage_reset` to `ready` and commit that
+change. Then, from PowerShell, derive every guard value from the committed dry
+plan and target its single frozen run directory:
+
+```powershell
+$probe = python experiments/cross-agent-collaboration-001/codex_native_probe_runner.py |
+    ConvertFrom-Json
+python experiments/cross-agent-collaboration-001/codex_native_probe_runner.py `
+    --execute `
+    --run-dir experiments/cross-agent-collaboration-001/runs/codex-native-capability-001/01-native-isolated `
+    --expected-harness-version $probe.harness_version `
+    --expected-plan-sha256 $probe.plan_sha256 `
+    --expected-root-prompt-sha256 $probe.root_prompt_sha256
+```
+
+The runner reserves that path before `turn/start`, so a second attempt is
+rejected even after a failed first attempt. Preserve and commit the run directory,
+then set the plan status to `capability_confirmed` or `capability_rejected` from
+its `result.json` or `disposition.json`; do not delete the evidence to retry.
+
 ## Implemented smoke apparatus
 
 - `fixture_control.py` verifies the hash-pinned fixture and oracle trees,
