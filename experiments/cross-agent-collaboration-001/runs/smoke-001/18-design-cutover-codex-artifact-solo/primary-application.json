@@ -1,0 +1,1 @@
+{"applied":[{"after_sha256":"f70c61e31a58e99cc3bc7b13aad48db663f56c831d3313ec161e15de5d3c0ab1","before_sha256":"a863fb5db676ec45adcc8159d93fd53c89f59475deb9359d24acc562edb7d8ef","bytes":3056,"path":"decision.json"}],"interface":"patch-artifact-v1","schema_version":1}

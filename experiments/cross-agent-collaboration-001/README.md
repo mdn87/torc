@@ -227,6 +227,12 @@ profile and every filesystem preflight passes. Those immutable attempts remain
 excluded. Further smoke cells use the tool-free artifact interface instead of
 spending usage on the same host-specific failure.
 
+The first design-fixture solo (`18-design-cutover-codex-artifact-solo`) is also
+excluded. It exposed an underspecified representation check: the hidden oracle
+required `compare_and_swap` while the visible task accepted a descriptive mode,
+and the worker returned the equivalent `compare-and-swap`. The task now freezes
+the exact enum before any comparative design-fixture run.
+
 The first Claude smoke also stopped before inference and is excluded. WSL
 resolved `claude` to a Windows-mounted npm shim, so no Linux sandbox was
 available; the provider recorded zero tokens. The launcher now rejects mounted

@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "valid_attempt": false,
+  "category": "oracle_contract_ambiguity",
+  "comparative_use": "excluded",
+  "reason": "The hidden oracle required the exact cutover_gate.mode enum compare_and_swap, but the agent-visible task only required a description of the atomic mechanism. The semantically equivalent compare-and-swap response therefore failed an undisclosed representation check."
+}

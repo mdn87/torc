@@ -49,8 +49,8 @@ Each step also lists the constraint IDs it directly satisfies.
 - `monitor`: observe the new store while retaining legacy data for recovery evidence.
 
 The `cas_route` step cannot precede final verification. `cutover_gate.mode` must
-describe the atomic mechanism, and `cutover_gate.requires` must name all three
-guard values: `legacy_route_version`, `final_watermark`, and
+be the exact string `compare_and_swap`, and `cutover_gate.requires` must name all
+three guard values: `legacy_route_version`, `final_watermark`, and
 `verification_passed`.
 
 Use these rollback values:
