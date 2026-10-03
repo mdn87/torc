@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "analysis_id": "design-cutover-critic-transport-001",
+  "status": "exploratory_same_candidate_replay",
+  "candidate_workspace_tree_sha256": "a91174d8bf1299ea4dc05a01efc7559067d70055a62990ab6fbfb6ac81515ff3",
+  "source_run_id": "22-design-cutover-codex-artifact-review-compact",
+  "provider": "codex",
+  "model": "gpt-6-sol",
+  "critic_effort": "low",
+  "full_context": {
+    "transport": "full-visible-bundle-v1",
+    "run_ids": [
+      "23-design-cutover-critic-replay-full",
+      "25-design-cutover-critic-replay-full",
+      "27-design-cutover-critic-replay-full"
+    ],
+    "sample_count": 3,
+    "changes_requested_count": 0,
+    "finding_count": 0,
+    "median_prompt_bytes": 16319,
+    "median_input_tokens": 16585,
+    "median_completion_ms": 5736.022
+  },
+  "compact_context": {
+    "transport": "claim-capsule-candidate-v1",
+    "run_ids": [
+      "22-design-cutover-codex-artifact-review-compact",
+      "24-design-cutover-critic-replay-compact",
+      "26-design-cutover-critic-replay-compact"
+    ],
+    "sample_count": 3,
+    "changes_requested_count": 3,
+    "finding_count": 6,
+    "median_prompt_bytes": 5036,
+    "median_input_tokens": 13371,
+    "median_completion_ms": 11601.566
+  },
+  "compact_to_full_ratios": {
+    "median_prompt_bytes": 0.309,
+    "median_input_tokens": 0.806,
+    "median_completion_ms": 2.023
+  },
+  "qualitative_finding_categories": [
+    {
+      "category": "pause_deadline_after_or_during_cutover",
+      "compact_observation_count": 3,
+      "claim_ids": ["x1"],
+      "assessment": "Supported by C1: the candidate bounded abort before cutover but did not guarantee release of paused writes if CAS or unfreeze stalled."
+    },
+    {
+      "category": "verification_bound_to_final_watermark",
+      "compact_observation_count": 1,
+      "claim_ids": ["x4"],
+      "assessment": "Supported hardening for C4: the candidate named both values without explicitly binding the verification result to the watermark it covered."
+    },
+    {
+      "category": "failed_cas_recovery_is_executable",
+      "compact_observation_count": 1,
+      "claim_ids": ["x1"],
+      "assessment": "Supported plan-completeness concern: the rollback field named recovery, but the dependency plan did not execute it after a failed CAS."
+    },
+    {
+      "category": "in_flight_legacy_write_fencing",
+      "compact_observation_count": 1,
+      "claim_ids": ["x2", "x4"],
+      "assessment": "Supported concurrency hardening for C2 and C4: freeze semantics did not explicitly drain or fence writes before recording the final watermark."
+    }
+  ],
+  "deterministic_acceptance": {
+    "candidate_accepted_before_review": true,
+    "candidate_accepted_after_revision": true,
+    "quality_delta": 0
+  },
+  "interpretation": "Compact governed context reduced median input and repeatedly focused the critic on authority and cutover invariants that full context missed in this sample. Compact latency was higher because it produced substantive reasoning and findings.",
+  "limitations": [
+    "One frozen candidate and one provider cannot establish a general transport effect.",
+    "The qualitative finding assessments are root-agent synthesis, not independent human adjudication.",
+    "Fresh model calls remain stochastic even when candidate and controls are frozen.",
+    "Deterministic fixture acceptance did not distinguish the qualitative hardenings."
+  ],
+  "next_gate": "Repeat the same 3-by-3 replay on at least two independent flawed candidates, then run the compact transport with a Claude critic after the account policy blocker is removed."
+}

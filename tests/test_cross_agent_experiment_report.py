@@ -225,3 +225,34 @@ def test_report_matches_critic_transports_by_candidate_hash(tmp_path: Path) -> N
     assert comparison["compact_median_prompt_byte_ratio"] == 0.5
     assert comparison["compact_median_input_ratio"] == 0.5
     assert comparison["compact_median_completion_ratio"] == 2.0
+
+
+def test_committed_critic_transport_analysis_matches_run_evidence() -> None:
+    result = report.build_report()
+    comparison = result["critic_transport_comparisons"][0]
+    analysis = json.loads(
+        (EXPERIMENT / "critic-transport-analysis.json").read_text(encoding="utf-8")
+    )
+
+    assert analysis["candidate_workspace_tree_sha256"] == comparison[
+        "candidate_workspace_tree_sha256"
+    ]
+    assert analysis["full_context"]["run_ids"] == comparison["full_run_ids"]
+    assert analysis["compact_context"]["run_ids"] == comparison["compact_run_ids"]
+    assert analysis["full_context"]["changes_requested_count"] == comparison[
+        "full_changes_requested_count"
+    ]
+    assert analysis["compact_context"]["changes_requested_count"] == comparison[
+        "compact_changes_requested_count"
+    ]
+    assert analysis["full_context"]["finding_count"] == comparison[
+        "full_total_findings"
+    ]
+    assert analysis["compact_context"]["finding_count"] == comparison[
+        "compact_total_findings"
+    ]
+    assert analysis["compact_to_full_ratios"] == {
+        "median_prompt_bytes": comparison["compact_median_prompt_byte_ratio"],
+        "median_input_tokens": comparison["compact_median_input_ratio"],
+        "median_completion_ms": comparison["compact_median_completion_ratio"],
+    }
