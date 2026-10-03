@@ -15,22 +15,23 @@ def test_confirmation_report_rescores_committed_evidence() -> None:
     result = report.build_report()
 
     assert result["status"] == "in_progress"
-    assert result["completed_call_count"] == 7
+    assert result["completed_call_count"] == 8
     assert result["expected_call_count"] == 12
-    assert result["remaining_call_count"] == 5
+    assert result["remaining_call_count"] == 4
     assert result["groups"][0]["critic_context"] == (
         "claim-capsule-candidate-v1"
     )
     assert result["groups"][0]["median_defect_area_recall"] == 1.0
     assert result["comparisons"][0]["compact_call_count"] == 3
     assert result["comparisons"][0]["full_call_count"] == 3
-    release_group = next(
+    release_groups = [
         group
         for group in result["groups"]
         if group["candidate_id"] == "release-policy-baseline-v1"
-    )
-    assert release_group["call_count"] == 1
-    assert release_group["median_defect_area_recall"] == 1.0
+    ]
+    assert len(release_groups) == 2
+    assert all(group["call_count"] == 1 for group in release_groups)
+    assert all(group["median_defect_area_recall"] == 1.0 for group in release_groups)
     assert {
         checkpoint["primary"]["used_percent"]
         for checkpoint in result["usage_checkpoints"]
