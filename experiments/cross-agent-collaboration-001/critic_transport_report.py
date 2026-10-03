@@ -293,7 +293,7 @@ def build_report(
     )
     checkpoints = [
         _object(path)
-        for path in sorted(resolved_runs.glob("usage-checkpoint-after-*.json"))
+        for path in sorted(resolved_runs.glob("usage-checkpoint-*.json"))
     ]
     return {
         "schema_version": 1,

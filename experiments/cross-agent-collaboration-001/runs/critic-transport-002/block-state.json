@@ -2,19 +2,19 @@
   "schema_version": 1,
   "series_id": "critic-transport-002-confirmation",
   "plan_sha256": "e686c1976b184a977f2d5aa76331a925b0acea335c8021e12cea7d2ac26ac80c",
-  "status": "paused_usage_guard",
+  "status": "in_progress",
   "candidate_id": "refactor-baseline-v1",
   "completed_order": [
-    "claim-capsule-candidate-v1"
+    "claim-capsule-candidate-v1",
+    "full-visible-bundle-v1"
   ],
   "remaining_order": [
-    "full-visible-bundle-v1",
     "full-visible-bundle-v1",
     "claim-capsule-candidate-v1",
     "claim-capsule-candidate-v1",
     "full-visible-bundle-v1"
   ],
-  "last_completed_run": "01-refactor-compact",
-  "pause_reason": "Five-hour usage was 90 percent after call 01, above the preregistered 75 percent stop threshold.",
+  "last_completed_run": "02-refactor-full",
+  "resumed_after_usage_checkpoint": "usage-checkpoint-before-02.json",
   "reset_credits_consumed": 0
 }
