@@ -19,15 +19,15 @@
   "candidate_id": "release-policy-baseline-v1",
   "completed_order": [
     "claim-capsule-candidate-v1",
+    "full-visible-bundle-v1",
     "full-visible-bundle-v1"
   ],
   "remaining_order": [
-    "full-visible-bundle-v1",
     "claim-capsule-candidate-v1",
     "claim-capsule-candidate-v1",
     "full-visible-bundle-v1"
   ],
-  "last_completed_run": "08-release-full",
+  "last_completed_run": "09-release-full",
   "resumed_after_usage_checkpoint": "usage-checkpoint-before-02.json",
   "reset_credits_consumed": 0
 }
