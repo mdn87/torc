@@ -210,9 +210,18 @@ def test_report_matches_critic_transports_by_candidate_hash(tmp_path: Path) -> N
 
     comparison = result["critic_transport_comparisons"][0]
     assert comparison["candidate_workspace_tree_sha256"] == candidate_hash
+    assert comparison["full_sample_count"] == 1
+    assert comparison["compact_sample_count"] == 1
+    assert comparison["full_changes_requested_count"] == 0
+    assert comparison["compact_changes_requested_count"] == 1
+    assert comparison["full_total_findings"] == 0
+    assert comparison["compact_total_findings"] == 2
     assert comparison["full_verdict"] == "approve"
     assert comparison["compact_verdict"] == "changes_requested"
     assert comparison["compact_finding_count"] == 2
     assert comparison["compact_prompt_byte_ratio"] == 0.5
     assert comparison["compact_input_ratio"] == 0.5
     assert comparison["compact_completion_ratio"] == 2.0
+    assert comparison["compact_median_prompt_byte_ratio"] == 0.5
+    assert comparison["compact_median_input_ratio"] == 0.5
+    assert comparison["compact_median_completion_ratio"] == 2.0

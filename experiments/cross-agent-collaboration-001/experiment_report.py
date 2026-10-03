@@ -327,6 +327,8 @@ def build_report(runs_dir: Path = DEFAULT_RUNS_DIR) -> dict[str, Any]:
         ]
         if not full or not compact:
             continue
+        full = sorted(full, key=lambda run: run["run_id"])
+        compact = sorted(compact, key=lambda run: run["run_id"])
         full_run = max(full, key=lambda run: run["run_id"])
         compact_run = max(compact, key=lambda run: run["run_id"])
         full_phase = next(
@@ -335,6 +337,36 @@ def build_report(runs_dir: Path = DEFAULT_RUNS_DIR) -> dict[str, Any]:
         compact_phase = next(
             phase for phase in compact_run["phases"] if phase["role"] == "critic"
         )
+        full_phases = [
+            next(phase for phase in run["phases"] if phase["role"] == "critic")
+            for run in full
+        ]
+        compact_phases = [
+            next(phase for phase in run["phases"] if phase["role"] == "critic")
+            for run in compact
+        ]
+
+        def phase_median(phases: list[dict[str, Any]], field: str) -> float | None:
+            values = [
+                phase[field]
+                for phase in phases
+                if isinstance(phase[field], (int, float))
+            ]
+            return round(statistics.median(values), 3) if values else None
+
+        full_median_prompt = phase_median(full_phases, "prompt_bytes")
+        compact_median_prompt = phase_median(compact_phases, "prompt_bytes")
+        full_median_input = phase_median(full_phases, "input_tokens")
+        compact_median_input = phase_median(compact_phases, "input_tokens")
+        full_median_completion = phase_median(full_phases, "completion_ms")
+        compact_median_completion = phase_median(compact_phases, "completion_ms")
+
+        def median_ratio_value(
+            compact_value: float | None, full_value: float | None
+        ) -> float | None:
+            if compact_value is not None and full_value:
+                return round(compact_value / full_value, 3)
+            return None
 
         def ratio(
             field: str,
@@ -358,6 +390,41 @@ def build_report(runs_dir: Path = DEFAULT_RUNS_DIR) -> dict[str, Any]:
                 "candidate_workspace_tree_sha256": candidate_hash,
                 "full_run_id": full_run["run_id"],
                 "compact_run_id": compact_run["run_id"],
+                "full_run_ids": [run["run_id"] for run in full],
+                "compact_run_ids": [run["run_id"] for run in compact],
+                "full_sample_count": len(full),
+                "compact_sample_count": len(compact),
+                "full_changes_requested_count": sum(
+                    run["critic_verdict"] == "changes_requested" for run in full
+                ),
+                "compact_changes_requested_count": sum(
+                    run["critic_verdict"] == "changes_requested" for run in compact
+                ),
+                "full_total_findings": sum(
+                    run["critic_finding_count"]
+                    for run in full
+                    if isinstance(run["critic_finding_count"], int)
+                ),
+                "compact_total_findings": sum(
+                    run["critic_finding_count"]
+                    for run in compact
+                    if isinstance(run["critic_finding_count"], int)
+                ),
+                "full_median_prompt_bytes": full_median_prompt,
+                "compact_median_prompt_bytes": compact_median_prompt,
+                "compact_median_prompt_byte_ratio": median_ratio_value(
+                    compact_median_prompt, full_median_prompt
+                ),
+                "full_median_input_tokens": full_median_input,
+                "compact_median_input_tokens": compact_median_input,
+                "compact_median_input_ratio": median_ratio_value(
+                    compact_median_input, full_median_input
+                ),
+                "full_median_completion_ms": full_median_completion,
+                "compact_median_completion_ms": compact_median_completion,
+                "compact_median_completion_ratio": median_ratio_value(
+                    compact_median_completion, full_median_completion
+                ),
                 "full_verdict": full_run["critic_verdict"],
                 "compact_verdict": compact_run["critic_verdict"],
                 "full_finding_count": full_run["critic_finding_count"],
