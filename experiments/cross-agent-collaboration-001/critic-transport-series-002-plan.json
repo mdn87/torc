@@ -24,11 +24,19 @@
       "required_defect_areas": [
         {
           "area_id": "production_uses_superseded_route",
-          "acceptable_claim_ids": ["d1", "s1", "c1"]
+          "acceptable_claim_ids": ["d1", "s1", "c1"],
+          "evidence_term_groups": [
+            ["dispatch", "dispatch_batch", "production caller"],
+            ["legacy_route", "superseded"]
+          ]
         },
         {
           "area_id": "legacy_route_duplicates_current_logic",
-          "acceptable_claim_ids": ["d1", "x1"]
+          "acceptable_claim_ids": ["d1", "x1"],
+          "evidence_term_groups": [
+            ["legacy_route"],
+            ["delegate", "duplicate", "route_request"]
+          ]
         }
       ]
     },
@@ -41,19 +49,35 @@
       "required_defect_areas": [
         {
           "area_id": "digest_comparison_not_constant_time",
-          "acceptable_claim_ids": ["x1"]
+          "acceptable_claim_ids": ["x1"],
+          "evidence_term_groups": [
+            ["digest"],
+            ["compare_digest", "constant-time", "constant time"]
+          ]
         },
         {
           "area_id": "paths_not_validated_or_segment_matched",
-          "acceptable_claim_ids": ["x2", "x3"]
+          "acceptable_claim_ids": ["x2", "x3"],
+          "evidence_term_groups": [
+            ["path", "root"],
+            ["segment", "prefix", "normalize", "normalized"]
+          ]
         },
         {
           "area_id": "rename_source_not_checked",
-          "acceptable_claim_ids": ["x4"]
+          "acceptable_claim_ids": ["x4"],
+          "evidence_term_groups": [
+            ["rename", "from_path", "source"],
+            ["scope", "validate", "allowed"]
+          ]
         },
         {
           "area_id": "malformed_and_unknown_records_not_fail_closed",
-          "acceptable_claim_ids": ["x5"]
+          "acceptable_claim_ids": ["x5"],
+          "evidence_term_groups": [
+            ["malformed", "unknown", "missing"],
+            ["fail closed", "exception", "deny"]
+          ]
         }
       ]
     }

@@ -17,7 +17,7 @@ if str(SRC) not in sys.path:
 import fixture_control  # noqa: E402
 import workflow_runner as workflow  # noqa: E402
 
-from torc.canonical import canonical_json  # noqa: E402
+from torc.canonical import canonical_json, payload_sha256  # noqa: E402
 
 
 class CriticReplayError(RuntimeError):
@@ -38,6 +38,8 @@ def _source_evidence(source_run: Path, fixture_id: str) -> dict[str, Any]:
     if not isinstance(workspace_hash, str) or not workspace_hash:
         raise CriticReplayError("source run has no candidate workspace hash")
     return {
+        "source_kind": "primary_run",
+        "source_id": result.get("run_id", resolved.name),
         "source_run_id": result.get("run_id", resolved.name),
         "source_apparatus_revision": result.get("apparatus_revision"),
         "primary_artifact": artifact,
@@ -47,11 +49,50 @@ def _source_evidence(source_run: Path, fixture_id: str) -> dict[str, Any]:
     }
 
 
+def _baseline_evidence(fixture_id: str) -> dict[str, Any]:
+    fixture = fixture_control.load_manifest()["fixtures"].get(fixture_id)
+    if not isinstance(fixture, dict):
+        raise CriticReplayError(f"fixture baseline is not pinned: {fixture_id}")
+    artifact = {
+        "schema_version": 1,
+        "changes": [],
+        "summary": "Review the hash-pinned fixture baseline without modification.",
+        "test_plan": ["python -m pytest -q"],
+    }
+    return {
+        "source_kind": "fixture_baseline",
+        "source_id": f"fixture-baseline:{fixture_id}",
+        "source_run_id": None,
+        "source_apparatus_revision": None,
+        "primary_artifact": artifact,
+        "primary_artifact_sha256": payload_sha256(artifact),
+        "workspace_tree_sha256": fixture["agent_visible_sha256"],
+        "accepted_after_primary": False,
+    }
+
+
+def _resolve_source(
+    *, source_run: Path | None, source_baseline: bool, fixture_id: str
+) -> dict[str, Any]:
+    if (source_run is None and not source_baseline) or (
+        source_run is not None and source_baseline
+    ):
+        raise CriticReplayError(
+            "select exactly one source: a primary run or the fixture baseline"
+        )
+    return (
+        _source_evidence(source_run, fixture_id)
+        if source_run is not None
+        else _baseline_evidence(fixture_id)
+    )
+
+
 def replay_plan(
     *,
     manifest: dict[str, Any],
     fixture_id: str,
-    source_run: Path,
+    source_run: Path | None = None,
+    source_baseline: bool = False,
     critic_provider: str,
     critic_context: str,
 ) -> dict[str, Any]:
@@ -60,11 +101,17 @@ def replay_plan(
     if critic_context not in workflow.CRITIC_CONTEXTS:
         raise CriticReplayError(f"unsupported critic context: {critic_context}")
     settings = workflow._provider_settings(manifest, critic_provider)
-    source = _source_evidence(source_run, fixture_id)
+    source = _resolve_source(
+        source_run=source_run,
+        source_baseline=source_baseline,
+        fixture_id=fixture_id,
+    )
     return {
         "schema_version": 1,
         "series_id": manifest["series_id"],
         "fixture_id": fixture_id,
+        "source_kind": source["source_kind"],
+        "source_id": source["source_id"],
         "source_run_id": source["source_run_id"],
         "source_workspace_tree_sha256": source["workspace_tree_sha256"],
         "critic_provider": critic_provider,
@@ -79,7 +126,8 @@ def run_critic_replay(
     *,
     manifest: dict[str, Any],
     fixture_id: str,
-    source_run: Path,
+    source_run: Path | None = None,
+    source_baseline: bool = False,
     critic_provider: str,
     critic_context: str,
     run_dir: Path,
@@ -88,6 +136,7 @@ def run_critic_replay(
         manifest=manifest,
         fixture_id=fixture_id,
         source_run=source_run,
+        source_baseline=source_baseline,
         critic_provider=critic_provider,
         critic_context=critic_context,
     )
@@ -95,7 +144,11 @@ def run_critic_replay(
     if resolved_run.exists():
         raise CriticReplayError(f"run directory already exists: {resolved_run}")
     apparatus_revision = workflow._apparatus_revision()
-    source = _source_evidence(source_run, fixture_id)
+    source = _resolve_source(
+        source_run=source_run,
+        source_baseline=source_baseline,
+        fixture_id=fixture_id,
+    )
     editable_paths = workflow._editable_paths(manifest, fixture_id)
     settings = workflow._provider_settings(manifest, critic_provider)
 
@@ -117,6 +170,8 @@ def run_critic_replay(
         resolved_run / "source-primary-ref.json",
         {
             "schema_version": 1,
+            "source_kind": source["source_kind"],
+            "source_id": source["source_id"],
             "source_run_id": source["source_run_id"],
             "source_apparatus_revision": source["source_apparatus_revision"],
             "primary_artifact_sha256": source["primary_artifact_sha256"],
@@ -165,6 +220,7 @@ def run_critic_replay(
         "fixture_id": fixture_id,
         "workflow_id": "critic-replay",
         "worker_interface": workflow.PATCH_ARTIFACT_INTERFACE,
+        "replay_source_id": source["source_id"],
         "replay_source_run_id": source["source_run_id"],
         "critic_context": critic_context,
         "critic_verdict": critique["verdict"],
@@ -188,7 +244,9 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, default=workflow.DEFAULT_MANIFEST)
     parser.add_argument("--fixture", required=True)
-    parser.add_argument("--source-run", type=Path, required=True)
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument("--source-run", type=Path)
+    source.add_argument("--source-baseline", action="store_true")
     parser.add_argument(
         "--critic-provider", choices=workflow.worker_runner.PROVIDERS, required=True
     )
@@ -209,6 +267,7 @@ def main(argv: list[str] | None = None) -> int:
                 manifest=manifest,
                 fixture_id=args.fixture,
                 source_run=args.source_run,
+                source_baseline=args.source_baseline,
                 critic_provider=args.critic_provider,
                 critic_context=args.critic_context,
             )
@@ -219,6 +278,7 @@ def main(argv: list[str] | None = None) -> int:
                 manifest=manifest,
                 fixture_id=args.fixture,
                 source_run=args.source_run,
+                source_baseline=args.source_baseline,
                 critic_provider=args.critic_provider,
                 critic_context=args.critic_context,
                 run_dir=args.run_dir,

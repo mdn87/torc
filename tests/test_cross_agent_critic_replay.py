@@ -68,6 +68,23 @@ def test_replay_plan_is_one_call_and_does_not_create_output(tmp_path: Path) -> N
     assert list(tmp_path.iterdir()) == []
 
 
+def test_baseline_replay_plan_uses_the_pinned_fixture_tree() -> None:
+    plan = replay.replay_plan(
+        manifest=workflow.load_manifest(),
+        fixture_id="refactor-superseded-path",
+        source_baseline=True,
+        critic_provider="codex",
+        critic_context=workflow.COMPACT_CRITIC_CONTEXT,
+    )
+
+    assert plan["source_kind"] == "fixture_baseline"
+    assert plan["source_id"] == "fixture-baseline:refactor-superseded-path"
+    assert plan["source_run_id"] is None
+    assert plan["source_workspace_tree_sha256"] == (
+        "8adde67f95bbeec5342ba29880e982dcb30adade419a471e6509c31e8b9f5a00"
+    )
+
+
 def test_replay_reconstructs_exact_candidate_and_calls_only_critic(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -113,6 +130,62 @@ def test_replay_reconstructs_exact_candidate_and_calls_only_critic(
         (tmp_path / "replay" / "score-candidate.json").read_text(encoding="utf-8")
     )
     assert score["workspace_tree_sha256"] == source["workspace_tree_sha256"]
+
+
+def test_baseline_replay_scores_without_a_primary_model_call(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    calls: list[dict[str, Any]] = []
+    monkeypatch.setattr(workflow, "_apparatus_revision", lambda: "e" * 40)
+
+    def fake_worker(**kwargs: Any) -> dict[str, Any]:
+        calls.append(kwargs)
+        kwargs["output_dir"].mkdir(parents=True)
+        critique = {
+            "schema_version": 1,
+            "verdict": "changes_requested",
+            "findings": [
+                {
+                    "finding_id": "f1",
+                    "severity": "blocking",
+                    "summary": "Production dispatch still uses legacy_route.",
+                    "evidence": "routing.py: dispatch and dispatch_batch",
+                    "claim_ids": ["s1", "c1"],
+                }
+            ],
+        }
+        event = {
+            "type": "item.completed",
+            "item": {"type": "agent_message", "text": json.dumps(critique)},
+        }
+        (kwargs["output_dir"] / "stdout.jsonl").write_text(
+            json.dumps(event) + "\n", encoding="utf-8"
+        )
+        return _record()
+
+    monkeypatch.setattr(workflow, "_run_worker", fake_worker)
+    result = replay.run_critic_replay(
+        manifest=workflow.load_manifest(),
+        fixture_id="refactor-superseded-path",
+        source_baseline=True,
+        critic_provider="codex",
+        critic_context=workflow.COMPACT_CRITIC_CONTEXT,
+        run_dir=tmp_path / "baseline-replay",
+    )
+
+    assert len(calls) == 1
+    assert "def legacy_route" in calls[0]["prompt"]
+    assert "ARCHITECTURE.md" not in calls[0]["prompt"]
+    assert result["accepted_final"] is False
+    assert result["replay_source_id"] == (
+        "fixture-baseline:refactor-superseded-path"
+    )
+    source = json.loads(
+        (tmp_path / "baseline-replay" / "source-primary-ref.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert source["source_kind"] == "fixture_baseline"
 
 
 def test_confirmation_plan_references_pinned_candidates_and_claims() -> None:

@@ -216,7 +216,11 @@ are implemented and tested; no calls from that series have begun.
   token counters, and measures startup, first-output, and completion time.
 - `critic_replay.py` reconstructs a committed primary artifact, refuses a
   workspace-hash mismatch, and sends that exact candidate through one selected
-  critic transport with a single model call.
+  critic transport with a single model call. It can also reconstruct a
+  hash-pinned fixture baseline without a primary model call.
+- `critic_probe_score.py` fails closed on candidate or worker-control drift and
+  scores critic verdict, preregistered defect-area recall, unsupported findings,
+  usage, and timing without model judgment.
 - `fixtures/bug-hidden-regression` starts with both visible and hidden failures.
 - `fixtures/refactor-superseded-path` passes its visible behavior tests while a
   hidden structural test catches the superseded production path.
@@ -263,6 +267,15 @@ python experiments/cross-agent-collaboration-001/critic_replay.py \
   --source-run experiments/cross-agent-collaboration-001/runs/smoke-001/22-design-cutover-codex-artifact-review-compact \
   --critic-provider codex \
   --critic-context full-visible-bundle-v1
+```
+
+For the planned confirmation series, replace `--source-run ...` with
+`--source-baseline`. After a baseline replay is complete, score it with:
+
+```text
+python experiments/cross-agent-collaboration-001/critic_probe_score.py \
+  --run-dir <immutable-run-directory> \
+  --candidate refactor-baseline-v1
 ```
 
 The first two attempted Codex smokes were retained but excluded. The first used
