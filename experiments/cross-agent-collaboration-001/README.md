@@ -196,6 +196,9 @@ aggregate separately from the earlier forced-revision control.
 - `worker_runner.py` builds fresh-session Codex and Claude Code commands,
   verifies the installed harness version, records raw JSONL, normalizes supplied
   token counters, and measures startup, first-output, and completion time.
+- `critic_replay.py` reconstructs a committed primary artifact, refuses a
+  workspace-hash mismatch, and sends that exact candidate through one selected
+  critic transport with a single model call.
 - `fixtures/bug-hidden-regression` starts with both visible and hidden failures.
 - `fixtures/refactor-superseded-path` passes its visible behavior tests while a
   hidden structural test catches the superseded production path.
@@ -233,6 +236,16 @@ python experiments/cross-agent-collaboration-001/workflow_runner.py \
 Token counters remain separated by phase and provider. Because Codex and Claude
 use different tokenizers and cache-accounting rules, the apparatus does not
 manufacture a cross-provider total.
+
+Plan a one-call critic replay without creating a run directory:
+
+```text
+python experiments/cross-agent-collaboration-001/critic_replay.py \
+  --fixture design-cutover-plan \
+  --source-run experiments/cross-agent-collaboration-001/runs/smoke-001/22-design-cutover-codex-artifact-review-compact \
+  --critic-provider codex \
+  --critic-context full-visible-bundle-v1
+```
 
 The first two attempted Codex smokes were retained but excluded. The first used
 an unsuitable noninteractive approval policy and inherited built-in app
