@@ -58,8 +58,10 @@ lease transfer.
 - Cross-provider handoffs always use an explicit, content-addressed execution
   capsule plus control-envelope references; TORC does not invent an opaque
   interchange format.
-- A native-agent benchmark must count root, subagent, retry, and synthesis
-  usage rather than comparing only the final critic turn.
+- A native-agent benchmark must count the entire response, including root,
+  subagent, retry, and synthesis work, rather than comparing only the final
+  critic text. Separate per-agent attribution is diagnostic evidence when the
+  selected API exposes it, not a prerequisite for total-cost accounting.
 - Capsule size must be measured in actual rendered input tokens during live
   experiments; byte counts are only deterministic local design evidence.
 - Acceptance and scoring must validate claim handles against the control

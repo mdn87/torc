@@ -37,7 +37,7 @@
   "decision_rules": {
     "continue_after_pilot_only_if": [
       "all arms produce a scoreable critic result",
-      "the apparatus exposes root and subagent usage separately",
+      "response-level usage is present and demonstrably includes the complete native run",
       "the native arms use exactly one subagent and no unplanned tools",
       "no candidate, prompt, scorer, or model drift is detected"
     ],
@@ -48,7 +48,7 @@
       "zero unsupported findings introduced by native transport"
     ],
     "stop_after_pilot_if": [
-      "a native arm cannot expose complete root and subagent usage",
+      "response-level usage is missing or cannot be treated as complete-run usage",
       "a native arm has lower deterministic defect recall",
       "a native arm has no plausible path to the 15 percent total-input threshold",
       "the provider launches extra agents or retries that cannot be bounded and counted"
@@ -56,9 +56,9 @@
   },
   "evidence": {
     "count_in_total_usage": [
-      "root input, cached input, reasoning output, and output",
-      "every subagent input, cached input, reasoning output, and output",
-      "automatic retries and root synthesis"
+      "the complete Responses API response usage object",
+      "all continuation responses and automatic retries, if any",
+      "root synthesis and hosted subagent work included by the provider in response usage"
     ],
     "do_not_store": [
       "API keys",
@@ -68,7 +68,7 @@
     "record": [
       "exact request configuration with credentials removed",
       "candidate, capsule, prompt, and scorer hashes",
-      "root and subagent turn identifiers and usage",
+      "response identifiers, response-level usage, and agent-attributed output item counts",
       "opaque artifact type, byte length, and SHA-256 digest only",
       "wall-clock timing and retry count",
       "raw critic result and deterministic score"
@@ -76,6 +76,7 @@
   },
   "limitations": [
     "Native encrypted items are provider artifacts, not a provider-neutral TORC handoff format.",
+    "Responses multi-agent exposes response-level usage but does not document separate root and subagent token totals; the Agents API has different turn-level observability and is not mixed into this comparison.",
     "API model and system context may differ from Codex CLI, so Series 002 is motivation rather than a matched control.",
     "A ChatGPT Plus subscription does not authorize or fund Responses API calls.",
     "Total native-agent cost can exceed a direct call even when the child context is smaller."
