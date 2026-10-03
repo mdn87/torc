@@ -37,6 +37,11 @@ verifies the candidate fixture against Series 002, reconstructs the selected
 capsule and visible bundle, and prints only hashes, byte counts, and a redacted
 request shape by default. It has no execution mode.
 
+`native_context_response.py` is the corresponding offline validator. It checks
+the exact model, complete usage shape, one-child topology, requested
+`fork_turns`, final critic contract, and claim identifiers. Encrypted message
+content is reduced to byte length and SHA-256 evidence in its output.
+
 OpenAI documents encrypted agent messages and independently compacted root and
 subagent contexts in its [Responses multi-agent guide](https://developers.openai.com/api/docs/guides/responses-multi-agent).
 Its [compaction guide](https://developers.openai.com/api/docs/guides/compaction)

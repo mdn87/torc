@@ -219,7 +219,9 @@ The preregistered native-context follow-up is documented in
 budget-gated because Responses API charges are separate from a ChatGPT
 subscription. The first authorized step is a three-call pilot, not the full
 series. `native_context_request.py` reconstructs and hashes any of those three
-request arms without a network call.
+request arms without a network call. `native_context_response.py` validates a
+supplied response, checks agent topology and aggregate usage, and scores the
+critic result while retaining only hashes of encrypted provider artifacts.
 
 ## Implemented smoke apparatus
 

@@ -82,6 +82,17 @@
     "reasoning_effort": "low",
     "store": false
   },
+  "response_validation": {
+    "network_behavior": "native_context_response.py validates an existing response and never makes a network call",
+    "fail_closed_on": [
+      "missing or inconsistent response-level usage",
+      "model or completion drift",
+      "extra subagents or unplanned collaboration actions",
+      "wrong fork_turns or agent attribution",
+      "malformed critic JSON or unknown claim identifiers"
+    ],
+    "opaque_artifact_policy": "retain source, byte length, and SHA-256 digest only"
+  },
   "limitations": [
     "Native encrypted items are provider artifacts, not a provider-neutral TORC handoff format.",
     "Responses multi-agent exposes response-level usage but does not document separate root and subagent token totals; the Agents API has different turn-level observability and is not mixed into this comparison.",
