@@ -42,6 +42,13 @@ the exact model, complete usage shape, one-child topology, requested
 `fork_turns`, final critic contract, and claim identifiers. Encrypted message
 content is reduced to byte length and SHA-256 evidence in its output.
 
+After one sanitized result exists for each arm,
+`native_context_pilot_report.py` checks that candidate, model, plan, usage, and
+topology stayed matched. It continues only native arms that preserve quality,
+remain within 10 percent of direct uncached input, and remain within 50 percent
+of direct completion time. The stricter 15-percent input saving and 20-percent
+time ceiling still determine a full-series win.
+
 OpenAI documents encrypted agent messages and independently compacted root and
 subagent contexts in its [Responses multi-agent guide](https://developers.openai.com/api/docs/guides/responses-multi-agent).
 Its [compaction guide](https://developers.openai.com/api/docs/guides/compaction)

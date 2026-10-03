@@ -222,6 +222,8 @@ series. `native_context_request.py` reconstructs and hashes any of those three
 request arms without a network call. `native_context_response.py` validates a
 supplied response, checks agent topology and aggregate usage, and scores the
 critic result while retaining only hashes of encrypted provider artifacts.
+`native_context_pilot_report.py` combines one validated result per arm and
+applies the preregistered stop or continue rules.
 
 ## Implemented smoke apparatus
 

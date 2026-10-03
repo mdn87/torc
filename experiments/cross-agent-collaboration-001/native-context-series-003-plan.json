@@ -48,6 +48,12 @@
       "no more than 20 percent higher median completion time",
       "zero unsupported findings introduced by native transport"
     ],
+    "pilot_arm_survives_if": [
+      "changes_requested correctness and deterministic recall are no lower than portable_direct",
+      "zero unsupported findings",
+      "uncached input is no more than 10 percent higher than portable_direct",
+      "completion time is no more than 50 percent higher than portable_direct"
+    ],
     "stop_after_pilot_if": [
       "response-level usage is missing or cannot be treated as complete-run usage",
       "a native arm has lower deterministic defect recall",
@@ -92,6 +98,11 @@
       "malformed critic JSON or unknown claim identifiers"
     ],
     "opaque_artifact_policy": "retain source, byte length, and SHA-256 digest only"
+  },
+  "pilot_reporting": {
+    "network_behavior": "native_context_pilot_report.py reads sanitized evidence and never makes a network call",
+    "incomplete_behavior": "list missing arms without making a comparative decision",
+    "complete_behavior": "apply pilot survival and full-series win thresholds mechanically"
   },
   "limitations": [
     "Native encrypted items are provider artifacts, not a provider-neutral TORC handoff format.",

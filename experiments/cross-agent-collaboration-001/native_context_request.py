@@ -123,8 +123,8 @@ def build_request(*, candidate_id: str, arm: str, model: str) -> dict[str, Any]:
         raise NativeContextRequestError(f"unsupported arm: {arm}")
     model = _validate_model(model)
     plan = _read_object(PLAN_PATH)
-    if plan.get("status") != "planned_requires_api_budget":
-        raise NativeContextRequestError("Series 003 is not in its budget-gated planning state")
+    if plan.get("status") not in {"planned_requires_api_budget", "pilot_authorized"}:
+        raise NativeContextRequestError("Series 003 is not in a request-planning state")
     if candidate_id != plan.get("candidate_policy", {}).get("pilot_candidate_id"):
         raise NativeContextRequestError("candidate is not the preregistered pilot candidate")
     candidate = _candidate(candidate_id)
