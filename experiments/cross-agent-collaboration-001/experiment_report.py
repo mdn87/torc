@@ -51,6 +51,12 @@ def summarize_run(run_dir: Path) -> dict[str, Any]:
     disposition_path = run_dir / "disposition.json"
     result = _object(result_path) if result_path.is_file() else None
     disposition = _object(disposition_path) if disposition_path.is_file() else None
+    score = None
+    for score_name in ("score-after-primary.json", "score-candidate.json"):
+        score_path = run_dir / score_name
+        if score_path.is_file():
+            score = _object(score_path)
+            break
     records = _phase_records(run_dir, result)
     if result is None and disposition is None and not records:
         raise ExperimentReportError(f"run has no evidence: {run_dir}")
@@ -113,7 +119,16 @@ def summarize_run(run_dir: Path) -> dict[str, Any]:
         "comparative_use": comparative_use,
         "accepted_final": result.get("accepted_final") if result else None,
         "critic_verdict": result.get("critic_verdict") if result else None,
+        "critic_finding_count": (
+            result.get("critic_finding_count") if result else None
+        ),
         "critic_context": critic_context,
+        "candidate_workspace_tree_sha256": (
+            score.get("workspace_tree_sha256") if score else None
+        ),
+        "replay_source_run_id": (
+            result.get("replay_source_run_id") if result else None
+        ),
         "revision_performed": revision_performed,
         "phases": phases,
     }
@@ -278,6 +293,92 @@ def build_report(runs_dir: Path = DEFAULT_RUNS_DIR) -> dict[str, Any]:
         "median_input_ratio": median_ratio("input_ratio"),
         "median_completion_ratio": median_ratio("completion_ratio"),
     }
+    critic_transport_comparisons: list[dict[str, Any]] = []
+    candidate_groups: dict[tuple[str, str, str], list[dict[str, Any]]] = defaultdict(
+        list
+    )
+    for run in valid_runs:
+        candidate_hash = run["candidate_workspace_tree_sha256"]
+        fixture_id = run["fixture_id"]
+        critic_phases = [
+            phase for phase in run["phases"] if phase["role"] == "critic"
+        ]
+        if (
+            isinstance(candidate_hash, str)
+            and isinstance(fixture_id, str)
+            and len(critic_phases) == 1
+            and critic_phases[0]["provider"] == "codex"
+            and run["critic_context"] in {
+                "full-visible-bundle-v1",
+                "claim-capsule-candidate-v1",
+            }
+        ):
+            candidate_groups[(fixture_id, candidate_hash, "codex")].append(run)
+    for (fixture_id, candidate_hash, provider), group in sorted(
+        candidate_groups.items()
+    ):
+        full = [
+            run for run in group if run["critic_context"] == "full-visible-bundle-v1"
+        ]
+        compact = [
+            run
+            for run in group
+            if run["critic_context"] == "claim-capsule-candidate-v1"
+        ]
+        if not full or not compact:
+            continue
+        full_run = max(full, key=lambda run: run["run_id"])
+        compact_run = max(compact, key=lambda run: run["run_id"])
+        full_phase = next(
+            phase for phase in full_run["phases"] if phase["role"] == "critic"
+        )
+        compact_phase = next(
+            phase for phase in compact_run["phases"] if phase["role"] == "critic"
+        )
+
+        def ratio(
+            field: str,
+            baseline_phase: dict[str, Any],
+            candidate_phase: dict[str, Any],
+        ) -> float | None:
+            baseline = baseline_phase[field]
+            candidate = candidate_phase[field]
+            if (
+                isinstance(baseline, (int, float))
+                and baseline
+                and isinstance(candidate, (int, float))
+            ):
+                return round(candidate / baseline, 3)
+            return None
+
+        critic_transport_comparisons.append(
+            {
+                "fixture_id": fixture_id,
+                "provider": provider,
+                "candidate_workspace_tree_sha256": candidate_hash,
+                "full_run_id": full_run["run_id"],
+                "compact_run_id": compact_run["run_id"],
+                "full_verdict": full_run["critic_verdict"],
+                "compact_verdict": compact_run["critic_verdict"],
+                "full_finding_count": full_run["critic_finding_count"],
+                "compact_finding_count": compact_run["critic_finding_count"],
+                "full_prompt_bytes": full_phase["prompt_bytes"],
+                "compact_prompt_bytes": compact_phase["prompt_bytes"],
+                "compact_prompt_byte_ratio": ratio(
+                    "prompt_bytes", full_phase, compact_phase
+                ),
+                "full_input_tokens": full_phase["input_tokens"],
+                "compact_input_tokens": compact_phase["input_tokens"],
+                "compact_input_ratio": ratio(
+                    "input_tokens", full_phase, compact_phase
+                ),
+                "full_completion_ms": full_phase["completion_ms"],
+                "compact_completion_ms": compact_phase["completion_ms"],
+                "compact_completion_ratio": ratio(
+                    "completion_ms", full_phase, compact_phase
+                ),
+            }
+        )
     return {
         "schema_version": 1,
         "runs_dir": str(runs_dir.resolve()),
@@ -290,6 +391,7 @@ def build_report(runs_dir: Path = DEFAULT_RUNS_DIR) -> dict[str, Any]:
         "usage_by_interface_and_provider": by_interface_provider,
         "matched_workflow_comparisons": comparisons,
         "approved_without_revision_summary": approval_summary,
+        "critic_transport_comparisons": critic_transport_comparisons,
         "runs": runs,
         "token_accounting_note": (
             "Token counts are aggregated only within the same provider and worker interface; "

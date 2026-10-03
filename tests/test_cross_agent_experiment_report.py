@@ -15,19 +15,26 @@ def _write(path: Path, value: dict[str, object]) -> None:
     path.write_text(json.dumps(value), encoding="utf-8")
 
 
-def _record(provider: str, input_tokens: int) -> dict[str, object]:
+def _record(
+    provider: str,
+    input_tokens: int,
+    *,
+    role: str = "implementer",
+    prompt_bytes: int = 1200,
+    completion_ms: float = 500.0,
+) -> dict[str, object]:
     return {
         "provider": provider,
-        "role": "implementer",
+        "role": role,
         "tool_mode": "none",
-        "prompt_bytes": 1200,
+        "prompt_bytes": prompt_bytes,
         "usage": {
             "input_tokens": input_tokens,
             "cached_input_tokens": 0,
             "reasoning_output_tokens": 10,
             "output_tokens": 20,
         },
-        "timing": {"completion_ms": 500.0},
+        "timing": {"completion_ms": completion_ms},
     }
 
 
@@ -134,3 +141,78 @@ def test_report_rejects_evidence_free_run(tmp_path: Path) -> None:
         assert "no evidence" in str(exc)
     else:
         raise AssertionError("evidence-free run should be rejected")
+
+
+def test_report_matches_critic_transports_by_candidate_hash(tmp_path: Path) -> None:
+    candidate_hash = "a" * 64
+    full = tmp_path / "01-full"
+    compact = tmp_path / "02-compact"
+    _write(
+        full / "phases" / "01-critic" / "worker-run.json",
+        _record(
+            "codex",
+            100,
+            role="critic",
+            prompt_bytes=1000,
+            completion_ms=500.0,
+        ),
+    )
+    _write(
+        compact / "phases" / "02-critic" / "worker-run.json",
+        _record(
+            "codex",
+            50,
+            role="critic",
+            prompt_bytes=500,
+            completion_ms=1000.0,
+        ),
+    )
+    for run, score_name in (
+        (full, "score-candidate.json"),
+        (compact, "score-after-primary.json"),
+    ):
+        _write(
+            run / score_name,
+            {
+                "fixture_id": "fixture-a",
+                "workspace_tree_sha256": candidate_hash,
+                "accepted": True,
+            },
+        )
+    _write(
+        full / "workflow-result.json",
+        {
+            "fixture_id": "fixture-a",
+            "workflow_id": "critic-replay",
+            "worker_interface": "patch-artifact-v1",
+            "accepted_final": True,
+            "critic_context": "full-visible-bundle-v1",
+            "critic_verdict": "approve",
+            "critic_finding_count": 0,
+            "phases": [{"record": "phases/01-critic/worker-run.json"}],
+        },
+    )
+    _write(
+        compact / "workflow-result.json",
+        {
+            "fixture_id": "fixture-a",
+            "workflow_id": "codex-review-compact",
+            "worker_interface": "patch-artifact-v1",
+            "accepted_final": True,
+            "critic_context": "claim-capsule-candidate-v1",
+            "critic_verdict": "changes_requested",
+            "critic_finding_count": 2,
+            "phases": [{"record": "phases/02-critic/worker-run.json"}],
+        },
+    )
+
+    result = report.build_report(tmp_path)
+
+    comparison = result["critic_transport_comparisons"][0]
+    assert comparison["candidate_workspace_tree_sha256"] == candidate_hash
+    assert comparison["full_verdict"] == "approve"
+    assert comparison["compact_verdict"] == "changes_requested"
+    assert comparison["compact_finding_count"] == 2
+    assert comparison["compact_prompt_byte_ratio"] == 0.5
+    assert comparison["compact_input_ratio"] == 0.5
+    assert comparison["compact_completion_ratio"] == 2.0
