@@ -214,6 +214,12 @@ payload savings. Compact median completion was 8.0% to 14.2% slower by candidate
 `critic-transport-series-002-analysis.json` preserves the exact aggregate,
 scorer caveat, usage checkpoints, and limits on interpretation.
 
+The preregistered native-context follow-up is documented in
+`native-context-follow-up.md` and `native-context-series-003-plan.json`. It is
+budget-gated because Responses API charges are separate from a ChatGPT
+subscription. The first authorized step is a three-call pilot, not the full
+series.
+
 ## Implemented smoke apparatus
 
 - `fixture_control.py` verifies the hash-pinned fixture and oracle trees,

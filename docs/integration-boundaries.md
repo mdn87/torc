@@ -34,3 +34,17 @@ A TORC projection may contain selected Sulis references or recalled text. The pr
 TORC may express that a next bearer requires repository write, image input, larger context, a local data boundary, or independent review. Autowork and Omniroute remain responsible for selecting and authorizing an actual route under their policies.
 
 The first TORC fit evaluator uses synthetic candidates only. A real adapter must reconcile TORC requirements with the route that the authoritative Lugos policy actually grants.
+
+## Opaque provider context
+
+Provider-native continuation state, including encrypted compaction or agent
+messages, is a derived execution artifact. A compatible harness adapter may
+retain and return it to the same provider while TORC records its digest and
+provenance. TORC does not inspect, synthesize, translate, or promote it to
+canonical lineage state.
+
+Cross-provider continuity uses a portable execution capsule and explicit
+artifact or evidence references. A provider-native subagent can carry out a
+bounded task, but receiving inherited context does not accept a TORC handoff or
+grant authority. Provider routing, credentials, model calls, retries, and
+provider usage accounting remain execution-layer responsibilities.

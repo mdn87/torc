@@ -1,6 +1,6 @@
 # 0004: Separate control records from model-visible execution capsules
 
-Status: accepted for experiment
+Status: accepted
 
 ## Context
 
@@ -10,10 +10,17 @@ projection and authority metadata needed by TORC rather than by the model. In
 the corrected Sol calibration, this made the TORC payload 21.6 percent larger
 than the compiled handoff by canonical JSON bytes.
 
-Provider-native compaction solves a different problem. It preserves one
-provider's conversation in an opaque representation that must be passed back
-unchanged. It is useful within a compatible harness, but it is not a portable
-Codex-to-Claude lineage record.
+Provider-native compaction solves a different problem. OpenAI's Responses API,
+for example, can return encrypted compaction and agent-message items that a
+compatible client carries into later calls. Multi-agent mode maintains separate
+root and subagent contexts and compacts them independently. These artifacts are
+useful within that provider and API, but are neither human-auditable evidence
+nor a portable Codex-to-Claude lineage record.
+
+References:
+
+- [OpenAI Responses multi-agent guide](https://developers.openai.com/api/docs/guides/responses-multi-agent)
+- [OpenAI compaction guide](https://developers.openai.com/api/docs/guides/compaction)
 
 ## Decision
 
@@ -31,7 +38,15 @@ and rejects unknown handles. The capsule hash binds the two representations.
 
 Provider-created opaque continuation artifacts may be referenced by the
 control envelope and passed through by a compatible harness adapter. TORC does
-not parse, synthesize, or treat them as canonical history.
+not parse, synthesize, translate, or treat them as canonical history. The
+adapter records the provider, API, model, artifact type, integrity digest, and
+the execution whose response produced the artifact. Possession of an opaque
+artifact never grants lineage authority.
+
+Native subagents remain an execution-layer facility. Their isolated contexts,
+delegation calls, and usage records may be experiment evidence or adapter
+artifacts, but they do not replace TORC handoff preparation, acceptance, or
+lease transfer.
 
 ## Consequences
 
@@ -40,6 +55,11 @@ not parse, synthesize, or treat them as canonical history.
 - Cross-provider handoffs have a portable representation.
 - Same-provider continuations may use native compaction alongside a minimal
   TORC delta.
+- Cross-provider handoffs always use an explicit, content-addressed execution
+  capsule plus control-envelope references; TORC does not invent an opaque
+  interchange format.
+- A native-agent benchmark must count root, subagent, retry, and synthesis
+  usage rather than comparing only the final critic turn.
 - Capsule size must be measured in actual rendered input tokens during live
   experiments; byte counts are only deterministic local design evidence.
 - Acceptance and scoring must validate claim handles against the control

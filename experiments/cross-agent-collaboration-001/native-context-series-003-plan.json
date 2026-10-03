@@ -1,0 +1,87 @@
+{
+  "budget_gate": {
+    "authorization_required": true,
+    "billing_surface": "OpenAI API, separate from a ChatGPT subscription",
+    "initial_pilot_max_calls": 3,
+    "initial_pilot_max_candidates": 1,
+    "run_status": "planned_requires_api_budget"
+  },
+  "candidate_policy": {
+    "initial_pilot": "choose one existing hash-pinned flawed baseline before randomization",
+    "scorer": "reuse the frozen deterministic defect-area scorer without changing its primary scores",
+    "series": "a full series must freeze at least two independent candidates before its first call"
+  },
+  "comparison": {
+    "arms": [
+      {
+        "id": "portable_direct",
+        "input": "claim-capsule-candidate-v1 plus the editable candidate",
+        "shape": "one direct Responses API critic call"
+      },
+      {
+        "id": "native_isolated",
+        "input": "a root turn delegates exactly one critic task with fork_turns none and an explicit compact capsule",
+        "shape": "one root execution plus one isolated subagent execution"
+      },
+      {
+        "id": "native_inherited",
+        "input": "a root turn receives the full visible bundle and delegates exactly one critic task with inherited turns",
+        "shape": "one root execution plus one context-inheriting subagent execution"
+      }
+    ],
+    "model_rule": "freeze one exact model identifier supported by every arm and do not compare these API arms directly with the earlier CLI series",
+    "question": "At equal deterministic critic quality, does native agent context propagation reduce total reported input or completion time relative to a portable TORC capsule?",
+    "repeats_after_pilot": 3,
+    "temperature_and_effort_rule": "freeze identical supported settings across arms"
+  },
+  "decision_rules": {
+    "continue_after_pilot_only_if": [
+      "all arms produce a scoreable critic result",
+      "the apparatus exposes root and subagent usage separately",
+      "the native arms use exactly one subagent and no unplanned tools",
+      "no candidate, prompt, scorer, or model drift is detected"
+    ],
+    "native_win_requires": [
+      "no lower deterministic defect recall than portable_direct",
+      "at least 15 percent lower median total uncached input than portable_direct",
+      "no more than 20 percent higher median completion time",
+      "zero unsupported findings introduced by native transport"
+    ],
+    "stop_after_pilot_if": [
+      "a native arm cannot expose complete root and subagent usage",
+      "a native arm has lower deterministic defect recall",
+      "a native arm has no plausible path to the 15 percent total-input threshold",
+      "the provider launches extra agents or retries that cannot be bounded and counted"
+    ]
+  },
+  "evidence": {
+    "count_in_total_usage": [
+      "root input, cached input, reasoning output, and output",
+      "every subagent input, cached input, reasoning output, and output",
+      "automatic retries and root synthesis"
+    ],
+    "do_not_store": [
+      "API keys",
+      "raw encrypted provider artifacts",
+      "account identifiers"
+    ],
+    "record": [
+      "exact request configuration with credentials removed",
+      "candidate, capsule, prompt, and scorer hashes",
+      "root and subagent turn identifiers and usage",
+      "opaque artifact type, byte length, and SHA-256 digest only",
+      "wall-clock timing and retry count",
+      "raw critic result and deterministic score"
+    ]
+  },
+  "limitations": [
+    "Native encrypted items are provider artifacts, not a provider-neutral TORC handoff format.",
+    "API model and system context may differ from Codex CLI, so Series 002 is motivation rather than a matched control.",
+    "A ChatGPT Plus subscription does not authorize or fund Responses API calls.",
+    "Total native-agent cost can exceed a direct call even when the child context is smaller."
+  ],
+  "name": "Native context propagation follow-up",
+  "schema_version": 1,
+  "series_id": "critic-transport-series-003",
+  "status": "planned_requires_api_budget"
+}
