@@ -12,6 +12,10 @@ receives the full bundle. The complete response usage counts; agent-attributed
 output items verify that exactly one child ran. Quality remains governed by the
 frozen deterministic defect scorer.
 
+The pilot freezes `gpt-6.1-sol`, low reasoning effort, at most one concurrent
+subagent, no response storage, and a 2,000-token output ceiling. This is a new
+API-only comparison; it is not merged with the older `gpt-6-sol` CLI results.
+
 This is deliberately not active. Responses API use has separate API billing,
 so an operator must authorize a budget before the three-call pilot. The pilot
 stops the series unless usage is complete, agent count is bounded, and all arms

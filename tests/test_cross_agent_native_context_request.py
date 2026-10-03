@@ -25,6 +25,7 @@ def test_portable_request_reuses_compact_critic_payload() -> None:
 
     assert request["store"] is False
     assert request["reasoning"] == {"effort": "low"}
+    assert request["max_output_tokens"] == 2000
     assert "multi_agent" not in request
     assert "def legacy_route" in request["input"]
     assert "ARCHITECTURE.md" not in request["input"]
@@ -93,6 +94,15 @@ def test_only_preregistered_pilot_candidate_is_accepted() -> None:
             candidate_id="release-policy-baseline-v1",
             arm="portable_direct",
             model=MODEL,
+        )
+
+
+def test_only_frozen_model_is_accepted() -> None:
+    with pytest.raises(native.NativeContextRequestError, match="frozen provider"):
+        native.build_request(
+            candidate_id=CANDIDATE,
+            arm="portable_direct",
+            model="different-model",
         )
 
 

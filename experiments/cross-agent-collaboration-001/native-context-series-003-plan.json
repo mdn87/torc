@@ -30,10 +30,19 @@
         "shape": "one root execution plus one context-inheriting subagent execution"
       }
     ],
-    "model_rule": "freeze one exact model identifier supported by every arm and do not compare these API arms directly with the earlier CLI series",
+    "model_rule": "use the frozen provider_controls model for every arm and do not compare these API arms directly with the earlier CLI series",
     "question": "At equal deterministic critic quality, does native agent context propagation reduce total reported input or completion time relative to a portable TORC capsule?",
     "repeats_after_pilot": 3,
     "temperature_and_effort_rule": "freeze identical supported settings across arms"
+  },
+  "provider_controls": {
+    "surface": "beta.responses.create",
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "low",
+    "max_output_tokens": 2000,
+    "store": false,
+    "native_beta": "responses_multi_agent=v1",
+    "native_max_concurrent_subagents": 1
   },
   "decision_rules": {
     "continue_after_pilot_only_if": [
@@ -85,8 +94,7 @@
     "network_behavior": "native_context_request.py never makes a network call",
     "surface": "beta.responses.create",
     "beta": "responses_multi_agent=v1 for native arms",
-    "reasoning_effort": "low",
-    "store": false
+    "controls": "read from provider_controls and rejected on caller drift"
   },
   "response_validation": {
     "network_behavior": "native_context_response.py validates an existing response and never makes a network call",

@@ -125,5 +125,5 @@ def test_model_drift_is_rejected() -> None:
     isolated = _evidence("native_isolated", uncached_input=800, completion_ms=1000)
     isolated["model"] = "different-model"
 
-    with pytest.raises(report.NativeContextPilotReportError, match="drifted"):
+    with pytest.raises(report.NativeContextPilotReportError, match="frozen provider"):
         report.build_report([direct, isolated])

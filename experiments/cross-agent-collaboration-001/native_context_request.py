@@ -125,6 +125,11 @@ def build_request(*, candidate_id: str, arm: str, model: str) -> dict[str, Any]:
     plan = _read_object(PLAN_PATH)
     if plan.get("status") not in {"planned_requires_api_budget", "pilot_authorized"}:
         raise NativeContextRequestError("Series 003 is not in a request-planning state")
+    controls = plan.get("provider_controls")
+    if not isinstance(controls, dict):
+        raise NativeContextRequestError("Series 003 provider controls are missing")
+    if model != controls.get("model"):
+        raise NativeContextRequestError("model does not match the frozen provider control")
     if candidate_id != plan.get("candidate_policy", {}).get("pilot_candidate_id"):
         raise NativeContextRequestError("candidate is not the preregistered pilot candidate")
     candidate = _candidate(candidate_id)
@@ -133,11 +138,17 @@ def build_request(*, candidate_id: str, arm: str, model: str) -> dict[str, Any]:
     request: dict[str, Any] = {
         "model": model,
         "input": request_input,
-        "reasoning": {"effort": "low"},
-        "store": False,
+        "reasoning": {"effort": controls["reasoning_effort"]},
+        "max_output_tokens": controls["max_output_tokens"],
+        "store": controls["store"],
     }
     if arm != "portable_direct":
-        request["multi_agent"] = {"enabled": True, "max_concurrent_subagents": 1}
+        request["multi_agent"] = {
+            "enabled": True,
+            "max_concurrent_subagents": controls[
+                "native_max_concurrent_subagents"
+            ],
+        }
     return request
 
 
@@ -153,7 +164,11 @@ def request_plan(*, candidate_id: str, arm: str, model: str) -> dict[str, Any]:
         "status": "planned_not_executed",
         "execute": False,
         "api_surface": "beta.responses.create",
-        "required_beta": "responses_multi_agent=v1" if arm != "portable_direct" else None,
+        "required_beta": (
+            _read_object(PLAN_PATH)["provider_controls"]["native_beta"]
+            if arm != "portable_direct"
+            else None
+        ),
         "candidate_id": candidate_id,
         "candidate_workspace_tree_sha256": _candidate(candidate_id)[
             "candidate_workspace_tree_sha256"
