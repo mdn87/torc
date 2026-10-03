@@ -230,6 +230,9 @@ whether the local Codex app-server can expose one child's topology and usage
 under the existing Plus allowance. `codex_native_capability.py` builds its
 ephemeral, read-only, collaboration-only request without starting Codex. The
 first live probe is held until the current usage window resets.
+`codex_native_probe_runner.py` is guarded by the committed plan status, exact
+version and content hashes, a clean apparatus, and a fresh usage check; failed
+capability evidence is preserved without an automatic retry.
 
 ## Implemented smoke apparatus
 

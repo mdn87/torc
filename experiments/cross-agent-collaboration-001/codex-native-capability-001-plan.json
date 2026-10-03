@@ -50,5 +50,11 @@
     "A successful local probe measures Codex-native delegation under Plus; it does not create a portable Claude handoff.",
     "The capability probe is apparatus evidence, not a quality comparison.",
     "Do not run while the current-window usage snapshot is at or above 60 percent."
-  ]
+  ],
+  "runner": {
+    "path": "codex_native_probe_runner.py",
+    "default_behavior": "print the redacted model-free request plan",
+    "live_gate": "requires status ready, exact plan/prompt/version arguments, clean apparatus, and a fresh below-60-percent usage snapshot",
+    "failure_behavior": "preserve sanitized immutable evidence and mark the only call excluded; do not retry automatically"
+  }
 }
