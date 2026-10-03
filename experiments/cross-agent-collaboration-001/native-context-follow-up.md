@@ -22,6 +22,17 @@ stops the series unless usage is complete, agent count is bounded, and all arms
 remain scoreable. A native arm must eventually save at least 15 percent of
 total uncached input without losing defect recall to count as a win.
 
+Before buying API usage, `codex-native-capability-001-plan.json` now specifies a
+one-call local Codex probe under the existing Plus allowance. Codex 0.159.3
+advertises stable multi-agent support, and its app-server schema exposes child
+thread relationships, collaboration items, and per-thread token updates. If
+those fields are complete in a real ephemeral run, the local surface becomes
+the preferred pilot and the API version remains deferred.
+
+The local probe is waiting for the five-hour usage window to reset. Its last
+sanitized checkpoint was already above the stricter 60-percent multi-agent
+start threshold, so no reset credit or model call was consumed.
+
 Responses multi-agent documents only response-level usage. Separate root and
 subagent turn usage is documented for the distinct Agents API. The pilot must
 therefore validate that the response usage represents the complete hosted run;

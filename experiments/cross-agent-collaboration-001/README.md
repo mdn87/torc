@@ -225,6 +225,12 @@ critic result while retaining only hashes of encrypted provider artifacts.
 `native_context_pilot_report.py` combines one validated result per arm and
 applies the preregistered stop or continue rules.
 
+The cheaper prerequisite is `codex-native-capability-001-plan.json`. It asks
+whether the local Codex app-server can expose one child's topology and usage
+under the existing Plus allowance. `codex_native_capability.py` builds its
+ephemeral, read-only, collaboration-only request without starting Codex. The
+first live probe is held until the current usage window resets.
+
 ## Implemented smoke apparatus
 
 - `fixture_control.py` verifies the hash-pinned fixture and oracle trees,
