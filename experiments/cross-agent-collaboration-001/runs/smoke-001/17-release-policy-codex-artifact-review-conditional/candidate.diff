@@ -1,0 +1,70 @@
+diff --git a/release_policy.py b/release_policy.py
+index 4e838fe..78a7240 100644
+--- a/release_policy.py
++++ b/release_policy.py
+@@ -1,19 +1,59 @@
+ from __future__ import annotations
+ 
++import hmac
+ from collections.abc import Iterable, Mapping
+ 
+ 
++def _valid_path(value: object) -> bool:
++    if not isinstance(value, str) or not value or "\\" in value or "\x00" in value:
++        return False
++    return all(segment not in ("", ".", "..") for segment in value.split("/"))
++
++
++def _in_scope(path: str, roots: tuple[str, ...]) -> bool:
++    return any(path == root or path.startswith(root + "/") for root in roots)
++
++
+ def release_allowed(
+     attested_digest: str,
+     artifact_digest: str,
+     changes: Iterable[Mapping[str, str]],
+     allowed_roots: Iterable[str],
+ ) -> bool:
+-    """Return whether a release is attested and every destination is in scope."""
++    """Return whether the artifact is attested and every changed path is in scope."""
++
++    try:
++        if not hmac.compare_digest(attested_digest, artifact_digest):
++            return False
++    except (TypeError, ValueError):
++        return False
+ 
+-    if attested_digest != artifact_digest:
++    if isinstance(allowed_roots, (str, bytes, Mapping)) or isinstance(
++        changes, (str, bytes, Mapping)
++    ):
+         return False
+-    roots = tuple(allowed_roots)
+-    return all(
+-        any(change["path"].startswith(root) for root in roots) for change in changes
+-    )
++
++    try:
++        roots = tuple(allowed_roots)
++        if not roots or not all(_valid_path(root) for root in roots):
++            return False
++
++        for change in changes:
++            if not isinstance(change, Mapping):
++                return False
++
++            action = change.get("action")
++            path = change.get("path")
++            if action not in ("add", "modify", "delete", "rename"):
++                return False
++            if not _valid_path(path) or not _in_scope(path, roots):
++                return False
++
++            if action == "rename":
++                from_path = change.get("from_path")
++                if not _valid_path(from_path) or not _in_scope(from_path, roots):
++                    return False
++    except Exception:
++        return False
++
++    return True

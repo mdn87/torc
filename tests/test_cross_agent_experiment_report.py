@@ -73,6 +73,8 @@ def test_report_separates_valid_runs_and_provider_usage(tmp_path: Path) -> None:
             "workflow_id": "codex-review",
             "worker_interface": "patch-artifact-v1",
             "accepted_final": True,
+            "critic_verdict": "approve",
+            "revision_performed": False,
             "phases": [
                 {"record": "phases/01-primary/worker-run.json"},
                 {"record": "phases/02-critic/worker-run.json"},
@@ -93,6 +95,8 @@ def test_report_separates_valid_runs_and_provider_usage(tmp_path: Path) -> None:
     assert codex["mean_input_tokens_per_reported_phase"] == 100.0
     comparison = result["matched_workflow_comparisons"][0]
     assert comparison["quality_delta"] == 0
+    assert comparison["review_critic_verdict"] == "approve"
+    assert comparison["review_revision_performed"] is False
     assert comparison["input_ratio"] == 2.0
     assert comparison["completion_ratio"] == 2.0
 

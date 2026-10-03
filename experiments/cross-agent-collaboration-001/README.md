@@ -1,6 +1,6 @@
 # Cross-agent collaboration experiment 001
 
-Status: artifact smoke active; three Codex solo cells and two review controls valid
+Status: artifact smoke active; three Codex solo cells and three review controls valid
 
 Scope envelope: `scope-envelope.json`
 
@@ -134,8 +134,8 @@ python experiments/cross-agent-collaboration-001/experiment_report.py
 The report keeps usage grouped by provider and interface and emits matched
 solo-versus-review comparisons when both use the same fixture, provider, and
 artifact interface. In the current smoke ledger, eight excluded direct-tool
-Codex phases report 851,208 input tokens, while eight valid artifact phases
-report 121,014. That large interface gap is diagnostic evidence from failed
+Codex phases report 851,208 input tokens, while ten valid artifact phases
+report 148,793. That large interface gap is diagnostic evidence from failed
 harness attempts, not a controlled quality comparison.
 
 The first native-review control (`14-bug-codex-artifact-review`) also passed,
@@ -156,6 +156,13 @@ The release-policy solo baseline (`16-release-policy-codex-artifact-solo`)
 passed all 17 visible and hidden checks with 13,278 input tokens. Its 81.2-second
 worker time and 2,896 reasoning tokens show that the compact prompt size stayed
 stable while the harder task moved cost into reasoning and output.
+
+The matched conditional review (`17-release-policy-codex-artifact-review-conditional`)
+also passed after a zero-finding approval and skipped revision. It used 27,779
+input tokens and 92.4 seconds of summed worker time: 2.09x the solo input and
+1.14x the solo time, with no quality change. Two conditional controls now show
+the same pattern: native review roughly doubles input after a correct primary,
+but has not yet improved deterministic acceptance.
 
 ## Implemented smoke apparatus
 

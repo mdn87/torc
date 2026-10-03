@@ -85,6 +85,16 @@ def summarize_run(run_dir: Path) -> dict[str, Any]:
             }
         )
 
+    revision_performed = result.get("revision_performed") if result else None
+    if (
+        not isinstance(revision_performed, bool)
+        and result is not None
+        and result.get("workflow_id") == "codex-review"
+    ):
+        revision_performed = sum(
+            phase["role"] == "implementer" for phase in phases
+        ) > 1
+
     return {
         "run_id": run_dir.name,
         "fixture_id": result.get("fixture_id") if result else None,
@@ -98,6 +108,8 @@ def summarize_run(run_dir: Path) -> dict[str, Any]:
         "category": category,
         "comparative_use": comparative_use,
         "accepted_final": result.get("accepted_final") if result else None,
+        "critic_verdict": result.get("critic_verdict") if result else None,
+        "revision_performed": revision_performed,
         "phases": phases,
     }
 
@@ -183,7 +195,8 @@ def build_report(runs_dir: Path = DEFAULT_RUNS_DIR) -> dict[str, Any]:
             values = [phase[field] for phase in run["phases"]]
             if not values or not all(isinstance(value, (int, float)) for value in values):
                 return None
-            return sum(values)
+            value = sum(values)
+            return round(value, 3) if field == "completion_ms" else value
 
         solo_input = total(baseline, "input_tokens")
         reviewed_input = total(candidate, "input_tokens")
@@ -197,6 +210,8 @@ def build_report(runs_dir: Path = DEFAULT_RUNS_DIR) -> dict[str, Any]:
                 "reviewed_run_id": candidate["run_id"],
                 "solo_accepted": baseline["accepted_final"],
                 "reviewed_accepted": candidate["accepted_final"],
+                "review_critic_verdict": candidate["critic_verdict"],
+                "review_revision_performed": candidate["revision_performed"],
                 "quality_delta": int(candidate["accepted_final"] is True)
                 - int(baseline["accepted_final"] is True),
                 "solo_phase_count": len(baseline["phases"]),
