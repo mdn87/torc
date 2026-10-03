@@ -109,6 +109,7 @@ def test_report_separates_valid_runs_and_provider_usage(tmp_path: Path) -> None:
     comparison = result["matched_workflow_comparisons"][0]
     assert comparison["quality_delta"] == 0
     assert comparison["review_critic_verdict"] == "approve"
+    assert comparison["review_critic_context"] == "full-visible-bundle-v1"
     assert comparison["review_revision_performed"] is False
     assert comparison["input_ratio"] == 2.0
     assert comparison["completion_ratio"] == 2.0

@@ -95,6 +95,9 @@ def summarize_run(run_dir: Path) -> dict[str, Any]:
         revision_performed = sum(
             phase["role"] == "implementer" for phase in phases
         ) > 1
+    critic_context = result.get("critic_context") if result else None
+    if critic_context is None and result is not None and result.get("critic_verdict"):
+        critic_context = "full-visible-bundle-v1"
 
     return {
         "run_id": run_dir.name,
@@ -110,6 +113,7 @@ def summarize_run(run_dir: Path) -> dict[str, Any]:
         "comparative_use": comparative_use,
         "accepted_final": result.get("accepted_final") if result else None,
         "critic_verdict": result.get("critic_verdict") if result else None,
+        "critic_context": critic_context,
         "revision_performed": revision_performed,
         "phases": phases,
     }
@@ -213,6 +217,7 @@ def build_report(runs_dir: Path = DEFAULT_RUNS_DIR) -> dict[str, Any]:
                 "solo_accepted": baseline["accepted_final"],
                 "reviewed_accepted": candidate["accepted_final"],
                 "review_critic_verdict": candidate["critic_verdict"],
+                "review_critic_context": candidate["critic_context"],
                 "review_revision_performed": candidate["revision_performed"],
                 "quality_delta": int(candidate["accepted_final"] is True)
                 - int(baseline["accepted_final"] is True),

@@ -29,6 +29,9 @@ from torc.execution_capsules import (  # noqa: E402
 EXPERIMENT_ROOT = Path(__file__).resolve().parent
 DEFAULT_MANIFEST = EXPERIMENT_ROOT / "smoke-manifest.json"
 PATCH_ARTIFACT_INTERFACE = "patch-artifact-v1"
+FULL_CRITIC_CONTEXT = "full-visible-bundle-v1"
+COMPACT_CRITIC_CONTEXT = "claim-capsule-candidate-v1"
+CRITIC_CONTEXTS = {FULL_CRITIC_CONTEXT, COMPACT_CRITIC_CONTEXT}
 _BUNDLE_IGNORED_PARTS = {".git", ".pytest_cache", "__pycache__"}
 _MAX_BUNDLE_BYTES = 500_000
 _MAX_REPLACEMENT_BYTES = 200_000
@@ -63,6 +66,14 @@ def load_manifest(path: Path = DEFAULT_MANIFEST) -> dict[str, Any]:
         or not isinstance(interface.get("editable_paths"), dict)
     ):
         raise WorkflowRunnerError("workflow manifest has no supported worker interface")
+    for workflow_id, workflow in manifest["workflows"].items():
+        if not isinstance(workflow, dict):
+            raise WorkflowRunnerError(f"workflow is invalid: {workflow_id}")
+        critic_context = workflow.get("critic_context", FULL_CRITIC_CONTEXT)
+        if workflow.get("critic") and critic_context not in CRITIC_CONTEXTS:
+            raise WorkflowRunnerError(
+                f"workflow has unsupported critic context: {workflow_id}"
+            )
     return manifest
 
 
@@ -177,6 +188,33 @@ def _visible_file_bundle(workspace: Path) -> dict[str, Any]:
         files.append(
             {
                 "path": relative.as_posix(),
+                "sha256": hashlib.sha256(content.encode("utf-8")).hexdigest(),
+                "content": content,
+            }
+        )
+    return {"schema_version": 1, "files": files, "total_bytes": total_bytes}
+
+
+def _selected_file_bundle(workspace: Path, relative_paths: list[str]) -> dict[str, Any]:
+    files: list[dict[str, Any]] = []
+    total_bytes = 0
+    for relative in relative_paths:
+        path = workspace / PurePosixPath(relative)
+        if not path.is_file() or not path.resolve().is_relative_to(workspace.resolve()):
+            raise WorkflowRunnerError(f"candidate file is unavailable: {relative}")
+        try:
+            content = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError as exc:
+            raise WorkflowRunnerError(
+                f"candidate file is not UTF-8: {relative}"
+            ) from exc
+        size = len(content.encode("utf-8"))
+        total_bytes += size
+        if total_bytes > _MAX_BUNDLE_BYTES:
+            raise WorkflowRunnerError("candidate file bundle exceeds the frozen limit")
+        files.append(
+            {
+                "path": relative,
                 "sha256": hashlib.sha256(content.encode("utf-8")).hexdigest(),
                 "content": content,
             }
@@ -321,10 +359,25 @@ def _compile_handoff(
     )
 
 
-def _critic_prompt(capsule: dict[str, Any], workspace: Path) -> str:
+def _critic_prompt(
+    capsule: dict[str, Any],
+    workspace: Path,
+    editable_paths: list[str],
+    critic_context: str,
+) -> str:
+    if critic_context == FULL_CRITIC_CONTEXT:
+        context_instruction = "task, candidate source, tests, and CANDIDATE.diff"
+        context_label = "Agent-visible bundle"
+        context = _visible_file_bundle(workspace)
+    elif critic_context == COMPACT_CRITIC_CONTEXT:
+        context_instruction = "execution claims and candidate source files"
+        context_label = "Candidate file bundle"
+        context = _selected_file_bundle(workspace, editable_paths)
+    else:
+        raise WorkflowRunnerError(f"unsupported critic context: {critic_context}")
     return (
         "Act as an independent critic in tool-free mode. Do not call any tool: every visible "
-        "input is included below. Inspect the task, candidate source, tests, and CANDIDATE.diff, "
+        f"input is included below. Inspect the {context_instruction}, "
         "then return JSON only. Use this exact shape: "
         '{"schema_version":1,"verdict":"approve|changes_requested","findings":['
         '{"finding_id":"f1","severity":"blocking|non_blocking","summary":"...",'
@@ -333,8 +386,8 @@ def _critic_prompt(capsule: dict[str, Any], workspace: Path) -> str:
         "use an empty claim_ids list only for a code defect unrelated to a stated claim. Do not "
         "invent a finding to avoid approving correct work.\n\nExecution capsule:\n"
         + canonical_json(capsule)
-        + "\n\nAgent-visible bundle:\n"
-        + canonical_json(_visible_file_bundle(workspace))
+        + f"\n\n{context_label}:\n"
+        + canonical_json(context)
     )
 
 
@@ -462,6 +515,7 @@ def run_workflow(
     run_id = resolved_run.name
     primary_name = workflow["primary"]
     critic_name = workflow.get("critic")
+    critic_context = workflow.get("critic_context", FULL_CRITIC_CONTEXT)
     primary_settings = _provider_settings(manifest, primary_name)
     primary_workspace = resolved_run / "workspaces" / "primary"
     stage = fixture_control.stage_fixture(fixture_id, primary_workspace)
@@ -540,7 +594,9 @@ def run_workflow(
     critic_record = _run_worker(
         settings=critic_settings,
         workspace=critic_workspace,
-        prompt=_critic_prompt(capsule, critic_workspace),
+        prompt=_critic_prompt(
+            capsule, critic_workspace, editable_paths, critic_context
+        ),
         effort=critic_settings["critic_effort"],
         role="critic",
         tool_mode="none",
@@ -609,6 +665,7 @@ def run_workflow(
         "phases": phases,
         "candidate_diff_bytes": len(candidate_diff.encode("utf-8")),
         "critic_verdict": critique["verdict"],
+        "critic_context": critic_context,
         "critic_finding_count": len(critique["findings"]),
         "revision_performed": revision_performed,
         "revision_skipped_reason": None if revision_performed else "critic_approved",
@@ -646,6 +703,11 @@ def workflow_plan(
         ),
         "revision_policy": (
             "changes_requested_only" if workflow.get("critic") else "not_applicable"
+        ),
+        "critic_context": (
+            workflow.get("critic_context", FULL_CRITIC_CONTEXT)
+            if workflow.get("critic")
+            else None
         ),
         "phases": providers,
         "provider_controls": {

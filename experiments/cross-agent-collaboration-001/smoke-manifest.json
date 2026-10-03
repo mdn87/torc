@@ -28,7 +28,8 @@
     ["release-policy-interaction", "codex-solo"],
     ["release-policy-interaction", "codex-review"],
     ["design-cutover-plan", "codex-solo"],
-    ["design-cutover-plan", "codex-review"]
+    ["design-cutover-plan", "codex-review"],
+    ["design-cutover-plan", "codex-review-compact"]
   ],
   "timeout_seconds": 900,
   "providers": {
@@ -52,8 +53,25 @@
   "workflows": {
     "codex-solo": {"primary": "codex", "critic": null},
     "claude-solo": {"primary": "claude-code", "critic": null},
-    "codex-review": {"primary": "codex", "critic": "codex"},
-    "codex-claude": {"primary": "codex", "critic": "claude-code"},
-    "claude-codex": {"primary": "claude-code", "critic": "codex"}
+    "codex-review": {
+      "primary": "codex",
+      "critic": "codex",
+      "critic_context": "full-visible-bundle-v1"
+    },
+    "codex-review-compact": {
+      "primary": "codex",
+      "critic": "codex",
+      "critic_context": "claim-capsule-candidate-v1"
+    },
+    "codex-claude": {
+      "primary": "codex",
+      "critic": "claude-code",
+      "critic_context": "claim-capsule-candidate-v1"
+    },
+    "claude-codex": {
+      "primary": "claude-code",
+      "critic": "codex",
+      "critic_context": "claim-capsule-candidate-v1"
+    }
   }
 }

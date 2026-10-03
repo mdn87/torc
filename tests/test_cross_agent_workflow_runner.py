@@ -109,6 +109,9 @@ def test_workflow_plans_make_call_cost_explicit() -> None:
     native_review = workflow.workflow_plan(
         manifest, "bug-hidden-regression", "codex-review"
     )
+    compact_review = workflow.workflow_plan(
+        manifest, "bug-hidden-regression", "codex-review-compact"
+    )
     cross = workflow.workflow_plan(manifest, "bug-hidden-regression", "codex-claude")
 
     assert solo["model_call_count"] == 1
@@ -118,8 +121,11 @@ def test_workflow_plans_make_call_cost_explicit() -> None:
     assert native_review["model_call_count_range"] == [2, 3]
     assert native_review["revision_policy"] == "changes_requested_only"
     assert native_review["phases"] == ["codex", "codex", "codex"]
+    assert native_review["critic_context"] == workflow.FULL_CRITIC_CONTEXT
+    assert compact_review["critic_context"] == workflow.COMPACT_CRITIC_CONTEXT
     assert cross["model_call_count"] == 3
     assert cross["phases"] == ["codex", "claude-code", "codex"]
+    assert cross["critic_context"] == workflow.COMPACT_CRITIC_CONTEXT
 
 
 def test_claim_capsule_accepts_known_citations_and_rejects_unknown() -> None:
@@ -150,6 +156,38 @@ def test_claim_capsule_accepts_known_citations_and_rejects_unknown() -> None:
     critique["findings"][0]["claim_ids"] = ["missing1"]
     with pytest.raises(workflow.WorkflowRunnerError, match="invalid claim"):
         workflow._validate_critique(critique, control)
+
+
+def test_compact_critic_context_excludes_redundant_fixture_files(
+    tmp_path: Path,
+) -> None:
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    (workspace / "candidate.py").write_text("CANDIDATE_MARKER\n", encoding="utf-8")
+    (workspace / "TASK.md").write_text("TASK_MARKER\n", encoding="utf-8")
+    (workspace / "tests.py").write_text("TEST_MARKER\n", encoding="utf-8")
+    (workspace / "CANDIDATE.diff").write_text("DIFF_MARKER\n", encoding="utf-8")
+    capsule = {"claims": {"hard_constraints": {"x1": "CLAIM_MARKER"}}}
+
+    compact = workflow._critic_prompt(
+        capsule,
+        workspace,
+        ["candidate.py"],
+        workflow.COMPACT_CRITIC_CONTEXT,
+    )
+    full = workflow._critic_prompt(
+        capsule,
+        workspace,
+        ["candidate.py"],
+        workflow.FULL_CRITIC_CONTEXT,
+    )
+
+    assert "CLAIM_MARKER" in compact
+    assert "CANDIDATE_MARKER" in compact
+    assert "TASK_MARKER" not in compact
+    assert "TEST_MARKER" not in compact
+    assert "DIFF_MARKER" not in compact
+    assert all(marker in full for marker in ("TASK_MARKER", "TEST_MARKER", "DIFF_MARKER"))
 
 
 def test_solo_workflow_scores_without_model_synthesis(
@@ -236,6 +274,7 @@ def test_cross_workflow_uses_capsule_critic_and_same_session_revision(
     assert result["accepted_after_primary"] is True
     assert result["accepted_final"] is True
     assert result["critic_verdict"] == "changes_requested"
+    assert result["critic_context"] == workflow.COMPACT_CRITIC_CONTEXT
     assert result["revision_performed"] is True
     assert [call["role"] for call in calls] == ["implementer", "critic", "implementer"]
     assert calls[2]["session_mode"] == "resume"
@@ -274,6 +313,7 @@ def test_approved_critique_skips_revision(
 
     assert len(calls) == 2
     assert result["revision_performed"] is False
+    assert result["critic_context"] == workflow.FULL_CRITIC_CONTEXT
     assert result["revision_skipped_reason"] == "critic_approved"
     assert result["accepted_final"] is True
     assert (tmp_path / "approved-run" / "revision-skipped.json").is_file()

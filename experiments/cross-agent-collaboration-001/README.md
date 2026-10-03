@@ -31,10 +31,13 @@ make a model call.
 2. Claude completes the task alone.
 3. Codex implements and a fresh low-effort Codex critic reviews the TORC capsule.
    The same primary thread revises only after `changes_requested`. This is the
-   native-review control.
-4. Codex implements and Claude critiques; the same Codex thread revises only
+   full-bundle native-review control.
+4. Codex implements and a fresh low-effort Codex critic receives only the TORC
+   claim capsule and editable candidate files. This is the compact-handoff
+   control.
+5. Codex implements and Claude critiques; the same Codex thread revises only
    after `changes_requested`.
-5. Claude implements and Codex critiques; the same Claude session revises only
+6. Claude implements and Codex critiques; the same Claude session revises only
    after `changes_requested`.
 
 The primary and reviser use the same frozen high-capability settings. The
@@ -119,6 +122,14 @@ shape, uniqueness, and size before applying replacements and running tests.
 This interface keeps file authority and test execution outside both providers,
 avoids host-specific nested tool routing, and makes the portable context bytes
 directly measurable. It is an experiment transport, not a TORC provider router.
+
+Reviewed workflows also freeze a critic-context mode. The full control receives
+the entire visible fixture plus the claim capsule. The compact mode receives
+only the claim capsule and hash-labeled editable candidate files; tests, task
+prose, harness instructions, and the duplicate diff stay outside target context.
+On the frozen design candidate this reduces critic prompt bytes from 15,849 to
+4,801 (69.7%) before inference. That is transport-size evidence, not yet a token
+or quality result.
 
 The first two live Codex artifact cells passed all visible and hidden tests.
 The bug fixture finished in 11.7 seconds with 13,013 input tokens; the refactor
