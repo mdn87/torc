@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "series_id": "critic-claim-link-confirmation-005",
+  "status": "draft",
+  "question": "Do repeated counterbalanced compact claim-link batches preserve structured claim coverage while reducing provider input and completion time?",
+  "excluded_predecessors": [
+    "critic-batch-capability-001",
+    "critic-batch-confirmation-004",
+    "critic-claim-matrix-capability-001",
+    "critic-claim-link-capability-002"
+  ],
+  "exploratory_predecessor": {
+    "series_id": "critic-claim-link-capability-002",
+    "use": "capability motivation only; excluded from confirmation estimates"
+  },
+  "apparatus_revision": "pending",
+  "apparatus_inputs": [],
+  "provider_controls": {
+    "provider": "codex",
+    "billing_surface": "ChatGPT Plus Codex allowance",
+    "harness_version": "codex-cli 0.159.3",
+    "model": "gpt-6-sol",
+    "effort": "low",
+    "session_mode": "fresh-ephemeral",
+    "tool_mode": "none",
+    "network_access": false
+  },
+  "reviewable_claim_categories": [
+    "active_commitments",
+    "hard_constraints",
+    "settled_decisions",
+    "superseded_directions"
+  ],
+  "expected_claim_statuses": {
+    "refactor-baseline-v1": {
+      "c1": "unmet",
+      "x1": "unmet",
+      "x2": "met",
+      "x3": "met",
+      "d1": "unmet",
+      "s1": "unmet"
+    },
+    "release-policy-baseline-v1": {
+      "c1": "met",
+      "c2": "met",
+      "x1": "unmet",
+      "x2": "unmet",
+      "x3": "unmet",
+      "x4": "unmet",
+      "x5": "unmet"
+    }
+  },
+  "counterbalanced_schedule": [
+    {
+      "run_index": 1,
+      "run_id": "01-refactor-first",
+      "candidate_order": [
+        "refactor-baseline-v1",
+        "release-policy-baseline-v1"
+      ]
+    },
+    {
+      "run_index": 2,
+      "run_id": "02-release-first",
+      "candidate_order": [
+        "release-policy-baseline-v1",
+        "refactor-baseline-v1"
+      ]
+    },
+    {
+      "run_index": 3,
+      "run_id": "03-release-first",
+      "candidate_order": [
+        "release-policy-baseline-v1",
+        "refactor-baseline-v1"
+      ]
+    },
+    {
+      "run_index": 4,
+      "run_id": "04-refactor-first",
+      "candidate_order": [
+        "refactor-baseline-v1",
+        "release-policy-baseline-v1"
+      ]
+    }
+  ],
+  "call_budget": {
+    "maximum_calls": 4,
+    "automatic_retries": 0,
+    "stop_threshold_percent": 60,
+    "series_directory": "runs/critic-claim-link-confirmation-005",
+    "reset_credits": "do not consume without explicit operator approval"
+  },
+  "matched_direct_baseline": {
+    "refactor_run_ids": [
+      "01-refactor-compact",
+      "04-refactor-compact",
+      "05-refactor-compact"
+    ],
+    "release_run_ids": [
+      "07-release-compact",
+      "10-release-compact",
+      "11-release-compact"
+    ],
+    "summed_median_input_tokens": 25107,
+    "summed_median_completion_ms": 23397.869,
+    "median_defect_recall_each": 1.0
+  },
+  "confirmation_thresholds": {
+    "quality": "all eight candidate critiques have every expected claim status, correct attribution and verdict, same-claim finding links, and zero unlinked findings",
+    "maximum_median_input_ratio": 0.75,
+    "maximum_median_completion_ratio": 1.0,
+    "order_check": "each candidate passes structured quality twice in first position and twice in second position"
+  },
+  "stop_rules": [
+    "Run exactly one scheduled batch per invocation and never retry automatically.",
+    "Stop after any excluded run, schema or attribution failure, claim-status miss, invalid link, unlinked finding, harness failure, or current-window usage at or above 60 percent.",
+    "Preserve every attempted run directory and commit its evidence before another call.",
+    "Do not count any predecessor or capability call in confirmation estimates.",
+    "Do not generalize beyond two independent compact review capsules from these two fixtures."
+  ]
+}
