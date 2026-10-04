@@ -234,7 +234,14 @@ def validate_output(value: dict[str, Any], *, plan: dict[str, Any]) -> list[dict
     critiques = value.get("critiques")
     if not isinstance(critiques, list) or len(critiques) != len(plan["candidates"]):
         raise CriticClaimMatrixProbeError("claim-matrix critique count is invalid")
-    observed_ids = [item.get("candidate_id") for item in critiques if isinstance(item, dict)]
+    for item in critiques:
+        if not isinstance(item, dict) or set(item) != {
+            "candidate_id",
+            "claim_assessments",
+            "result",
+        }:
+            raise CriticClaimMatrixProbeError("claim-matrix candidate envelope is invalid")
+    observed_ids = [item["candidate_id"] for item in critiques]
     if observed_ids != plan["candidates"]:
         raise CriticClaimMatrixProbeError("claim-matrix candidate order drifted")
     nested = {
@@ -252,12 +259,6 @@ def validate_output(value: dict[str, Any], *, plan: dict[str, Any]) -> list[dict
     categories = plan["reviewable_claim_categories"]
     validated = []
     for item in critiques:
-        if set(item) != {
-            "candidate_id",
-            "claim_assessments",
-            "result",
-        }:
-            raise CriticClaimMatrixProbeError("claim-matrix candidate envelope is invalid")
         candidate_id = item["candidate_id"]
         claim_ids = _reviewable_claim_ids(
             candidate_id=candidate_id,
@@ -349,6 +350,7 @@ def execute_probe(
     except (
         CriticClaimMatrixProbeError,
         batch.CriticBatchProbeError,
+        request_builder.NativeContextRequestError,
         workflow.WorkflowRunnerError,
         worker_runner.WorkerRunnerError,
     ) as exc:
@@ -386,6 +388,7 @@ def execute_probe(
         "schema_version": 1,
         "series_id": plan["series_id"],
         "status": "capability_confirmed" if capability_confirmed else "capability_rejected",
+        "apparatus_revision": plan["apparatus_revision"],
         "prompt_bytes": probe["prompt_bytes"],
         "prompt_sha256": probe["prompt_sha256"],
         "candidate_results": scored,
@@ -400,6 +403,15 @@ def execute_probe(
     }
     _write_json(resolved_run / "batch-output.json", output)
     _write_json(resolved_run / "result.json", result)
+    _write_json(
+        resolved_run / "attempt.json",
+        {
+            "schema_version": 1,
+            "status": "completed",
+            "apparatus_revision": plan["apparatus_revision"],
+            "retry_requires_plan_change": True,
+        },
+    )
     return result
 
 

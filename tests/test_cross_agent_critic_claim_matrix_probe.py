@@ -88,6 +88,15 @@ def test_claim_matrix_validator_rejects_missing_claim() -> None:
         matrix.validate_output(output, plan=plan)
 
 
+def test_claim_matrix_validator_rejects_missing_candidate_result_cleanly() -> None:
+    plan = json.loads(matrix.PLAN_PATH.read_text(encoding="utf-8"))
+    output = _valid_output(plan)
+    del output["critiques"][0]["result"]
+
+    with pytest.raises(matrix.CriticClaimMatrixProbeError, match="envelope"):
+        matrix.validate_output(output, plan=plan)
+
+
 def test_claim_matrix_validator_rejects_cross_claim_finding_link() -> None:
     plan = json.loads(matrix.PLAN_PATH.read_text(encoding="utf-8"))
     output = copy.deepcopy(_valid_output(plan))
