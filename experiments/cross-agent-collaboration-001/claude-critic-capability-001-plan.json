@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "series_id": "claude-critic-capability-001",
+  "status": "ready",
+  "question": "Can the authenticated Claude Pro CLI execute the same tool-free TORC compact critique after the prior organization-policy rejection?",
+  "candidate": {
+    "candidate_id": "refactor-baseline-v1",
+    "fixture_id": "refactor-superseded-path",
+    "candidate_workspace_tree_sha256": "8adde67f95bbeec5342ba29880e982dcb30adade419a471e6509c31e8b9f5a00",
+    "critic_context": "claim-capsule-candidate-v1"
+  },
+  "provider_controls": {
+    "provider": "claude-code",
+    "billing_surface": "Claude Pro subscription allowance",
+    "transport": "native Linux CLI through WSL",
+    "harness_version": "2.1.285 (Claude Code)",
+    "model": "claude-opus-4-7",
+    "effort": "low",
+    "session_mode": "fresh-ephemeral",
+    "tool_mode": "none",
+    "network_access": false,
+    "mcp_servers": 0
+  },
+  "call_budget": {
+    "maximum_calls": 1,
+    "automatic_retries": 0,
+    "run_directory": "runs/claude-critic-capability-001/01-refactor-compact"
+  },
+  "success_requires": [
+    "the pinned Claude harness completes exactly one inference",
+    "the result is valid critic JSON for the frozen refactor baseline",
+    "provider-supplied token usage is present",
+    "the deterministic scorer reports changes_requested and full defect recall",
+    "no tool, subagent, MCP, browser, or web action occurs"
+  ],
+  "decision": {
+    "on_success": "freeze a separate repeated Claude compact-critic series before making any quality comparison",
+    "on_policy_rejection": "preserve and exclude the attempt; do not retry until authentication or organization policy changes",
+    "on_quality_failure": "preserve the result and do not generalize from a single capability call"
+  },
+  "comparison_rule": "Do not add Claude and Codex token counts or treat their tokenizers as equivalent; compare deterministic quality first and report each provider's supplied usage separately."
+}
