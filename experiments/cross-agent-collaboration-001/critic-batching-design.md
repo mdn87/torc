@@ -18,6 +18,7 @@ calls, routing, retries, and usage accounting remain in the harness adapter.
 | Local native Codex subagent | Full recall, but incomplete transport observability | Child 5.0% below direct; root plus child 304.6% above direct | 246.0% above direct |
 | Two-candidate batch capability | Both candidates full recall | 42.7% below summed direct medians | 35.8% below summed direct medians |
 | Free-text batch confirmation, three completed calls | Strictly stopped at 5/6 full-recall critiques | Descriptive median 42.8% below direct | Descriptive median 36.1% below direct |
+| Compact claim-link confirmation, four calls | 52/52 statuses correct; 28/28 findings linked | 42.1% below summed direct median | 19.6% below summed direct median |
 
 The batching saving is consistent with amortizing roughly one large fixed
 Codex harness context. Shrinking the explicit capsule alone cannot remove that
@@ -82,20 +83,33 @@ steps, mixed policy domains, secrets with different access boundaries, or work
 whose result depends on ordering. Keep the tested batch size at two until a
 broader fixture set earns a larger bound.
 
+## Confirmed operating bound
+
+The four-call `AB, BA, BA, AB` confirmation preserved all 52 expected claim
+statuses, linked all 28 findings, and passed every frozen input and completion
+threshold. Median provider input fell 42.1% and median completion time fell
+19.6% against matched summed-direct controls. Candidate position did not change
+quality. The recommendation is therefore batch size two for independent,
+read-only critiques with one model, effort, policy boundary, and compact
+claim-link contract.
+
+This is a narrow operating bound from two synthetic fixtures, not evidence that
+larger batches, dependent tasks, mutable work, or other providers behave the
+same way. The older lexical scorer remains descriptive because it mislabeled
+two structurally valid critiques.
+
 ## Next evidence gates
 
-1. Freeze four fresh compact claim-link batches in `AB, BA, BA, AB` order now
-   that its separate capability call passed quality, input, and time gates.
-   Exclude all capability and free-text calls from that estimate.
-2. Require every run to preserve all 13 expected claim statuses, same-claim
-   finding links, full attribution, and no unlinked findings.
-3. Add at least two new fixtures with different claim shapes before making a
+1. Add at least two fixtures with different claim shapes before making a
    general quality claim or testing a batch size above two.
-4. When Claude organization policy permits inference, run the same structured
+2. When Claude organization policy permits inference, run the same structured
    contract as a separate provider series. Compare quality and latency, but do
    not combine tokenizer totals.
-5. Add an execution-adapter integration only after the structured confirmation
-   passes. Keep TORC core provider-neutral.
+3. Add batching only at an execution-adapter boundary. Keep TORC core
+   provider-neutral and retain batch-level usage rather than inventing
+   per-candidate token totals.
+4. Re-run the frozen structured gates for every new model, provider, effort, or
+   fixture family before expanding its operating bound.
 
 Stop pursuing batching if structured coverage repeatedly misses explicit
 claims, median input saving falls below 25%, or attribution cannot fail closed.
@@ -114,22 +128,11 @@ hashes, commands, guard, and dispositions needed to resume without reconstructin
 the full conversation. The runner rechecked every control independently, and
 the deferred call ran at 0% five-hour usage without consuming a reset credit.
 
-## Pending capability command
+## Reproduce the confirmation audit
 
-First recheck usage:
-
-```text
-python experiments/cross-agent-collaboration-001/codex_usage_snapshot.py --stop-threshold 60
-```
-
-Then inspect the model-free request. The live runner independently verifies the
-plan, prompt, apparatus hashes, exact run directory, and usage gate:
+The audit makes no model call. It revalidates all four frozen runs and compares
+their aggregate with the matched separate-call controls:
 
 ```text
-python experiments/cross-agent-collaboration-001/critic_claim_matrix_probe.py
+python experiments/cross-agent-collaboration-001/critic_claim_link_confirmation_audit.py --pretty
 ```
-
-The frozen plan hash is
-`245da3f6520bf31ce5fd60692081dc95914b09934ae80e70418bffc2df760931` and
-the prompt hash is
-`f5f867a4eb3b7bbfe7671fad3314a618295125c5db954472ecd761668be8065f`.

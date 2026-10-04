@@ -252,7 +252,23 @@ statuses were correct, both candidates retained full defect recall, and every
 finding was structurally linked. Compared with separate compact calls, input
 fell 42.0% and completion time fell 28.3%. Compared with the verbose matrix,
 output fell 41.2% and completion time fell 35.7%. The compact link map passed
-all frozen gates; a fresh four-call counterbalanced confirmation is next.
+all frozen gates.
+
+`critic-claim-link-confirmation-005` then repeated the compact contract in four
+fresh calls with counterbalanced `AB, BA, BA, AB` ordering. All 52 claim-status
+decisions were correct across eight candidate critiques, all 28 findings were
+linked, and quality was unchanged by candidate position. Median provider input
+was 42.1% below the matched summed-direct baseline and median completion time
+was 19.6% lower. Two legacy lexical labels disagreed with otherwise valid
+structured evidence, so they remain descriptive rather than overriding the
+preregistered structural gate. This confirms batch size two only for the two
+bounded, independent, read-only fixtures tested here. New fixture shapes and a
+separate provider series are required before increasing the batch size or
+generalizing the result. The reproducible audit is:
+
+```text
+python experiments/cross-agent-collaboration-001/critic_claim_link_confirmation_audit.py --pretty
+```
 
 The preregistered native-context follow-up is documented in
 `native-context-follow-up.md` and `native-context-series-003-plan.json`. It is
