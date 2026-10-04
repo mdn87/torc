@@ -222,7 +222,11 @@ matched separate-call medians, a 42.7% reduction, and completed in 15.0 seconds
 versus a 23.4-second summed median, a 35.8% reduction. The explicit batch prompt
 was larger than the two payloads alone, so the saving came from sharing the
 harness context, not more aggressive TORC compression. This is a strong
-one-call capability result; repeated counterbalanced batches are the next gate.
+one-call capability result. `critic-batch-confirmation-004-plan.json` freezes
+the next gate as four fresh batches in `AB, BA, BA, AB` order. The exploratory
+call is excluded from its estimates, every candidate-position result must have
+full recall and zero unsupported findings, and median input must remain at
+least 30% below the matched separate-call baseline.
 
 The preregistered native-context follow-up is documented in
 `native-context-follow-up.md` and `native-context-series-003-plan.json`. It is
@@ -302,6 +306,9 @@ explicitly authorized.
 - `critic_batch_probe.py` reconstructs two hash-pinned compact capsules, runs
   one guarded tool-free critic batch, and scores each nested critique against
   its own frozen defect oracle.
+- `critic_batch_series.py` enforces the four-run counterbalanced confirmation,
+  stops on the first quality or execution failure, and produces its aggregate
+  report without another model call.
 - `fixtures/bug-hidden-regression` starts with both visible and hidden failures.
 - `fixtures/refactor-superseded-path` passes its visible behavior tests while a
   hidden structural test catches the superseded production path.

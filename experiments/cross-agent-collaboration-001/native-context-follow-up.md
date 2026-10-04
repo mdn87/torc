@@ -57,6 +57,12 @@ This single call does not establish a safe general batch size, but it moves the
 next Plus-backed work from native delegation to repeated counterbalanced
 batching.
 
+That confirmation is now frozen as `critic-batch-confirmation-004`: four fresh
+tool-free batches ordered `AB, BA, BA, AB`. The exploratory result is excluded,
+each candidate must pass twice in each position, and live calls stop at 60%
+current-window usage so the series can continue in a later session without
+reset credits.
+
 Before authorization, inspect a request plan without making a model call:
 
 ```text
