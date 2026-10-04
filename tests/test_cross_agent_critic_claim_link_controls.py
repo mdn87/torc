@@ -105,8 +105,8 @@ def test_series_starts_incomplete_without_live_calls() -> None:
     }
 
 
-def test_execute_requires_a_frozen_ready_plan(tmp_path: Path) -> None:
-    with pytest.raises(controls.CriticClaimLinkControlsError, match="not ready"):
+def test_execute_rejects_the_wrong_frozen_plan_hash(tmp_path: Path) -> None:
+    with pytest.raises(controls.CriticClaimLinkControlsError, match="plan hash does not match"):
         controls.execute_cell(
             run_id="01-header-direct",
             run_dir=tmp_path / "unused",
