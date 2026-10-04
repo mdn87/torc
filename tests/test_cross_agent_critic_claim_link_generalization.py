@@ -55,7 +55,7 @@ def _valid_output() -> dict[str, object]:
 def test_build_probe_uses_two_new_fixture_shapes_without_oracle_content() -> None:
     probe = generalization.build_probe()
 
-    assert probe["plan_status"] == "draft"
+    assert probe["plan_status"] == "ready"
     assert probe["candidate_order"] == [
         "header-merge-baseline-v1",
         "cutover-plan-baseline-v1",
@@ -110,10 +110,10 @@ def test_validate_output_rejects_candidate_order_drift() -> None:
         generalization.validate_output(drifted, plan=_plan())
 
 
-def test_execute_requires_a_frozen_ready_plan(tmp_path: Path) -> None:
+def test_execute_rejects_the_wrong_frozen_plan_hash(tmp_path: Path) -> None:
     with pytest.raises(
         generalization.CriticClaimLinkGeneralizationError,
-        match="not ready",
+        match="plan hash does not match",
     ):
         generalization.execute_probe(
             run_dir=tmp_path / "unused",

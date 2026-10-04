@@ -1,9 +1,64 @@
 {
   "schema_version": 1,
   "series_id": "critic-claim-link-generalization-006",
-  "status": "draft",
+  "status": "ready",
+  "frozen_at": "2026-10-04T20:37:03Z",
+  "apparatus_revision": "9cae0a276950b7d0e9d813c172062b163cd02f5e",
   "question": "Does the compact claim-link contract preserve structured review quality on two previously unbatched fixture shapes?",
-  "apparatus_inputs": [],
+  "apparatus_inputs": [
+    {
+      "path": "experiments/cross-agent-collaboration-001/critic_claim_link_generalization.py",
+      "sha256": "e462c1028533bac2105a5917242f207797df8c7d3a4f3c7df8c8d5acd8eab059"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/critic_claim_link_probe.py",
+      "sha256": "446233209f47e6eca5320563d6c7cb7f1e7787558798841edd6f05e30e3b17fc"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/codex_usage_snapshot.py",
+      "sha256": "1ae8ff50ac7ee339929a0e9463da3e21f22c4bda9ab7ec869b3f4ead318d4183"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/fixture_control.py",
+      "sha256": "1c4534a1ae2446bf8f4e13a3abeb1b295227b3e8213e4bd0fd2a36f5666d8625"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/native_context_request.py",
+      "sha256": "05b995813b0d406909455a4675d8da032031a6a9114af0a2a98cc9cb4b4a01be"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/workflow_runner.py",
+      "sha256": "e8b5c9657472dd4ab73a40c9ec33ae3346d6d6dbd30cec539f1614e7e508e448"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/worker_runner.py",
+      "sha256": "6888871ef69a63979db5a07530879ddef1c0a8a0209c978bde7ef16d61da6054"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/smoke-manifest.json",
+      "sha256": "410df6ae9e8b2a7950180b0905034a8881561a5fbcfc056de5004a40ef9fb6c0"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/fixtures-manifest.json",
+      "sha256": "81feb1eff70ab1d81a4e9f38fc4454c534e42d7cf40fbdcd58e04404406dca11"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/handoffs/bug-hidden-regression.json",
+      "sha256": "220b99ab00b289399ef603db75dbda9bb18647b98b3e7d660e5a55c2f6978465"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/handoffs/design-cutover-plan.json",
+      "sha256": "b48de5ec39c6943175a295a4496ba2170512b8dc97770088f73ff3f0e925f310"
+    },
+    {
+      "path": "src/torc/execution_capsules.py",
+      "sha256": "3ebb1874f4a8a35ffea6dc1893ae9bdfaea9ca5c053ff51260766c626a76b986"
+    },
+    {
+      "path": "src/torc/canonical.py",
+      "sha256": "424fe3640a094f6dd34fa2b4c7b3ce374eada88685243c6a4dbf01b3b8653838"
+    }
+  ],
   "provider_controls": {
     "provider": "codex",
     "billing_surface": "ChatGPT Plus Codex allowance",
