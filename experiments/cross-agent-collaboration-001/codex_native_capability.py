@@ -127,7 +127,12 @@ def _root_prompt(payload: str, plan: dict[str, Any]) -> str:
 def build_probe(*, executable: str = "codex") -> dict[str, Any]:
     """Return exact app-server inputs without starting Codex or making a model call."""
     plan = _object(PLAN_PATH)
-    if plan.get("status") not in {"waiting_usage_reset", "ready"}:
+    if plan.get("status") not in {
+        "waiting_usage_reset",
+        "ready",
+        "capability_confirmed",
+        "capability_rejected",
+    }:
         raise CodexNativeCapabilityError("capability probe is not in a plannable state")
     controls = plan.get("provider_controls")
     if not isinstance(controls, dict):
@@ -203,6 +208,7 @@ def build_probe(*, executable: str = "codex") -> dict[str, Any]:
     return {
         "schema_version": 1,
         "series_id": plan["series_id"],
+        "plan_status": plan["status"],
         "status": "planned_not_executed",
         "execute": False,
         "harness_version": controls["harness_version"],

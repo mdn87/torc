@@ -337,7 +337,11 @@ def test_opaque_event_content_is_reduced_to_hash_evidence() -> None:
         {
             "content": {"encrypted_content": "enc_secret_value"},
             "encryptedContent": "camel_secret_value",
-        }
+            "installationId": "installation_secret_value",
+            "serverName": "host_secret_value",
+            "cwd": "C:/private/repo/workspace",
+        },
+        replacements={"C:/private/repo": "<repo>"},
     )
 
     encrypted = sanitized["content"]["encrypted_content"]
@@ -345,6 +349,9 @@ def test_opaque_event_content_is_reduced_to_hash_evidence() -> None:
     assert len(encrypted["sha256"]) == 64
     assert "enc_secret_value" not in json.dumps(sanitized)
     assert "camel_secret_value" not in json.dumps(sanitized)
+    assert "installation_secret_value" not in json.dumps(sanitized)
+    assert "host_secret_value" not in json.dumps(sanitized)
+    assert sanitized["cwd"] == "<repo>/workspace"
 
 
 def test_evidence_preserves_exact_supplied_plan_without_prompt(tmp_path: Path) -> None:

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "series_id": "codex-native-capability-001",
-  "status": "ready",
+  "status": "capability_rejected",
   "question": "Can the local Codex app-server expose enough native subagent topology and per-thread usage to run the context-transport pilot under ChatGPT Plus instead of separate API billing?",
   "candidate": {
     "candidate_id": "refactor-baseline-v1",
@@ -57,5 +57,12 @@
     "default_behavior": "print the redacted model-free request plan",
     "live_gate": "requires status ready, exact plan/prompt/version arguments, clean apparatus, and a fresh below-60-percent usage snapshot",
     "failure_behavior": "preserve sanitized immutable evidence and mark the only call excluded; do not retry automatically"
+  },
+  "outcome": {
+    "run_directory": "runs/codex-native-capability-001/01-native-isolated",
+    "disposition": "excluded",
+    "calls_consumed": 1,
+    "retry_allowed": false,
+    "reason": "The app-server exposed one child's activity and separate usage but no spawnAgent item, child settings, or observable child prompt/model/effort, so the frozen provenance requirement was not met."
   }
 }

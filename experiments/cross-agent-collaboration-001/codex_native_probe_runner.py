@@ -594,20 +594,45 @@ def summarize_capture(
     }
 
 
-def _sanitize_opaque(value: Any) -> Any:
+def _host_replacements(probe_plan: dict[str, Any]) -> dict[str, str]:
+    replacements = {
+        str(REPO_ROOT.resolve()): "<repo>",
+        str((Path.home() / ".codex").resolve()): "<codex-home>",
+    }
+    executable = Path(probe_plan["launch"][0])
+    if executable.is_absolute():
+        replacements[str(executable.resolve())] = "<resolved-codex-executable>"
+    return replacements
+
+
+def _sanitize_opaque(
+    value: Any, *, replacements: dict[str, str] | None = None
+) -> Any:
+    replacements = replacements or {}
     if isinstance(value, list):
-        return [_sanitize_opaque(item) for item in value]
+        return [
+            _sanitize_opaque(item, replacements=replacements) for item in value
+        ]
+    if isinstance(value, str):
+        for source, replacement in replacements.items():
+            value = value.replace(source, replacement)
+        return value
     if not isinstance(value, dict):
         return value
     sanitized = {}
     for key, item in value.items():
-        if key in {"encrypted_content", "encryptedContent"} and isinstance(item, str):
+        if key in {
+            "encrypted_content",
+            "encryptedContent",
+            "installationId",
+            "serverName",
+        } and isinstance(item, str):
             sanitized[key] = {
                 "bytes": len(item.encode("utf-8")),
                 "sha256": hashlib.sha256(item.encode("utf-8")).hexdigest(),
             }
         else:
-            sanitized[key] = _sanitize_opaque(item)
+            sanitized[key] = _sanitize_opaque(item, replacements=replacements)
     return sanitized
 
 
@@ -630,8 +655,12 @@ def _reserve_evidence(
     if resolved.exists():
         raise CodexNativeProbeError(f"run directory already exists: {resolved}")
     resolved.mkdir(parents=True)
+    stored_plan = _sanitize_opaque(
+        _redacted_probe_plan(probe_plan),
+        replacements=_host_replacements(probe_plan),
+    )
     (resolved / "probe-plan.json").write_text(
-        canonical_json(_redacted_probe_plan(probe_plan)) + "\n", encoding="utf-8"
+        canonical_json(stored_plan) + "\n", encoding="utf-8"
     )
     (resolved / "usage-checkpoint.json").write_text(
         canonical_json(usage_checkpoint) + "\n", encoding="utf-8"
@@ -660,7 +689,13 @@ def _write_capture_evidence(
     resolved = run_dir.resolve()
     if not resolved.is_dir():
         raise CodexNativeProbeError(f"run directory was not reserved: {resolved}")
-    sanitized_messages = _sanitize_opaque(capture["messages"])
+    replacements = {
+        str(REPO_ROOT.resolve()): "<repo>",
+        str((Path.home() / ".codex").resolve()): "<codex-home>",
+    }
+    sanitized_messages = _sanitize_opaque(
+        capture["messages"], replacements=replacements
+    )
     (resolved / "events.jsonl").write_text(
         "".join(canonical_json(message) + "\n" for message in sanitized_messages),
         encoding="utf-8",
