@@ -112,3 +112,17 @@ def test_claim_link_validator_marks_unlinked_finding() -> None:
 def test_claim_link_live_probe_requires_frozen_apparatus() -> None:
     with pytest.raises(link.CriticClaimLinkProbeError, match="inputs are missing"):
         link._verify_apparatus({"apparatus_inputs": []})
+
+
+def test_committed_claim_link_probe_is_frozen_and_reproducible() -> None:
+    plan = json.loads(link.PLAN_PATH.read_text(encoding="utf-8"))
+    probe = link.build_probe()
+
+    assert plan["status"] == "ready"
+    assert len(link._verify_apparatus(plan)) == 14
+    assert (
+        probe["plan_sha256"] == "a0589397007769b59aa58be4d2bfabe901bfab3d1ec097b3659526a42483cff8"
+    )
+    assert (
+        probe["prompt_sha256"] == "4cbc8a217fe98dcd401f21e76edba8023c1bd96682556fa3e3017ff20776641f"
+    )
