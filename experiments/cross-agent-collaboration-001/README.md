@@ -258,6 +258,15 @@ The separately billed Responses API pilot remains available only if measuring
 the hosted opaque transport is worth its own budget; the local result is not a
 reason to expect lower end-to-end usage.
 
+The separate `claude-critic-capability-001` check also completed without model
+inference. Claude Code 2.1.285 reported an active Pro login, initialized the
+tool-free WSL harness, and then returned
+`oauth_not_allowed_for_organization`. Provider usage and cost were both zero.
+This confirms that `claude -p` is a viable TORC adapter shape, but the current
+organization policy still blocks the cross-provider quality experiment. No
+retry is allowed until that external policy changes or an API budget is
+explicitly authorized.
+
 ## Implemented smoke apparatus
 
 - `fixture_control.py` verifies the hash-pinned fixture and oracle trees,

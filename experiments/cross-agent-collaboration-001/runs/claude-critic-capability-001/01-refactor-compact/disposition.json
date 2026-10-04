@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "series_id": "claude-critic-capability-001",
+  "run_id": "01-refactor-compact",
+  "status": "excluded",
+  "valid_attempt": false,
+  "retry_allowed": false,
+  "model_inference_occurred": false,
+  "usage": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "reported_cost_usd": 0
+  },
+  "reason_code": "oauth_not_allowed_for_organization",
+  "evidence": [
+    "The pinned native Linux Claude Code 2.1.285 harness initialized with no tools or MCP servers.",
+    "Anthropic returned HTTP 403 before inference because the selected organization disables subscription access to Claude Code.",
+    "The provider reported zero input tokens, zero output tokens, zero model usage entries, and zero cost."
+  ],
+  "corrective_action": "Enable Claude Code subscription access for the selected organization or deliberately authorize an Anthropic API budget before defining a new immutable attempt."
+}

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "series_id": "claude-critic-capability-001",
-  "status": "ready",
+  "status": "blocked_by_organization_policy",
   "question": "Can the authenticated Claude Pro CLI execute the same tool-free TORC compact critique after the prior organization-policy rejection?",
   "candidate": {
     "candidate_id": "refactor-baseline-v1",
@@ -38,5 +38,15 @@
     "on_policy_rejection": "preserve and exclude the attempt; do not retry until authentication or organization policy changes",
     "on_quality_failure": "preserve the result and do not generalize from a single capability call"
   },
-  "comparison_rule": "Do not add Claude and Codex token counts or treat their tokenizers as equivalent; compare deterministic quality first and report each provider's supplied usage separately."
+  "comparison_rule": "Do not add Claude and Codex token counts or treat their tokenizers as equivalent; compare deterministic quality first and report each provider's supplied usage separately.",
+  "outcome": {
+    "run_directory": "runs/claude-critic-capability-001/01-refactor-compact",
+    "attempts": 1,
+    "inference_calls": 0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "reported_cost_usd": 0,
+    "retry_allowed": false,
+    "reason": "Anthropic returned oauth_not_allowed_for_organization before inference even though the native CLI reported an active Pro login."
+  }
 }
