@@ -237,6 +237,12 @@ failure remains unchanged. Descriptively, the three-call median still reduced
 input by 42.8% and completion time by 36.1%. The next gate is a structured
 per-claim assessment contract, not another free-text batch repeat.
 
+`critic-batching-design.md` turns those results into the current design:
+provider-neutral capsules, two independent reviews per call, honest batch-level
+usage accounting, and a claim-assessment matrix before a batch can pass. The
+one-call `critic-claim-matrix-capability-001` probe is frozen but deferred
+because the five-hour usage snapshot reached the 60% stop threshold.
+
 The preregistered native-context follow-up is documented in
 `native-context-follow-up.md` and `native-context-series-003-plan.json`. It is
 budget-gated because Responses API charges are separate from a ChatGPT
@@ -321,6 +327,8 @@ explicitly authorized.
 - `critic_batch_confirmation_audit.py` reproduces the stopped confirmation's
   strict outcome, descriptive cost, and lexical-scorer sensitivity without
   changing the preregistered score.
+- `critic_claim_matrix_probe.py` requires every reviewable capsule claim to be
+  explicitly assessed and linked to same-claim findings in one guarded batch.
 - `fixtures/bug-hidden-regression` starts with both visible and hidden failures.
 - `fixtures/refactor-superseded-path` passes its visible behavior tests while a
   hidden structural test catches the superseded production path.
