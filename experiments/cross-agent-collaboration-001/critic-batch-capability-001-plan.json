@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "series_id": "critic-batch-capability-001",
-  "status": "ready",
+  "status": "complete",
   "question": "Can two independent TORC compact critiques share one Codex harness invocation without losing deterministic defect recall?",
   "candidates": [
     "refactor-baseline-v1",
@@ -50,5 +50,17 @@
     "on_quality_failure": "preserve and stop; fixed-context savings do not justify cross-candidate interference",
     "on_cost_failure": "preserve and stop; batching does not materially amortize this harness",
     "on_execution_failure": "preserve and exclude the only attempt without automatic retry"
+  },
+  "outcome": {
+    "run_directory": "runs/critic-batch-capability-001/01-two-candidate-compact",
+    "calls_consumed": 1,
+    "capability_confirmed": true,
+    "full_defect_recall_candidates": 2,
+    "unsupported_finding_count": 0,
+    "batch_input_tokens": 14387,
+    "input_reduction_percent_vs_summed_direct_medians": 42.697,
+    "batch_completion_ms": 15020.23,
+    "completion_reduction_percent_vs_summed_direct_medians": 35.805,
+    "next_gate": "freeze a repeated counterbalanced batch series before recommending a production batch size"
   }
 }

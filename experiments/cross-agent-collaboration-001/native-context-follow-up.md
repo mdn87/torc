@@ -48,6 +48,15 @@ behaves materially differently from local Codex delegation. It should not be
 run merely to seek token savings, because the observed root orchestration cost
 overwhelmed the child's small context reduction.
 
+A cheaper provider-neutral optimization has now shown more promise. The
+two-candidate `critic-batch-capability-001` call shared one Codex harness context
+while keeping each TORC capsule and result isolated. Both candidates retained
+full deterministic recall, batch input was 42.7 percent below the summed direct
+medians, and completion time was 35.8 percent lower than the summed medians.
+This single call does not establish a safe general batch size, but it moves the
+next Plus-backed work from native delegation to repeated counterbalanced
+batching.
+
 Before authorization, inspect a request plan without making a model call:
 
 ```text

@@ -106,3 +106,21 @@ def test_batch_baseline_reconstructs_frozen_summed_medians() -> None:
 
     assert baseline["summed_median_input_tokens"] == 25107
     assert baseline["summed_median_completion_ms"] == 23397.869
+
+
+def test_committed_batch_capability_preserves_quality_and_saves_input() -> None:
+    plan = json.loads(batch.PLAN_PATH.read_text(encoding="utf-8"))
+    run_dir = EXPERIMENT / plan["outcome"]["run_directory"]
+    result = json.loads((run_dir / "result.json").read_text(encoding="utf-8"))
+
+    assert plan["status"] == "complete"
+    assert result["status"] == "capability_confirmed"
+    assert result["quality_passed"] is True
+    assert len(result["candidate_results"]) == 2
+    assert all(
+        item["score"]["defect_area_recall"] == 1.0
+        for item in result["candidate_results"]
+    )
+    assert result["usage"]["input_tokens"] == 14387
+    assert result["input_reduction_percent"] == 42.697
+    assert result["completion_ratio_to_summed_direct"] < 1

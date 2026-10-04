@@ -214,6 +214,16 @@ payload savings. Compact median completion was 8.0% to 14.2% slower by candidate
 `critic-transport-series-002-analysis.json` preserves the exact aggregate,
 scorer caveat, usage checkpoints, and limits on interpretation.
 
+`critic-batch-capability-001` then tested the practical consequence of that
+fixed overhead: amortize it across two independent compact critiques. The one
+batch call preserved full deterministic recall for both candidates with zero
+unsupported findings. It used 14,387 input tokens versus 25,107 across the
+matched separate-call medians, a 42.7% reduction, and completed in 15.0 seconds
+versus a 23.4-second summed median, a 35.8% reduction. The explicit batch prompt
+was larger than the two payloads alone, so the saving came from sharing the
+harness context, not more aggressive TORC compression. This is a strong
+one-call capability result; repeated counterbalanced batches are the next gate.
+
 The preregistered native-context follow-up is documented in
 `native-context-follow-up.md` and `native-context-series-003-plan.json`. It is
 budget-gated because Responses API charges are separate from a ChatGPT
@@ -289,6 +299,9 @@ explicitly authorized.
 - `codex_native_probe_audit.py` proves the preserved native capability outcome
   and compares its quality, usage, and timing with the matched direct compact
   baseline without making a model call.
+- `critic_batch_probe.py` reconstructs two hash-pinned compact capsules, runs
+  one guarded tool-free critic batch, and scores each nested critique against
+  its own frozen defect oracle.
 - `fixtures/bug-hidden-regression` starts with both visible and hidden failures.
 - `fixtures/refactor-superseded-path` passes its visible behavior tests while a
   hidden structural test catches the superseded production path.
