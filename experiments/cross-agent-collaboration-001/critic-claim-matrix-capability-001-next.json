@@ -1,9 +1,16 @@
 {
   "schema_version": 1,
   "series_id": "critic-claim-matrix-capability-001",
-  "status": "awaiting_usage_window",
+  "status": "complete_rejected",
   "objective": "Run the single frozen structured-claim batch capability call, preserve its evidence, and do not retry automatically.",
-  "why_deferred": "The last model-free checkpoint reported 63 percent five-hour usage against the frozen 60 percent stop threshold.",
+  "why_deferred": "The first session stopped at 63 percent five-hour usage; the call ran after reset in the next session.",
+  "result": {
+    "path": "runs/critic-claim-matrix-capability-001/01-two-candidate-compact/result.json",
+    "quality_passed": true,
+    "input_reduction_percent": 40.63,
+    "completion_ratio_to_summed_direct": 1.116012,
+    "capability_confirmed": false
+  },
   "usage_checkpoint": "runs/critic-claim-matrix-capability-001/usage-checkpoint-before-01.json",
   "constraints": {
     "maximum_model_calls": 1,

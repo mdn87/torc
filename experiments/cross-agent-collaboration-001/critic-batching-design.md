@@ -84,10 +84,11 @@ broader fixture set earns a larger bound.
 
 ## Next evidence gates
 
-1. Run the frozen one-call `critic-claim-matrix-capability-001` only after the
-   five-hour usage window falls below 60%; do not consume a reset credit.
-2. On success, freeze four fresh structured batches in `AB, BA, BA, AB` order.
-   Exclude all capability and free-text calls from that estimate.
+1. Replace the rejected verbose assessment matrix with a new compact claim-link
+   capability contract. Do not retry or rescore the rejected call.
+2. If the compact link capability passes quality, input, and time gates, freeze
+   four fresh batches in `AB, BA, BA, AB` order. Exclude all capability and
+   free-text calls from that estimate.
 3. Add at least two new fixtures with different claim shapes before making a
    general quality claim or testing a batch size above two.
 4. When Claude organization policy permits inference, run the same structured
@@ -108,9 +109,10 @@ Long setup work can therefore consume the room reserved for a live cell.
 
 Freeze, test, and commit apparatus in one session, then execute the live cell
 early in a fresh post-reset session. The compact
-`critic-claim-matrix-capability-001-next.json` checkpoint contains the exact
+`critic-claim-matrix-capability-001-next.json` checkpoint contained the exact
 hashes, commands, guard, and dispositions needed to resume without reconstructing
-the full conversation. The runner still rechecks every control independently.
+the full conversation. The runner rechecked every control independently, and
+the deferred call ran at 0% five-hour usage without consuming a reset credit.
 
 ## Pending capability command
 

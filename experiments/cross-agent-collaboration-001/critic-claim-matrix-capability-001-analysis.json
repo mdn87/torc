@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "series_id": "critic-claim-matrix-capability-001",
+  "status": "complete_rejected_on_time",
+  "frozen_result_unchanged": true,
+  "quality": {
+    "passed": true,
+    "candidate_count": 2,
+    "claim_assessment_count": 13,
+    "correct_claim_assessment_count": 13,
+    "full_legacy_defect_recall_candidates": 2,
+    "linked_finding_count": 6,
+    "unlinked_finding_count": 0
+  },
+  "frozen_capability_gates": {
+    "input_ratio_to_summed_direct": 0.593699,
+    "input_reduction_percent": 40.63,
+    "completion_ratio_to_summed_direct": 1.116012,
+    "input_gate_passed": true,
+    "completion_gate_passed": false,
+    "overall_passed": false
+  },
+  "post_hoc_output_overhead_audit": {
+    "structured_prompt_bytes": 7990,
+    "free_text_prompt_bytes": 6045,
+    "structured_input_tokens": 14906,
+    "free_text_three_run_median_input_tokens": 14364,
+    "structured_input_increase_percent": 3.773,
+    "structured_output_tokens": 1081,
+    "free_text_three_run_median_output_tokens": 483,
+    "structured_output_increase_percent": 123.81,
+    "structured_completion_ms": 26112.304,
+    "free_text_three_run_median_completion_ms": 14945.333,
+    "structured_completion_increase_percent": 74.719,
+    "interpretation": "The matrix preserved input savings and fixed quality attribution, but duplicated evidence across thirteen assessments and six findings. The single-call timing result is noisy, yet the output expansion is exact."
+  },
+  "next_gate": {
+    "contract": "compact_claim_link_map",
+    "shape": "one exact claim_id-to-finding_ids map per candidate; an empty list means met and a non-empty list means unmet",
+    "reason": "retain deterministic claim coverage and same-claim finding linkage without repeating status and evidence text",
+    "classification": "new contract capability test, not a retry"
+  }
+}

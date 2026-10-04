@@ -134,11 +134,21 @@ def test_claim_matrix_live_probe_requires_frozen_apparatus() -> None:
 def test_committed_claim_matrix_probe_is_frozen_and_reproducible() -> None:
     plan = json.loads(matrix.PLAN_PATH.read_text(encoding="utf-8"))
     probe = matrix.build_probe()
+    run_probe = json.loads(
+        (
+            EXPERIMENT
+            / "runs"
+            / "critic-claim-matrix-capability-001"
+            / "01-two-candidate-compact"
+            / "probe-plan.json"
+        ).read_text(encoding="utf-8")
+    )
 
-    assert plan["status"] == "ready"
+    assert plan["status"] == "rejected"
     assert len(matrix._verify_apparatus(plan)) == 13
     assert (
-        probe["plan_sha256"] == "245da3f6520bf31ce5fd60692081dc95914b09934ae80e70418bffc2df760931"
+        run_probe["plan_sha256"]
+        == "245da3f6520bf31ce5fd60692081dc95914b09934ae80e70418bffc2df760931"
     )
     assert (
         probe["prompt_sha256"] == "f5f867a4eb3b7bbfe7671fad3314a618295125c5db954472ecd761668be8065f"
@@ -148,10 +158,19 @@ def test_committed_claim_matrix_probe_is_frozen_and_reproducible() -> None:
 def test_compact_next_session_checkpoint_matches_frozen_probe() -> None:
     checkpoint = json.loads(NEXT_PATH.read_text(encoding="utf-8"))
     probe = matrix.build_probe()
+    run_probe = json.loads(
+        (
+            EXPERIMENT
+            / "runs"
+            / "critic-claim-matrix-capability-001"
+            / "01-two-candidate-compact"
+            / "probe-plan.json"
+        ).read_text(encoding="utf-8")
+    )
 
-    assert checkpoint["status"] == "awaiting_usage_window"
+    assert checkpoint["status"] == "complete_rejected"
     assert checkpoint["constraints"]["maximum_model_calls"] == 1
     assert checkpoint["constraints"]["reset_credits_allowed"] is False
-    assert checkpoint["frozen_evidence"]["plan_sha256"] == probe["plan_sha256"]
+    assert checkpoint["frozen_evidence"]["plan_sha256"] == run_probe["plan_sha256"]
     assert checkpoint["frozen_evidence"]["prompt_sha256"] == probe["prompt_sha256"]
     assert checkpoint["frozen_evidence"]["prompt_bytes"] == probe["prompt_bytes"]

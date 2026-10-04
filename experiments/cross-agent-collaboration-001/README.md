@@ -240,10 +240,12 @@ per-claim assessment contract, not another free-text batch repeat.
 `critic-batching-design.md` turns those results into the current design:
 provider-neutral capsules, two independent reviews per call, honest batch-level
 usage accounting, and a claim-assessment matrix before a batch can pass. The
-one-call `critic-claim-matrix-capability-001` probe is frozen but deferred
-because the five-hour usage snapshot reached the 60% stop threshold.
-`critic-claim-matrix-capability-001-next.json` is the compact execution
-checkpoint for a fresh post-reset session, avoiding another long setup turn.
+one-call `critic-claim-matrix-capability-001` probe ran after the usage reset.
+It correctly assessed all 13 claims, retained full legacy defect recall, linked
+all six findings, and cut input by 40.6%. Its 26.1-second completion was 11.6%
+above the frozen summed-direct threshold, so the overall capability was
+rejected without retry. The exact output expansion points to a smaller claim
+link map as a new contract, not a post-hoc relaxation of this result.
 
 The preregistered native-context follow-up is documented in
 `native-context-follow-up.md` and `native-context-series-003-plan.json`. It is
