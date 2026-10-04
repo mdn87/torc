@@ -228,8 +228,7 @@ applies the preregistered stop or continue rules.
 The cheaper prerequisite is `codex-native-capability-001-plan.json`. It asks
 whether the local Codex app-server can expose one child's topology and usage
 under the existing Plus allowance. `codex_native_capability.py` builds its
-ephemeral, read-only, collaboration-only request without starting Codex. The
-first live probe is held until the current usage window resets.
+ephemeral, read-only, collaboration-only request without starting Codex.
 `codex_native_probe_runner.py` is guarded by the committed plan status, exact
 version and content hashes, a clean apparatus, and a fresh usage check; failed
 capability evidence is preserved without an automatic retry.
@@ -237,28 +236,27 @@ The model-free `--preflight` mode exercises the exact app-server launch,
 initialization, and ephemeral thread creation, but deliberately sends no
 `turn/start` request.
 
-The live capability probe has a one-call runbook. First run
-`codex_native_probe_runner.py --preflight`, then run
-`codex_usage_snapshot.py --stop-threshold 60`. Only after the usage check exits zero, change
-the capability plan status from `waiting_usage_reset` to `ready` and commit that
-change. Then, from PowerShell, derive every guard value from the committed dry
-plan and target its single frozen run directory:
+The one allowed live probe is complete and excluded. It produced the correct
+two-finding critique with full deterministic recall, exposed one child's
+activity and separate token usage, and returned the child's answer unchanged.
+However, the app-server emitted no completed `spawnAgent` item, child settings,
+or child prompt. That fails the frozen provenance requirement, so the local
+Plus-backed series is not authorized and the call will not be retried.
 
-```powershell
-$probe = python experiments/cross-agent-collaboration-001/codex_native_probe_runner.py |
-    ConvertFrom-Json
-python experiments/cross-agent-collaboration-001/codex_native_probe_runner.py `
-    --execute `
-    --run-dir experiments/cross-agent-collaboration-001/runs/codex-native-capability-001/01-native-isolated `
-    --expected-harness-version $probe.harness_version `
-    --expected-plan-sha256 $probe.plan_sha256 `
-    --expected-root-prompt-sha256 $probe.root_prompt_sha256
+The cost signal also runs against native delegation as a token-saving strategy.
+The child used 11,955 input tokens versus the matched direct compact median of
+12,587, but the root used another 38,970 across spawn, wait, and return rounds.
+Combined native input was 50,925 tokens (4.05x direct) and completion time was
+3.46x the direct median. Recompute the complete audit without a model call:
+
+```text
+python experiments/cross-agent-collaboration-001/codex_native_probe_audit.py
 ```
 
-The runner reserves that path before `turn/start`, so a second attempt is
-rejected even after a failed first attempt. Preserve and commit the run directory,
-then set the plan status to `capability_confirmed` or `capability_rejected` from
-its `result.json` or `disposition.json`; do not delete the evidence to retry.
+`codex-native-capability-001-analysis.json` contains the deterministic result.
+The separately billed Responses API pilot remains available only if measuring
+the hosted opaque transport is worth its own budget; the local result is not a
+reason to expect lower end-to-end usage.
 
 ## Implemented smoke apparatus
 
@@ -279,6 +277,9 @@ its `result.json` or `disposition.json`; do not delete the evidence to retry.
   series, enforces its counterbalanced order, and summarizes progress and costs.
 - `codex_usage_snapshot.py` reads a sanitized, read-only local Codex usage
   snapshot and returns exit status 3 when the configured stop threshold is met.
+- `codex_native_probe_audit.py` proves the preserved native capability outcome
+  and compares its quality, usage, and timing with the matched direct compact
+  baseline without making a model call.
 - `fixtures/bug-hidden-regression` starts with both visible and hidden failures.
 - `fixtures/refactor-superseded-path` passes its visible behavior tests while a
   hidden structural test catches the superseded production path.

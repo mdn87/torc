@@ -22,21 +22,31 @@ stops the series unless usage is complete, agent count is bounded, and all arms
 remain scoreable. A native arm must eventually save at least 15 percent of
 total uncached input without losing defect recall to count as a win.
 
-Before buying API usage, `codex-native-capability-001-plan.json` now specifies a
-one-call local Codex probe under the existing Plus allowance. Codex 0.159.3
-advertises stable multi-agent support, and its app-server schema exposes child
-thread relationships, collaboration items, and per-thread token updates. If
-those fields are complete in a real ephemeral run, the local surface becomes
-the preferred pilot and the API version remains deferred.
+Before buying API usage, `codex-native-capability-001-plan.json` specified a
+one-call local Codex probe under the existing Plus allowance. That probe is now
+complete and rejected without retry. It exposed exactly one child activity
+lifecycle and separate root/child usage, but it did not emit a `spawnAgent`
+item, child settings, or the child prompt. The local surface therefore cannot
+prove the frozen transport controls well enough to replace the API pilot.
 
-The local probe is waiting for the five-hour usage window to reset. Its last
-sanitized checkpoint was already above the stricter 60-percent multi-agent
-start threshold, so no reset credit or model call was consumed.
+The child produced the correct critique at full deterministic recall and used
+11,955 input tokens, 5.0 percent less than the matched direct compact median.
+Root orchestration used another 38,970 input tokens, making the combined total
+50,925, or 4.05 times direct. Native completion was 3.46 times the direct
+median. `codex-native-capability-001-analysis.json` is reproducible with
+`codex_native_probe_audit.py`. This single call is a cost warning, not a repeated
+performance estimate.
 
 Responses multi-agent documents only response-level usage. Separate root and
 subagent turn usage is documented for the distinct Agents API. The pilot must
 therefore validate that the response usage represents the complete hosted run;
 the experiment will not combine accounting from the two APIs.
+
+The API pilot remains budget-gated rather than recommended by default. Its
+value is now narrow: determine whether the hosted opaque Responses transport
+behaves materially differently from local Codex delegation. It should not be
+run merely to seek token savings, because the observed root orchestration cost
+overwhelmed the child's small context reduction.
 
 Before authorization, inspect a request plan without making a model call:
 

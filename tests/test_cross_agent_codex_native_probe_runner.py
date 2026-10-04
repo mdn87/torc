@@ -362,6 +362,7 @@ def test_evidence_preserves_exact_supplied_plan_without_prompt(tmp_path: Path) -
         run_dir,
         probe_plan=probe_plan,
         usage_checkpoint={"decision": "proceed"},
+        apparatus_revision="d" * 40,
     )
     runner._write_capture_evidence(
         run_dir,
@@ -375,6 +376,8 @@ def test_evidence_preserves_exact_supplied_plan_without_prompt(tmp_path: Path) -
     assert stored["plan_sha256"] == probe_plan["plan_sha256"]
     assert stored["turn_start"]["input"].startswith("<redacted")
     assert probe_plan["turn_start"]["input"][0]["text"] not in json.dumps(stored)
+    attempt = json.loads((run_dir / "attempt.json").read_text(encoding="utf-8"))
+    assert attempt["apparatus_revision"] == "d" * 40
     disposition = json.loads(
         (run_dir / "disposition.json").read_text(encoding="utf-8")
     )

@@ -650,6 +650,7 @@ def _reserve_evidence(
     *,
     probe_plan: dict[str, Any],
     usage_checkpoint: dict[str, Any],
+    apparatus_revision: str,
 ) -> None:
     resolved = run_dir.resolve()
     if resolved.exists():
@@ -671,6 +672,7 @@ def _reserve_evidence(
                 "schema_version": 1,
                 "status": "reserved",
                 "reserved_at": _utc_now(),
+                "apparatus_revision": apparatus_revision,
                 "retry_requires_plan_change": True,
             }
         )
@@ -800,6 +802,7 @@ def execute_probe(
         resolved_run_dir,
         probe_plan=probe_plan,
         usage_checkpoint=checkpoint,
+        apparatus_revision=apparatus_revision,
     )
     result: dict[str, Any] | None = None
     error: str | None = None
