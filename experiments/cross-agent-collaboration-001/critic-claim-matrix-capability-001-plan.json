@@ -3,6 +3,8 @@
   "series_id": "critic-claim-matrix-capability-001",
   "status": "draft",
   "question": "Can an explicit per-claim assessment matrix remove free-text scoring ambiguity while retaining the batching cost advantage?",
+  "apparatus_revision": "pending",
+  "apparatus_inputs": [],
   "candidates": [
     "refactor-baseline-v1",
     "release-policy-baseline-v1"

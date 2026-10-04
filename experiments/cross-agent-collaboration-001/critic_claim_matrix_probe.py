@@ -44,8 +44,27 @@ def _sha256_text(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
+def _sha256_file(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def _write_json(path: Path, value: dict[str, Any]) -> None:
     path.write_text(canonical_json(value) + "\n", encoding="utf-8")
+
+
+def _verify_apparatus(plan: dict[str, Any]) -> list[dict[str, str]]:
+    verified = []
+    for item in plan.get("apparatus_inputs", []):
+        path = REPO_ROOT / item["path"]
+        observed = _sha256_file(path)
+        if observed != item["sha256"]:
+            raise CriticClaimMatrixProbeError(
+                f"apparatus hash drifted for {item['path']}: {observed}"
+            )
+        verified.append({"path": item["path"], "sha256": observed})
+    if not verified:
+        raise CriticClaimMatrixProbeError("frozen apparatus inputs are missing")
+    return verified
 
 
 def _capsule(candidate_id: str, model: str) -> dict[str, Any]:
@@ -272,6 +291,7 @@ def execute_probe(
     plan = _object(PLAN_PATH)
     if plan.get("status") != "ready":
         raise CriticClaimMatrixProbeError("claim-matrix probe is not ready")
+    _verify_apparatus(plan)
     probe = build_probe()
     if expected_plan_sha256 != probe["plan_sha256"]:
         raise CriticClaimMatrixProbeError("claim-matrix plan hash does not match")
@@ -301,7 +321,7 @@ def execute_probe(
         {
             "schema_version": 1,
             "status": "reserved",
-            "apparatus_revision": workflow._apparatus_revision(),
+            "apparatus_revision": plan["apparatus_revision"],
             "retry_requires_plan_change": True,
         },
     )
