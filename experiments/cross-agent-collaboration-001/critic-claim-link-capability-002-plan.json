@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "series_id": "critic-claim-link-capability-002",
+  "status": "draft",
+  "question": "Can a compact claim-to-finding map retain deterministic structured coverage and restore the batching latency advantage?",
+  "predecessor": {
+    "series_id": "critic-claim-matrix-capability-001",
+    "disposition": "rejected on frozen completion-time gate",
+    "primary_result_unchanged": true
+  },
+  "apparatus_revision": "pending",
+  "apparatus_inputs": [],
+  "candidates": [
+    "refactor-baseline-v1",
+    "release-policy-baseline-v1"
+  ],
+  "reviewable_claim_categories": [
+    "active_commitments",
+    "hard_constraints",
+    "settled_decisions",
+    "superseded_directions"
+  ],
+  "excluded_claim_categories": {
+    "unresolved_work": "work questions are not candidate predicates and remain visible in the capsule"
+  },
+  "expected_claim_statuses": {
+    "refactor-baseline-v1": {
+      "c1": "unmet",
+      "x1": "unmet",
+      "x2": "met",
+      "x3": "met",
+      "d1": "unmet",
+      "s1": "unmet"
+    },
+    "release-policy-baseline-v1": {
+      "c1": "met",
+      "c2": "met",
+      "x1": "unmet",
+      "x2": "unmet",
+      "x3": "unmet",
+      "x4": "unmet",
+      "x5": "unmet"
+    }
+  },
+  "provider_controls": {
+    "provider": "codex",
+    "billing_surface": "ChatGPT Plus Codex allowance",
+    "harness_version": "codex-cli 0.159.3",
+    "model": "gpt-6-sol",
+    "effort": "low",
+    "session_mode": "fresh-ephemeral",
+    "tool_mode": "none",
+    "network_access": false
+  },
+  "call_budget": {
+    "maximum_calls": 1,
+    "automatic_retries": 0,
+    "stop_threshold_percent": 60,
+    "run_directory": "runs/critic-claim-link-capability-002/01-two-candidate-compact"
+  },
+  "matched_direct_baseline": {
+    "refactor_run_ids": [
+      "01-refactor-compact",
+      "04-refactor-compact",
+      "05-refactor-compact"
+    ],
+    "release_run_ids": [
+      "07-release-compact",
+      "10-release-compact",
+      "11-release-compact"
+    ],
+    "summed_median_input_tokens": 25107,
+    "summed_median_completion_ms": 23397.869,
+    "median_defect_recall_each": 1.0
+  },
+  "capability_thresholds": {
+    "quality": "every reviewable claim has the expected status; every non-empty claim link references a finding citing the same claim; every finding is linked; both verdicts request changes; legacy lexical scores are descriptive only",
+    "maximum_input_ratio_to_direct": 0.75,
+    "maximum_completion_ratio_to_direct": 1.0
+  },
+  "decision": {
+    "on_success": "freeze a fresh counterbalanced compact claim-link batch confirmation",
+    "on_quality_failure": "preserve and stop; compactness does not justify lost claim coverage",
+    "on_cost_failure": "preserve and stop; the compact structure does not restore the batching advantage",
+    "on_execution_failure": "preserve and exclude the only attempt without automatic retry"
+  }
+}
