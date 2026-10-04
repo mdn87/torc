@@ -2,13 +2,13 @@
   "schema_version": 1,
   "series_id": "critic-claim-matrix-capability-001",
   "status": "ready",
-  "frozen_at": "2026-10-04T04:56:41Z",
+  "frozen_at": "2026-10-04T04:58:24Z",
   "question": "Can an explicit per-claim assessment matrix remove free-text scoring ambiguity while retaining the batching cost advantage?",
-  "apparatus_revision": "7e8225b8f9b4f0ce102fdde4df856b24178e8417",
+  "apparatus_revision": "b4cd95875cc23018796b5fe41ff27f9a578de1a4",
   "apparatus_inputs": [
     {
       "path": "experiments/cross-agent-collaboration-001/critic_claim_matrix_probe.py",
-      "sha256": "ff9a99ab34c3c5eb48f2b7c6124bb1e9c021e8b5ad885a35e642ff4cd3243a4c"
+      "sha256": "14d037fb7edae3e355f6b7982832b4721a0b47c7eb198c07cf7404fed3bddda7"
     },
     {
       "path": "experiments/cross-agent-collaboration-001/critic_batch_probe.py",

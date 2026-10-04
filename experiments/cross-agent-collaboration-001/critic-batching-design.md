@@ -115,6 +115,6 @@ python experiments/cross-agent-collaboration-001/critic_claim_matrix_probe.py
 ```
 
 The frozen plan hash is
-`7934b7cc690786836ac010def40a76cf74fd8b03a127e4a9be4a5d3c56d9266d` and
+`245da3f6520bf31ce5fd60692081dc95914b09934ae80e70418bffc2df760931` and
 the prompt hash is
-`0b321d1549e3f68aa6d012d7bbf562590c6058c9a6975c2cbcebab191b138893`.
+`f5f867a4eb3b7bbfe7671fad3314a618295125c5db954472ecd761668be8065f`.
