@@ -101,9 +101,9 @@ two structurally valid critiques.
 
 ## Next evidence gates
 
-1. For the two new fixture shapes that passed a one-call quality capability
-   probe, collect one direct compact claim-link control each and one
-   reversed-order batch. Do not claim savings from their absolute usage alone.
+1. Complete `critic-claim-link-controls-007`: the header direct control passed;
+   the cutover direct control and reversed-order batch remain. Do not claim
+   savings from absolute usage before those matched cells complete.
 2. Repeat the new-fixture batch only if those controls preserve quality and
    show a useful input or time difference. Do not test a batch size above two
    before that confirmation.

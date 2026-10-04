@@ -284,6 +284,13 @@ a reversed-order batch. Recompute the capability audit without a model call:
 python experiments/cross-agent-collaboration-001/critic_claim_link_generalization_audit.py --pretty
 ```
 
+`critic-claim-link-controls-007` is executing that gate as three resumable
+cells. The header-only direct control passed all six statuses and used 13,678
+input tokens in 9.8 seconds. The five-hour meter then reached the frozen 60%
+stop threshold, so the cutover-only control and reversed batch remain unrun.
+`critic-claim-link-controls-007-next.json` pins the next prompt, plan hash, exact
+resume command, and no-reset-credit rule.
+
 The preregistered native-context follow-up is documented in
 `native-context-follow-up.md` and `native-context-series-003-plan.json`. It is
 budget-gated because Responses API charges are separate from a ChatGPT
