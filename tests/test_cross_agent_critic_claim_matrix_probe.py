@@ -128,3 +128,17 @@ def test_claim_matrix_validator_marks_unlinked_finding() -> None:
 def test_claim_matrix_live_probe_requires_frozen_apparatus() -> None:
     with pytest.raises(matrix.CriticClaimMatrixProbeError, match="inputs are missing"):
         matrix._verify_apparatus({"apparatus_inputs": []})
+
+
+def test_committed_claim_matrix_probe_is_frozen_and_reproducible() -> None:
+    plan = json.loads(matrix.PLAN_PATH.read_text(encoding="utf-8"))
+    probe = matrix.build_probe()
+
+    assert plan["status"] == "ready"
+    assert len(matrix._verify_apparatus(plan)) == 13
+    assert (
+        probe["plan_sha256"] == "245da3f6520bf31ce5fd60692081dc95914b09934ae80e70418bffc2df760931"
+    )
+    assert (
+        probe["prompt_sha256"] == "f5f867a4eb3b7bbfe7671fad3314a618295125c5db954472ecd761668be8065f"
+    )
