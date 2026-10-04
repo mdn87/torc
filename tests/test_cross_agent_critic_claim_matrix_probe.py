@@ -77,6 +77,7 @@ def test_claim_matrix_validator_accepts_complete_linked_assessments() -> None:
 
     assert len(results) == 2
     assert all(item["claim_matrix_correct"] for item in results)
+    assert all(item["structured_finding_linkage_complete"] for item in results)
 
 
 def test_claim_matrix_validator_rejects_missing_claim() -> None:
@@ -111,6 +112,17 @@ def test_claim_matrix_validator_rejects_cross_claim_finding_link() -> None:
 
     with pytest.raises(matrix.CriticClaimMatrixProbeError, match="same claim"):
         matrix.validate_output(output, plan=plan)
+
+
+def test_claim_matrix_validator_marks_unlinked_finding() -> None:
+    plan = json.loads(matrix.PLAN_PATH.read_text(encoding="utf-8"))
+    output = _valid_output(plan)
+    output["critiques"][0]["result"]["findings"].append(_finding("extra", ["x1"]))
+
+    results = matrix.validate_output(output, plan=plan)
+
+    assert results[0]["structured_finding_linkage_complete"] is False
+    assert results[0]["unlinked_finding_ids"] == ["extra"]
 
 
 def test_claim_matrix_live_probe_requires_frozen_apparatus() -> None:

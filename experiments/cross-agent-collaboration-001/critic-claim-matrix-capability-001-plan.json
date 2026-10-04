@@ -123,7 +123,7 @@
     "median_defect_recall_each": 1.0
   },
   "capability_thresholds": {
-    "quality": "every reviewable claim has the expected status; every unmet claim points to a finding citing the same claim; both verdicts request changes; no finding is mechanically unsupported",
+    "quality": "every reviewable claim has the expected status; every unmet claim points to a finding citing the same claim; every finding is linked from an unmet assessment; both verdicts request changes; the legacy lexical score is descriptive only",
     "maximum_input_ratio_to_direct": 0.75,
     "maximum_completion_ratio_to_direct": 1.0
   },

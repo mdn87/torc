@@ -43,6 +43,11 @@ same claim. A `met` assessment cannot reference a finding. Open-work questions
 remain visible in the capsule but are not misrepresented as candidate
 predicates.
 
+Every finding must also be linked back from at least one `unmet` assessment.
+That structural linkage replaces lexical unsupported-finding matching as the
+quality gate. The older lexical score remains in the evidence only for
+comparison; wording variants cannot decide the structured result.
+
 The expected statuses remain in the scorer and are not sent to the critic. The
 critic sees only the claim text, candidate source, and output contract.
 

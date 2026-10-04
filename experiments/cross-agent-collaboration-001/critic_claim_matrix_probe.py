@@ -140,7 +140,9 @@ def _prompt(
         "no observed violation. Mark it unmet when the candidate contradicts it. Every "
         "assessment needs concrete evidence. An unmet assessment must name at least one "
         "finding_id whose finding cites that same claim_id; a met assessment must use an empty "
-        "finding_ids list. Each enclosed payload's critic rules apply to its nested result. "
+        "finding_ids list. Every finding must be referenced by at least one unmet assessment. "
+        "For example, a met claim uses finding_ids [], while an unmet claim may use "
+        'finding_ids ["f1"]. Each enclosed payload\'s critic rules apply to its nested result. '
         "Return exactly one JSON object with no Markdown and this shape: "
         + canonical_json(contract)
         + ". Include each candidate exactly once in the given order.\n\n"
@@ -269,6 +271,11 @@ def validate_output(value: dict[str, Any], *, plan: dict[str, Any]) -> list[dict
             item=item,
             expected_claim_ids=claim_ids,
         )
+        finding_ids = {finding["finding_id"] for finding in item["result"]["findings"]}
+        linked_finding_ids = {
+            finding_id for assessment in assessments for finding_id in assessment["finding_ids"]
+        }
+        unlinked_finding_ids = sorted(finding_ids - linked_finding_ids)
         expected = plan["expected_claim_statuses"][candidate_id]
         observed = {assessment["claim_id"]: assessment["status"] for assessment in assessments}
         validated.append(
@@ -278,6 +285,8 @@ def validate_output(value: dict[str, Any], *, plan: dict[str, Any]) -> list[dict
                 "claim_matrix_correct": observed == expected,
                 "expected_claim_statuses": expected,
                 "observed_claim_statuses": observed,
+                "structured_finding_linkage_complete": not unlinked_finding_ids,
+                "unlinked_finding_ids": unlinked_finding_ids,
             }
         )
     return validated
@@ -376,7 +385,7 @@ def execute_probe(
     quality_passed = all(
         item["score"]["changes_requested_correct"]
         and item["claim_matrix_correct"]
-        and item["score"]["unsupported_finding_count"] == 0
+        and item["structured_finding_linkage_complete"]
         for item in scored
     )
     capability_confirmed = (
