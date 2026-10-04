@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "series_id": "critic-batch-capability-001",
+  "status": "ready",
+  "question": "Can two independent TORC compact critiques share one Codex harness invocation without losing deterministic defect recall?",
+  "candidates": [
+    "refactor-baseline-v1",
+    "release-policy-baseline-v1"
+  ],
+  "provider_controls": {
+    "provider": "codex",
+    "billing_surface": "ChatGPT Plus Codex allowance",
+    "harness_version": "codex-cli 0.159.3",
+    "model": "gpt-6-sol",
+    "effort": "low",
+    "session_mode": "fresh-ephemeral",
+    "tool_mode": "none",
+    "network_access": false
+  },
+  "call_budget": {
+    "maximum_calls": 1,
+    "automatic_retries": 0,
+    "stop_threshold_percent": 60,
+    "run_directory": "runs/critic-batch-capability-001/01-two-candidate-compact"
+  },
+  "matched_direct_baseline": {
+    "refactor_run_ids": [
+      "01-refactor-compact",
+      "04-refactor-compact",
+      "05-refactor-compact"
+    ],
+    "release_run_ids": [
+      "07-release-compact",
+      "10-release-compact",
+      "11-release-compact"
+    ],
+    "summed_median_input_tokens": 25107,
+    "summed_median_completion_ms": 23397.869,
+    "median_defect_recall_each": 1.0
+  },
+  "capability_success_requires": [
+    "both candidate critiques are schema-valid and correctly attributed",
+    "both critiques request changes with full deterministic defect recall",
+    "provider-reported batch input is at least 20 percent below the summed matched direct medians",
+    "batch completion time is no greater than the summed matched direct medians",
+    "no tool, subagent, MCP, app, browser, or web action occurs"
+  ],
+  "decision": {
+    "on_success": "freeze a repeated counterbalanced batching series before recommending batch size or general savings",
+    "on_quality_failure": "preserve and stop; fixed-context savings do not justify cross-candidate interference",
+    "on_cost_failure": "preserve and stop; batching does not materially amortize this harness",
+    "on_execution_failure": "preserve and exclude the only attempt without automatic retry"
+  }
+}
