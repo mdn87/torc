@@ -1,10 +1,64 @@
 {
   "schema_version": 1,
   "series_id": "critic-claim-matrix-capability-001",
-  "status": "draft",
+  "status": "ready",
+  "frozen_at": "2026-10-04T04:55:11Z",
   "question": "Can an explicit per-claim assessment matrix remove free-text scoring ambiguity while retaining the batching cost advantage?",
-  "apparatus_revision": "pending",
-  "apparatus_inputs": [],
+  "apparatus_revision": "90291f4cac49745f125a7bcbe5fab7c14721f54d",
+  "apparatus_inputs": [
+    {
+      "path": "experiments/cross-agent-collaboration-001/critic_claim_matrix_probe.py",
+      "sha256": "045bee2a458e3cfc921a4b5321725a3c80f288494573f783060131fdcf6113f2"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/critic_batch_probe.py",
+      "sha256": "742c200dbe79d2ca1d7a04aeab3c3cf95e5d293781f2e11c8df5aa7eb564651a"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/codex_usage_snapshot.py",
+      "sha256": "1ae8ff50ac7ee339929a0e9463da3e21f22c4bda9ab7ec869b3f4ead318d4183"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/native_context_request.py",
+      "sha256": "05b995813b0d406909455a4675d8da032031a6a9114af0a2a98cc9cb4b4a01be"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/native_context_response.py",
+      "sha256": "d6b33e9381f2a526e97158bb6d220258cf5374f4ee4b2182fe6b84eb276b7b4a"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/workflow_runner.py",
+      "sha256": "e8b5c9657472dd4ab73a40c9ec33ae3346d6d6dbd30cec539f1614e7e508e448"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/worker_runner.py",
+      "sha256": "6888871ef69a63979db5a07530879ddef1c0a8a0209c978bde7ef16d61da6054"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/smoke-manifest.json",
+      "sha256": "410df6ae9e8b2a7950180b0905034a8881561a5fbcfc056de5004a40ef9fb6c0"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/fixtures-manifest.json",
+      "sha256": "81feb1eff70ab1d81a4e9f38fc4454c534e42d7cf40fbdcd58e04404406dca11"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/handoffs/refactor-superseded-path.json",
+      "sha256": "25161061ada68cf85fcff0b15c7bd92c8d1fd0f7c707911c329f088630b64606"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/handoffs/release-policy-interaction.json",
+      "sha256": "d9ccafa9866423f81bc737d866f2f303db7cbc0d7b0d75e6bb42bab12ff058cd"
+    },
+    {
+      "path": "src/torc/execution_capsules.py",
+      "sha256": "3ebb1874f4a8a35ffea6dc1893ae9bdfaea9ca5c053ff51260766c626a76b986"
+    },
+    {
+      "path": "src/torc/canonical.py",
+      "sha256": "424fe3640a094f6dd34fa2b4c7b3ce374eada88685243c6a4dbf01b3b8653838"
+    }
+  ],
   "candidates": [
     "refactor-baseline-v1",
     "release-policy-baseline-v1"

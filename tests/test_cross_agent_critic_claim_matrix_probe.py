@@ -105,7 +105,5 @@ def test_claim_matrix_validator_rejects_cross_claim_finding_link() -> None:
 
 
 def test_claim_matrix_live_probe_requires_frozen_apparatus() -> None:
-    plan = json.loads(matrix.PLAN_PATH.read_text(encoding="utf-8"))
-
     with pytest.raises(matrix.CriticClaimMatrixProbeError, match="inputs are missing"):
-        matrix._verify_apparatus(plan)
+        matrix._verify_apparatus({"apparatus_inputs": []})
