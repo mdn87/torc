@@ -242,6 +242,8 @@ provider-neutral capsules, two independent reviews per call, honest batch-level
 usage accounting, and a claim-assessment matrix before a batch can pass. The
 one-call `critic-claim-matrix-capability-001` probe is frozen but deferred
 because the five-hour usage snapshot reached the 60% stop threshold.
+`critic-claim-matrix-capability-001-next.json` is the compact execution
+checkpoint for a fresh post-reset session, avoiding another long setup turn.
 
 The preregistered native-context follow-up is documented in
 `native-context-follow-up.md` and `native-context-series-003-plan.json`. It is

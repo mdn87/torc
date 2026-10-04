@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "series_id": "critic-claim-matrix-capability-001",
+  "status": "awaiting_usage_window",
+  "objective": "Run the single frozen structured-claim batch capability call, preserve its evidence, and do not retry automatically.",
+  "why_deferred": "The last model-free checkpoint reported 63 percent five-hour usage against the frozen 60 percent stop threshold.",
+  "usage_checkpoint": "runs/critic-claim-matrix-capability-001/usage-checkpoint-before-01.json",
+  "constraints": {
+    "maximum_model_calls": 1,
+    "automatic_retries": 0,
+    "stop_threshold_percent": 60,
+    "reset_credits_allowed": false,
+    "expected_clean_worktree": true
+  },
+  "frozen_evidence": {
+    "plan": "critic-claim-matrix-capability-001-plan.json",
+    "plan_sha256": "245da3f6520bf31ce5fd60692081dc95914b09934ae80e70418bffc2df760931",
+    "prompt_sha256": "f5f867a4eb3b7bbfe7671fad3314a618295125c5db954472ecd761668be8065f",
+    "prompt_bytes": 7990,
+    "apparatus_revision": "b4cd95875cc23018796b5fe41ff27f9a578de1a4",
+    "run_directory": "runs/critic-claim-matrix-capability-001/01-two-candidate-compact"
+  },
+  "steps": [
+    {
+      "step": 1,
+      "kind": "model_free",
+      "command": "python experiments/cross-agent-collaboration-001/codex_usage_snapshot.py --stop-threshold 60",
+      "continue_only_if": "decision is proceed"
+    },
+    {
+      "step": 2,
+      "kind": "model_free",
+      "command": "python experiments/cross-agent-collaboration-001/critic_claim_matrix_probe.py",
+      "continue_only_if": "plan and prompt hashes equal frozen_evidence"
+    },
+    {
+      "step": 3,
+      "kind": "one_model_call",
+      "command": "python experiments/cross-agent-collaboration-001/critic_claim_matrix_probe.py --run-dir experiments/cross-agent-collaboration-001/runs/critic-claim-matrix-capability-001/01-two-candidate-compact --expected-plan-sha256 245da3f6520bf31ce5fd60692081dc95914b09934ae80e70418bffc2df760931 --expected-prompt-sha256 f5f867a4eb3b7bbfe7671fad3314a618295125c5db954472ecd761668be8065f --execute",
+      "continue_only_if": "the runner's independent usage and apparatus gates pass"
+    },
+    {
+      "step": 4,
+      "kind": "model_free",
+      "command": "python -m pytest tests/test_cross_agent_critic_claim_matrix_probe.py -q",
+      "continue_only_if": "the attempted run directory is preserved whether the result passes or fails"
+    }
+  ],
+  "disposition": {
+    "on_capability_confirmed": "commit the immutable run, add a deterministic outcome audit, then freeze a fresh structured counterbalanced series",
+    "on_capability_rejected": "commit the immutable run and stop; do not weaken expected claim statuses post hoc",
+    "on_excluded": "commit the immutable disposition and stop; any retry requires a new plan"
+  }
+}

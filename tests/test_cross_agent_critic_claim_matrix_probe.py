@@ -9,6 +9,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 EXPERIMENT = ROOT / "experiments" / "cross-agent-collaboration-001"
+NEXT_PATH = EXPERIMENT / "critic-claim-matrix-capability-001-next.json"
 sys.path.insert(0, str(EXPERIMENT))
 import critic_claim_matrix_probe as matrix  # noqa: E402
 
@@ -142,3 +143,15 @@ def test_committed_claim_matrix_probe_is_frozen_and_reproducible() -> None:
     assert (
         probe["prompt_sha256"] == "f5f867a4eb3b7bbfe7671fad3314a618295125c5db954472ecd761668be8065f"
     )
+
+
+def test_compact_next_session_checkpoint_matches_frozen_probe() -> None:
+    checkpoint = json.loads(NEXT_PATH.read_text(encoding="utf-8"))
+    probe = matrix.build_probe()
+
+    assert checkpoint["status"] == "awaiting_usage_window"
+    assert checkpoint["constraints"]["maximum_model_calls"] == 1
+    assert checkpoint["constraints"]["reset_credits_allowed"] is False
+    assert checkpoint["frozen_evidence"]["plan_sha256"] == probe["plan_sha256"]
+    assert checkpoint["frozen_evidence"]["prompt_sha256"] == probe["prompt_sha256"]
+    assert checkpoint["frozen_evidence"]["prompt_bytes"] == probe["prompt_bytes"]

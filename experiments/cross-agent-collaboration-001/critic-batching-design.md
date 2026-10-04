@@ -99,6 +99,19 @@ broader fixture set earns a larger bound.
 Stop pursuing batching if structured coverage repeatedly misses explicit
 claims, median input saving falls below 25%, or attribution cannot fail closed.
 
+## Usage-efficient execution
+
+The ChatGPT Plus rate-limit snapshot covers the coordinating Codex session as
+well as experiment workers. In this run, the meter rose from 51% to 63% after
+the last worker call while the apparatus and documentation were being built.
+Long setup work can therefore consume the room reserved for a live cell.
+
+Freeze, test, and commit apparatus in one session, then execute the live cell
+early in a fresh post-reset session. The compact
+`critic-claim-matrix-capability-001-next.json` checkpoint contains the exact
+hashes, commands, guard, and dispositions needed to resume without reconstructing
+the full conversation. The runner still rechecks every control independently.
+
 ## Pending capability command
 
 First recheck usage:
