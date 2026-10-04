@@ -1,7 +1,8 @@
 {
   "schema_version": 1,
   "series_id": "critic-claim-link-confirmation-005",
-  "status": "draft",
+  "status": "frozen_before_live_runs",
+  "frozen_at": "2026-10-04T20:23:34Z",
   "question": "Do repeated counterbalanced compact claim-link batches preserve structured claim coverage while reducing provider input and completion time?",
   "excluded_predecessors": [
     "critic-batch-capability-001",
@@ -13,8 +14,73 @@
     "series_id": "critic-claim-link-capability-002",
     "use": "capability motivation only; excluded from confirmation estimates"
   },
-  "apparatus_revision": "pending",
-  "apparatus_inputs": [],
+  "apparatus_revision": "812e88bd97e490dbb8de394f177556e3bb79ca26",
+  "apparatus_inputs": [
+    {
+      "path": "experiments/cross-agent-collaboration-001/critic_claim_link_series.py",
+      "sha256": "101aeff37b3e57fb246f968d09f3ffbedda4cb87ee44d1eec5e6761930436225"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/critic_claim_link_probe.py",
+      "sha256": "446233209f47e6eca5320563d6c7cb7f1e7787558798841edd6f05e30e3b17fc"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/critic_claim_matrix_probe.py",
+      "sha256": "14d037fb7edae3e355f6b7982832b4721a0b47c7eb198c07cf7404fed3bddda7"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/critic_batch_series.py",
+      "sha256": "7df2f0e05eaf439b77dc63e87f88df652680a14a0b4c4ef7f96e8a723166213a"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/critic_batch_probe.py",
+      "sha256": "742c200dbe79d2ca1d7a04aeab3c3cf95e5d293781f2e11c8df5aa7eb564651a"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/codex_usage_snapshot.py",
+      "sha256": "1ae8ff50ac7ee339929a0e9463da3e21f22c4bda9ab7ec869b3f4ead318d4183"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/native_context_request.py",
+      "sha256": "05b995813b0d406909455a4675d8da032031a6a9114af0a2a98cc9cb4b4a01be"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/native_context_response.py",
+      "sha256": "d6b33e9381f2a526e97158bb6d220258cf5374f4ee4b2182fe6b84eb276b7b4a"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/workflow_runner.py",
+      "sha256": "e8b5c9657472dd4ab73a40c9ec33ae3346d6d6dbd30cec539f1614e7e508e448"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/worker_runner.py",
+      "sha256": "6888871ef69a63979db5a07530879ddef1c0a8a0209c978bde7ef16d61da6054"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/smoke-manifest.json",
+      "sha256": "410df6ae9e8b2a7950180b0905034a8881561a5fbcfc056de5004a40ef9fb6c0"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/fixtures-manifest.json",
+      "sha256": "81feb1eff70ab1d81a4e9f38fc4454c534e42d7cf40fbdcd58e04404406dca11"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/handoffs/refactor-superseded-path.json",
+      "sha256": "25161061ada68cf85fcff0b15c7bd92c8d1fd0f7c707911c329f088630b64606"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/handoffs/release-policy-interaction.json",
+      "sha256": "d9ccafa9866423f81bc737d866f2f303db7cbc0d7b0d75e6bb42bab12ff058cd"
+    },
+    {
+      "path": "src/torc/execution_capsules.py",
+      "sha256": "3ebb1874f4a8a35ffea6dc1893ae9bdfaea9ca5c053ff51260766c626a76b986"
+    },
+    {
+      "path": "src/torc/canonical.py",
+      "sha256": "424fe3640a094f6dd34fa2b4c7b3ce374eada88685243c6a4dbf01b3b8653838"
+    }
+  ],
   "provider_controls": {
     "provider": "codex",
     "billing_surface": "ChatGPT Plus Codex allowance",

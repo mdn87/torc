@@ -56,6 +56,18 @@ def test_claim_link_series_builds_counterbalanced_compact_prompts() -> None:
     assert probes[0]["prompt_sha256"] == probes[3]["prompt_sha256"]
     assert probes[1]["prompt_sha256"] == probes[2]["prompt_sha256"]
     assert probes[0]["prompt_sha256"] != probes[1]["prompt_sha256"]
+    assert all(
+        item["plan_sha256"] == "584660fabc103c1587d6408a72461a120659a916944b8167b7983bda005880fc"
+        for item in probes
+    )
+    assert (
+        probes[0]["prompt_sha256"]
+        == "4cbc8a217fe98dcd401f21e76edba8023c1bd96682556fa3e3017ff20776641f"
+    )
+    assert (
+        probes[1]["prompt_sha256"]
+        == "a77fb02f5a1bf16452356193e7380871bd58e1e9af579e9e410a7c2900344915"
+    )
     assert all(item["prompt_bytes"] < 7000 for item in probes)
     assert all("required_defect_areas" not in item["prompt"] for item in probes)
 
@@ -87,4 +99,5 @@ def test_claim_link_series_summary_confirms_balanced_savings() -> None:
 def test_claim_link_series_dry_report_is_not_available_before_freeze() -> None:
     plan = _plan()
 
-    assert plan["status"] == "draft"
+    assert plan["status"] == "frozen_before_live_runs"
+    assert len(series._verify_apparatus(plan)) == 16
