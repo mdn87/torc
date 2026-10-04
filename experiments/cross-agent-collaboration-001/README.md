@@ -247,6 +247,13 @@ above the frozen summed-direct threshold, so the overall capability was
 rejected without retry. The exact output expansion points to a smaller claim
 link map as a new contract, not a post-hoc relaxation of this result.
 
+`critic-claim-link-capability-002` tested that new contract. All 13 claim
+statuses were correct, both candidates retained full defect recall, and every
+finding was structurally linked. Compared with separate compact calls, input
+fell 42.0% and completion time fell 28.3%. Compared with the verbose matrix,
+output fell 41.2% and completion time fell 35.7%. The compact link map passed
+all frozen gates; a fresh four-call counterbalanced confirmation is next.
+
 The preregistered native-context follow-up is documented in
 `native-context-follow-up.md` and `native-context-series-003-plan.json`. It is
 budget-gated because Responses API charges are separate from a ChatGPT

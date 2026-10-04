@@ -117,11 +117,21 @@ def test_claim_link_live_probe_requires_frozen_apparatus() -> None:
 def test_committed_claim_link_probe_is_frozen_and_reproducible() -> None:
     plan = json.loads(link.PLAN_PATH.read_text(encoding="utf-8"))
     probe = link.build_probe()
+    run_probe = json.loads(
+        (
+            EXPERIMENT
+            / "runs"
+            / "critic-claim-link-capability-002"
+            / "01-two-candidate-compact"
+            / "probe-plan.json"
+        ).read_text(encoding="utf-8")
+    )
 
-    assert plan["status"] == "ready"
+    assert plan["status"] == "complete"
     assert len(link._verify_apparatus(plan)) == 14
     assert (
-        probe["plan_sha256"] == "a0589397007769b59aa58be4d2bfabe901bfab3d1ec097b3659526a42483cff8"
+        run_probe["plan_sha256"]
+        == "a0589397007769b59aa58be4d2bfabe901bfab3d1ec097b3659526a42483cff8"
     )
     assert (
         probe["prompt_sha256"] == "4cbc8a217fe98dcd401f21e76edba8023c1bd96682556fa3e3017ff20776641f"

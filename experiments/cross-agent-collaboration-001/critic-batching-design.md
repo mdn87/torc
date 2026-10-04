@@ -84,11 +84,11 @@ broader fixture set earns a larger bound.
 
 ## Next evidence gates
 
-1. Replace the rejected verbose assessment matrix with a new compact claim-link
-   capability contract. Do not retry or rescore the rejected call.
-2. If the compact link capability passes quality, input, and time gates, freeze
-   four fresh batches in `AB, BA, BA, AB` order. Exclude all capability and
-   free-text calls from that estimate.
+1. Freeze four fresh compact claim-link batches in `AB, BA, BA, AB` order now
+   that its separate capability call passed quality, input, and time gates.
+   Exclude all capability and free-text calls from that estimate.
+2. Require every run to preserve all 13 expected claim statuses, same-claim
+   finding links, full attribution, and no unlinked findings.
 3. Add at least two new fixtures with different claim shapes before making a
    general quality claim or testing a batch size above two.
 4. When Claude organization policy permits inference, run the same structured

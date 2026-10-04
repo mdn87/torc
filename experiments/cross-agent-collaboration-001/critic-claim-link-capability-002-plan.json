@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "series_id": "critic-claim-link-capability-002",
-  "status": "ready",
+  "status": "complete",
   "frozen_at": "2026-10-04T20:15:44Z",
   "question": "Can a compact claim-to-finding map retain deterministic structured coverage and restore the batching latency advantage?",
   "predecessor": {
@@ -141,5 +141,16 @@
     "on_quality_failure": "preserve and stop; compactness does not justify lost claim coverage",
     "on_cost_failure": "preserve and stop; the compact structure does not restore the batching advantage",
     "on_execution_failure": "preserve and exclude the only attempt without automatic retry"
+  },
+  "outcome": {
+    "run_directory": "runs/critic-claim-link-capability-002/01-two-candidate-compact",
+    "calls_consumed": 1,
+    "capability_confirmed": true,
+    "correct_claim_statuses": 13,
+    "unlinked_finding_count": 0,
+    "input_reduction_percent_vs_summed_direct_medians": 42.044,
+    "completion_reduction_percent_vs_summed_direct_medians": 28.288,
+    "output_token_reduction_percent_vs_verbose_matrix": 41.166,
+    "next_gate": "freeze four fresh counterbalanced compact claim-link batches"
   }
 }
