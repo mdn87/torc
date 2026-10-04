@@ -375,7 +375,20 @@ def test_evidence_preserves_exact_supplied_plan_without_prompt(tmp_path: Path) -
     assert disposition["model_call_may_have_started"] is False
 
 
-def test_execution_refuses_while_usage_reset_is_pending(tmp_path: Path) -> None:
+def test_execution_refuses_while_usage_reset_is_pending(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    plan = deepcopy(capability._object(capability.PLAN_PATH))
+    plan["status"] = "waiting_usage_reset"
+    original_object = capability._object
+
+    def waiting_plan(path: Path) -> dict[str, Any]:
+        if path == capability.PLAN_PATH:
+            return plan
+        return original_object(path)
+
+    monkeypatch.setattr(capability, "_object", waiting_plan)
     probe = capability.build_probe()
 
     with pytest.raises(runner.CodexNativeProbeError, match="not ready"):

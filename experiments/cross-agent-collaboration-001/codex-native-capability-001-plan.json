@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "series_id": "codex-native-capability-001",
-  "status": "waiting_usage_reset",
+  "status": "ready",
   "question": "Can the local Codex app-server expose enough native subagent topology and per-thread usage to run the context-transport pilot under ChatGPT Plus instead of separate API billing?",
   "candidate": {
     "candidate_id": "refactor-baseline-v1",

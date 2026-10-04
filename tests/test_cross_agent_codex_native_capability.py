@@ -74,7 +74,7 @@ def test_capability_probe_launch_disables_surfaces_and_enables_multi_agent() -> 
     assert "--strict-config" in launch
 
 
-def test_capability_plan_matches_current_usage_stop_evidence() -> None:
+def test_capability_plan_matches_current_usage_proceed_evidence() -> None:
     plan = json.loads(
         (EXPERIMENT / "codex-native-capability-001-plan.json").read_text(
             encoding="utf-8"
@@ -85,13 +85,13 @@ def test_capability_plan_matches_current_usage_stop_evidence() -> None:
             EXPERIMENT
             / "runs"
             / "codex-native-capability-001"
-            / "usage-checkpoint-before-01.json"
+            / "usage-checkpoint-before-04.json"
         ).read_text(encoding="utf-8")
     )
 
-    assert plan["status"] == "waiting_usage_reset"
-    assert checkpoint["decision"] == "stop"
-    assert checkpoint["primary"]["used_percent"] >= plan["call_budget"][
+    assert plan["status"] == "ready"
+    assert checkpoint["decision"] == "proceed"
+    assert checkpoint["primary"]["used_percent"] < plan["call_budget"][
         "stop_threshold_percent"
     ]
     assert checkpoint["reset_credits_consumed"] == 0
