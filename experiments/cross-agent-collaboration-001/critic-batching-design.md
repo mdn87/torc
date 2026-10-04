@@ -19,6 +19,7 @@ calls, routing, retries, and usage accounting remain in the harness adapter.
 | Two-candidate batch capability | Both candidates full recall | 42.7% below summed direct medians | 35.8% below summed direct medians |
 | Free-text batch confirmation, three completed calls | Strictly stopped at 5/6 full-recall critiques | Descriptive median 42.8% below direct | Descriptive median 36.1% below direct |
 | Compact claim-link confirmation, four calls | 52/52 statuses correct; 28/28 findings linked | 42.1% below summed direct median | 19.6% below summed direct median |
+| New-fixture claim-link capability, one call | 12/12 statuses correct; 5/5 findings linked | 14,618 absolute; no matched direct control | 19.3 seconds; no matched direct control |
 
 The batching saving is consistent with amortizing roughly one large fixed
 Codex harness context. Shrinking the explicit capsule alone cannot remove that
@@ -100,15 +101,19 @@ two structurally valid critiques.
 
 ## Next evidence gates
 
-1. Add at least two fixtures with different claim shapes before making a
-   general quality claim or testing a batch size above two.
-2. When Claude organization policy permits inference, run the same structured
+1. For the two new fixture shapes that passed a one-call quality capability
+   probe, collect one direct compact claim-link control each and one
+   reversed-order batch. Do not claim savings from their absolute usage alone.
+2. Repeat the new-fixture batch only if those controls preserve quality and
+   show a useful input or time difference. Do not test a batch size above two
+   before that confirmation.
+3. When Claude organization policy permits inference, run the same structured
    contract as a separate provider series. Compare quality and latency, but do
    not combine tokenizer totals.
-3. Add batching only at an execution-adapter boundary. Keep TORC core
+4. Add batching only at an execution-adapter boundary. Keep TORC core
    provider-neutral and retain batch-level usage rather than inventing
    per-candidate token totals.
-4. Re-run the frozen structured gates for every new model, provider, effort, or
+5. Re-run the frozen structured gates for every new model, provider, effort, or
    fixture family before expanding its operating bound.
 
 Stop pursuing batching if structured coverage repeatedly misses explicit

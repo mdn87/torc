@@ -270,6 +270,20 @@ generalizing the result. The reproducible audit is:
 python experiments/cross-agent-collaboration-001/critic_claim_link_confirmation_audit.py --pretty
 ```
 
+The first fixture-generalization capability call then paired two previously
+unbatched shapes: a Python header-merging defect and a JSON architecture and
+cutover plan. The compact contract correctly classified all 12 claims, returned
+both expected verdicts, and linked all five findings without an attribution
+gap. Its 14,618 input tokens and 19.3-second completion were within 0.6% and
+2.4% of the prior confirmed batch medians, respectively. Those comparisons are
+descriptive only: matched direct controls do not yet exist for these candidates.
+The next gate is one direct compact claim-link control per candidate followed by
+a reversed-order batch. Recompute the capability audit without a model call:
+
+```text
+python experiments/cross-agent-collaboration-001/critic_claim_link_generalization_audit.py --pretty
+```
+
 The preregistered native-context follow-up is documented in
 `native-context-follow-up.md` and `native-context-series-003-plan.json`. It is
 budget-gated because Responses API charges are separate from a ChatGPT
