@@ -228,6 +228,15 @@ call is excluded from its estimates, every candidate-position result must have
 full recall and zero unsupported findings, and median input must remain at
 least 30% below the matched separate-call baseline.
 
+That confirmation stopped after its third call under the frozen quality rule.
+All six critiques requested changes, five had full deterministic recall, and
+none had an unsupported finding. The sixth cited `x5` and described the right
+malformed-input and unknown-action behaviors, but split them across findings
+and used `failing closed` rather than one exact lexical scorer term. The strict
+failure remains unchanged. Descriptively, the three-call median still reduced
+input by 42.8% and completion time by 36.1%. The next gate is a structured
+per-claim assessment contract, not another free-text batch repeat.
+
 The preregistered native-context follow-up is documented in
 `native-context-follow-up.md` and `native-context-series-003-plan.json`. It is
 budget-gated because Responses API charges are separate from a ChatGPT
@@ -309,6 +318,9 @@ explicitly authorized.
 - `critic_batch_series.py` enforces the four-run counterbalanced confirmation,
   stops on the first quality or execution failure, and produces its aggregate
   report without another model call.
+- `critic_batch_confirmation_audit.py` reproduces the stopped confirmation's
+  strict outcome, descriptive cost, and lexical-scorer sensitivity without
+  changing the preregistered score.
 - `fixtures/bug-hidden-regression` starts with both visible and hidden failures.
 - `fixtures/refactor-superseded-path` passes its visible behavior tests while a
   hidden structural test catches the superseded production path.

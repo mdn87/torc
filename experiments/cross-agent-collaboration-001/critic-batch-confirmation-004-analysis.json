@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "series_id": "critic-batch-confirmation-004",
+  "status": "stopped_quality_failure",
+  "preregistered_result": {
+    "completed_batch_calls": 3,
+    "scheduled_batch_calls": 4,
+    "strict_confirmation_passed": false,
+    "reason": "one release-policy critique scored 0.75 deterministic defect-area recall",
+    "fourth_call_permitted": false
+  },
+  "descriptive_quality": {
+    "candidate_critiques": 6,
+    "correct_changes_requested_verdicts": 6,
+    "full_deterministic_recall_critiques": 5,
+    "unsupported_finding_count": 0
+  },
+  "descriptive_cost_not_a_confirmation_claim": {
+    "median_batch_input_tokens": 14364,
+    "median_input_ratio_to_summed_direct": 0.572111,
+    "median_input_reduction_percent": 42.789,
+    "median_batch_completion_ms": 14945.333,
+    "median_completion_ratio_to_summed_direct": 0.638748,
+    "median_completion_reduction_percent": 36.125
+  },
+  "post_hoc_scorer_audit": {
+    "primary_scores_changed": false,
+    "misses": [
+      {
+        "candidate_id": "release-policy-baseline-v1",
+        "missed_areas": [
+          {
+            "area_id": "malformed_and_unknown_records_not_fail_closed",
+            "acceptable_claim_ids": [
+              "x5"
+            ],
+            "related_findings": [
+              {
+                "claim_ids": [
+                  "x2",
+                  "x5"
+                ],
+                "evidence": "release_policy.py:16-18 uses roots and change[\"path\"] without validation. A missing path raises KeyError, and an empty root matches every path.",
+                "finding_id": "f2",
+                "severity": "blocking",
+                "summary": "Paths and roots are not validated as non-empty normalized relative POSIX paths; malformed values can also raise instead of failing closed."
+              },
+              {
+                "claim_ids": [
+                  "x4",
+                  "x5"
+                ],
+                "evidence": "release_policy.py:17-19 reads only change[\"path\"]; a record with path \"release/file\", an out-of-scope rename source, or an unknown action can return true.",
+                "finding_id": "f4",
+                "severity": "blocking",
+                "summary": "Rename sources and actions are ignored, allowing an out-of-scope source or unknown action to pass."
+              }
+            ],
+            "original_lexical_group_matches_across_related_findings": [
+              {
+                "terms": [
+                  "malformed",
+                  "unknown",
+                  "missing"
+                ],
+                "matched_terms": [
+                  "malformed",
+                  "unknown",
+                  "missing"
+                ]
+              },
+              {
+                "terms": [
+                  "fail closed",
+                  "exception",
+                  "deny"
+                ],
+                "matched_terms": []
+              }
+            ],
+            "fail_closed_inflection_observed": true,
+            "any_single_finding_matches_frozen_area": false
+          }
+        ]
+      }
+    ],
+    "interpretation": "The missed area retained its x5 claim citation and described the malformed and unknown-action behaviors, but no single finding used one frozen second-group lexical term. This is evidence for a structured claim-coverage contract, not grounds to override the preregistered failure."
+  },
+  "next_gate": "Test a result contract that requires one explicit assessment for every capsule claim before spending more calls on batch-size confirmation."
+}

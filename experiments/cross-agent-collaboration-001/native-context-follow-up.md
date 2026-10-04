@@ -63,6 +63,13 @@ each candidate must pass twice in each position, and live calls stop at 60%
 current-window usage so the series can continue in a later session without
 reset credits.
 
+The confirmation stopped after call three. Five of six candidate critiques had
+full strict recall; the sixth described the missed `x5` behavior but did not
+place an exact frozen lexical term in one matching finding. Its primary score
+remains 0.75. The three observed batches still had a 42.8% median input saving,
+but that is descriptive rather than a passed confirmation. A structured
+per-claim assessment is now required before another batching series.
+
 Before authorization, inspect a request plan without making a model call:
 
 ```text
