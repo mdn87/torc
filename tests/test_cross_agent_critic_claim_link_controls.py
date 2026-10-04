@@ -95,20 +95,38 @@ def test_validate_output_accepts_complete_structural_evidence(run_id: str) -> No
     assert all(item["structured_finding_linkage_complete"] for item in validated)
 
 
-def test_series_starts_incomplete_without_live_calls() -> None:
+def test_series_resumes_after_the_committed_first_control() -> None:
     assert controls.report() == {
         "schema_version": 1,
         "series_id": "critic-claim-link-controls-007",
         "status": "incomplete",
-        "completed_calls": 0,
+        "completed_calls": 1,
         "planned_calls": 3,
     }
+    next_cell = controls.next_cell()
+    assert next_cell["completed_calls"] == 1
+    assert next_cell["next"]["run_id"] == "02-cutover-direct"
+    assert next_cell["next"]["prompt_sha256"] == (
+        "b3c70735b9ddd4060c65779979d25267412add0f4d3be41fa44d4f3fc5bf1dcc"
+    )
+
+
+def test_resume_checkpoint_matches_the_next_cell() -> None:
+    checkpoint = json.loads(
+        (EXPERIMENT / "critic-claim-link-controls-007-next.json").read_text(encoding="utf-8")
+    )
+    next_probe = controls.next_cell()["next"]
+
+    assert checkpoint["completed_calls"] == 1
+    assert checkpoint["next_cell"]["run_id"] == next_probe["run_id"]
+    assert checkpoint["next_cell"]["prompt_sha256"] == next_probe["prompt_sha256"]
+    assert checkpoint["frozen_controls"]["plan_sha256"] == next_probe["plan_sha256"]
 
 
 def test_execute_rejects_the_wrong_frozen_plan_hash(tmp_path: Path) -> None:
     with pytest.raises(controls.CriticClaimLinkControlsError, match="plan hash does not match"):
         controls.execute_cell(
-            run_id="01-header-direct",
+            run_id="02-cutover-direct",
             run_dir=tmp_path / "unused",
             expected_plan_sha256="unused",
             expected_prompt_sha256="unused",
