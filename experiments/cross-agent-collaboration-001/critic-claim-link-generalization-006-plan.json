@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "series_id": "critic-claim-link-generalization-006",
+  "status": "draft",
+  "question": "Does the compact claim-link contract preserve structured review quality on two previously unbatched fixture shapes?",
+  "apparatus_inputs": [],
+  "provider_controls": {
+    "provider": "codex",
+    "billing_surface": "ChatGPT Plus Codex allowance",
+    "harness_version": "codex-cli 0.159.3",
+    "model": "gpt-6-sol",
+    "effort": "low",
+    "session_mode": "fresh-ephemeral",
+    "tool_mode": "none",
+    "network_access": false
+  },
+  "reviewable_claim_categories": [
+    "active_commitments",
+    "hard_constraints",
+    "settled_decisions",
+    "superseded_directions"
+  ],
+  "candidates": [
+    {
+      "candidate_id": "header-merge-baseline-v1",
+      "fixture_id": "bug-hidden-regression",
+      "candidate_workspace_tree_sha256": "e8a61165b9a9e48a35f28df64f16cc6a37e5768024a6023cdb92f621e2808b5f",
+      "expected_verdict": "changes_requested",
+      "expected_claim_statuses": {
+        "c1": "met",
+        "c2": "met",
+        "x1": "unmet",
+        "x2": "unmet",
+        "x3": "unmet",
+        "x4": "met"
+      }
+    },
+    {
+      "candidate_id": "cutover-plan-baseline-v1",
+      "fixture_id": "design-cutover-plan",
+      "candidate_workspace_tree_sha256": "ecbf9ea2c9c6cd178d29853832cffd93d4d91076227eaacc0440c5a2b29255de",
+      "expected_verdict": "changes_requested",
+      "expected_claim_statuses": {
+        "c1": "met",
+        "c2": "unmet",
+        "x1": "met",
+        "x2": "unmet",
+        "x3": "unmet",
+        "x4": "unmet"
+      }
+    }
+  ],
+  "call_budget": {
+    "maximum_calls": 1,
+    "automatic_retries": 0,
+    "stop_threshold_percent": 60,
+    "run_directory": "runs/critic-claim-link-generalization-006/01-header-first",
+    "reset_credits": "do not consume without explicit operator approval"
+  },
+  "capability_thresholds": {
+    "quality": "both candidates have every expected claim status, expected verdict, same-claim finding links, and zero unlinked findings",
+    "maximum_input_tokens": 18000,
+    "maximum_completion_ms": 60000
+  },
+  "interpretation_limits": [
+    "This one call can test quality capability on two new fixture shapes but cannot confirm repeatability.",
+    "Without matched direct calls on these candidates, input and completion measurements are descriptive rather than batching savings.",
+    "Do not increase batch size or generalize to mutable or dependent work from this result."
+  ],
+  "stop_rules": [
+    "Run at most one call and never retry automatically.",
+    "Preserve and exclude any run with schema, identity, fixture, apparatus, claim-link, or provider-control drift.",
+    "Do not edit expected statuses after live output is observed.",
+    "Stop without a call when current-window usage is at or above 60 percent."
+  ]
+}
