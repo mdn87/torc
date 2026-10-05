@@ -20,6 +20,7 @@ calls, routing, retries, and usage accounting remain in the harness adapter.
 | Free-text batch confirmation, three completed calls | Strictly stopped at 5/6 full-recall critiques | Descriptive median 42.8% below direct | Descriptive median 36.1% below direct |
 | Compact claim-link confirmation, four calls | 52/52 statuses correct; 28/28 findings linked | 42.1% below summed direct median | 19.6% below summed direct median |
 | New-fixture claim-link capability, one call | 12/12 statuses correct; 5/5 findings linked | 14,618 absolute; no matched direct control | 19.3 seconds; no matched direct control |
+| New-fixture matched controls, both orders | 24/24 batch statuses correct; 10/10 findings linked | 47.2% below summed direct in both orders | 9.3%-33.5% below summed direct |
 
 The batching saving is consistent with amortizing roughly one large fixed
 Codex harness context. Shrinking the explicit capsule alone cannot remove that
@@ -101,12 +102,11 @@ two structurally valid critiques.
 
 ## Next evidence gates
 
-1. Complete `critic-claim-link-controls-007`: the header direct control passed;
-   the cutover direct control and reversed-order batch remain. Do not claim
-   savings from absolute usage before those matched cells complete.
-2. Repeat the new-fixture batch only if those controls preserve quality and
-   show a useful input or time difference. Do not test a batch size above two
-   before that confirmation.
+1. Run two additional new-fixture batches, one per order, and report medians
+   across the two observations per order. The matched capability passed, but
+   its 9.3%-33.5% timing spread is too wide for a stable latency claim.
+2. Keep batch size two until that new-fixture confirmation passes the same
+   structured quality, input, and completion gates.
 3. When Claude organization policy permits inference, run the same structured
    contract as a separate provider series. Compare quality and latency, but do
    not combine tokenizer totals.

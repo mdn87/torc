@@ -284,12 +284,18 @@ a reversed-order batch. Recompute the capability audit without a model call:
 python experiments/cross-agent-collaboration-001/critic_claim_link_generalization_audit.py --pretty
 ```
 
-`critic-claim-link-controls-007` is executing that gate as three resumable
-cells. The header-only direct control passed all six statuses and used 13,678
-input tokens in 9.8 seconds. The five-hour meter then reached the frozen 60%
-stop threshold, so the cutover-only control and reversed batch remain unrun.
-`critic-claim-link-controls-007-next.json` pins the next prompt, plan hash, exact
-resume command, and no-reset-credit rule.
+`critic-claim-link-controls-007` completed that gate. The two direct controls
+used 27,671 input tokens and 29.0 seconds in total. The fresh reversed batch
+preserved all 12 claim decisions and all five finding links while using 14,618
+input tokens and 26.3 seconds: 47.2% less input and 9.3% less time. Combined
+with the earlier header-first batch, each candidate passed in each position;
+that earlier order used the same 14,618 input tokens and was 33.5% faster than
+the summed direct controls. The input result is consistent, but one observation
+per order is not a stable latency estimate. The model-free audit is:
+
+```text
+python experiments/cross-agent-collaboration-001/critic_claim_link_controls_audit.py --pretty
+```
 
 The preregistered native-context follow-up is documented in
 `native-context-follow-up.md` and `native-context-series-003-plan.json`. It is

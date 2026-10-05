@@ -1,7 +1,9 @@
 {
   "schema_version": 1,
   "series_id": "critic-claim-link-controls-007",
-  "status": "paused_by_usage_guard",
+  "status": "historical_checkpoint_completed",
+  "series_final_status": "capability_confirmed",
+  "completed_at_commit": "d1b9782",
   "completed_calls": 1,
   "planned_calls": 3,
   "completed_run_ids": [
@@ -39,5 +41,5 @@
     "python experiments/cross-agent-collaboration-001/critic_claim_link_controls.py",
     "python experiments/cross-agent-collaboration-001/critic_claim_link_controls.py --run-id 02-cutover-direct --run-dir experiments/cross-agent-collaboration-001/runs/critic-claim-link-controls-007/02-cutover-direct --expected-plan-sha256 5cb70cb2f35e7c2242bfe228520d1e9d2e4a5ba28b8981ed8b23bafc3a8a1e45 --expected-prompt-sha256 b3c70735b9ddd4060c65779979d25267412add0f4d3be41fa44d4f3fc5bf1dcc --execute"
   ],
-  "resume_rule": "Start the next cell only when the usage snapshot says proceed. Commit its evidence before starting the reversed batch. Do not consume reset credits without explicit operator approval."
+  "resume_rule": "Historical only: all planned cells subsequently completed. Do not run these commands again."
 }
