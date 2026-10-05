@@ -35,8 +35,8 @@ def test_replication_starts_incomplete() -> None:
     }
 
 
-def test_draft_plan_cannot_execute(tmp_path: Path) -> None:
-    with pytest.raises(replication.CriticClaimLinkReplicationError, match="not ready"):
+def test_wrong_frozen_plan_hash_cannot_execute(tmp_path: Path) -> None:
+    with pytest.raises(replication.CriticClaimLinkReplicationError, match="plan hash"):
         replication.execute_cell(
             run_id="01-header-first",
             run_dir=tmp_path / "unused",
