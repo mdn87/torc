@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "series_id": "critic-claim-link-replication-008",
+  "status": "replicated",
+  "batch_observations": 4,
+  "structured_quality": {
+    "candidate_critiques": 8,
+    "correct_claim_status_count": 48,
+    "correct_verdict_count": 8,
+    "unlinked_finding_count": 0,
+    "each_order_observations": 2
+  },
+  "by_order": {
+    "header_first": {
+      "observations": 2,
+      "median_input_tokens": 14618.0,
+      "median_completion_ms": 23206.671
+    },
+    "cutover_first": {
+      "observations": 2,
+      "median_input_tokens": 14618.0,
+      "median_completion_ms": 27538.801
+    }
+  },
+  "aggregate": {
+    "matched_summed_direct_input_tokens": 27671,
+    "matched_summed_direct_completion_ms": 28964.679,
+    "median_batch_input_tokens": 14618.0,
+    "median_input_reduction_percent": 47.172,
+    "median_batch_completion_ms": 26712.104,
+    "median_completion_reduction_percent": 7.777,
+    "confirmation_thresholds_passed": true
+  },
+  "interpretation": "Across four batches and two observations per candidate order, compact claim-link batching preserved every structured decision and reduced median provider input by 47.2% against matched direct calls. Median completion was 7.8% faster, but latency remained substantially more variable than input usage.",
+  "recommendation": "Adopt batch size two as the tested default for independent read-only critiques sharing model, effort, policy boundary, and compact claim-link contract. Treat input reduction as the primary expected benefit and latency reduction as secondary."
+}

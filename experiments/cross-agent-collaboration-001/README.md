@@ -297,6 +297,14 @@ per order is not a stable latency estimate. The model-free audit is:
 python experiments/cross-agent-collaboration-001/critic_claim_link_controls_audit.py --pretty
 ```
 
+`critic-claim-link-replication-008` added one fresh batch per order. Across the
+four total batch observations, all 48 claim decisions were correct and every
+finding remained structurally linked. Both orders had the same 14,618-token
+median, 47.2% below matched direct calls. Aggregate median completion was 26.7
+seconds, 7.8% below direct; order medians were 23.2 and 27.5 seconds. This earns
+a bounded batch-size-two recommendation. Input reduction is the stable primary
+benefit; latency reduction is secondary and noisier.
+
 The preregistered native-context follow-up is documented in
 `native-context-follow-up.md` and `native-context-series-003-plan.json`. It is
 budget-gated because Responses API charges are separate from a ChatGPT

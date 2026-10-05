@@ -21,6 +21,7 @@ calls, routing, retries, and usage accounting remain in the harness adapter.
 | Compact claim-link confirmation, four calls | 52/52 statuses correct; 28/28 findings linked | 42.1% below summed direct median | 19.6% below summed direct median |
 | New-fixture claim-link capability, one call | 12/12 statuses correct; 5/5 findings linked | 14,618 absolute; no matched direct control | 19.3 seconds; no matched direct control |
 | New-fixture matched controls, both orders | 24/24 batch statuses correct; 10/10 findings linked | 47.2% below summed direct in both orders | 9.3%-33.5% below summed direct |
+| New-fixture replication, four total batches | 48/48 statuses correct; both orders repeated | 47.2% below summed direct median | 7.8% below summed direct median |
 
 The batching saving is consistent with amortizing roughly one large fixed
 Codex harness context. Shrinking the explicit capsule alone cannot remove that
@@ -102,11 +103,11 @@ two structurally valid critiques.
 
 ## Next evidence gates
 
-1. Run two additional new-fixture batches, one per order, and report medians
-   across the two observations per order. The matched capability passed, but
-   its 9.3%-33.5% timing spread is too wide for a stable latency claim.
-2. Keep batch size two until that new-fixture confirmation passes the same
-   structured quality, input, and completion gates.
+1. Implement batch size two at the execution-adapter boundary for independent,
+   read-only critiques under the same model, effort, policy, and output contract.
+   Treat input reduction as the primary benefit and latency as secondary.
+2. Add a new frozen evaluation before changing batch size, model, effort,
+   provider, policy boundary, or task dependency assumptions.
 3. When Claude organization policy permits inference, run the same structured
    contract as a separate provider series. Compare quality and latency, but do
    not combine tokenizer totals.

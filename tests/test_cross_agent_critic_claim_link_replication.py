@@ -25,18 +25,19 @@ def test_replication_probes_are_counterbalanced_and_hash_stable() -> None:
     )
 
 
-def test_replication_starts_incomplete() -> None:
-    assert replication.report() == {
-        "schema_version": 1,
-        "series_id": "critic-claim-link-replication-008",
-        "status": "incomplete",
-        "completed_calls": 0,
-        "planned_calls": 2,
-    }
+def test_replication_reports_confirmed_medians() -> None:
+    report = replication.report()
+
+    assert report["status"] == "replicated"
+    assert report["batch_observations"] == 4
+    assert report["median_input_reduction_percent"] == 47.172
+    assert report["median_completion_reduction_percent"] == 7.777
+    assert report["confirmation_thresholds_passed"] is True
+    assert replication.next_cell() == {"status": "complete", "completed_calls": 2}
 
 
-def test_wrong_frozen_plan_hash_cannot_execute(tmp_path: Path) -> None:
-    with pytest.raises(replication.CriticClaimLinkReplicationError, match="plan hash"):
+def test_completed_replication_cannot_execute(tmp_path: Path) -> None:
+    with pytest.raises(replication.CriticClaimLinkReplicationError, match="already complete"):
         replication.execute_cell(
             run_id="01-header-first",
             run_dir=tmp_path / "unused",
