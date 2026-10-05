@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "series_id": "critic-claim-link-replication-008",
+  "status": "draft",
+  "question": "With two observations per candidate order, do new-fixture claim-link batches retain quality and remain below matched direct input and completion cost?",
+  "source_capability": {
+    "plan_path": "experiments/cross-agent-collaboration-001/critic-claim-link-generalization-006-plan.json"
+  },
+  "prior_batches": [
+    {
+      "order": "header_first",
+      "result_path": "experiments/cross-agent-collaboration-001/runs/critic-claim-link-generalization-006/01-header-first/result.json"
+    },
+    {
+      "order": "cutover_first",
+      "result_path": "experiments/cross-agent-collaboration-001/runs/critic-claim-link-controls-007/03-cutover-first-batch/result.json"
+    }
+  ],
+  "matched_direct_baseline": {
+    "analysis_path": "experiments/cross-agent-collaboration-001/critic-claim-link-controls-007-analysis.json",
+    "summed_input_tokens": 27671,
+    "summed_completion_ms": 28964.679
+  },
+  "apparatus_inputs": [],
+  "provider_controls": {
+    "provider": "codex",
+    "billing_surface": "ChatGPT Plus Codex allowance",
+    "harness_version": "codex-cli 0.159.3",
+    "model": "gpt-6-sol",
+    "effort": "low",
+    "session_mode": "fresh-ephemeral",
+    "tool_mode": "none",
+    "network_access": false
+  },
+  "reviewable_claim_categories": [
+    "active_commitments",
+    "hard_constraints",
+    "settled_decisions",
+    "superseded_directions"
+  ],
+  "schedule": [
+    {
+      "run_index": 1,
+      "run_id": "01-header-first",
+      "order": "header_first",
+      "candidate_order": [
+        "header-merge-baseline-v1",
+        "cutover-plan-baseline-v1"
+      ]
+    },
+    {
+      "run_index": 2,
+      "run_id": "02-cutover-first",
+      "order": "cutover_first",
+      "candidate_order": [
+        "cutover-plan-baseline-v1",
+        "header-merge-baseline-v1"
+      ]
+    }
+  ],
+  "call_budget": {
+    "maximum_calls": 2,
+    "automatic_retries": 0,
+    "stop_threshold_percent": 60,
+    "series_directory": "runs/critic-claim-link-replication-008",
+    "reset_credits": "do not consume without explicit operator approval"
+  },
+  "confirmation_thresholds": {
+    "quality": "all four fresh candidate critiques have every expected claim status, expected verdict, same-claim finding links, and zero unlinked findings",
+    "maximum_median_input_ratio_to_summed_direct": 0.75,
+    "maximum_median_completion_ratio_to_summed_direct": 1.0,
+    "order_check": "each order has two quality-passing observations when its prior batch is included"
+  },
+  "interpretation_limits": [
+    "The earlier observation in each order predates this replication plan and must remain identified separately.",
+    "Two observations per order support a bounded replication result, not a universal latency distribution.",
+    "Keep batch size two and do not generalize to mutable, dependent, or mixed-policy work."
+  ],
+  "stop_rules": [
+    "Run exactly one scheduled cell per invocation and never retry automatically.",
+    "Commit every attempted cell before starting another.",
+    "Stop after any excluded run, structured quality failure, provider drift, or current-window usage at or above 60 percent.",
+    "Do not edit candidate orders, prompt hashes, baselines, or thresholds after the first live call."
+  ]
+}
