@@ -305,6 +305,15 @@ seconds, 7.8% below direct; order medians were 23.2 and 27.5 seconds. This earns
 a bounded batch-size-two recommendation. Input reduction is the stable primary
 benefit; latency reduction is secondary and noisier.
 
+`critic_batch_adapter.py` turns that bound into a provider-neutral reference
+policy for the owning execution layer. It requires explicit opt-in and a named
+evaluated operating bound, accepts only two independent read-only tool-free
+jobs with identical execution and policy controls, hash-binds their payloads
+and claim IDs, validates complete same-claim response linkage, and records only
+aggregate provider usage. Ineligible work falls back to direct execution with
+reason codes. The policy performs no provider call or authority change. See
+`critic-batch-adapter-contract.md`.
+
 The preregistered native-context follow-up is documented in
 `native-context-follow-up.md` and `native-context-series-003-plan.json`. It is
 budget-gated because Responses API charges are separate from a ChatGPT

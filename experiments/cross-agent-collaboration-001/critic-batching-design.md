@@ -101,6 +101,19 @@ larger batches, dependent tasks, mutable work, or other providers behave the
 same way. The older lexical scorer remains descriptive because it mislabeled
 two structurally valid critiques.
 
+## Reference adapter policy
+
+`critic_batch_adapter.py` implements the decision boundary without moving
+provider execution into TORC. Batching requires explicit opt-in, exactly two
+jobs, a named evaluated model/provider/effort/output-contract bound, read-only
+tool-free work, no dependencies, and equal policy and data boundaries. It
+hash-binds ordered payloads and claim identities, fails the whole response on
+coverage or attribution drift, retains only aggregate usage, and records that
+lineage authority did not change.
+
+This module is a reference for the Lugos execution owner. It is not registered
+as a TORC provider adapter and cannot route or execute a model call.
+
 ## Next evidence gates
 
 1. Implement batch size two at the execution-adapter boundary for independent,
