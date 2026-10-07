@@ -25,3 +25,8 @@ The owning Lugos execution adapter may serialize the envelope for its provider
 and persist the receipt. TORC core should only supply or reference the claim
 capsules and record resulting artifact hashes where an authorized workflow
 needs provenance.
+
+The evidence-replay tests feed both recorded Series 008 batch orders through
+this contract. They recover all expected claim statuses, retain the provider's
+14,618-token aggregate record, and confirm that the derived receipt changes no
+authority.
