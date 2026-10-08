@@ -1,0 +1,71 @@
+{
+  "authority": {
+    "live_calls": false,
+    "parent_repository_changes": false,
+    "provider_sdks": 0
+  },
+  "candidate_claim_ids": {
+    "cutover-plan-baseline-v1": [
+      "c1",
+      "c2",
+      "x1",
+      "x2",
+      "x3",
+      "x4"
+    ],
+    "header-merge-baseline-v1": [
+      "c1",
+      "c2",
+      "x1",
+      "x2",
+      "x3",
+      "x4"
+    ]
+  },
+  "candidate_payload_sha256": {
+    "cutover-plan-baseline-v1": "7be53b2749d158e18ee9dbd8336808eaf8725d030467419d517caefe93af3720",
+    "header-merge-baseline-v1": "a0152f29d8434fdc97e518d60a3d39d98bf6fa8c7cb01679a638c9ea3dd343fb"
+  },
+  "controls": {
+    "billing_surface": "ChatGPT Plus Codex allowance",
+    "effort": "low",
+    "harness_version": "codex-cli 0.159.3",
+    "model": "gpt-6-sol",
+    "network_access": false,
+    "provider": "codex",
+    "session_mode": "fresh-ephemeral",
+    "tool_mode": "none"
+  },
+  "data_boundary": "synthetic-fixtures",
+  "evaluation_id": "critic-claim-link-replication-008",
+  "evidence_inputs": [
+    {
+      "path": "experiments/cross-agent-collaboration-001/critic-claim-link-replication-008-plan.json",
+      "sha256": "b73c63eb9f580708c5fed6fe2756e94b6d7cf3d967f88d458ef8febacc447636"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/critic-claim-link-replication-008-analysis.json",
+      "sha256": "63d2895a28c82c6943a643d6d3460bfb3a00176dd498e1bcf11e25068baaa2b1"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/critic-claim-link-generalization-006-plan.json",
+      "sha256": "be6be2d7122ca0c73d69dc2b4bc973631e1cf6e80d773862f62f8faf24adb892"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/runs/critic-claim-link-replication-008/01-header-first/output.json",
+      "sha256": "f22efb49bae79ab744c0681e6899f9aa724d298f0ecfc0365ff884938bd48468"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/runs/critic-claim-link-replication-008/01-header-first/phase/worker-run.json",
+      "sha256": "b75d47830cd0a0b369cd7cbd8f61674f41ef16d91a91cef9447e8bd7fc44d6b9"
+    }
+  ],
+  "execution_mode": "model-free-recorded-replay",
+  "maximum_output_bytes": 32768,
+  "maximum_prompt_bytes": 16384,
+  "policy_boundary": "local-tool-free-review",
+  "schema_version": 1,
+  "series_id": "critic-batch-consumer-smoke-009",
+  "status": "model_free",
+  "usage_source": "recorded-provider-usage"
+}

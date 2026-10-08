@@ -37,17 +37,18 @@ production-shaped fix is structured coverage, not a post-hoc score override.
 
 For each candidate, the batch result contains:
 
-1. The candidate identifier.
-2. One ordered assessment for every reviewable claim in the capsule.
-3. `met` or `unmet`, concrete evidence, and finding references for each claim.
-4. A normal critique whose findings use the same stable claim identifiers.
+1. The candidate identifier, in the requested candidate order.
+2. A `claim_links` entry for every reviewable claim in the capsule.
+3. An empty finding-ID list for `met`, or same-claim finding IDs for `unmet`.
+4. A normal critique whose findings contain concrete evidence and the same
+   stable claim identifiers. Evidence is attached to findings, not to met claims.
 
 Every `unmet` assessment must reference at least one finding that cites that
 same claim. A `met` assessment cannot reference a finding. Open-work questions
 remain visible in the capsule but are not misrepresented as candidate
 predicates.
 
-Every finding must also be linked back from at least one `unmet` assessment.
+Every finding must also be linked back from every claim it names.
 That structural linkage replaces lexical unsupported-finding matching as the
 quality gate. The older lexical score remains in the evidence only for
 comparison; wording variants cannot decide the structured result.
@@ -113,6 +114,12 @@ lineage authority did not change.
 
 This module is a reference for the Lugos execution owner. It is not registered
 as a TORC provider adapter and cannot route or execute a model call.
+
+The local consumer and provenance gate is complete. It adds pinned approval
+checks, model-free request/response binding, full failed-attempt retention, and
+an ordinary TORC evidence checkpoint under the same lease. See
+`critic-batch-integration-proposal.md` and
+`critic-batch-consumer-smoke-009-results.json`.
 
 ## Next evidence gates
 

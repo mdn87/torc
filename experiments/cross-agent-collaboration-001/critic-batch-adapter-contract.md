@@ -30,3 +30,19 @@ The evidence-replay tests feed both recorded Series 008 batch orders through
 this contract. They recover all expected claim statuses, retain the provider's
 14,618-token aggregate record, and confirm that the derived receipt changes no
 authority.
+
+Envelope construction and response validation recompute the decision from its
+retained operating bound and supplied jobs. Changing payload hashes, claims,
+controls, or order therefore invalidates the decision. A finding must be linked
+from every claim it names, so partial attribution cannot mark a named claim met.
+Aggregate usage rejects boolean counters and non-string keys.
+Job descriptors enforce immutable tuple IDs and valid scalar types. Malformed
+nested JSON values fail with an adapter error. An approval may contain only
+nonblocking findings; a changes-requested verdict must contain a finding.
+
+The next consumer step is specified in
+[the integration proposal](critic-batch-integration-proposal.md). Its local
+model-free transport smoke and authorized TORC evidence checkpoint are now
+implemented in `critic_batch_consumer_smoke.py` and `critic_batch_provenance.py`.
+They preserve the full response and aggregate receipt, label replay usage,
+reject incomplete claim sets before dispatch, and retain the same lease.

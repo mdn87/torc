@@ -314,6 +314,16 @@ aggregate provider usage. Ineligible work falls back to direct execution with
 reason codes. The policy performs no provider call or authority change. See
 `critic-batch-adapter-contract.md`.
 
+`critic-batch-integration-proposal.md` specifies the execution-owner integration
+and its completed local gate. `critic_batch_consumer_smoke.py` exercises both
+candidate orders through a model-free recorded-response transport, validates
+the echoed batch ID and full claim coverage, preserves complete evidence, and
+never retries failed responses. Its optional `--state-dir` path uses
+`critic_batch_provenance.py` to append a verified evidence checkpoint with the
+same activation and lease. `critic-batch-consumer-smoke-009-results.json` records
+the completed local result. Replay usage is historical; no new model calls were
+made. Actual Lugos dispatch remains an external execution-owner integration.
+
 The preregistered native-context follow-up is documented in
 `native-context-follow-up.md` and `native-context-series-003-plan.json`. It is
 budget-gated because Responses API charges are separate from a ChatGPT

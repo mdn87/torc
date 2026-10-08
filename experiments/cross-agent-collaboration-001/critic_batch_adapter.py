@@ -20,6 +20,19 @@ class CriticBatchAdapterError(RuntimeError):
     """Raised when an adapter request or response fails closed."""
 
 
+def _valid_identifier(value: object) -> bool:
+    return isinstance(value, str) and bool(value) and value.strip() == value
+
+
+def _validate_ids(values: tuple[str, ...], name: str, *, required: bool) -> None:
+    if type(values) is not tuple or (required and not values):
+        raise CriticBatchAdapterError(f"{name} IDs must be an immutable tuple")
+    if any(not _valid_identifier(value) for value in values):
+        raise CriticBatchAdapterError(f"{name} ID is invalid")
+    if len(values) != len(set(values)):
+        raise CriticBatchAdapterError(f"{name} IDs must be unique")
+
+
 @dataclass(frozen=True)
 class CriticJob:
     """Execution-layer facts needed to decide whether one critique may batch."""
@@ -50,18 +63,14 @@ class CriticJob:
             "tool_mode": self.tool_mode,
         }
         for name, value in scalar_values.items():
-            if not value or value.strip() != value:
+            if not _valid_identifier(value):
                 raise CriticBatchAdapterError(f"invalid job field: {name}")
-        if len(self.payload_sha256) != 64 or any(
+        if not isinstance(self.payload_sha256, str) or len(self.payload_sha256) != 64 or any(
             character not in "0123456789abcdef" for character in self.payload_sha256
         ):
             raise CriticBatchAdapterError("payload hash must be lowercase SHA-256")
-        if not self.claim_ids or len(self.claim_ids) != len(set(self.claim_ids)):
-            raise CriticBatchAdapterError("claim IDs must be non-empty and unique")
-        if any(not value or value.strip() != value for value in self.claim_ids):
-            raise CriticBatchAdapterError("claim ID is invalid")
-        if len(self.dependency_ids) != len(set(self.dependency_ids)):
-            raise CriticBatchAdapterError("dependency IDs must be unique")
+        _validate_ids(self.claim_ids, "claim", required=True)
+        _validate_ids(self.dependency_ids, "dependency", required=False)
 
 
 @dataclass(frozen=True)
@@ -83,9 +92,9 @@ class BatchOperatingBound:
             self.effort,
             self.output_contract,
         )
-        if any(not value or value.strip() != value for value in values):
+        if any(not _valid_identifier(value) for value in values):
             raise CriticBatchAdapterError("operating bound contains an invalid field")
-        if self.maximum_batch_size != 2:
+        if type(self.maximum_batch_size) is not int or self.maximum_batch_size != 2:
             raise CriticBatchAdapterError("only evaluated batch size two is supported")
 
 
@@ -97,6 +106,7 @@ class BatchDecision:
     reason_codes: tuple[str, ...]
     ordered_candidate_ids: tuple[str, ...]
     batch_id: str | None
+    operating_bound: BatchOperatingBound | None = None
 
 
 _MATCHED_FIELDS = (
@@ -116,6 +126,12 @@ def decide_batch(
     operating_bound: BatchOperatingBound,
 ) -> BatchDecision:
     """Choose a two-job batch only inside the experimentally supported bound."""
+    if type(jobs) is not tuple or any(not isinstance(job, CriticJob) for job in jobs):
+        raise CriticBatchAdapterError("jobs must be an immutable tuple of critic jobs")
+    if type(batching_requested) is not bool:
+        raise CriticBatchAdapterError("batching_requested must be a boolean")
+    if not isinstance(operating_bound, BatchOperatingBound):
+        raise CriticBatchAdapterError("operating bound is invalid")
     candidate_ids = tuple(job.candidate_id for job in jobs)
     reasons: list[str] = []
     if not batching_requested:
@@ -165,7 +181,18 @@ def decide_batch(
         reason_codes=(),
         ordered_candidate_ids=candidate_ids,
         batch_id=f"critic-batch-{digest}",
+        operating_bound=operating_bound,
     )
+
+
+def _validate_decision(decision: BatchDecision, jobs: tuple[CriticJob, ...]) -> None:
+    if decision.operating_bound is None:
+        raise CriticBatchAdapterError("batch decision has no operating bound")
+    expected = decide_batch(
+        jobs, batching_requested=True, operating_bound=decision.operating_bound
+    )
+    if expected.mode != "batch" or expected != decision:
+        raise CriticBatchAdapterError("jobs do not match the bound batch decision")
 
 
 def build_envelope(
@@ -176,14 +203,22 @@ def build_envelope(
     """Bind verified payloads and claim identities to an eligible decision."""
     if decision.mode != "batch" or decision.batch_id is None:
         raise CriticBatchAdapterError("direct decisions cannot build a batch envelope")
+    _validate_decision(decision, jobs)
     if tuple(job.candidate_id for job in jobs) != decision.ordered_candidate_ids:
         raise CriticBatchAdapterError("job order does not match the decision")
-    if set(payloads) != set(decision.ordered_candidate_ids):
+    if not isinstance(payloads, dict) or set(payloads) != set(decision.ordered_candidate_ids):
         raise CriticBatchAdapterError("payload membership does not match the decision")
     candidates = []
     for job in jobs:
         payload = payloads[job.candidate_id]
-        observed = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+        if not isinstance(payload, str):
+            raise CriticBatchAdapterError(f"payload must be text: {job.candidate_id}")
+        try:
+            observed = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+        except UnicodeError as exc:
+            raise CriticBatchAdapterError(
+                f"payload is not valid UTF-8: {job.candidate_id}"
+            ) from exc
         if observed != job.payload_sha256:
             raise CriticBatchAdapterError(f"payload hash drifted: {job.candidate_id}")
         candidates.append(
@@ -205,11 +240,13 @@ def build_envelope(
 def _validate_usage(usage: dict[str, Any]) -> dict[str, int]:
     if not isinstance(usage, dict) or "input_tokens" not in usage or "output_tokens" not in usage:
         raise CriticBatchAdapterError("aggregate provider usage is incomplete")
+    if any(not isinstance(key, str) for key in usage):
+        raise CriticBatchAdapterError("provider usage keys must be strings")
     if any("candidate" in key or key.startswith("per_") for key in usage):
         raise CriticBatchAdapterError("per-candidate usage must not be manufactured")
     validated = {}
     for key, value in usage.items():
-        if not isinstance(key, str) or not isinstance(value, int) or value < 0:
+        if type(value) is not int or value < 0:
             raise CriticBatchAdapterError("provider usage values must be non-negative integers")
         validated[key] = value
     return validated
@@ -225,9 +262,16 @@ def validate_response(
     """Fail closed on identity, coverage, or finding-link attribution drift."""
     if decision.mode != "batch" or decision.batch_id is None:
         raise CriticBatchAdapterError("response validation requires a batch decision")
+    _validate_decision(decision, jobs)
+    if not isinstance(response, dict):
+        raise CriticBatchAdapterError("response envelope is invalid")
     if set(response) != {"schema_version", "batch_id", "critiques"}:
         raise CriticBatchAdapterError("response envelope is invalid")
-    if response["schema_version"] != 1 or response["batch_id"] != decision.batch_id:
+    if (
+        type(response["schema_version"]) is not int
+        or response["schema_version"] != 1
+        or response["batch_id"] != decision.batch_id
+    ):
         raise CriticBatchAdapterError("response batch identity drifted")
     critiques = response["critiques"]
     if not isinstance(critiques, list) or len(critiques) != len(jobs):
@@ -255,10 +299,12 @@ def validate_response(
             "findings",
         }:
             raise CriticBatchAdapterError("nested result is invalid")
-        if result["schema_version"] != 1 or result["verdict"] not in {
-            "approve",
-            "changes_requested",
-        }:
+        if (
+            type(result["schema_version"]) is not int
+            or result["schema_version"] != 1
+            or not isinstance(result["verdict"], str)
+            or result["verdict"] not in {"approve", "changes_requested"}
+        ):
             raise CriticBatchAdapterError("nested result header is invalid")
         findings = result["findings"]
         if not isinstance(findings, list):
@@ -279,6 +325,7 @@ def validate_response(
                 not isinstance(finding_id, str)
                 or not finding_id
                 or finding_id in finding_by_id
+                or not isinstance(finding["severity"], str)
                 or finding["severity"] not in {"blocking", "non_blocking"}
                 or not isinstance(finding["summary"], str)
                 or not finding["summary"]
@@ -286,18 +333,26 @@ def validate_response(
                 or not finding["evidence"]
                 or not isinstance(claim_ids, list)
                 or not claim_ids
+                or any(not isinstance(value, str) or not value for value in claim_ids)
+                or len(claim_ids) != len(set(claim_ids))
                 or not set(claim_ids) <= set(job.claim_ids)
             ):
                 raise CriticBatchAdapterError("finding content is invalid")
             finding_by_id[finding_id] = finding
+        if result["verdict"] == "approve" and any(
+            finding["severity"] == "blocking" for finding in findings
+        ):
+            raise CriticBatchAdapterError("approval contradicts a blocking finding")
+        if result["verdict"] == "changes_requested" and not findings:
+            raise CriticBatchAdapterError("changes_requested requires at least one finding")
         linked: set[str] = set()
         statuses = {}
         for claim_id in job.claim_ids:
             finding_ids = links[claim_id]
             if (
                 not isinstance(finding_ids, list)
-                or len(finding_ids) != len(set(finding_ids))
                 or any(not isinstance(value, str) or not value for value in finding_ids)
+                or len(finding_ids) != len(set(finding_ids))
             ):
                 raise CriticBatchAdapterError("claim-link values are invalid")
             for finding_id in finding_ids:
@@ -308,6 +363,9 @@ def validate_response(
             statuses[claim_id] = "unmet" if finding_ids else "met"
         if linked != set(finding_by_id):
             raise CriticBatchAdapterError("response contains an unlinked finding")
+        for finding_id, finding in finding_by_id.items():
+            if any(finding_id not in links[claim_id] for claim_id in finding["claim_ids"]):
+                raise CriticBatchAdapterError("finding is not linked to every named claim")
         candidate_receipts.append(
             {
                 "candidate_id": job.candidate_id,
@@ -318,7 +376,10 @@ def validate_response(
             }
         )
     usage = _validate_usage(aggregate_usage)
-    output_sha256 = hashlib.sha256(canonical_json(response).encode("utf-8")).hexdigest()
+    try:
+        output_sha256 = hashlib.sha256(canonical_json(response).encode("utf-8")).hexdigest()
+    except (TypeError, ValueError, UnicodeError) as exc:
+        raise CriticBatchAdapterError("response is not valid canonical JSON") from exc
     return {
         "schema_version": 1,
         "batch_id": decision.batch_id,
