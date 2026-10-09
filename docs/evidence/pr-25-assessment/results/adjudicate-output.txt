@@ -1,0 +1,14 @@
+== CR-001: successor adds an item and completes it before the implementer returns ==
+  changes-since-receiver: {'since_revision_id': 'revision-247935f5c4de4a198a2b9af55cc817ad', 'revisions_since': 3, 'added': {}, 'removed': {}, 'self_model_changed': True}
+  -> transient add+complete visible to the returning bearer: False
+
+== CR-003: directly appended, correctly sealed revision with a fabricated resolution ==
+  verify valid: True errors: []
+  unaccounted after the fabricated 'completed' resolution: [('constraints', 'Never write outside the state directory')]
+  -> fabricated resolution silenced the real drop: True
+  malformed resolution accepted by the store; history read raises: KeyError 'section'
+
+== CR-002: the Python API accepts event_type='rollback_applied' on a plain checkpoint ==
+  accepted; boundary.unaccounted: [('constraints', 'Never write outside the state directory'), ('open_work', 'Handle exports larger than memory')]
+  (the removal made by this mislabeled revision is exempted; earlier drops still show)
+  verify afterwards valid: False ['rollback_context_invalid']
