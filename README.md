@@ -161,6 +161,8 @@ exports seven immutable JSON artifacts under `.torc/demo/artifacts/`.
 - `docs/p3-branch-scope-envelope.json` - branch-creation authority and budgets
 - `docs/p4-visibility.md` - read-only authority and continuity explanation contract
 - `docs/p4-visibility-scope-envelope.json` - bounded P4 visibility authority and budgets
+- `docs/pr-26-continuity-and-batching-assessment.md` - PR #26 architecture, concept fit, review findings, and Orca-grounded rollout
+- `docs/pr-25-receiver-fitted-carry-assessment.md` - PR #25 measured carry comparison, concept fit, review findings, coverage and scaling evidence, and Orca-grounded rollout (version 2, after Codex and Claude cross-review; evidence under `docs/evidence/pr-25-assessment/`)
 - `docs/thread-checkpoint-authority.md` - LIR binding and checkpoint acceptance contract
 - `docs/project-snapshot-artifacts.md` - three-record artifact architecture, reconnaissance, and Phase 2 boundary
 - `docs/artifacts/README.md` - project snapshot schemas, CLI, retention, renderer, and cold-agent refresh index

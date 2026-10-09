@@ -1,0 +1,5 @@
+# The scripts under scripts/ are kept as they were run to produce the recorded results
+# (apart from the path edits listed in README.md), so the repository lint rules
+# (pyproject.toml: line length 100, import order, ...) are not applied to them.
+# This file only affects this directory tree.
+exclude = ["scripts"]

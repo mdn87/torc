@@ -1,0 +1,16 @@
+[router]
+mode = "fusion"
+
+[router.fusion]
+timeout_s = 1500
+max_panel = 4
+on_panelist_error = "drop"
+return_mode = "analysis"
+preflight_enabled = true
+judge_fallback = []
+panel = [
+  { transport = "cli", command = "codex", label = "codex:gpt-6-sol-high", args_template = ["exec", "--skip-git-repo-check", "--sandbox", "read-only", "-c", "model_reasoning_effort=high", "{prompt}"] },
+  { transport = "cli", command = "claude", model = "fable", label = "claude:fable" },
+  { transport = "cli", command = "claude", model = "opus", label = "claude:opus" },
+]
+judge = { transport = "cli", command = "claude", model = "sonnet", label = "judge:claude-sonnet" }

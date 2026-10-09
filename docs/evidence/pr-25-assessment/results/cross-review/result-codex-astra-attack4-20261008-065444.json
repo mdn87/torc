@@ -1,0 +1,19 @@
+{
+  "adjudications_recorded": 1,
+  "command_kind": "cross-review",
+  "completed_at": "2026-10-08T06:56:41.072571Z",
+  "deadline_overridden": false,
+  "deadline_s": 1800,
+  "dry_run": false,
+  "effort": "high",
+  "findings_received": 1,
+  "manifest_sha256": "d5639d2bb4dd4c5cfd9b5f1c8f3264b1621dbc0299c48b3089cb45c0d7018f16",
+  "mode": "adversarial",
+  "model": "gpt-6-astra",
+  "packet_path": "$HOME/.local/state/lugos/autowork/runs/20261008-065444-cross-review/review-packet.md",
+  "reviewer_route": "codex-astra",
+  "run_id": "20261008-065444-cross-review",
+  "stats_path": "$HOME/.local/state/lugos/autowork/runs/20261008-065444-cross-review/review-stats.json",
+  "status": "succeeded",
+  "subject_kind": "implementation"
+}

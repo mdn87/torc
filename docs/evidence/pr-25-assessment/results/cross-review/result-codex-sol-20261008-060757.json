@@ -1,0 +1,19 @@
+{
+  "adjudications_recorded": 8,
+  "command_kind": "cross-review",
+  "completed_at": "2026-10-08T06:10:59.079046Z",
+  "deadline_overridden": false,
+  "deadline_s": 1800,
+  "dry_run": false,
+  "effort": "high",
+  "findings_received": 8,
+  "manifest_sha256": "fcb13fc4302d6041647da79d5e15f53add9079dc15be947336ea7f6ef45672d7",
+  "mode": "adversarial",
+  "model": "gpt-5.6-sol",
+  "packet_path": "$HOME/.local/state/lugos/autowork/runs/20261008-060757-cross-review/review-packet.md",
+  "reviewer_route": "codex-sol",
+  "run_id": "20261008-060757-cross-review",
+  "stats_path": "$HOME/.local/state/lugos/autowork/runs/20261008-060757-cross-review/review-stats.json",
+  "status": "succeeded",
+  "subject_kind": "implementation"
+}

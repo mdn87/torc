@@ -1,0 +1,85 @@
+== 1. Fixture replay ==
+  checkpoint state-2-work-added.json: unaccounted=[]
+  checkpoint state-3-item-completed.json: unaccounted=[]
+  checkpoint state-4-last-summary.json: unaccounted=[('constraints', 'Never write outside the state directory'), ('open_work', 'Handle exports larger than memory')]
+  status.boundary.self_model = {'authored_at_revision_id': 'revision-2d7dc90a53d14631af86259ebdb9c5f5', 'authored_by_activation_id': 'activation-implementer', 'authored_by_substrate_id': 'p5-implementer', 'bearer_substrate_id': 'p5-implementer', 'restatement_due': False}
+
+  P5 carry for receiver-small.json: budget 99/100 words, sections 12 included / 4 omitted
+    + identity-role                  11 words  req=True prio=100
+    + constraints                     6 words  req=True prio=100
+    + commitments                     6 words  req=True prio=100
+    + open-work                       5 words  req=True prio=100
+    + session-purpose                 9 words  req=True prio=100
+    + receiver-fit                    8 words  req=True prio=100
+    + self-model-provenance          10 words  req=True prio=100
+    + unaccounted-constraints-1      15 words  req=False prio=90
+    + unaccounted-open_work-2        14 words  req=False prio=90
+    + goals                           9 words  req=False prio=80
+    + settled-decisions               6 words  req=False prio=70
+    + memory-refs                     0 words  req=False prio=30
+    - settled-decisions.remainder  omitted: budget
+    - uncertainties                omitted: budget
+    - methods                      omitted: budget
+    - artifact-refs                omitted: capability_irrelevant
+    units: required=55 history=29 optional=15
+    rendered carry: 174 words, 2435 bytes; canonical projection JSON: 4343 bytes
+    carries dropped work: True; carries dropped constraint: True
+
+  P5 carry for receiver-large.json: budget 116/10000 words, sections 15 included / 0 omitted
+    + identity-role                  11 words  req=True prio=100
+    + constraints                     6 words  req=True prio=100
+    + commitments                     6 words  req=True prio=100
+    + open-work                       5 words  req=True prio=100
+    + session-purpose                 9 words  req=True prio=100
+    + receiver-fit                    8 words  req=True prio=100
+    + self-model-provenance          10 words  req=True prio=100
+    + unaccounted-constraints-1      15 words  req=False prio=90
+    + unaccounted-open_work-2        14 words  req=False prio=90
+    + goals                           9 words  req=False prio=80
+    + settled-decisions              13 words  req=False prio=70
+    + uncertainties                   4 words  req=False prio=60
+    + methods                         5 words  req=False prio=50
+    + artifact-refs                   1 words  req=False prio=40
+    + memory-refs                     0 words  req=False prio=30
+    units: required=55 history=29 optional=32
+    rendered carry: 184 words, 2519 bytes; canonical projection JSON: 4468 bytes
+    carries dropped work: True; carries dropped constraint: True
+
+== 2. Same head, P0 compiler at the same budgets ==
+  P0 for receiver-small.json at 100: used 67, included ['identity-role', 'constraints', 'commitments', 'open-work', 'handoff-purpose', 'goals', 'settled-decisions', 'uncertainties', 'methods', 'artifact-refs', 'memory-refs'], omitted []
+    carries dropped work: False; carries dropped constraint: False
+  P0 for receiver-large.json at 10000: used 67, included ['identity-role', 'constraints', 'commitments', 'open-work', 'handoff-purpose', 'goals', 'settled-decisions', 'uncertainties', 'methods', 'artifact-refs', 'memory-refs'], omitted []
+    carries dropped work: False; carries dropped constraint: False
+
+== 3. P1 compiled-prompt lane shape from the same head ==
+  compiled prompt: 60 words, 580 bytes; carries dropped work: False; carries dropped constraint: False
+
+== 4. Smallest receiver budget that compiles (small receiver descriptor) ==
+  smallest carry_limit that compiles: 55 words (required tier = 55 words)
+    required identity-role             11 words
+    required constraints                6 words
+    required commitments                6 words
+    required open-work                  5 words
+    required session-purpose            9 words
+    required receiver-fit               8 words
+    required self-model-provenance     10 words
+    at that budget the history tier is: ['unaccounted-constraints-1:budget', 'unaccounted-open_work-2:budget']
+
+== 5. Codex review scenarios ==
+
+  S1: resolve -> restore -> drop again, then carry for the substrate that was away
+    boundary.unaccounted after second drop: [('constraints', 'Never write outside the state directory'), ('open_work', 'Handle exports larger than memory'), ('open_work', 'Write the export round-trip test')]
+    changes-since-receiver.removed: {'open_work': [{'item': 'Write the export round-trip test', 'disposition': 'completed'}]}
+    unaccounted sections in carry: ['unaccounted-open_work-3', 'unaccounted-constraints-1', 'unaccounted-open_work-2']
+    CONTRADICTION (same item both 'completed' and unaccounted): True
+
+  S2: successor confirms the inherited self-model unchanged with self_model_revised
+    before: author=p5-implementer restatement_due=True
+    after unchanged self_model_revised: author=p5-implementer restatement_due=True
+    after changed self_model_revised: author=p5-receiver-large restatement_due=False
+
+  S3: implementer hands to successor, successor resolves work, hands back; implementer's carry
+    carry for implementer while successor still bears: changes-since-receiver present=True; revisions_since=2
+    carry for implementer after taking the lineage back: changes-since-receiver present=False
+    session-purpose: {'purpose': 'session_start', 'authority': {'activation_id': 'activation-implementer-2', 'substrate_id': 'p5-implementer'}, 'receiver_is_authority_substrate': True}
+    self-model-provenance: {'authored_at_revision_id': 'revision-a3ba67e4b8fb44fe8e35ae17add56e8a', 'authored_by_activation_id': 'activation-implementer', 'authored_by_substrate_id': 'p5-implementer', 'receiver_substrate_id': 'p5-implementer', 'restatement_due': False}
