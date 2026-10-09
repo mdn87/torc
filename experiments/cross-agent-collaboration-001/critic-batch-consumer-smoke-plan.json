@@ -53,11 +53,11 @@
     },
     {
       "path": "experiments/cross-agent-collaboration-001/runs/critic-claim-link-replication-008/01-header-first/output.json",
-      "sha256": "f22efb49bae79ab744c0681e6899f9aa724d298f0ecfc0365ff884938bd48468"
+      "sha256": "8572c9a5e8321e6e167b074d97d8cc5e0a94ec77f0ea4e94459bf046b6eefd8f"
     },
     {
       "path": "experiments/cross-agent-collaboration-001/runs/critic-claim-link-replication-008/01-header-first/phase/worker-run.json",
-      "sha256": "b75d47830cd0a0b369cd7cbd8f61674f41ef16d91a91cef9447e8bd7fc44d6b9"
+      "sha256": "a73d1a74dfc5c595e78b1d8406fe6aa9518d7ba2782a00e72f36b368648b86bb"
     }
   ],
   "execution_mode": "model-free-recorded-replay",
