@@ -33,7 +33,17 @@ def tree_entries(root: Path) -> list[dict[str, Any]]:
     if not resolved.is_dir():
         raise FixtureControlError(f"fixture tree does not exist: {resolved}")
     entries = []
-    for path in sorted(item for item in resolved.rglob("*") if item.is_file()):
+    # Sort by lower-cased path parts with the exact parts as a tie-breaker, so the
+    # order (and therefore every pinned tree hash) is the same on Windows, macOS,
+    # and Linux; a plain Path sort is case-insensitive only on Windows.
+    files = (item for item in resolved.rglob("*") if item.is_file())
+    for path in sorted(
+        files,
+        key=lambda item: (
+            tuple(part.lower() for part in item.relative_to(resolved).parts),
+            item.relative_to(resolved).parts,
+        ),
+    ):
         relative = path.relative_to(resolved).as_posix()
         relative_parts = Path(relative).parts
         if (
