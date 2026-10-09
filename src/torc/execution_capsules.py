@@ -78,6 +78,10 @@ def compile_claim_capsule(
             zip(values, source_refs, strict=True), start=1
         ):
             claim_id = f"{prefix}{index}"
+            if claim_id in claim_sources:
+                # Prefixes such as "c" and "c1" both generate "c11"; a silent
+                # overwrite would misattribute a source reference.
+                raise ValueError(f"claim id collision: {claim_id}")
             section_claims[claim_id] = value
             claim_sources[claim_id] = {
                 "section_id": section_id,

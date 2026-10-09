@@ -107,3 +107,30 @@ def test_claim_capsule_rejects_ambiguous_or_unknown_claims() -> None:
     _, control = _fixture_capsule()
     with pytest.raises(ValueError, match="unknown claim id"):
         resolve_claim_sources(control, ["missing1"])
+
+
+def test_overlapping_claim_prefixes_cannot_collide() -> None:
+    sections = [
+        {
+            "section_id": "first",
+            "claim_prefix": "c",
+            "values": [f"value {index}" for index in range(1, 12)],
+            "source_refs": [f"revision-1:first:{index}" for index in range(1, 12)],
+        },
+        {
+            "section_id": "second",
+            "claim_prefix": "c1",
+            "values": ["another value"],
+            "source_refs": ["revision-1:second:1"],
+        },
+    ]
+    with pytest.raises(ValueError, match="claim id collision: c11"):
+        compile_claim_capsule(
+            projection_id="projection-1",
+            lineage_identity="lineage",
+            current_responsibility="responsibility",
+            source_revision_id="revision-1",
+            handoff_reason="model_succession",
+            target_substrate="target",
+            sections=sections,
+        )
