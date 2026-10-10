@@ -57,7 +57,7 @@ def test_claim_link_series_builds_counterbalanced_compact_prompts() -> None:
     assert probes[1]["prompt_sha256"] == probes[2]["prompt_sha256"]
     assert probes[0]["prompt_sha256"] != probes[1]["prompt_sha256"]
     assert all(
-        item["plan_sha256"] == "584660fabc103c1587d6408a72461a120659a916944b8167b7983bda005880fc"
+        item["plan_sha256"] == "4d9d33043d1b1e84d8b822dec96e99d7ae24dc0f899529c103fcdd79e9be6285"
         for item in probes
     )
     assert (

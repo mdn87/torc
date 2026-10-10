@@ -20,7 +20,7 @@
     },
     {
       "path": "experiments/cross-agent-collaboration-001/fixture_control.py",
-      "sha256": "1c4534a1ae2446bf8f4e13a3abeb1b295227b3e8213e4bd0fd2a36f5666d8625"
+      "sha256": "1709e33fcec84091e2f746cc3cd0fbf327172e1513d35affaf95bf2fef4deca5"
     },
     {
       "path": "experiments/cross-agent-collaboration-001/native_context_request.py",
@@ -28,7 +28,7 @@
     },
     {
       "path": "experiments/cross-agent-collaboration-001/workflow_runner.py",
-      "sha256": "e8b5c9657472dd4ab73a40c9ec33ae3346d6d6dbd30cec539f1614e7e508e448"
+      "sha256": "1ddb06b6d1a584ac289b600014901636b7b7d915b504073ee97c7f8e238d558b"
     },
     {
       "path": "experiments/cross-agent-collaboration-001/worker_runner.py",

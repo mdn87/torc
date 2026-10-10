@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "series_id": "critic-transport-002-confirmation",
-  "plan_sha256": "e686c1976b184a977f2d5aa76331a925b0acea335c8021e12cea7d2ac26ac80c",
+  "plan_sha256": "ef82624926b835f64f9436a19a46be804a40c2dce177e6d848fdc74008319850",
   "status": "complete",
   "completed_candidates": [
     {
