@@ -1,4 +1,4 @@
-# 0004: Separate control records from model-visible execution capsules
+# ADR 0005: Separate control records from model-visible execution capsules
 
 Status: accepted
 
@@ -47,6 +47,26 @@ Native subagents remain an execution-layer facility. Their isolated contexts,
 delegation calls, and usage records may be experiment evidence or adapter
 artifacts, but they do not replace TORC handoff preparation, acceptance, or
 lease transfer.
+
+## Relation to ADR 0004
+
+[ADR 0004](0004-torc-is-always-in-charge.md) assigns the receiver-facing carry
+to TORC: the P5 compiler reads canonical history, derives the receiver's
+budget from its descriptor, and decides what fits. This decision implements
+the model-visible rendering of that carry; it does not replace it.
+
+- Sizing happens in the projection compiler, before any capsule exists. A
+  capsule is built from a projection's already-fitted sections and cannot
+  recover an item the projection omitted for budget.
+- Every claim handle resolves, through the control envelope, to a source
+  reference that the projection recorded, so TORC can still verify a citation
+  against canonical history.
+- A capsule may be handed to a read-only observer, such as a critic, without
+  granting lineage authority. An actual successor still receives every required
+  continuity field through the ordinary handoff path and passes its acceptance
+  gate; material held only in the control envelope does not satisfy that gate.
+
+`tests/test_p5_capsule_contract.py` holds the contract test for this ordering.
 
 ## Consequences
 
