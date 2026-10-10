@@ -110,6 +110,16 @@ experiment lanes. P5 proves the mechanism on a deterministic fixture; it does
 not yet show that a receiving agent performs better. See
 `docs/p5-receiver-carry.md`.
 
+The portable continuity work came from [Reed Newman](https://github.com/ReedNewman)
+(PR #26, merged through #28 with his history intact). It separates the compact
+execution capsule a receiving agent reads from the control envelope TORC keeps
+(`docs/decisions/0005-separate-control-and-execution-capsules.md`), adds a
+provider-neutral usage normalizer, and runs the cross-agent collaboration
+experiment that turned exploratory critic trials into a bounded, replayable
+two-job batching policy with hash-pinned fixtures, hidden oracles, and retained
+negative results. See `experiments/cross-agent-collaboration-001/README.md` and
+`docs/pr-26-continuity-and-batching-assessment.md`.
+
 TORC also includes the first provider-agnostic project snapshot artifact slice.
 It collects manifest-bounded Git evidence, validates content-addressed
 candidate projections, writes separate acceptance receipts, advances a
@@ -176,6 +186,8 @@ exports seven immutable JSON artifacts under `.torc/demo/artifacts/`.
 - `docs/p4-visibility-scope-envelope.json` - bounded P4 visibility authority and budgets
 - `docs/p5-receiver-carry.md` - receiver-fitted carry, history reading, resolutions, and boundary asks
 - `docs/p5-receiver-carry-scope-envelope.json` - bounded P5 authority and budgets
+- `docs/decisions/0005-separate-control-and-execution-capsules.md` - control envelope versus model-visible execution capsule, and how it implements the P5 carry
+- `experiments/cross-agent-collaboration-001/README.md` - portable continuity and bounded critic batching experiment (Reed Newman)
 - `docs/pr-26-continuity-and-batching-assessment.md` - PR #26 architecture, concept fit, review findings, and Orca-grounded rollout
 - `docs/pr-25-receiver-fitted-carry-assessment.md` - PR #25 measured carry comparison, concept fit, review findings, coverage and scaling evidence, and Orca-grounded rollout (version 2, after Codex and Claude cross-review; evidence under `docs/evidence/pr-25-assessment/`)
 - `docs/thread-checkpoint-authority.md` - LIR binding and checkpoint acceptance contract
