@@ -39,7 +39,7 @@
     {"path": "experiments/cross-agent-collaboration-001/handoffs/design-cutover-plan.json", "sha256": "b48de5ec39c6943175a295a4496ba2170512b8dc97770088f73ff3f0e925f310"},
     {"path": "experiments/cross-agent-collaboration-001/critic-claim-link-generalization-006-plan.json", "sha256": "be6be2d7122ca0c73d69dc2b4bc973631e1cf6e80d773862f62f8faf24adb892"},
     {"path": "experiments/cross-agent-collaboration-001/critic-claim-link-controls-007-analysis.json", "sha256": "ab22ae27cdc3afd54826e24d31327ade126b26343534797edfa7734865648000"},
-    {"path": "experiments/cross-agent-collaboration-001/runs/critic-claim-link-generalization-006/01-header-first/result.json", "sha256": "13a03e097bbc61a7e34971ca374eda09115f95700e5dd75fcfb9b654694a3e8d"},
+    {"path": "experiments/cross-agent-collaboration-001/runs/critic-claim-link-generalization-006/01-header-first/result.json", "sha256": "22add5a6cd579e6901f4e620a1125ef418bd76d2fe77f5ae5f49177b1649ace2"},
     {"path": "experiments/cross-agent-collaboration-001/runs/critic-claim-link-controls-007/03-cutover-first-batch/result.json", "sha256": "54d49a3d934933182eaeb1144c242864703a8e89274bc7a8487ff0688c73464f"},
     {"path": "src/torc/execution_capsules.py", "sha256": "3ebb1874f4a8a35ffea6dc1893ae9bdfaea9ca5c053ff51260766c626a76b986"},
     {"path": "src/torc/canonical.py", "sha256": "424fe3640a094f6dd34fa2b4c7b3ce374eada88685243c6a4dbf01b3b8653838"}
