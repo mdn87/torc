@@ -7,9 +7,12 @@ from typing import Any
 import pytest
 from jsonschema import Draft202012Validator, FormatChecker
 
-from torc.canonical import seal_record
+import torc.operator as operator_module
+from torc.canonical import seal_record, utc_now
 from torc.cli import main
-from torc.errors import InvalidInputError, ProjectionBudgetError
+from torc.errors import IntegrityError, InvalidInputError, ProjectionBudgetError
+from torc.history import changes_since_substrate, unaccounted_drops
+from torc.ids import new_id
 from torc.operator import (
     carry_operator_lineage,
     checkpoint_operator_lineage,
@@ -613,3 +616,461 @@ def test_cli_checkpoint_resolutions_and_carry(
     assert status == 1
     assert json.loads(output)["error"] == "InvalidInputError"
     assert run("verify", "--state-dir", state_dir, "--lineage", LINEAGE, "--json")[0] == 0
+
+
+# --- Regressions from the PR 25 assessment -----------------------------------
+#
+# The history reader's dispositions and authorship were the under-tested region.
+# These tests drive the exact sequences that were reproduced against the PR.
+
+RECEIVER = "p5-receiver"
+OTHER = "p5-other"
+
+
+def _revision(
+    revision_id: str,
+    substrate: str | None,
+    open_work: list[str],
+    *,
+    event_type: str = "checkpoint",
+    resolutions: list[dict[str, str]] | None = None,
+    rollback_target: str | None = None,
+) -> dict[str, Any]:
+    """A minimal in-memory revision for exercising the pure history functions."""
+
+    revision: dict[str, Any] = {
+        "revision_id": revision_id,
+        "event_type": event_type,
+        "actor": {
+            "kind": "activation",
+            "activation_id": None if substrate is None else f"activation-{substrate}",
+            "substrate_id": substrate,
+        },
+        "canonical_state": {
+            "constraints": [],
+            "commitments": [],
+            "open_work": list(open_work),
+            "self_model": {"role": "Finish the export"},
+        },
+    }
+    if resolutions is not None:
+        revision["resolutions"] = resolutions
+    if rollback_target is not None:
+        revision["rollback_context"] = {"target_revision_id": rollback_target}
+    return revision
+
+
+COMPLETED = [{"section": "open_work", "item": DROPPED_WORK, "disposition": "completed"}]
+
+
+@pytest.mark.parametrize(
+    ("chain", "disposition", "unaccounted"),
+    (
+        pytest.param(
+            [
+                _revision("r0", RECEIVER, [DROPPED_WORK]),
+                _revision("r1", OTHER, [], resolutions=COMPLETED),
+                _revision("r2", OTHER, [DROPPED_WORK]),
+                _revision("r3", OTHER, []),
+            ],
+            "unaccounted",
+            ["r3"],
+            id="resolve-restore-drop",
+        ),
+        pytest.param(
+            [
+                _revision("r0", RECEIVER, [DROPPED_WORK]),
+                _revision("r1", OTHER, [], resolutions=COMPLETED),
+                _revision("r2", OTHER, [DROPPED_WORK]),
+                _revision("r3", OTHER, [], event_type="rollback_applied", rollback_target="r1"),
+            ],
+            "rolled_back",
+            [],
+            id="resolve-restore-rollback",
+        ),
+        pytest.param(
+            [_revision("r0", RECEIVER, [DROPPED_WORK]), _revision("r1", OTHER, [])],
+            "unaccounted",
+            ["r1"],
+            id="plain-unresolved-removal",
+        ),
+    ),
+)
+def test_disposition_describes_the_latest_removal_only(
+    chain: list[dict[str, Any]], disposition: str, unaccounted: list[str]
+) -> None:
+    changes = changes_since_substrate(chain, RECEIVER)
+
+    assert changes is not None
+    assert changes["removed"] == {"open_work": [{"item": DROPPED_WORK, "disposition": disposition}]}
+    assert [drop["dropped_at_revision_id"] for drop in unaccounted_drops(chain)] == unaccounted
+
+
+def test_changes_since_receiver_reports_transient_and_late_resolutions() -> None:
+    transient = [
+        _revision("r0", RECEIVER, ["Define the export schema"]),
+        _revision("r1", OTHER, ["Define the export schema", DROPPED_WORK]),
+        _revision("r2", OTHER, ["Define the export schema"], resolutions=COMPLETED),
+    ]
+    late = [
+        _revision("r0", OTHER, [DROPPED_WORK]),
+        _revision("r1", OTHER, []),
+        _revision("r2", RECEIVER, []),
+        _revision("r3", OTHER, [], resolutions=COMPLETED),
+    ]
+    before_baseline = [
+        _revision("r0", OTHER, [DROPPED_WORK]),
+        _revision("r1", OTHER, [], resolutions=COMPLETED),
+        _revision("r2", RECEIVER, []),
+        _revision("r3", OTHER, ["Publish the export guide"]),
+    ]
+
+    added_then_resolved = changes_since_substrate(transient, RECEIVER)
+    resolved_late = changes_since_substrate(late, RECEIVER)
+    settled_earlier = changes_since_substrate(before_baseline, RECEIVER)
+
+    # Added and completed while the receiver was away: absent from the net delta,
+    # present in the events the receiver is told about.
+    assert added_then_resolved is not None
+    assert added_then_resolved["added"] == {}
+    assert added_then_resolved["removed"] == {
+        "open_work": [{"item": DROPPED_WORK, "disposition": "completed"}]
+    }
+    # Dropped before the baseline, resolved after it: the resolution is news.
+    assert resolved_late is not None
+    assert resolved_late["removed"] == {
+        "open_work": [{"item": DROPPED_WORK, "disposition": "completed"}]
+    }
+    # Dropped and resolved before the baseline: nothing about it is news.
+    assert settled_earlier is not None
+    assert settled_earlier["removed"] == {}
+    assert settled_earlier["added"] == {"open_work": ["Publish the export guide"]}
+
+
+def _accept(store: Store, prepared: dict[str, Any], activation_id: str) -> dict[str, Any]:
+    template = json.loads(
+        (store.state_dir / prepared["reconstruction_template_path"]).read_text(
+            encoding="utf-8"
+        )
+    )
+    return resolve_operator_handoff(
+        store,
+        handoff_id=prepared["handoff_id"],
+        target_activation_id=activation_id,
+        reconstruction=template,
+    )
+
+
+def _head_state(store: Store) -> dict[str, Any]:
+    head = store.get_revision(store.get_lineage(LINEAGE)["head_revision_id"])
+    return json.loads(json.dumps(head["canonical_state"]))
+
+
+def test_changes_since_receiver_survive_a_hand_back(tmp_path: Path) -> None:
+    hand_back = _handoff_plan() | {
+        "target_substrate": _load("source-substrate.json"),
+        "target_activation_id": "activation-returning",
+        "target_responsibility": "Resume the export work",
+        "rationale": "The original session returns after the review.",
+    }
+    with Store(tmp_path) as store:
+        revisions = _build(store, through=3)
+        out = prepare_operator_handoff(
+            store, lineage_id=LINEAGE, source_activation_id=ACTIVATION, plan=_handoff_plan()
+        )
+        assert _accept(store, out, "activation-successor")["disposition"] == "accepted"
+        advanced = _head_state(store)
+        advanced["open_work"] = [DROPPED_WORK, "Publish the export guide"]
+        _checkpoint(
+            store,
+            advanced,
+            activation_id="activation-successor",
+            resolutions=[
+                {
+                    "section": "open_work",
+                    "item": "Write the export round-trip test",
+                    "disposition": "completed",
+                }
+            ],
+        )
+        back = prepare_operator_handoff(
+            store,
+            lineage_id=LINEAGE,
+            source_activation_id="activation-successor",
+            plan=hand_back,
+        )
+        assert _accept(store, back, "activation-returning")["disposition"] == "accepted"
+        returning = _carry(store, "source-substrate.json")
+        boundary = operator_lineage_status(store, LINEAGE)["boundary"]
+
+    # The accepted hand-back is TORC's bookkeeping, not the returning bearer's work,
+    # so the baseline stays at its last real checkpoint and the successor's work shows.
+    changes = _sections(returning)["changes-since-receiver"]["content"]
+    assert changes["since_revision_id"] == revisions[2]
+    assert changes["revisions_since"] == 3
+    assert changes["added"] == {"open_work": ["Publish the export guide"]}
+    assert changes["removed"] == {
+        "open_work": [{"item": "Write the export round-trip test", "disposition": "completed"}]
+    }
+    assert boundary["self_model"]["bearer_substrate_id"] == "p5-implementer"
+    assert boundary["self_model"]["restatement_due"] is False
+
+
+def test_verbatim_confirmation_is_a_restatement(tmp_path: Path) -> None:
+    with Store(tmp_path) as store:
+        _build(store)
+        prepared = prepare_operator_handoff(
+            store, lineage_id=LINEAGE, source_activation_id=ACTIVATION, plan=_handoff_plan()
+        )
+        _accept(store, prepared, "activation-successor")
+        inherited = _head_state(store)
+        plain = _checkpoint(store, inherited, activation_id="activation-successor")
+        confirmed = _checkpoint(
+            store,
+            inherited,
+            activation_id="activation-successor",
+            event_type="self_model_revised",
+        )
+        carry = _carry(store, "receiver-large.json")
+        verification = verify_store(store, LINEAGE)
+
+    # A plain checkpoint of the inherited text is not a restatement.
+    assert plain["boundary"]["self_model"]["restatement_due"] is True
+    # The self_model_revised event is, even when the text is confirmed verbatim.
+    answered = confirmed["boundary"]["self_model"]
+    assert answered["authored_by_substrate_id"] == "p5-implementer"
+    assert answered["restated_by_substrate_id"] == "p5-receiver-large"
+    assert answered["restated_at_revision_id"] == confirmed["revision_id"]
+    assert answered["restatement_due"] is False
+    # The carry shows the confirmation as a confirmation.
+    provenance = _sections(carry)["self-model-provenance"]["content"]
+    assert provenance["authored_by_substrate_id"] == "p5-implementer"
+    assert provenance["restated_by_substrate_id"] == "p5-receiver-large"
+    assert provenance["restatement_due"] is False
+    assert verification["valid"] is True
+
+
+def _ledger(store: Store) -> dict[str, Any]:
+    authority = store.current_authority(LINEAGE)
+    return {
+        "head": store.get_lineage(LINEAGE)["head_revision_id"],
+        "lease_head": store.get_lease(authority["lease_id"])["head_revision_id"],
+        "activation_revision": store.get_activation(ACTIVATION)["revision_id"],
+        "revisions": len(store.lineage_revisions(LINEAGE)),
+    }
+
+
+@pytest.mark.parametrize(
+    ("resolutions", "message"),
+    (
+        (
+            [{"section": "open_work", "item": "Never existed", "disposition": "completed"}],
+            "never dropped",
+        ),
+        (
+            [{"section": "constraints", "item": DROPPED_WORK, "disposition": "completed"}],
+            "never dropped",
+        ),
+        (
+            [{"section": "open_work", "item": DROPPED_WORK, "disposition": "done"}],
+            "disposition",
+        ),
+        (["not an object"], "JSON object"),
+    ),
+)
+def test_store_rejects_resolutions_before_any_write(
+    tmp_path: Path, resolutions: Any, message: str
+) -> None:
+    with Store(tmp_path) as store:
+        _build(store, through=3)
+        before = _ledger(store)
+        with pytest.raises(InvalidInputError, match=message):
+            store.append_revision(
+                LINEAGE,
+                _load("state-4-last-summary.json"),
+                event_type="checkpoint",
+                activation_id=ACTIVATION,
+                resolutions=resolutions,
+            )
+        after = _ledger(store)
+        verification = verify_store(store, LINEAGE)
+
+    assert before == after
+    assert verification["valid"] is True
+
+
+def _append_raw(
+    store: Store,
+    canonical_state: dict[str, Any],
+    *,
+    event_type: str = "checkpoint",
+    resolutions: list[Any] | None = None,
+) -> dict[str, Any]:
+    """Append a correctly sealed revision around the store's append rules."""
+
+    parent = store.get_revision(store.get_lineage(LINEAGE)["head_revision_id"])
+    payload: dict[str, Any] = {
+        "schema_version": 1,
+        "lineage_id": LINEAGE,
+        "revision_id": new_id("revision"),
+        "parent_revision_ids": [parent["revision_id"]],
+        "created_at": utc_now(),
+        "event_type": event_type,
+        "actor": {
+            "kind": "activation",
+            "activation_id": ACTIVATION,
+            "substrate_id": "p5-implementer",
+        },
+        "canonical_state": canonical_state,
+        "evidence_refs": [],
+    }
+    if resolutions is not None:
+        payload["resolutions"] = resolutions
+    record = seal_record(
+        payload, previous_revision_sha256=parent["integrity"]["canonical_payload_sha256"]
+    )
+    with store.transaction(immediate=True):
+        authority = store.current_authority(LINEAGE)
+        store._insert_revision(record)
+        for table, column, key in (
+            ("lineages", "lineage_id", LINEAGE),
+            ("leases", "lease_id", authority["lease_id"]),
+        ):
+            store.connection.execute(
+                f"UPDATE {table} SET head_revision_id = ? WHERE {column} = ?",
+                (record["revision_id"], key),
+            )
+        store.connection.execute(
+            "UPDATE activations SET revision_id = ? WHERE activation_id = ?",
+            (record["revision_id"], ACTIVATION),
+        )
+    return record
+
+
+@pytest.mark.parametrize(
+    ("resolutions", "code"),
+    (
+        (
+            [{"section": "open_work", "item": "Never existed", "disposition": "completed"}],
+            "resolution_invalid",
+        ),
+        ([{"section": "open_work", "item": "x", "disposition": "done"}], "resolution_invalid"),
+    ),
+)
+def test_verify_reports_a_resolution_stored_around_the_append_rules(
+    tmp_path: Path, resolutions: list[Any], code: str
+) -> None:
+    with Store(tmp_path) as store:
+        _build(store, through=3)
+        forged = _append_raw(
+            store, _load("state-4-last-summary.json"), resolutions=resolutions
+        )
+        verification = verify_store(store, LINEAGE)
+        with pytest.raises(IntegrityError, match=code):
+            _checkpoint(store, _load("state-4-last-summary.json"))
+        with pytest.raises(IntegrityError, match=code):
+            _carry(store, "receiver-large.json")
+
+    assert verification["valid"] is False
+    assert (code, forged["revision_id"]) in {
+        (error["code"], error["record_id"]) for error in verification["errors"]
+    }
+
+
+def test_verify_reports_an_unknown_event_type(tmp_path: Path) -> None:
+    with Store(tmp_path) as store:
+        _build(store, through=3)
+        bogus = _append_raw(store, _load("state-3-item-completed.json"), event_type="bogus")
+        verification = verify_store(store, LINEAGE)
+
+    assert ("event_type_unknown", bogus["revision_id"]) in {
+        (error["code"], error["record_id"]) for error in verification["errors"]
+    }
+
+
+@pytest.mark.parametrize(
+    "event_type",
+    ("rollback_applied", "branch_created", "handoff_accepted", "lineage_created", "bogus"),
+)
+def test_reserved_event_types_are_refused_before_any_write(
+    tmp_path: Path, event_type: str
+) -> None:
+    with Store(tmp_path) as store:
+        _build(store, through=2)
+        before = _ledger(store)
+        with pytest.raises(InvalidInputError, match="reserved"):
+            _checkpoint(
+                store, _load("state-3-item-completed.json"), event_type=event_type
+            )
+        with pytest.raises(InvalidInputError, match="reserved"):
+            store.append_revision(
+                LINEAGE,
+                _load("state-3-item-completed.json"),
+                event_type=event_type,
+                activation_id=ACTIVATION,
+            )
+        after = _ledger(store)
+        verification = verify_store(store, LINEAGE)
+        # The lineage is not poisoned: an ordinary checkpoint still lands.
+        later = _checkpoint(
+            store, _load("state-3-item-completed.json"), resolutions=_load("resolutions-3.json")
+        )
+
+    assert before == after
+    assert verification["valid"] is True
+    assert later["ok"] is True
+    assert later["boundary"]["unaccounted"] == []
+
+
+def _table_counts(store: Store) -> dict[str, int]:
+    return {
+        table: store.connection.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+        for table in (
+            "substrates",
+            "activations",
+            "fit_decisions",
+            "projections",
+            "handoffs",
+            "artifacts",
+        )
+    }
+
+
+def test_handoff_preparation_stores_nothing_when_an_export_fails(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    real_metadata = operator_module.artifact_metadata
+
+    def fail_on_second_export(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        if kwargs["record_kind"] == "handoff_reconstruction_template":
+            raise OSError("disk full")
+        return real_metadata(*args, **kwargs)
+
+    with Store(tmp_path) as store:
+        _build(store)
+        before = _table_counts(store)
+        monkeypatch.setattr(operator_module, "artifact_metadata", fail_on_second_export)
+        with pytest.raises(OSError, match="disk full"):
+            prepare_operator_handoff(
+                store, lineage_id=LINEAGE, source_activation_id=ACTIVATION, plan=_handoff_plan()
+            )
+        after = _table_counts(store)
+        leftovers = sorted(path.name for path in (store.state_dir / "artifacts").glob("*"))
+        failed_verification = verify_store(store, LINEAGE)
+        monkeypatch.undo()
+
+        # The same plan, including the same target activation id, now succeeds.
+        retried = prepare_operator_handoff(
+            store, lineage_id=LINEAGE, source_activation_id=ACTIVATION, plan=_handoff_plan()
+        )
+        exported = sorted(path.name for path in (store.state_dir / "artifacts").glob("*"))
+        verification = verify_store(store, LINEAGE)
+
+    assert after == before
+    assert leftovers == []
+    assert failed_verification["valid"] is True
+    assert retried["ok"] is True
+    assert exported == sorted(
+        [Path(retried["brief_path"]).name, Path(retried["reconstruction_template_path"]).name]
+    )
+    assert verification["valid"] is True

@@ -303,7 +303,7 @@ def compile_receiver_projection(
         (
             "self-model-provenance",
             f"{provenance['authored_at_revision_id']}:self_model",
-            provenance
+            _carried_provenance(provenance)
             | {
                 "receiver_substrate_id": receiver_substrate_id,
                 "restatement_due": restatement_due(provenance, receiver_substrate_id),
@@ -412,6 +412,20 @@ def compile_receiver_projection(
     )
     store.insert_hashed_record("projections", record["projection_id"], record)
     return record
+
+
+def _carried_provenance(provenance: dict[str, Any]) -> dict[str, Any]:
+    """Carry the restatement fields only when a restatement differs from authorship.
+
+    When the author's revision is also the latest restatement, the three
+    `restated_*` fields repeat the `authored_*` fields word for word, so the carry
+    leaves them out. They appear exactly when a bearer confirmed an inherited
+    self-model verbatim, which makes that confirmation visible to the receiver.
+    """
+
+    if provenance["restated_at_revision_id"] == provenance["authored_at_revision_id"]:
+        return {key: value for key, value in provenance.items() if not key.startswith("restated_")}
+    return dict(provenance)
 
 
 def _fitted_section(

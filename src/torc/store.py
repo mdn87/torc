@@ -10,8 +10,14 @@ from pathlib import Path
 from typing import Any
 
 from .canonical import canonical_json, seal_record, utc_now
-from .errors import LeaseConflictError, NotFoundError, SchemaVersionError
+from .errors import (
+    InvalidInputError,
+    LeaseConflictError,
+    NotFoundError,
+    SchemaVersionError,
+)
 from .ids import new_id
+from .vocabulary import CHECKPOINT_EVENT_TYPES
 
 _MIGRATION_1 = """
 CREATE TABLE lineages (
@@ -442,37 +448,55 @@ class Store:
         revision_id: str | None = None,
         created_at: str | None = None,
     ) -> dict[str, Any]:
-        authority = self.current_authority(lineage_id)
-        if authority["activation_id"] != activation_id:
-            raise LeaseConflictError("activation does not hold the authoritative lease")
-        parent = self.get_revision(authority["lineage_head_revision_id"])
-        activation = self.get_activation(activation_id)
-        payload = {
-            "schema_version": 1,
-            "lineage_id": lineage_id,
-            "revision_id": revision_id or new_id("revision"),
-            "parent_revision_ids": [parent["revision_id"]],
-            "created_at": created_at or utc_now(),
-            "event_type": event_type,
-            "actor": {
-                "kind": "activation",
-                "activation_id": activation_id,
-                "substrate_id": activation["substrate_id"],
-            },
-            "canonical_state": canonical_state,
-            "evidence_refs": evidence_refs or [],
-        }
-        # Absent when empty so records without resolutions keep their existing hashes.
-        if resolutions:
-            payload["resolutions"] = resolutions
-        record = seal_record(
-            payload,
-            previous_revision_sha256=parent["integrity"]["canonical_payload_sha256"],
-        )
-        with self.transaction():
-            current = self.current_authority(lineage_id)
-            if current["activation_id"] != activation_id:
-                raise LeaseConflictError("authority changed before revision append")
+        """Append an ordinary checkpoint through the authoritative activation.
+
+        Only the checkpoint vocabulary is accepted here. Rollback, branch, and
+        handoff revisions are written by their own workflows, which supply the
+        context the verifier checks. Resolutions are validated inside the append
+        transaction so that no caller can store one that names an item the
+        lineage never dropped.
+        """
+
+        if event_type not in CHECKPOINT_EVENT_TYPES:
+            raise InvalidInputError(
+                f"event type {event_type!r} is reserved for its own workflow; "
+                "append_revision accepts: " + ", ".join(CHECKPOINT_EVENT_TYPES)
+            )
+        # Deferred to break the import cycle: history reads revisions from this store.
+        from .history import revision_chain, validate_resolutions
+
+        with self.transaction(immediate=True):
+            authority = self.current_authority(lineage_id)
+            if authority["activation_id"] != activation_id:
+                raise LeaseConflictError("activation does not hold the authoritative lease")
+            parent = self.get_revision(authority["lineage_head_revision_id"])
+            activation = self.get_activation(activation_id)
+            if resolutions is not None:
+                resolutions = validate_resolutions(
+                    revision_chain(self, parent["revision_id"]), canonical_state, resolutions
+                )
+            payload = {
+                "schema_version": 1,
+                "lineage_id": lineage_id,
+                "revision_id": revision_id or new_id("revision"),
+                "parent_revision_ids": [parent["revision_id"]],
+                "created_at": created_at or utc_now(),
+                "event_type": event_type,
+                "actor": {
+                    "kind": "activation",
+                    "activation_id": activation_id,
+                    "substrate_id": activation["substrate_id"],
+                },
+                "canonical_state": canonical_state,
+                "evidence_refs": evidence_refs or [],
+            }
+            # Absent when empty so records without resolutions keep their existing hashes.
+            if resolutions:
+                payload["resolutions"] = resolutions
+            record = seal_record(
+                payload,
+                previous_revision_sha256=parent["integrity"]["canonical_payload_sha256"],
+            )
             self._insert_revision(record)
             self.connection.execute(
                 "UPDATE lineages SET head_revision_id = ? WHERE lineage_id = ?",
@@ -480,7 +504,7 @@ class Store:
             )
             self.connection.execute(
                 "UPDATE leases SET head_revision_id = ? WHERE lease_id = ?",
-                (record["revision_id"], current["lease_id"]),
+                (record["revision_id"], authority["lease_id"]),
             )
             self.connection.execute(
                 "UPDATE activations SET revision_id = ? WHERE activation_id = ?",

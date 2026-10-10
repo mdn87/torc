@@ -65,9 +65,19 @@ Sections are considered in this order.
   omitted for `budget`.
 - `artifact-refs` is omitted with reason `capability_irrelevant` when the
   receiver lacks `repository_read`. It cannot open what the refs point to.
-- `changes-since-receiver` lists what was added, removed, and resolved since the
-  receiving substrate last authored a revision. It is absent when the receiver
-  has never borne the lineage or nothing has changed since.
+- `changes-since-receiver` reports what changed since the receiving substrate
+  last authored a revision. Authored revisions define that baseline: revisions
+  TORC writes on the substrate's behalf, such as the `handoff_accepted` revision
+  of a hand-back, do not count, and neither does an interval during which the
+  substrate held the lease without checkpointing. `added` is the net addition
+  between the baseline and the head. `removed` lists every tracked item that is
+  absent from the head and whose latest removal happened, or was accounted for,
+  after the baseline, with that removal's disposition (`completed`,
+  `superseded`, `withdrawn`, `rolled_back`, or `unaccounted`). An item added
+  and resolved while the receiver was away is therefore reported, and a
+  disposition recorded for an earlier removal never describes a later one. The
+  section is absent when the receiver has never authored a revision or nothing
+  has changed since its baseline.
 
 ## Reading history
 
@@ -100,8 +110,17 @@ A revision may carry an optional `resolutions` list:
 
 `disposition` is `completed`, `superseded`, or `withdrawn`. Each resolution
 must name an item that this revision removes or that is currently an
-unaccounted drop. Anything else is rejected before any write. The field is
-absent when empty, so existing records and their hashes are unchanged.
+unaccounted drop. Anything else is rejected before any write. That check runs
+inside the store's append transaction, so it holds for every caller, not only
+the operator command. A resolution accounts for the latest open removal of its
+item: if the item is restored and dropped again, the new drop is unaccounted
+until it is resolved in turn. The field is absent when empty, so existing
+records and their hashes are unchanged.
+
+The store accepts only `checkpoint` and `self_model_revised` through the
+ordinary append path. Rollback, branch, and handoff revisions are written by
+their own workflows, which supply the context the verifier checks; a reserved
+event type is refused before any write.
 
 ## Boundary asks
 
@@ -110,13 +129,30 @@ Every checkpoint response and `lineage status` include a `boundary` block:
 - `unaccounted`: the open unaccounted drops, including any this checkpoint just
   created;
 - `self_model`: the revision, activation, and substrate that last authored the
-  self-model, and `restatement_due`, which is true when that substrate differs
-  from the current bearer's.
+  self-model (`authored_*`, keyed on a change to its content), the revision,
+  activation, and substrate that last restated it (`restated_*`), and
+  `restatement_due`, which is true when the last restating substrate differs
+  from the current bearer's. A `self_model_revised` checkpoint restates the
+  self-model even when its text is confirmed verbatim, so a confirmation is
+  visible as a confirmation rather than as a change. A plain checkpoint of
+  unchanged text restates nothing. An accepted handoff copies the recipient's
+  responsibility into the role; that is TORC's bookkeeping and changes neither
+  authorship nor restatement. The carry's `self-model-provenance` section
+  includes the `restated_*` fields only when they differ from `authored_*`.
 
 The asks do not block. TORC accepts the checkpoint, records it, and repeats the
 ask in every carry until the bearer restores the item, resolves it, or restates
 the self-model through a `self_model_revised` checkpoint. Blocking enforcement
-waits for evidence from use.
+waits for evidence from use. The asks persist in every carry that has budget
+for them; the history tier is fitted after the required tier, so a very small
+receiver may receive the asks only through the checkpoint response and
+`lineage status`.
+
+A `handoff prepare` runs in one immediate transaction. Its two exported
+artifacts are created last, with exclusive create, and removed again if
+anything fails, so a preparation that cannot fit the receiver stores neither
+the target descriptor nor the fit decision and a retry does not trip over a
+half-finished export.
 
 ## Commands
 
@@ -148,6 +184,14 @@ still evaluate every registered substrate.
 `torc verify` accepts a `p5-1` section whose source reference points at the
 source revision or one of its ancestors in the same lineage. `p0-1` projections
 keep the stricter rule that every reference points at the source revision.
+
+The verifier also replays each revision's `resolutions` against the history
+before it and reports `resolution_invalid` for one that is malformed or names
+an item that was never dropped; a malformed entry stops the replay rather than
+crashing a later carry. It reports `event_type_unknown` for a revision whose
+event type is outside the revision schema's vocabulary. Because checkpoint and
+carry verify the lineage first, a record stored around the append rules is
+refused as an integrity failure instead of silencing a real drop.
 
 ## Fixture
 

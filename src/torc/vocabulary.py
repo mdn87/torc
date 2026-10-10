@@ -19,6 +19,31 @@ TRACKED_CONTINUITY_SECTIONS: tuple[str, ...] = (
     "open_work",
 )
 
+# Every event type a lineage revision may carry; mirrors the revision schema.
+REVISION_EVENT_TYPES: tuple[str, ...] = (
+    "lineage_created",
+    "checkpoint",
+    "self_model_revised",
+    "handoff_prepared",
+    "handoff_accepted",
+    "handoff_rejected",
+    "rollback_applied",
+    "branch_created",
+    "lineage_retired",
+)
+
+# Revisions an activation appends through the ordinary checkpoint path. Every other
+# event type is written by its own workflow, which supplies the context the
+# verifier checks for it.
+CHECKPOINT_EVENT_TYPES: tuple[str, ...] = (
+    "checkpoint",
+    "self_model_revised",
+)
+
+# Revisions TORC writes on a substrate's behalf. They record bookkeeping, not
+# work the substrate authored.
+BOOKKEEPING_EVENT_TYPES: tuple[str, ...] = ("handoff_accepted",)
+
 RESOLUTION_DISPOSITIONS: tuple[str, ...] = (
     "completed",
     "superseded",
