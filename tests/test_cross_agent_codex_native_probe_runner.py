@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import sys
 import textwrap
 from copy import deepcopy
@@ -417,6 +418,8 @@ def test_armed_execution_reserves_frozen_path_before_single_capture(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    if shutil.which("codex") is None:
+        pytest.skip("the armed execution path resolves a real codex executable")
     plan = deepcopy(capability._object(capability.PLAN_PATH))
     plan["status"] = "ready"
     monkeypatch.setattr(capability, "_object", lambda _path: plan)
