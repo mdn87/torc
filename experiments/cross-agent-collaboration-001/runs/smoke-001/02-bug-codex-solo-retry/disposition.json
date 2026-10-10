@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "run_id": "02-bug-codex-solo-retry",
+  "valid_attempt": false,
+  "category": "harness_permission_failure",
+  "comparative_use": "excluded",
+  "evidence": [
+    "The explicit never-ask approval setting did not override the host filesystem permission profile.",
+    "Every attempted shell read was rejected and the worker made no edits.",
+    "workspace_diff_bytes was zero and the original visible test still failed."
+  ],
+  "corrective_action": "Use the built-in :workspace permission profile, do not mix it with the legacy --sandbox setting, and require a model-free read/write preflight before launch."
+}

@@ -10,10 +10,12 @@ from typing import Any
 
 from .branches import validate_branch_origin
 from .canonical import canonical_json, record_hash_is_valid
-from .errors import BranchError, HandoffError, NotFoundError, TorcError
+from .errors import BranchError, HandoffError, InvalidInputError, NotFoundError, TorcError
 from .handoffs import validate_recovery_context
+from .history import validate_resolution_shape, validate_resolutions
 from .rollbacks import validate_rollback_context
 from .store import Store
+from .vocabulary import REVISION_EVENT_TYPES
 
 
 def verify_store(store: Store, lineage_id: str | None = None) -> dict[str, Any]:
@@ -124,6 +126,7 @@ def _verify_lineage(
             "lineage head is not the final append-only revision",
         )
 
+    _verify_revision_history(revisions, errors)
     _verify_immutable_records(store, lineage_id, errors)
     _verify_authority_ledger(store, lineage_id, revisions, errors)
     active_leases = [
@@ -159,6 +162,46 @@ def _verify_lineage(
                 activation["activation_id"],
                 "authoritative activation is not active at the lineage head",
             )
+
+
+def _verify_revision_history(
+    revisions: list[dict[str, Any]], errors: list[dict[str, str]]
+) -> None:
+    """Replay event types and resolutions so a stored record cannot evade the append rules.
+
+    A resolution must name an item the revision removes or an unaccounted drop at
+    that point in history. A malformed resolution stops the replay, because every
+    later history read would depend on it; it is reported here rather than raised
+    from a carry.
+    """
+
+    for index, revision in enumerate(revisions):
+        record_id = revision["revision_id"]
+        if revision.get("event_type") not in REVISION_EVENT_TYPES:
+            _error(
+                errors,
+                "event_type_unknown",
+                record_id,
+                f"unknown revision event type: {revision.get('event_type')!r}",
+            )
+        resolutions = revision.get("resolutions")
+        if resolutions is None:
+            continue
+        try:
+            validate_resolution_shape(resolutions)
+        except InvalidInputError as exc:
+            _error(errors, "resolution_invalid", record_id, str(exc))
+            return
+        if index == 0:
+            _error(errors, "resolution_invalid", record_id, "a root revision removes nothing")
+            return
+        try:
+            validate_resolutions(revisions[:index], revision["canonical_state"], resolutions)
+        except InvalidInputError as exc:
+            _error(errors, "resolution_invalid", record_id, str(exc))
+        except (KeyError, TypeError) as exc:
+            _error(errors, "history_unreadable", record_id, f"history cannot be read: {exc!r}")
+            return
 
 
 def _verify_authority_ledger(
@@ -452,6 +495,13 @@ def _verify_immutable_records(
         )
     }
 
+    parent_ids = {
+        row["revision_id"]: row["parent_revision_id"]
+        for row in store.connection.execute(
+            "SELECT revision_id, parent_revision_id FROM revisions WHERE lineage_id = ?",
+            (lineage_id,),
+        )
+    }
     projections = store.list_hashed_records("projections", lineage_id)
     for projection in projections:
         if projection["source_revision_id"] not in revision_ids:
@@ -461,11 +511,17 @@ def _verify_immutable_records(
                 projection["projection_id"],
                 projection["source_revision_id"],
             )
-        source_prefix = f"{projection['source_revision_id']}:"
+        source_prefixes = [f"{projection['source_revision_id']}:"]
+        if str(projection["compiler_version"]).startswith("p5-"):
+            # A receiver-fitted projection may cite the source revision's ancestors.
+            ancestor = parent_ids.get(projection["source_revision_id"])
+            while ancestor in parent_ids and f"{ancestor}:" not in source_prefixes:
+                source_prefixes.append(f"{ancestor}:")
+                ancestor = parent_ids[ancestor]
         for section in (
             projection["included_sections"] + projection["omitted_sections"]
         ):
-            if not section["source_ref"].startswith(source_prefix):
+            if not section["source_ref"].startswith(tuple(source_prefixes)):
                 _error(
                     errors,
                     "projection_source_ref_invalid",
@@ -1118,7 +1174,8 @@ def artifact_metadata(
 ) -> dict[str, Any]:
     path = store.state_dir / Path(relative_path)
     digest = hashlib.sha256(path.read_bytes()).hexdigest()
-    with store.connection:
+    # Joins an enclosing transaction instead of committing it early.
+    with store.transaction():
         store.connection.execute(
             "INSERT INTO artifacts VALUES (?, ?, ?, ?, ?, ?)",
             (artifact_id, record_kind, record_id, relative_path, digest, created_at),

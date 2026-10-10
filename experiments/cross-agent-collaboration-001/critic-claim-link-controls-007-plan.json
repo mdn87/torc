@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "series_id": "critic-claim-link-controls-007",
+  "status": "ready",
+  "frozen_at": "2026-10-04T20:44:14Z",
+  "apparatus_revision": "02d5327d89b51599110cc5f5789426c6eb459987",
+  "question": "Against matched direct controls, does compact claim-link batching retain quality and reduce input and completion time on the two new fixture shapes?",
+  "source_capability": {
+    "series_id": "critic-claim-link-generalization-006",
+    "plan_path": "experiments/cross-agent-collaboration-001/critic-claim-link-generalization-006-plan.json",
+    "analysis_path": "experiments/cross-agent-collaboration-001/critic-claim-link-generalization-006-analysis.json",
+    "run_path": "experiments/cross-agent-collaboration-001/runs/critic-claim-link-generalization-006/01-header-first",
+    "use": "header-first quality capability and descriptive comparison; not a fresh Series 007 call"
+  },
+  "apparatus_inputs": [
+    {
+      "path": "experiments/cross-agent-collaboration-001/critic_claim_link_controls.py",
+      "sha256": "fffd1cdba6b0315a4641bfa66cb4fdd8f8e43e8bbac376115dea09fed4dffc1a"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/critic_claim_link_generalization.py",
+      "sha256": "e462c1028533bac2105a5917242f207797df8c7d3a4f3c7df8c8d5acd8eab059"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/critic_claim_link_probe.py",
+      "sha256": "446233209f47e6eca5320563d6c7cb7f1e7787558798841edd6f05e30e3b17fc"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/codex_usage_snapshot.py",
+      "sha256": "1ae8ff50ac7ee339929a0e9463da3e21f22c4bda9ab7ec869b3f4ead318d4183"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/fixture_control.py",
+      "sha256": "1709e33fcec84091e2f746cc3cd0fbf327172e1513d35affaf95bf2fef4deca5"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/native_context_request.py",
+      "sha256": "05b995813b0d406909455a4675d8da032031a6a9114af0a2a98cc9cb4b4a01be"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/workflow_runner.py",
+      "sha256": "1ddb06b6d1a584ac289b600014901636b7b7d915b504073ee97c7f8e238d558b"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/worker_runner.py",
+      "sha256": "6888871ef69a63979db5a07530879ddef1c0a8a0209c978bde7ef16d61da6054"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/smoke-manifest.json",
+      "sha256": "410df6ae9e8b2a7950180b0905034a8881561a5fbcfc056de5004a40ef9fb6c0"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/fixtures-manifest.json",
+      "sha256": "81feb1eff70ab1d81a4e9f38fc4454c534e42d7cf40fbdcd58e04404406dca11"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/handoffs/bug-hidden-regression.json",
+      "sha256": "220b99ab00b289399ef603db75dbda9bb18647b98b3e7d660e5a55c2f6978465"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/handoffs/design-cutover-plan.json",
+      "sha256": "b48de5ec39c6943175a295a4496ba2170512b8dc97770088f73ff3f0e925f310"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/critic-claim-link-generalization-006-plan.json",
+      "sha256": "20c4d7693b2be54c42b50d17e2c5515506b7a9cb6064fac8d8a7189899f19ceb"
+    },
+    {
+      "path": "src/torc/execution_capsules.py",
+      "sha256": "3ebb1874f4a8a35ffea6dc1893ae9bdfaea9ca5c053ff51260766c626a76b986"
+    },
+    {
+      "path": "src/torc/canonical.py",
+      "sha256": "424fe3640a094f6dd34fa2b4c7b3ce374eada88685243c6a4dbf01b3b8653838"
+    }
+  ],
+  "provider_controls": {
+    "provider": "codex",
+    "billing_surface": "ChatGPT Plus Codex allowance",
+    "harness_version": "codex-cli 0.159.3",
+    "model": "gpt-6-sol",
+    "effort": "low",
+    "session_mode": "fresh-ephemeral",
+    "tool_mode": "none",
+    "network_access": false
+  },
+  "reviewable_claim_categories": [
+    "active_commitments",
+    "hard_constraints",
+    "settled_decisions",
+    "superseded_directions"
+  ],
+  "schedule": [
+    {
+      "run_index": 1,
+      "run_id": "01-header-direct",
+      "mode": "direct",
+      "prompt_bytes": 3259,
+      "prompt_sha256": "e079da9bb12cd6d9d2736f670f73f4b5d406449e244d07532c62219742159237",
+      "candidate_order": [
+        "header-merge-baseline-v1"
+      ]
+    },
+    {
+      "run_index": 2,
+      "run_id": "02-cutover-direct",
+      "mode": "direct",
+      "prompt_bytes": 4173,
+      "prompt_sha256": "b3c70735b9ddd4060c65779979d25267412add0f4d3be41fa44d4f3fc5bf1dcc",
+      "candidate_order": [
+        "cutover-plan-baseline-v1"
+      ]
+    },
+    {
+      "run_index": 3,
+      "run_id": "03-cutover-first-batch",
+      "mode": "batch",
+      "prompt_bytes": 6669,
+      "prompt_sha256": "6ad4714cbbb5f7371740eb2a31b5214437bb635b26bb1f2509ae1a879891677a",
+      "candidate_order": [
+        "cutover-plan-baseline-v1",
+        "header-merge-baseline-v1"
+      ]
+    }
+  ],
+  "call_budget": {
+    "maximum_calls": 3,
+    "automatic_retries": 0,
+    "stop_threshold_percent": 60,
+    "series_directory": "runs/critic-claim-link-controls-007",
+    "reset_credits": "do not consume without explicit operator approval"
+  },
+  "capability_thresholds": {
+    "quality": "every direct and batch critique has every expected claim status, expected verdict, same-claim finding links, and zero unlinked findings",
+    "maximum_batch_input_ratio_to_summed_direct": 0.75,
+    "maximum_batch_completion_ratio_to_summed_direct": 1.0,
+    "order_check": "both candidates pass once in each batch position across the source capability and fresh reversed batch"
+  },
+  "interpretation_limits": [
+    "One direct call per candidate and one batch per order establish only a matched capability result, not a stable median.",
+    "The source header-first batch predates this plan and is reported separately from the fresh reversed batch.",
+    "Do not increase batch size, combine provider tokenizers, or generalize to mutable or dependent work."
+  ],
+  "stop_rules": [
+    "Run exactly one scheduled cell per invocation and never retry automatically.",
+    "Commit every attempted cell before starting another.",
+    "Stop after any excluded run, structured quality failure, provider drift, or current-window usage at or above 60 percent.",
+    "Do not edit candidates, expected statuses, prompt hashes, or thresholds after the first live call."
+  ]
+}

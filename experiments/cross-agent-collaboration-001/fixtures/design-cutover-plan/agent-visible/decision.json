@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "selected_strategy": "dual-write-backfill",
+  "rationale": "Dual writes avoid pausing tenants and make read cutover easy.",
+  "constraints_addressed": ["C1", "C3", "C7"],
+  "rejected_strategies": {
+    "global-stop-rewrite": "Requires a global maintenance window.",
+    "cdc-mirror-cutover": "Adds operational complexity.",
+    "shadow-copy-cas": "Requires a brief tenant write freeze."
+  },
+  "plan": [
+    {
+      "step_id": "p1",
+      "operation": "enable_dual_writes",
+      "depends_on": [],
+      "satisfies": ["C1"]
+    },
+    {
+      "step_id": "p2",
+      "operation": "backfill",
+      "depends_on": ["p1"],
+      "satisfies": ["C3"]
+    },
+    {
+      "step_id": "p3",
+      "operation": "flip_reads",
+      "depends_on": ["p2"],
+      "satisfies": ["C7"]
+    }
+  ],
+  "cutover_gate": {
+    "mode": "manual",
+    "requires": ["count_match"]
+  },
+  "rollback": {
+    "before_cutover": "disable_dual_writes",
+    "after_cutover": "switch_reads_to_legacy"
+  },
+  "max_tenant_write_pause_seconds": 0
+}

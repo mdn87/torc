@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "series_id": "cross-agent-smoke-001",
+  "worker_interface": {
+    "name": "patch-artifact-v1",
+    "editable_paths": {
+      "bug-hidden-regression": ["header_merge.py"],
+      "refactor-superseded-path": ["routing.py"],
+      "release-policy-interaction": ["release_policy.py"],
+      "design-cutover-plan": ["decision.json"]
+    }
+  },
+  "fixtures": [
+    "bug-hidden-regression",
+    "refactor-superseded-path",
+    "release-policy-interaction",
+    "design-cutover-plan"
+  ],
+  "recommended_order": [
+    ["bug-hidden-regression", "codex-solo"],
+    ["refactor-superseded-path", "claude-solo"],
+    ["bug-hidden-regression", "claude-codex"],
+    ["refactor-superseded-path", "codex-claude"],
+    ["bug-hidden-regression", "claude-solo"],
+    ["refactor-superseded-path", "codex-solo"],
+    ["bug-hidden-regression", "codex-claude"],
+    ["refactor-superseded-path", "claude-codex"],
+    ["release-policy-interaction", "codex-solo"],
+    ["release-policy-interaction", "codex-review"],
+    ["design-cutover-plan", "codex-solo"],
+    ["design-cutover-plan", "codex-review"],
+    ["design-cutover-plan", "codex-review-compact"]
+  ],
+  "timeout_seconds": 900,
+  "providers": {
+    "codex": {
+      "transport": "native",
+      "executable": "codex",
+      "model": "gpt-6-sol",
+      "primary_effort": "xhigh",
+      "critic_effort": "low",
+      "harness_version": "codex-cli 0.159.3"
+    },
+    "claude-code": {
+      "transport": "wsl",
+      "executable": "claude",
+      "model": "claude-opus-4-7",
+      "primary_effort": "xhigh",
+      "critic_effort": "low",
+      "harness_version": "2.1.285 (Claude Code)"
+    }
+  },
+  "workflows": {
+    "codex-solo": {"primary": "codex", "critic": null},
+    "claude-solo": {"primary": "claude-code", "critic": null},
+    "codex-review": {
+      "primary": "codex",
+      "critic": "codex",
+      "critic_context": "full-visible-bundle-v1"
+    },
+    "codex-review-compact": {
+      "primary": "codex",
+      "critic": "codex",
+      "critic_context": "claim-capsule-candidate-v1"
+    },
+    "codex-claude": {
+      "primary": "codex",
+      "critic": "claude-code",
+      "critic_context": "claim-capsule-candidate-v1"
+    },
+    "claude-codex": {
+      "primary": "claude-code",
+      "critic": "codex",
+      "critic_context": "claim-capsule-candidate-v1"
+    }
+  }
+}

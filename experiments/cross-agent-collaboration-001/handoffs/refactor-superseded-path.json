@@ -1,0 +1,50 @@
+{
+  "lineage_identity": "cross-agent-smoke/refactor-superseded-path",
+  "current_responsibility": "Independently review the candidate routing refactor against the authoritative architecture decision.",
+  "sections": [
+    {
+      "section_id": "settled_decisions",
+      "claim_prefix": "d",
+      "values": [
+        "route_request is the sole current routing implementation."
+      ],
+      "source_refs": [
+        "fixtures/refactor-superseded-path/agent-visible/ARCHITECTURE.md#routing-decision"
+      ]
+    },
+    {
+      "section_id": "superseded_directions",
+      "claim_prefix": "s",
+      "values": [
+        "legacy_route is superseded and production callers must not route through it."
+      ],
+      "source_refs": [
+        "fixtures/refactor-superseded-path/agent-visible/ARCHITECTURE.md#legacy-path"
+      ]
+    },
+    {
+      "section_id": "hard_constraints",
+      "claim_prefix": "x",
+      "values": [
+        "legacy_route must remain importable and directly delegate to route_request.",
+        "Unknown kinds must retain the exact ValueError behavior.",
+        "Public signatures and dependencies must not change."
+      ],
+      "source_refs": [
+        "fixtures/refactor-superseded-path/agent-visible/TASK.md#requirement-2",
+        "fixtures/refactor-superseded-path/agent-visible/TASK.md#requirement-4",
+        "fixtures/refactor-superseded-path/agent-visible/TASK.md#requirement-5"
+      ]
+    },
+    {
+      "section_id": "active_commitments",
+      "claim_prefix": "c",
+      "values": [
+        "dispatch and dispatch_batch must call route_request directly."
+      ],
+      "source_refs": [
+        "fixtures/refactor-superseded-path/agent-visible/TASK.md#requirement-3"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "series_id": "critic-claim-link-capability-002",
+  "status": "capability_confirmed",
+  "quality": {
+    "candidate_count": 2,
+    "correct_claim_status_count": 13,
+    "reviewable_claim_count": 13,
+    "full_legacy_defect_recall_candidates": 2,
+    "linked_finding_count": 7,
+    "unlinked_finding_count": 0,
+    "legacy_lexical_unsupported_finding_count_descriptive_only": 1
+  },
+  "frozen_capability_gates": {
+    "input_tokens": 14551,
+    "input_reduction_percent_vs_summed_direct": 42.044,
+    "completion_ms": 16779.016,
+    "completion_ratio_to_summed_direct": 0.717117,
+    "all_passed": true
+  },
+  "compact_vs_verbose_matrix": {
+    "prompt_byte_reduction_percent": 17.897,
+    "input_token_reduction_percent": 2.382,
+    "output_token_reduction_percent": 41.166,
+    "completion_reduction_percent": 35.743
+  },
+  "compact_vs_free_text_three_run_medians": {
+    "input_token_increase_percent": 1.302,
+    "output_token_increase_percent": 31.677,
+    "completion_increase_percent": 12.269
+  },
+  "next_gate": "freeze four fresh compact claim-link batches in AB, BA, BA, AB order; exclude all capability calls from confirmation estimates"
+}

@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "mechanism": "compiled-handoff",
+  "instruction": "Continue as the independent release reviewer. Preserve inherited values exactly, keep citations out of value strings, and distinguish inherited state from new inference.",
+  "continuity": {
+    "lineage_identity": "northstar-ledger-release",
+    "current_responsibility": "Independently review the Ledger V2 cutover candidate and block release unless every inherited gate is satisfied",
+    "settled_decisions": [
+      "Assign UUIDv7 ledger identifiers at ingest and retain the legacy invoice identifier as external_ref",
+      "Use the append-only outbox backfill; dual writes are rejected because replay is not proven idempotent",
+      "Cut over through shadow reads followed by tenant cohorts rather than a big-bang switch",
+      "Rollback disables Ledger V2 reads and preserves all Ledger V2 rows"
+    ],
+    "active_commitments": [
+      "Do not enable Ledger V2 reads for a tenant until row count, cent total, and checksum all match",
+      "Retain invoice audit records for seven years",
+      "Keep Ledger V2 p95 read latency within 15 milliseconds of the legacy path",
+      "Stop rollout when the reconciliation mismatch rate exceeds 0.01 percent",
+      "Publish the reconciliation report before release approval"
+    ],
+    "hard_constraints": [
+      "The reviewer must not execute production writes",
+      "No destructive SQL is permitted",
+      "No schema changes are permitted during release review",
+      "Customer PII must remain in the local approved environment",
+      "Original invoice timestamps are immutable"
+    ],
+    "unresolved_work": [
+      "Prove the retry worker cannot duplicate outbox rows after a crash",
+      "Finalize the reconciliation checksum formula for partial refunds",
+      "Resolve missing timezone mappings for tenants amber-grove and cedar-labs",
+      "Run the representative load test against the release candidate",
+      "Add cache invalidation ordering to the rollback runbook"
+    ],
+    "uncertainties": [
+      "Whether observed duplicate rows came from the retry worker or pre-existing source data",
+      "Whether the synthetic latency result predicts tenant-cohort performance",
+      "Whether either missing timezone mapping changes invoice-day grouping"
+    ],
+    "superseded_directions": [
+      "Use Redis as the canonical legacy-to-ledger identifier map",
+      "Switch every tenant to Ledger V2 reads in one big-bang cutover"
+    ],
+    "handoff_reason": "task_phase_transition",
+    "source_revision_id": "sol-pilot-revision-0002"
+  },
+  "source_refs": {
+    "settled_decisions": ["ADR-014", "ADR-018", "ADR-021", "RUNBOOK-07"],
+    "active_commitments": ["GATE-RECON-3", "POLICY-RET-7Y", "SLO-LEDGER-15MS", "GATE-RECON-3", "GATE-RECON-3"],
+    "hard_constraints": [
+      "canonical-state.json#hard_constraints/0",
+      "canonical-state.json#hard_constraints/1",
+      "canonical-state.json#hard_constraints/2",
+      "canonical-state.json#hard_constraints/3",
+      "canonical-state.json#hard_constraints/4"
+    ],
+    "unresolved_work": ["INCIDENT-009", "ISSUE-442", "ISSUE-451", "TEST-LOAD-PENDING", "RUNBOOK-07-GAP"],
+    "uncertainties": ["INCIDENT-009", "SLO-LEDGER-15MS", "ISSUE-451"],
+    "superseded_directions": ["ADR-018", "ADR-021"]
+  }
+}

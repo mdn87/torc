@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "series_id": "critic-claim-link-controls-007",
+  "status": "capability_confirmed",
+  "design": {
+    "fresh_direct_calls": 2,
+    "fresh_reversed_batch_calls": 1,
+    "source_header_first_batch_calls": 1,
+    "candidate_fixture_shapes": 2,
+    "matched_repeats_per_cell": 1
+  },
+  "structured_quality": {
+    "fresh_calls": {
+      "correct_claim_status_count": 24,
+      "correct_verdict_count": 4,
+      "linked_finding_count": 10,
+      "unlinked_finding_count": 0
+    },
+    "both_batch_orders": {
+      "correct_claim_status_count": 24,
+      "correct_verdict_count": 4,
+      "linked_finding_count": 10,
+      "unlinked_finding_count": 0
+    },
+    "each_candidate_passed_in_each_batch_position": true
+  },
+  "direct_controls": {
+    "calls": [
+      {
+        "candidate_order": [
+          "header-merge-baseline-v1"
+        ],
+        "input_tokens": 13678,
+        "output_tokens": 303,
+        "completion_ms": 9801.489
+      },
+      {
+        "candidate_order": [
+          "cutover-plan-baseline-v1"
+        ],
+        "input_tokens": 13993,
+        "output_tokens": 425,
+        "completion_ms": 19163.19
+      }
+    ],
+    "summed_input_tokens": 27671,
+    "summed_completion_ms": 28964.679
+  },
+  "batch_results": {
+    "header_first_source": {
+      "candidate_order": [
+        "header-merge-baseline-v1",
+        "cutover-plan-baseline-v1"
+      ],
+      "input_tokens": 14618,
+      "input_reduction_percent_vs_summed_direct": 47.172,
+      "output_tokens": 666,
+      "completion_ms": 19253.713,
+      "completion_reduction_percent_vs_summed_direct": 33.527
+    },
+    "cutover_first_fresh": {
+      "candidate_order": [
+        "cutover-plan-baseline-v1",
+        "header-merge-baseline-v1"
+      ],
+      "input_tokens": 14618,
+      "input_reduction_percent_vs_summed_direct": 47.172,
+      "output_tokens": 639,
+      "completion_ms": 26264.58,
+      "completion_reduction_percent_vs_summed_direct": 9.322
+    },
+    "input_tokens_identical_across_orders": true
+  },
+  "thresholds": {
+    "maximum_batch_input_ratio_to_summed_direct": 0.75,
+    "maximum_batch_completion_ratio_to_summed_direct": 1.0,
+    "fresh_reversed_batch_passed": true
+  },
+  "interpretation": "Across two new fixture shapes, compact claim-link batching preserved every structured decision in both candidate orders and used 47.2% less input than matched direct calls. Both orders were faster than summed direct calls, but the order timings differed enough to require repetition before claiming a stable latency effect.",
+  "next_gate": "Run two additional counterbalanced batches, one per order, then report medians across the two observations per order. Keep batch size two and the same frozen quality contract."
+}

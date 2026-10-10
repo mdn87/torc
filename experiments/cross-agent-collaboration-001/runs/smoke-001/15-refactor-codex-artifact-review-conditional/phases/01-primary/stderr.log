@@ -1,0 +1,2 @@
+2026-10-01T02:16:09.210699Z  WARN codex_core::shell_snapshot: Failed to create shell snapshot for powershell: Shell snapshot not supported yet for PowerShell
+2026-10-01T02:16:16.953292Z  WARN codex_core::tasks: failed to flush rollout after emitting terminal turn event: thread 01a0f53f-6aa5-7bd2-8b90-40fd7a7759ef not found

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "run_id": "01-bug-codex-solo",
+  "valid_attempt": false,
+  "category": "harness_permission_failure",
+  "comparative_use": "excluded",
+  "evidence": [
+    "Every attempted shell command was rejected by the noninteractive approval policy.",
+    "The worker reported that the workspace appeared read-only and made no edits.",
+    "workspace_diff_bytes was zero and the original visible test still failed.",
+    "Built-in app resources entered the worker context, so the recorded token usage is contaminated."
+  ],
+  "corrective_action": "Set the Codex approval policy to never and disable apps, plugins, skill search, browser tools, and multi-agent features before retrying."
+}

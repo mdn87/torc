@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "provider": "claude-code",
+  "transport": "wsl",
+  "model": "opus",
+  "effort": "low",
+  "harness_version": "2.1.273 (Claude Code)",
+  "role": "critic",
+  "session": {
+    "mode": "fresh-ephemeral",
+    "requested_id": null,
+    "observed_id": null
+  },
+  "command": ["wsl.exe", "--exec", "claude", "--print"],
+  "prompt_sha256": "08eaf86c1dd9197362fcd8a2cfb8e57fe27d6cefc678ab5611729ea9b60d6e82",
+  "started_at": "2026-09-30T01:00:00.000Z",
+  "completed_at": "2026-09-30T01:00:01.250Z",
+  "timing": {
+    "startup_ms": 12.5,
+    "time_to_first_output_ms": 500.0,
+    "completion_ms": 1250.0
+  },
+  "exit_status": 0,
+  "timed_out": false,
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "event_count": 1,
+  "malformed_event_count": 0,
+  "control_preflight": {
+    "performed": false,
+    "reason": "provider sandbox is fail-closed at worker startup"
+  },
+  "usage": {
+    "schema_version": 1,
+    "source": "claude-code",
+    "supplied": false,
+    "input_tokens": null,
+    "cached_input_tokens": null,
+    "cache_write_input_tokens": null,
+    "reasoning_output_tokens": null,
+    "output_tokens": null,
+    "reported_fields": [],
+    "unreported_fields": [
+      "input_tokens",
+      "cached_input_tokens",
+      "cache_write_input_tokens",
+      "reasoning_output_tokens",
+      "output_tokens"
+    ],
+    "provider_usage": {}
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "run_id": "05-bug-claude-solo-valid",
+  "valid_attempt": false,
+  "category": "provider_account_policy",
+  "comparative_use": "excluded",
+  "usage": {
+    "input_tokens": 0,
+    "output_tokens": 0
+  },
+  "evidence": [
+    "The native Linux Claude harness authenticated and initialized its fail-closed sandbox.",
+    "Anthropic returned oauth_not_allowed_for_organization because the selected organization disables subscription access to Claude Code.",
+    "The provider result recorded zero input and output tokens."
+  ],
+  "corrective_action": "Enable Claude Code subscription access for the selected organization or authenticate an eligible account before retrying Claude cells."
+}

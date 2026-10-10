@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "run_id": "09-bug-codex-solo-valid",
+  "valid_attempt": false,
+  "category": "harness_permission_failure",
+  "comparative_use": "excluded",
+  "usage": {
+    "input_tokens": 96037,
+    "cached_input_tokens": 91264,
+    "reasoning_output_tokens": 958,
+    "output_tokens": 1554
+  },
+  "evidence": [
+    "The official standalone Codex CLI received a managed workspace-write profile with the fixture workspace as a writable root.",
+    "The launcher ignored user configuration that normally selects the native-Windows sandbox backend.",
+    "The tool router rejected every attempted command even though the model-visible filesystem policy was writable."
+  ],
+  "corrective_action": "Freeze the native-Windows unelevated sandbox backend explicitly while continuing to ignore unrelated user configuration, then retry as a new immutable attempt."
+}

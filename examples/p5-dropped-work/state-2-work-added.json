@@ -1,0 +1,37 @@
+{
+  "identity": {
+    "label": "P5 dropped-work fixture"
+  },
+  "self_model": {
+    "role": "Implement the lineage export command",
+    "methods": [
+      "Write the failing test first"
+    ],
+    "settled_decisions": [
+      "Exports are written as UTF-8 JSON"
+    ]
+  },
+  "goals": [
+    "Ship a lineage export command",
+    "Document the export command"
+  ],
+  "commitments": [
+    "Keep the export format backward compatible"
+  ],
+  "constraints": [
+    "Do not add a network dependency",
+    "Never write outside the state directory"
+  ],
+  "open_work": [
+    "Define the export schema",
+    "Write the export round-trip test",
+    "Handle exports larger than memory"
+  ],
+  "uncertainties": [
+    "Whether exports need pagination"
+  ],
+  "artifact_refs": [
+    "artifact-export-design-note"
+  ],
+  "memory_refs": []
+}

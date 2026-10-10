@@ -1,0 +1,104 @@
+diff --git a/decision.json b/decision.json
+index e53473c..6ab9f93 100644
+--- a/decision.json
++++ b/decision.json
+@@ -1,40 +1,82 @@
+ {
+   "schema_version": 1,
+-  "selected_strategy": "dual-write-backfill",
+-  "rationale": "Dual writes avoid pausing tenants and make read cutover easy.",
+-  "constraints_addressed": ["C1", "C3", "C7"],
++  "selected_strategy": "shadow-copy-cas",
++  "rationale": "Use the existing copy worker, router, and stores to migrate tenants independently. Keep the legacy store as each tenant's sole live writer until its atomic route change. Copy idempotently from a durable per-tenant checkpoint and verify ordered event identity and content. Pause only the tenant being cut over, then capture its final legacy watermark, copy and verify the delta, and change the route only if the expected legacy route version and final watermark still match and verification passed. If the gate fails or the 30-second pause budget would be exceeded before cutover, resume legacy writes and reuse the checkpoint. After cutover, the new store is the sole authority; repair it forward while retaining legacy data as evidence.",
++  "constraints_addressed": ["C1", "C2", "C3", "C4", "C5", "C6", "C7"],
+   "rejected_strategies": {
+-    "global-stop-rewrite": "Requires a global maintenance window.",
+-    "cdc-mirror-cutover": "Adds operational complexity.",
+-    "shadow-copy-cas": "Requires a brief tenant write freeze."
++    "global-stop-rewrite": "Violates C1 by stopping writes globally.",
++    "dual-write-backfill": "Violates C2 by writing to both stores before the tenant's atomic route change.",
++    "cdc-mirror-cutover": "Violates C6 by introducing a CDC pipeline and lag monitor, and C2 by mirroring writes before the route change."
+   },
+   "plan": [
+     {
+       "step_id": "p1",
+-      "operation": "enable_dual_writes",
++      "operation": "capture_initial_watermark",
+       "depends_on": [],
+-      "satisfies": ["C1"]
++      "satisfies": ["C3", "C7"]
+     },
+     {
+       "step_id": "p2",
+-      "operation": "backfill",
++      "operation": "shadow_copy",
+       "depends_on": ["p1"],
+-      "satisfies": ["C3"]
++      "satisfies": ["C3", "C6", "C7"]
+     },
+     {
+       "step_id": "p3",
+-      "operation": "flip_reads",
++      "operation": "verify_shadow",
+       "depends_on": ["p2"],
+-      "satisfies": ["C7"]
++      "satisfies": ["C4"]
++    },
++    {
++      "step_id": "p4",
++      "operation": "freeze_tenant_writes",
++      "depends_on": ["p3"],
++      "satisfies": ["C1", "C2", "C7"]
++    },
++    {
++      "step_id": "p5",
++      "operation": "capture_final_watermark",
++      "depends_on": ["p4"],
++      "satisfies": ["C4"]
++    },
++    {
++      "step_id": "p6",
++      "operation": "copy_delta",
++      "depends_on": ["p5"],
++      "satisfies": ["C3", "C4"]
++    },
++    {
++      "step_id": "p7",
++      "operation": "verify_final",
++      "depends_on": ["p6"],
++      "satisfies": ["C4"]
++    },
++    {
++      "step_id": "p8",
++      "operation": "cas_route",
++      "depends_on": ["p7"],
++      "satisfies": ["C2", "C4", "C5"]
++    },
++    {
++      "step_id": "p9",
++      "operation": "unfreeze_tenant_writes",
++      "depends_on": ["p8"],
++      "satisfies": ["C1", "C5", "C7"]
++    },
++    {
++      "step_id": "p10",
++      "operation": "monitor",
++      "depends_on": ["p9"],
++      "satisfies": ["C5", "C6", "C7"]
+     }
+   ],
+   "cutover_gate": {
+-    "mode": "manual",
+-    "requires": ["count_match"]
++    "mode": "compare_and_swap",
++    "requires": ["legacy_route_version", "final_watermark", "verification_passed"]
+   },
+   "rollback": {
+-    "before_cutover": "disable_dual_writes",
+-    "after_cutover": "switch_reads_to_legacy"
++    "before_cutover": "resume_legacy_and_reuse_checkpoint",
++    "after_cutover": "forward_repair_on_new_store"
+   },
+-  "max_tenant_write_pause_seconds": 0
++  "max_tenant_write_pause_seconds": 30
+ }

@@ -97,7 +97,8 @@ def prepare_handoff(
             "prepared_at": prepared_at or utc_now(),
         }
     )
-    with store.connection:
+    # Joins an enclosing transaction instead of committing it early.
+    with store.transaction():
         store.connection.execute(
             """INSERT INTO handoffs
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",

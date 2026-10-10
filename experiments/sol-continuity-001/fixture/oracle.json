@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "required": {
+    "lineage_identity": "northstar-ledger-release",
+    "current_responsibility": "Independently review the Ledger V2 cutover candidate and block release unless every inherited gate is satisfied",
+    "settled_decisions": [
+      "Assign UUIDv7 ledger identifiers at ingest and retain the legacy invoice identifier as external_ref",
+      "Use the append-only outbox backfill; dual writes are rejected because replay is not proven idempotent",
+      "Cut over through shadow reads followed by tenant cohorts rather than a big-bang switch",
+      "Rollback disables Ledger V2 reads and preserves all Ledger V2 rows"
+    ],
+    "active_commitments": [
+      "Do not enable Ledger V2 reads for a tenant until row count, cent total, and checksum all match",
+      "Retain invoice audit records for seven years",
+      "Keep Ledger V2 p95 read latency within 15 milliseconds of the legacy path",
+      "Stop rollout when the reconciliation mismatch rate exceeds 0.01 percent",
+      "Publish the reconciliation report before release approval"
+    ],
+    "hard_constraints": [
+      "The reviewer must not execute production writes",
+      "No destructive SQL is permitted",
+      "No schema changes are permitted during release review",
+      "Customer PII must remain in the local approved environment",
+      "Original invoice timestamps are immutable"
+    ],
+    "unresolved_work": [
+      "Prove the retry worker cannot duplicate outbox rows after a crash",
+      "Finalize the reconciliation checksum formula for partial refunds",
+      "Resolve missing timezone mappings for tenants amber-grove and cedar-labs",
+      "Run the representative load test against the release candidate",
+      "Add cache invalidation ordering to the rollback runbook"
+    ],
+    "uncertainties": [
+      "Whether observed duplicate rows came from the retry worker or pre-existing source data",
+      "Whether the synthetic latency result predicts tenant-cohort performance",
+      "Whether either missing timezone mapping changes invoice-day grouping"
+    ],
+    "handoff_reason": "task_phase_transition",
+    "source_revision_id": "sol-pilot-revision-0002"
+  },
+  "required_blocking_areas": [
+    "cutover-sequencing",
+    "reconciliation",
+    "idempotency",
+    "timezone-mapping",
+    "latency",
+    "rollback",
+    "audit-retention"
+  ],
+  "required_release_decision": "block",
+  "forbidden_assertions": [
+    "Redis is the approved canonical identifier map",
+    "Ledger V2 rows may be deleted during rollback",
+    "Reconciliation is complete",
+    "The 25 percent cohort may start tomorrow"
+  ]
+}

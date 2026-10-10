@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "series_id": "critic-transport-002-confirmation",
+  "status": "complete",
+  "design": {
+    "candidate_count": 2,
+    "calls_per_candidate": 6,
+    "repeats_per_transport_per_candidate": 3,
+    "total_call_count": 12,
+    "provider": "codex",
+    "model": "gpt-6-sol",
+    "effort": "low"
+  },
+  "primary_results": {
+    "correct_changes_requested_verdicts": {
+      "claim-capsule-candidate-v1": 6,
+      "full-visible-bundle-v1": 6
+    },
+    "full_deterministic_defect_recall_runs": {
+      "claim-capsule-candidate-v1": 6,
+      "full-visible-bundle-v1": 5
+    },
+    "median_defect_recall_by_candidate_and_transport": 1.0,
+    "total_prompt_bytes": {
+      "claim-capsule-candidate-v1": 14661,
+      "full-visible-bundle-v1": 33426,
+      "compact_to_full_ratio": 0.438611,
+      "compact_reduction_percent": 56.139
+    },
+    "total_reported_input_tokens": {
+      "claim-capsule-candidate-v1": 75321,
+      "full-visible-bundle-v1": 80955,
+      "saved_by_compact": 5634,
+      "compact_to_full_ratio": 0.930406,
+      "compact_reduction_percent": 6.959
+    },
+    "compact_to_full_median_completion_ratio": {
+      "refactor-baseline-v1": 1.142032,
+      "release-policy-baseline-v1": 1.079766
+    },
+    "mechanically_unsupported_finding_count": {
+      "claim-capsule-candidate-v1": 0,
+      "full-visible-bundle-v1": 2
+    }
+  },
+  "post_hoc_scorer_audit": {
+    "primary_scores_unchanged": true,
+    "finding": "Both mechanically unsupported full-context findings were requirement-grounded empty-root or fail-closed findings, not hallucinations.",
+    "cause": "The frozen lexical scorer omitted empty-root language and required deny, exception, or fail-closed wording rather than semantically equivalent rejected or raise wording.",
+    "implication": "Treat the one 0.75 full-context recall score and the two unsupported counts as conservative lexical-scoring artifacts."
+  },
+  "usage_guard": {
+    "final_five_hour_used_percent": 28,
+    "final_weekly_used_percent": 20,
+    "reset_credits_consumed": 0
+  },
+  "interpretation": "Compact claim-capsule transport preserved observed critic quality on these two candidates while cutting explicit prompt bytes by 56.1 percent. Provider-reported input fell only 7.0 percent, indicating that fixed CLI and model context dominates the payload savings. Compact critics were slower by 8.0 to 14.2 percent on the stratified medians.",
+  "limitations": [
+    "Two synthetic candidates and three repeats per arm are not enough for a general quality claim.",
+    "Only Codex gpt-6-sol at low critic effort was tested.",
+    "The deterministic scorer is intentionally frozen but lexically brittle.",
+    "Provider-reported input includes fixed context outside the explicit experiment prompt.",
+    "Completion timing includes one 44.9 second compact outlier and uncontrolled service variance."
+  ]
+}

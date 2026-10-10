@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "experiment_id": "sol-continuity-002-calibration",
+  "status": "frozen_before_live_runs",
+  "frozen_at": "2026-09-27T00:58:20Z",
+  "supersedes_for_future_runs": "sol-continuity-001-calibration",
+  "prior_series_disposition": "apparatus_shakeout_excluded",
+  "apparatus_correction": "Deliver literal JSON and keep inherited values separate from evidence references in both lanes",
+  "fixed_inputs": [
+    {
+      "path": "fixture/candidate-release.json",
+      "sha256": "cf1ba38d2123b631719bbe62581772838aab65e4e0f6bfc21cc8dcf56af26f61"
+    },
+    {
+      "path": "fixture/oracle.json",
+      "sha256": "5c9ede9eb6e27ec7f51679b3868822b577465548dd6802f76858170ff27f1a2a"
+    },
+    {
+      "path": "payloads/compiled-handoff-v2.json",
+      "sha256": "98ca71e4946fdc3188dd07c5aa0e1f16932c4b563b457d1b379166cbca274ea4"
+    },
+    {
+      "path": "payloads/torc-projection.json",
+      "sha256": "d797fdd2f1adf6c43fe32a034aed85d964db5951ecb6db0f77194e8ec1bfb268"
+    },
+    {
+      "path": "prompts/assignment-v1.txt",
+      "sha256": "8c9eb52be728d3bdad316cdcbb2d37c2253cec1b549b7cf25947ae60a993bdad"
+    },
+    {
+      "path": "prompts/target-contract-v2.txt",
+      "sha256": "0253c56bef955c6652a9816ad5087e8982e25fcbc9ce2eb13eac98b106f4d5a6"
+    },
+    {
+      "path": "schemas/target-output.schema.json",
+      "sha256": "aef199c827f2543a8ad0287d96d5b1782d35f377e4f05bd144b5919427a524fd"
+    },
+    {
+      "path": "score.py",
+      "sha256": "5660578b166d831eef928698948dfacfa6b5f2f87e91b174146defd4cc914024"
+    }
+  ],
+  "payload_measurements": {
+    "compiled-handoff": {
+      "file_bytes": 3306,
+      "canonical_bytes": 2930,
+      "estimated_words": 325
+    },
+    "torc-projection": {
+      "file_bytes": 3981,
+      "canonical_bytes": 3563,
+      "estimated_words": 365
+    }
+  },
+  "target_controls": {
+    "model": "gpt-6-sol",
+    "surface": "isolated Codex collaboration subagent",
+    "tools": "forbidden by assignment",
+    "workspace_access": "forbidden by assignment",
+    "service_tier": "inherited",
+    "efforts": ["low", "xhigh"]
+  },
+  "run_order": [
+    {
+      "run_id": "cal2-v1-torc-low",
+      "mechanism": "torc-projection",
+      "effort": "low",
+      "assignment": "assignment-v1"
+    },
+    {
+      "run_id": "cal2-v1-compiled-xhigh",
+      "mechanism": "compiled-handoff",
+      "effort": "xhigh",
+      "assignment": "assignment-v1"
+    },
+    {
+      "run_id": "cal2-v1-compiled-low",
+      "mechanism": "compiled-handoff",
+      "effort": "low",
+      "assignment": "assignment-v1"
+    },
+    {
+      "run_id": "cal2-v1-torc-xhigh",
+      "mechanism": "torc-projection",
+      "effort": "xhigh",
+      "assignment": "assignment-v1"
+    }
+  ],
+  "calibration_gate": {
+    "minimum_usable_continuity_recall": 0.75,
+    "minimum_usable_blocking_area_recall": 0.75,
+    "requires_at_least_one_nonperfect_low_run": true,
+    "comparative_claim_authorized": false
+  }
+}

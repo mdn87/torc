@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "run_id": "07-bug-codex-solo-valid",
+  "valid_attempt": false,
+  "category": "harness_permission_failure",
+  "comparative_use": "excluded",
+  "usage": {
+    "input_tokens": 110628,
+    "cached_input_tokens": 80256,
+    "reasoning_output_tokens": 1303,
+    "output_tokens": 1970
+  },
+  "evidence": [
+    "The worker environment cleared every inherited CODEX_* parent-session control except the optional authentication home.",
+    "The standalone operating-system permission preflight verified workspace reads and writes.",
+    "The worker still described its workspace as read-only and its tool router rejected every attempted command."
+  ],
+  "corrective_action": "Use a standalone Codex process with daemon reuse disabled and one explicit legacy sandbox mode, then retry as a new immutable attempt."
+}

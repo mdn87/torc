@@ -1,0 +1,6 @@
+Assume responsibility for the review phase represented by the supplied
+continuity material. Establish what is inherited before judging the candidate,
+and do not silently turn your deductions into inherited facts. Decide whether
+release can proceed, grounding every blocking area in the provided evidence.
+Your entire response must be one JSON object conforming to the supplied schema.
+Use no tools, files, network access, or outside information.

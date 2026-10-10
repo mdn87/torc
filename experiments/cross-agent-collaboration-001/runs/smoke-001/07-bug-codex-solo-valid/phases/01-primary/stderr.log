@@ -1,0 +1,8 @@
+2026-10-01T01:51:24.054914Z  WARN codex_core::shell_snapshot: Failed to create shell snapshot for powershell: Shell snapshot not supported yet for PowerShell
+2026-10-01T01:51:31.361095Z ERROR codex_core::tools::router: error=exec_command failed: CreateProcess { message: "Rejected(\"`\\\"C:\\\\\\\\WINDOWS\\\\\\\\System32\\\\\\\\WindowsPowerShell\\\\\\\\v1.0\\\\\\\\powershell.exe\\\" -Command \\\"Get-Location; rg --files -g 'AGENTS.md' -g 'TASK.md' -g '*test*' -g '\\\"'!node_modules'\\\"' -g '\\\"'!vendor'\\\"'\\\"` rejected: blocked by policy\")" }
+2026-10-01T01:51:35.547602Z ERROR codex_core::tools::router: error=exec_command failed: CreateProcess { message: "Rejected(\"`\\\"C:\\\\\\\\WINDOWS\\\\\\\\System32\\\\\\\\WindowsPowerShell\\\\\\\\v1.0\\\\\\\\powershell.exe\\\" -Command 'Get-Content -LiteralPath AGENTS.md'` rejected: blocked by policy\")" }
+2026-10-01T01:51:39.222430Z ERROR codex_core::tools::router: error=exec_command failed: CreateProcess { message: "Rejected(\"`\\\"C:\\\\\\\\WINDOWS\\\\\\\\system32\\\\\\\\cmd.exe\\\" /c 'type AGENTS.md'` rejected: blocked by policy\")" }
+2026-10-01T01:51:46.162388Z ERROR codex_core::tools::router: error=exec_command failed: CreateProcess { message: "Rejected(\"`\\\"C:\\\\\\\\WINDOWS\\\\\\\\System32\\\\\\\\WindowsPowerShell\\\\\\\\v1.0\\\\\\\\powershell.exe\\\" -Command pwd` rejected: blocked by policy\")" }
+2026-10-01T01:51:53.207339Z ERROR codex_core::tools::router: error=patch rejected: empty patch
+2026-10-01T01:52:03.372219Z ERROR codex_core::tools::router: error=apply_patch verification failed: Failed to find expected lines in C:\Users\reedn\source\torc\experiments\cross-agent-collaboration-001\runs\smoke-001\07-bug-codex-solo-valid\workspaces\primary\TASK.md:
+__NONEXISTENT_CONTEXT_LINE_8f6c7a__

@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "series_id": "critic-transport-002-confirmation",
+  "plan_sha256": "ef82624926b835f64f9436a19a46be804a40c2dce177e6d848fdc74008319850",
+  "status": "complete",
+  "completed_candidates": [
+    {
+      "candidate_id": "refactor-baseline-v1",
+      "completed_order": [
+        "claim-capsule-candidate-v1",
+        "full-visible-bundle-v1",
+        "full-visible-bundle-v1",
+        "claim-capsule-candidate-v1",
+        "claim-capsule-candidate-v1",
+        "full-visible-bundle-v1"
+      ]
+    },
+    {
+      "candidate_id": "release-policy-baseline-v1",
+      "completed_order": [
+        "claim-capsule-candidate-v1",
+        "full-visible-bundle-v1",
+        "full-visible-bundle-v1",
+        "claim-capsule-candidate-v1",
+        "claim-capsule-candidate-v1",
+        "full-visible-bundle-v1"
+      ]
+    }
+  ],
+  "candidate_id": "release-policy-baseline-v1",
+  "completed_order": [
+    "claim-capsule-candidate-v1",
+    "full-visible-bundle-v1",
+    "full-visible-bundle-v1",
+    "claim-capsule-candidate-v1",
+    "claim-capsule-candidate-v1",
+    "full-visible-bundle-v1"
+  ],
+  "remaining_order": [],
+  "last_completed_run": "12-release-full",
+  "resumed_after_usage_checkpoint": "usage-checkpoint-before-02.json",
+  "reset_credits_consumed": 0
+}

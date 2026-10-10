@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "series_id": "critic-claim-matrix-capability-001",
+  "status": "rejected",
+  "frozen_at": "2026-10-04T04:58:24Z",
+  "question": "Can an explicit per-claim assessment matrix remove free-text scoring ambiguity while retaining the batching cost advantage?",
+  "apparatus_revision": "b4cd95875cc23018796b5fe41ff27f9a578de1a4",
+  "apparatus_inputs": [
+    {
+      "path": "experiments/cross-agent-collaboration-001/critic_claim_matrix_probe.py",
+      "sha256": "14d037fb7edae3e355f6b7982832b4721a0b47c7eb198c07cf7404fed3bddda7"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/critic_batch_probe.py",
+      "sha256": "742c200dbe79d2ca1d7a04aeab3c3cf95e5d293781f2e11c8df5aa7eb564651a"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/codex_usage_snapshot.py",
+      "sha256": "1ae8ff50ac7ee339929a0e9463da3e21f22c4bda9ab7ec869b3f4ead318d4183"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/native_context_request.py",
+      "sha256": "05b995813b0d406909455a4675d8da032031a6a9114af0a2a98cc9cb4b4a01be"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/native_context_response.py",
+      "sha256": "d6b33e9381f2a526e97158bb6d220258cf5374f4ee4b2182fe6b84eb276b7b4a"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/workflow_runner.py",
+      "sha256": "1ddb06b6d1a584ac289b600014901636b7b7d915b504073ee97c7f8e238d558b"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/worker_runner.py",
+      "sha256": "6888871ef69a63979db5a07530879ddef1c0a8a0209c978bde7ef16d61da6054"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/smoke-manifest.json",
+      "sha256": "410df6ae9e8b2a7950180b0905034a8881561a5fbcfc056de5004a40ef9fb6c0"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/fixtures-manifest.json",
+      "sha256": "81feb1eff70ab1d81a4e9f38fc4454c534e42d7cf40fbdcd58e04404406dca11"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/handoffs/refactor-superseded-path.json",
+      "sha256": "25161061ada68cf85fcff0b15c7bd92c8d1fd0f7c707911c329f088630b64606"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/handoffs/release-policy-interaction.json",
+      "sha256": "d9ccafa9866423f81bc737d866f2f303db7cbc0d7b0d75e6bb42bab12ff058cd"
+    },
+    {
+      "path": "src/torc/execution_capsules.py",
+      "sha256": "3ebb1874f4a8a35ffea6dc1893ae9bdfaea9ca5c053ff51260766c626a76b986"
+    },
+    {
+      "path": "src/torc/canonical.py",
+      "sha256": "424fe3640a094f6dd34fa2b4c7b3ce374eada88685243c6a4dbf01b3b8653838"
+    }
+  ],
+  "candidates": [
+    "refactor-baseline-v1",
+    "release-policy-baseline-v1"
+  ],
+  "reviewable_claim_categories": [
+    "active_commitments",
+    "hard_constraints",
+    "settled_decisions",
+    "superseded_directions"
+  ],
+  "excluded_claim_categories": {
+    "unresolved_work": "work questions are not candidate predicates and remain visible in the capsule"
+  },
+  "expected_claim_statuses": {
+    "refactor-baseline-v1": {
+      "c1": "unmet",
+      "x1": "unmet",
+      "x2": "met",
+      "x3": "met",
+      "d1": "unmet",
+      "s1": "unmet"
+    },
+    "release-policy-baseline-v1": {
+      "c1": "met",
+      "c2": "met",
+      "x1": "unmet",
+      "x2": "unmet",
+      "x3": "unmet",
+      "x4": "unmet",
+      "x5": "unmet"
+    }
+  },
+  "provider_controls": {
+    "provider": "codex",
+    "billing_surface": "ChatGPT Plus Codex allowance",
+    "harness_version": "codex-cli 0.159.3",
+    "model": "gpt-6-sol",
+    "effort": "low",
+    "session_mode": "fresh-ephemeral",
+    "tool_mode": "none",
+    "network_access": false
+  },
+  "call_budget": {
+    "maximum_calls": 1,
+    "automatic_retries": 0,
+    "stop_threshold_percent": 60,
+    "run_directory": "runs/critic-claim-matrix-capability-001/01-two-candidate-compact"
+  },
+  "matched_direct_baseline": {
+    "refactor_run_ids": [
+      "01-refactor-compact",
+      "04-refactor-compact",
+      "05-refactor-compact"
+    ],
+    "release_run_ids": [
+      "07-release-compact",
+      "10-release-compact",
+      "11-release-compact"
+    ],
+    "summed_median_input_tokens": 25107,
+    "summed_median_completion_ms": 23397.869,
+    "median_defect_recall_each": 1.0
+  },
+  "capability_thresholds": {
+    "quality": "every reviewable claim has the expected status; every unmet claim points to a finding citing the same claim; every finding is linked from an unmet assessment; both verdicts request changes; the legacy lexical score is descriptive only",
+    "maximum_input_ratio_to_direct": 0.75,
+    "maximum_completion_ratio_to_direct": 1.0
+  },
+  "decision": {
+    "on_success": "freeze a fresh counterbalanced claim-matrix batch confirmation",
+    "on_quality_failure": "preserve and redesign the structured contract without retrying this capability call",
+    "on_cost_failure": "preserve and stop because added structure erased the batching advantage",
+    "on_execution_failure": "preserve and exclude the only attempt without automatic retry"
+  },
+  "outcome": {
+    "run_directory": "runs/critic-claim-matrix-capability-001/01-two-candidate-compact",
+    "calls_consumed": 1,
+    "quality_passed": true,
+    "correct_claim_assessments": 13,
+    "unlinked_finding_count": 0,
+    "input_reduction_percent_vs_summed_direct_medians": 40.63,
+    "completion_ratio_vs_summed_direct_medians": 1.116012,
+    "capability_confirmed": false,
+    "rejection_reason": "completion time exceeded the frozen summed-direct threshold",
+    "next_gate": "a new compact claim-link-map contract that removes duplicated assessment evidence"
+  }
+}

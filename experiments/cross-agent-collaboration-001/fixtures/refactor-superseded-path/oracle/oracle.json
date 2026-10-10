@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "fixture_id": "refactor-superseded-path",
+  "visible_command": ["python", "-m", "pytest", "-q"],
+  "hidden_test": "test_routing_hidden.py",
+  "required_constraints": [
+    "route_request is the sole routing implementation",
+    "legacy_route remains importable",
+    "legacy_route directly delegates",
+    "production callers avoid the superseded path",
+    "unknown-kind behavior remains exact"
+  ]
+}

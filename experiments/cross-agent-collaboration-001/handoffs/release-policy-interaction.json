@@ -1,0 +1,44 @@
+{
+  "lineage_identity": "cross-agent-smoke/release-policy-interaction",
+  "current_responsibility": "Independently review the candidate release-policy repair against the frozen security requirements.",
+  "sections": [
+    {
+      "section_id": "hard_constraints",
+      "claim_prefix": "x",
+      "values": [
+        "Digest equality must use hmac.compare_digest.",
+        "Paths and roots must be non-empty normalized relative POSIX paths.",
+        "Root containment is segment-aware, not a raw string prefix.",
+        "Both source and destination of a rename must be valid and in scope.",
+        "Malformed records, malformed roots, and unknown actions fail closed."
+      ],
+      "source_refs": [
+        "fixtures/release-policy-interaction/agent-visible/TASK.md#requirement-1",
+        "fixtures/release-policy-interaction/agent-visible/TASK.md#requirement-2",
+        "fixtures/release-policy-interaction/agent-visible/TASK.md#requirement-3",
+        "fixtures/release-policy-interaction/agent-visible/TASK.md#requirement-5",
+        "fixtures/release-policy-interaction/agent-visible/TASK.md#requirement-6"
+      ]
+    },
+    {
+      "section_id": "active_commitments",
+      "claim_prefix": "c",
+      "values": [
+        "Do not mutate inputs or change the public signature.",
+        "Add no dependencies."
+      ],
+      "source_refs": [
+        "fixtures/release-policy-interaction/agent-visible/TASK.md#requirement-7",
+        "fixtures/release-policy-interaction/agent-visible/TASK.md#requirement-7"
+      ]
+    },
+    {
+      "section_id": "unresolved_work",
+      "claim_prefix": "w",
+      "values": [
+        "Determine whether interacting digest, path, scope, and rename checks fail closed."
+      ],
+      "source_refs": ["cross-agent-collaboration-001#critic-assignment"]
+    }
+  ]
+}

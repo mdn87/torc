@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "series_id": "critic-claim-link-confirmation-005",
+  "status": "confirmed",
+  "design": {
+    "fresh_batch_calls": 4,
+    "candidate_critiques": 8,
+    "order": [
+      "AB",
+      "BA",
+      "BA",
+      "AB"
+    ],
+    "excluded_predecessors": [
+      "critic-batch-capability-001",
+      "critic-batch-confirmation-004",
+      "critic-claim-matrix-capability-001",
+      "critic-claim-link-capability-002"
+    ]
+  },
+  "structured_quality": {
+    "correct_claim_status_count": 52,
+    "reviewable_claim_status_count": 52,
+    "candidate_position_quality_passes": 8,
+    "linked_finding_count": 28,
+    "unlinked_finding_count": 0,
+    "full_legacy_defect_recall_candidates_descriptive_only": 7,
+    "legacy_unsupported_finding_count_descriptive_only": 2
+  },
+  "primary_cost_result": {
+    "median_batch_input_tokens": 14539.5,
+    "median_input_reduction_percent_vs_summed_direct": 42.09,
+    "median_batch_output_tokens": 614.5,
+    "median_batch_completion_ms": 18808.315,
+    "median_completion_reduction_percent_vs_summed_direct": 19.615,
+    "all_frozen_thresholds_passed": true
+  },
+  "order_check": {
+    "quality_changed_by_position": false,
+    "by_order": {
+      "refactor_first": {
+        "run_count": 2,
+        "median_input_tokens": 14551.0,
+        "median_completion_ms": 18038.103
+      },
+      "release_first": {
+        "run_count": 2,
+        "median_input_tokens": 14528.0,
+        "median_completion_ms": 20472.047
+      }
+    }
+  },
+  "interpretation": "For these two bounded tool-free reviews, a two-candidate compact claim-link batch preserved every structured claim decision and reduced both provider input and completion time relative to matched separate calls.",
+  "recommendation": "Use batch size two for independent read-only critiques with the same model, effort, policy boundary, and compact claim-link contract. Broaden fixtures and providers before increasing batch size or generalizing the effect."
+}

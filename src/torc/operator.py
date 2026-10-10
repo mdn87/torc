@@ -18,8 +18,9 @@ from .errors import (
 )
 from .fit import evaluate_fit
 from .handoffs import expected_reconstruction, prepare_handoff, resolve_handoff
+from .history import boundary_report, revision_chain
 from .ids import new_id, valid_id
-from .projections import compile_projection
+from .projections import compile_receiver_projection, receiver_budget
 from .rollbacks import apply_rollback
 from .store import Store
 from .verify import artifact_metadata, verify_store
@@ -88,24 +89,34 @@ def checkpoint_operator_lineage(
     canonical_state: dict[str, Any],
     event_type: str = "checkpoint",
     evidence_refs: list[str] | None = None,
+    resolutions: list[dict[str, str]] | None = None,
 ) -> dict[str, Any]:
-    """Append a full canonical state through the current authority."""
+    """Append a full canonical state through the current authority.
+
+    The response reports what the bearer still owes the lineage. It never blocks
+    the checkpoint: TORC records the state and keeps asking.
+    """
 
     validate_canonical_state(canonical_state)
     _require_integrity(store, lineage_id)
-    revision = store.append_revision(
-        lineage_id,
-        canonical_state,
-        event_type=event_type,
-        activation_id=activation_id,
-        evidence_refs=evidence_refs,
-    )
+    # The store validates the event type and resolutions inside the append transaction.
+    with store.transaction(immediate=True):
+        revision = store.append_revision(
+            lineage_id,
+            canonical_state,
+            event_type=event_type,
+            activation_id=activation_id,
+            evidence_refs=evidence_refs,
+            resolutions=resolutions,
+        )
+        boundary = _boundary(store, lineage_id)
     return {
         "ok": True,
         "lineage_id": lineage_id,
         "revision_id": revision["revision_id"],
         "activation_id": activation_id,
         "event_type": event_type,
+        "boundary": boundary,
     }
 
 
@@ -235,6 +246,45 @@ def operator_lineage_status(store: Store, lineage_id: str) -> dict[str, Any]:
         "open_work": head["canonical_state"]["open_work"],
         "pending_handoff_ids": [row["handoff_id"] for row in pending],
         "revision_count": len(store.lineage_revisions(lineage_id)),
+        "boundary": _boundary(store, lineage_id),
+    }
+
+
+def carry_operator_lineage(
+    store: Store,
+    *,
+    lineage_id: str,
+    substrate: dict[str, Any],
+    budget_cap: int | None = None,
+) -> dict[str, Any]:
+    """Compile the carry for a receiver at session start.
+
+    This reads canonical history and stores one derived projection. It creates no
+    activation or lease and cannot change authority.
+    """
+
+    validate_substrate(substrate)
+    _require_integrity(store, lineage_id)
+    # One transaction, so a carry that cannot fit leaves no registered descriptor behind.
+    with store.transaction(immediate=True):
+        head_revision_id = store.get_lineage(lineage_id)["head_revision_id"]
+        _register_substrate_once(store, substrate)
+        projection = compile_receiver_projection(
+            store,
+            lineage_id=lineage_id,
+            source_revision_id=head_revision_id,
+            receiver_substrate_id=substrate["substrate_id"],
+            purpose="session_start",
+            budget_cap=budget_cap,
+        )
+    return {
+        "ok": True,
+        "lineage_id": lineage_id,
+        "source_revision_id": head_revision_id,
+        "receiver_substrate_id": substrate["substrate_id"],
+        "projection_id": projection["projection_id"],
+        "authority_transferred": False,
+        "projection": projection,
     }
 
 
@@ -246,13 +296,16 @@ def prepare_operator_handoff(
     plan: dict[str, Any],
     recovery_context: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Prepare a bound handoff and export its derived operator artifacts."""
+    """Prepare a bound handoff and export its derived operator artifacts.
+
+    Everything is written in one immediate transaction. The two artifact files
+    are created last, with exclusive create, and removed again if anything
+    fails, so a preparation that cannot complete stores nothing and a retry does
+    not trip over a half-finished one.
+    """
 
     validate_handoff_plan(plan)
     _require_integrity(store, lineage_id)
-    authority = store.current_authority(lineage_id)
-    if authority["activation_id"] != source_activation_id:
-        raise HandoffError("source activation does not hold lineage authority")
     reason_code = str(plan["reason_code"])
     if reason_code == "failure_recovery" and recovery_context is None:
         raise HandoffError("use the recovery workflow for failure_recovery handoffs")
@@ -264,75 +317,105 @@ def prepare_operator_handoff(
             raise HandoffError("target activation identifier is invalid")
         if target_activation_id == source_activation_id:
             raise HandoffError("target activation must differ from the source")
-        try:
-            store.get_activation(target_activation_id)
-        except NotFoundError:
-            pass
-        else:
-            raise HandoffError("target activation already exists")
 
-    target_substrate = plan["target_substrate"]
-    requirements = plan["requirements"]
-    _register_substrate_once(store, target_substrate)
-    fit = evaluate_fit(
-        store,
-        lineage_id=lineage_id,
-        source_revision_id=authority["lineage_head_revision_id"],
-        source_substrate_id=authority["substrate_id"],
-        task_phase=str(plan["task_phase"]),
-        requirements=requirements,
-    )
-    requested_target = target_substrate["substrate_id"]
-    if fit["selected_substrate_id"] != requested_target:
-        raise HandoffError(
-            "fit evaluation selected "
-            f"{fit['selected_substrate_id']!r}, not requested target {requested_target!r}"
-        )
+    written: list[Path] = []
+    try:
+        with store.transaction(immediate=True):
+            authority = store.current_authority(lineage_id)
+            if authority["activation_id"] != source_activation_id:
+                raise HandoffError("source activation does not hold lineage authority")
+            if target_activation_id is not None:
+                try:
+                    store.get_activation(target_activation_id)
+                except NotFoundError:
+                    pass
+                else:
+                    raise HandoffError("target activation already exists")
 
-    projection = compile_projection(
-        store,
-        lineage_id=lineage_id,
-        source_revision_id=authority["lineage_head_revision_id"],
-        target_substrate_id=requested_target,
-        budget_limit=int(plan["budget_limit"]),
-        handoff_reason=reason_code,
-        target_responsibility=str(plan["target_responsibility"]),
-    )
-    target = store.create_activation(
-        lineage_id,
-        authority["lineage_head_revision_id"],
-        requested_target,
-        activation_id=target_activation_id,
-    )
-    snapshot = prepare_handoff(
-        store,
-        lineage_id=lineage_id,
-        source_activation_id=source_activation_id,
-        target_activation_id=target["activation_id"],
-        fit_decision_id=fit["fit_decision_id"],
-        projection_id=projection["projection_id"],
-        reason_code=reason_code,
-        rationale=str(plan["rationale"]),
-        recovery_context=recovery_context,
-        continuity_requirements=plan.get("continuity_requirements"),
-    )
-    reconstruction = expected_reconstruction(store, snapshot)
-    brief_path = _export_text_artifact(
-        store,
-        record_kind="handoff_brief",
-        record_id=snapshot["handoff_id"],
-        filename=f"handoff-{_filename_component(snapshot['handoff_id'])}.md",
-        content=render_handoff_brief(snapshot, projection, reconstruction),
-        created_at=snapshot["prepared_at"],
-    )
-    reconstruction_path = _export_text_artifact(
-        store,
-        record_kind="handoff_reconstruction_template",
-        record_id=snapshot["handoff_id"],
-        filename=f"reconstruction-{_filename_component(snapshot['handoff_id'])}.json",
-        content=json.dumps(reconstruction, indent=2, sort_keys=True) + "\n",
-        created_at=snapshot["prepared_at"],
-    )
+            target_substrate = plan["target_substrate"]
+            requirements = plan["requirements"]
+            _register_substrate_once(store, target_substrate)
+            fit = evaluate_fit(
+                store,
+                lineage_id=lineage_id,
+                source_revision_id=authority["lineage_head_revision_id"],
+                source_substrate_id=authority["substrate_id"],
+                task_phase=str(plan["task_phase"]),
+                requirements=requirements,
+                # The operator named the target. Other registered descriptors, such as
+                # an observer that only asked for a carry, must not be able to veto it.
+                candidate_ids={authority["substrate_id"], target_substrate["substrate_id"]},
+            )
+            requested_target = target_substrate["substrate_id"]
+            if fit["selected_substrate_id"] != requested_target:
+                raise HandoffError(
+                    "fit evaluation selected "
+                    f"{fit['selected_substrate_id']!r}, not requested target "
+                    f"{requested_target!r}"
+                )
+
+            projection = compile_receiver_projection(
+                store,
+                lineage_id=lineage_id,
+                source_revision_id=authority["lineage_head_revision_id"],
+                receiver_substrate_id=requested_target,
+                purpose="handoff",
+                handoff_reason=reason_code,
+                target_responsibility=str(plan["target_responsibility"]),
+                budget_cap=plan.get("budget_limit"),
+            )
+            target = store.create_activation(
+                lineage_id,
+                authority["lineage_head_revision_id"],
+                requested_target,
+                activation_id=target_activation_id,
+            )
+            snapshot = prepare_handoff(
+                store,
+                lineage_id=lineage_id,
+                source_activation_id=source_activation_id,
+                target_activation_id=target["activation_id"],
+                fit_decision_id=fit["fit_decision_id"],
+                projection_id=projection["projection_id"],
+                reason_code=reason_code,
+                rationale=str(plan["rationale"]),
+                recovery_context=recovery_context,
+                continuity_requirements=plan.get("continuity_requirements"),
+            )
+            reconstruction = expected_reconstruction(store, snapshot)
+            handoff_name = _filename_component(snapshot["handoff_id"])
+            exports = (
+                (
+                    "handoff_brief",
+                    f"handoff-{handoff_name}.md",
+                    render_handoff_brief(snapshot, projection, reconstruction),
+                ),
+                (
+                    "handoff_reconstruction_template",
+                    f"reconstruction-{handoff_name}.json",
+                    json.dumps(reconstruction, indent=2, sort_keys=True) + "\n",
+                ),
+            )
+            for _kind, filename, _content in exports:
+                if (store.state_dir / "artifacts" / filename).exists():
+                    raise HandoffError(f"handoff artifact already exists: {filename}")
+            paths = [
+                _export_text_artifact(
+                    store,
+                    record_kind=record_kind,
+                    record_id=snapshot["handoff_id"],
+                    filename=filename,
+                    content=content,
+                    created_at=snapshot["prepared_at"],
+                    written=written,
+                )
+                for record_kind, filename, content in exports
+            ]
+    except BaseException:
+        for path in written:
+            path.unlink(missing_ok=True)
+        raise
+    brief_path, reconstruction_path = paths
     return {
         "ok": True,
         "lineage_id": lineage_id,
@@ -479,22 +562,7 @@ def render_handoff_brief(
     for field in snapshot["continuity_requirements"]:
         lines.append(f"- `{field}`")
     lines.extend(["", "## Projected continuity", ""])
-    for section in projection["included_sections"]:
-        lines.extend(
-            [
-                f"### {section['section_id']}",
-                "",
-                "```json",
-                json.dumps(section["content"], indent=2, sort_keys=True),
-                "```",
-                "",
-            ]
-        )
-    if projection["omitted_sections"]:
-        lines.extend(["## Omitted from this projection", ""])
-        for section in projection["omitted_sections"]:
-            lines.append(f"- `{section['section_id']}`: {section['reason']}")
-        lines.append("")
+    lines.extend(_projection_lines(projection))
     recovery = snapshot.get("recovery_context")
     if recovery is not None:
         lines.extend(
@@ -512,6 +580,51 @@ def render_handoff_brief(
             ]
         )
     return "\n".join(lines)
+
+
+def render_carry(projection: dict[str, Any]) -> str:
+    """Render a session-start carry for the receiving agent to read."""
+
+    budget = projection["budget"]
+    lines = [
+        f"# TORC Carry {projection['projection_id']}",
+        "",
+        (
+            "> Derived execution artifact. The TORC store and immutable records "
+            "are canonical; this file is not. Receiving it grants no authority."
+        ),
+        "",
+        f"- Lineage: `{projection['lineage_id']}`",
+        f"- Source revision: `{projection['source_revision_id']}`",
+        f"- Receiver substrate: `{projection['target_substrate_id']}`",
+        f"- Budget: {budget['estimated_used']} of {budget['limit']} {budget['unit']}",
+        "",
+        "## Carried continuity",
+        "",
+    ]
+    lines.extend(_projection_lines(projection))
+    return "\n".join(lines)
+
+
+def _projection_lines(projection: dict[str, Any]) -> list[str]:
+    lines: list[str] = []
+    for section in projection["included_sections"]:
+        lines.extend(
+            [
+                f"### {section['section_id']}",
+                "",
+                "```json",
+                json.dumps(section["content"], indent=2, sort_keys=True),
+                "```",
+                "",
+            ]
+        )
+    if projection["omitted_sections"]:
+        lines.extend(["## Omitted from this projection", ""])
+        for section in projection["omitted_sections"]:
+            lines.append(f"- `{section['section_id']}`: {section['reason']}")
+        lines.append("")
+    return lines
 
 
 _STATE_OBJECT_FIELDS = ("identity", "self_model")
@@ -550,6 +663,11 @@ def validate_handoff_plan(plan: Any) -> None:
         raise InvalidInputError("handoff plan must be a JSON object")
     validate_substrate(_required_object(plan, "target_substrate"))
     _required_object(plan, "requirements")
+    budget_limit = plan.get("budget_limit")
+    if budget_limit is not None and (
+        isinstance(budget_limit, bool) or not isinstance(budget_limit, int) or budget_limit <= 0
+    ):
+        raise InvalidInputError("handoff plan budget_limit must be a positive integer")
 
 
 def validate_canonical_state(state: Any) -> None:
@@ -608,6 +726,7 @@ def validate_substrate(substrate: Any) -> None:
         raise InvalidInputError(
             "substrate descriptor requires a positive integer context_budget.limit"
         )
+    receiver_budget(substrate)
 
 
 def _string_list(value: Any) -> bool:
@@ -658,6 +777,12 @@ def _nonempty_unique_strings(values: Any, field: str) -> list[str]:
     return values
 
 
+def _boundary(store: Store, lineage_id: str) -> dict[str, Any]:
+    authority = store.current_authority(lineage_id)
+    chain = revision_chain(store, authority["lineage_head_revision_id"])
+    return boundary_report(chain, authority["substrate_id"])
+
+
 def _require_integrity(store: Store, lineage_id: str) -> None:
     verification = verify_store(store, lineage_id)
     if not verification["valid"]:
@@ -679,11 +804,14 @@ def _export_text_artifact(
     filename: str,
     content: str,
     created_at: str,
+    written: list[Path] | None = None,
 ) -> str:
     relative_path = str(Path("artifacts") / filename).replace("\\", "/")
     path = store.state_dir / relative_path
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("x", encoding="utf-8", newline="\n") as handle:
+        if written is not None:
+            written.append(path)
         handle.write(content)
     artifact_metadata(
         store,

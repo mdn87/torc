@@ -1,0 +1,104 @@
+diff --git a/decision.json b/decision.json
+index e53473c..18ae156 100644
+--- a/decision.json
++++ b/decision.json
+@@ -1,40 +1,82 @@
+ {
+   "schema_version": 1,
+-  "selected_strategy": "dual-write-backfill",
+-  "rationale": "Dual writes avoid pausing tenants and make read cutover easy.",
+-  "constraints_addressed": ["C1", "C3", "C7"],
++  "selected_strategy": "shadow-copy-cas",
++  "rationale": "Migrate tenants independently using only the existing copy worker, router, and stores. Keep the legacy store as the sole live writer until each tenant's atomic route change. Copy through an initial legacy watermark with idempotent event keys and a durable per-tenant checkpoint in an existing store, then verify ordered event identity and content. Freeze only that tenant, capture the final legacy watermark, copy and verify the delta, and compare-and-swap the route only if its legacy version and final watermark still match and verification passed. Enforce a 30-second pause deadline: if cutover cannot complete within it, resume legacy writes before changing the route and reuse the checkpoint. After a successful route change, immediately resume writes against the new store; retain legacy data as recovery evidence and perform any repair on the new store. A tenant's failure does not delay other tenants.",
++  "constraints_addressed": ["C1", "C2", "C3", "C4", "C5", "C6", "C7"],
+   "rejected_strategies": {
+-    "global-stop-rewrite": "Requires a global maintenance window.",
+-    "cdc-mirror-cutover": "Adds operational complexity.",
+-    "shadow-copy-cas": "Requires a brief tenant write freeze."
++    "global-stop-rewrite": "Stopping all writes violates C1.",
++    "dual-write-backfill": "Writing to both stores before route change violates C2.",
++    "cdc-mirror-cutover": "A new change-data-capture pipeline violates C6, and mirroring live writes before route change violates C2."
+   },
+   "plan": [
+     {
+       "step_id": "p1",
+-      "operation": "enable_dual_writes",
++      "operation": "capture_initial_watermark",
+       "depends_on": [],
+-      "satisfies": ["C1"]
++      "satisfies": ["C3", "C7"]
+     },
+     {
+       "step_id": "p2",
+-      "operation": "backfill",
++      "operation": "shadow_copy",
+       "depends_on": ["p1"],
+-      "satisfies": ["C3"]
++      "satisfies": ["C2", "C3", "C6"]
+     },
+     {
+       "step_id": "p3",
+-      "operation": "flip_reads",
++      "operation": "verify_shadow",
+       "depends_on": ["p2"],
+-      "satisfies": ["C7"]
++      "satisfies": ["C4"]
++    },
++    {
++      "step_id": "p4",
++      "operation": "freeze_tenant_writes",
++      "depends_on": ["p3"],
++      "satisfies": ["C1", "C2", "C7"]
++    },
++    {
++      "step_id": "p5",
++      "operation": "capture_final_watermark",
++      "depends_on": ["p4"],
++      "satisfies": ["C4"]
++    },
++    {
++      "step_id": "p6",
++      "operation": "copy_delta",
++      "depends_on": ["p5"],
++      "satisfies": ["C3", "C4"]
++    },
++    {
++      "step_id": "p7",
++      "operation": "verify_final",
++      "depends_on": ["p6"],
++      "satisfies": ["C4"]
++    },
++    {
++      "step_id": "p8",
++      "operation": "cas_route",
++      "depends_on": ["p7"],
++      "satisfies": ["C2", "C4", "C5"]
++    },
++    {
++      "step_id": "p9",
++      "operation": "unfreeze_tenant_writes",
++      "depends_on": ["p8"],
++      "satisfies": ["C1", "C5", "C7"]
++    },
++    {
++      "step_id": "p10",
++      "operation": "monitor",
++      "depends_on": ["p9"],
++      "satisfies": ["C5", "C7"]
+     }
+   ],
+   "cutover_gate": {
+-    "mode": "manual",
+-    "requires": ["count_match"]
++    "mode": "compare-and-swap",
++    "requires": ["legacy_route_version", "final_watermark", "verification_passed"]
+   },
+   "rollback": {
+-    "before_cutover": "disable_dual_writes",
+-    "after_cutover": "switch_reads_to_legacy"
++    "before_cutover": "resume_legacy_and_reuse_checkpoint",
++    "after_cutover": "forward_repair_on_new_store"
+   },
+-  "max_tenant_write_pause_seconds": 0
++  "max_tenant_write_pause_seconds": 30
+ }

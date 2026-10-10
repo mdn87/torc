@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "fixture_id": "bug-hidden-regression",
+  "visible_command": ["python", "-m", "pytest", "-q"],
+  "hidden_test": "test_header_merge_hidden.py",
+  "required_constraints": [
+    "case-insensitive logical identity",
+    "last spelling and value wins",
+    "first logical position is stable",
+    "inputs remain unchanged",
+    "no new dependency"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "mechanism": "compiled-handoff",
+  "instruction": "Continue as the independent release reviewer. Preserve the following inherited state exactly and distinguish it from any new inference.",
+  "handoff": [
+    "Lineage northstar-ledger-release is responsible for independently reviewing the Ledger V2 cutover candidate and blocking release unless every inherited gate is satisfied.",
+    "Settled decisions: Assign UUIDv7 ledger identifiers at ingest and retain the legacy invoice identifier as external_ref [ADR-014]. Use the append-only outbox backfill; dual writes are rejected because replay is not proven idempotent [ADR-018]. Cut over through shadow reads followed by tenant cohorts rather than a big-bang switch [ADR-021]. Rollback disables Ledger V2 reads and preserves all Ledger V2 rows [RUNBOOK-07].",
+    "Active commitments: Do not enable Ledger V2 reads for a tenant until row count, cent total, and checksum all match [GATE-RECON-3]. Retain invoice audit records for seven years [POLICY-RET-7Y]. Keep Ledger V2 p95 read latency within 15 milliseconds of the legacy path [SLO-LEDGER-15MS]. Stop rollout when the reconciliation mismatch rate exceeds 0.01 percent [GATE-RECON-3]. Publish the reconciliation report before release approval [GATE-RECON-3].",
+    "Hard constraints: The reviewer must not execute production writes. No destructive SQL is permitted. No schema changes are permitted during release review. Customer PII must remain in the local approved environment. Original invoice timestamps are immutable.",
+    "Unresolved work: Prove the retry worker cannot duplicate outbox rows after a crash [INCIDENT-009]. Finalize the reconciliation checksum formula for partial refunds [ISSUE-442]. Resolve missing timezone mappings for tenants amber-grove and cedar-labs [ISSUE-451]. Run the representative load test against the release candidate [TEST-LOAD-PENDING]. Add cache invalidation ordering to the rollback runbook [RUNBOOK-07-GAP].",
+    "Known uncertainties: Whether observed duplicate rows came from the retry worker or pre-existing source data. Whether the synthetic latency result predicts tenant-cohort performance. Whether either missing timezone mapping changes invoice-day grouping.",
+    "Superseded directions that must not be revived: Use Redis as the canonical legacy-to-ledger identifier map. Switch every tenant to Ledger V2 reads in one big-bang cutover.",
+    "Handoff reason is task_phase_transition. Canonical source revision is sol-pilot-revision-0002."
+  ]
+}

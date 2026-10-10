@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "format": "torc-claim-capsule-v1",
+  "lineage_identity": "demo-lineage",
+  "current_responsibility": "Independently review the implementation",
+  "source_revision_id": "revision-demo-0002",
+  "handoff_reason": "independent_challenge",
+  "claims": {
+    "active_commitments": {
+      "c1": "Preserve the accepted public contract"
+    },
+    "hard_constraints": {
+      "x1": "Do not modify canonical history"
+    }
+  }
+}

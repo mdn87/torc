@@ -1,0 +1,1735 @@
+{
+  "cases": [
+    {
+      "attempt_id": "header-first",
+      "authority_changed": false,
+      "batch_id": "critic-batch-69434fa209512cc583e5b1443be89e397b1f76cc10d1f4c88f9a0e9b977f53be",
+      "candidate_order": "header-first",
+      "completed_at": "2026-10-08T01:39:10.722669Z",
+      "elapsed_ms": 1.578,
+      "evidence": {
+        "canonical_revisions": [
+          {
+            "actor": {
+              "activation_id": null,
+              "kind": "operator",
+              "substrate_id": null
+            },
+            "canonical_state": {
+              "artifact_refs": [
+                "artifact-project-brief",
+                "artifact-vertical-slice"
+              ],
+              "commitments": [
+                "Do not broaden execution authority during handoff",
+                "Preserve canonical state when deriving target projections"
+              ],
+              "constraints": [
+                "No network calls",
+                "No daemon or background process",
+                "SHA-256 is tamper evidence only"
+              ],
+              "goals": [
+                "Prove an acceptance-gated lineage handoff",
+                "Produce inspectable provenance for every authority change"
+              ],
+              "identity": {
+                "label": "TORC demo lineage"
+              },
+              "memory_refs": [],
+              "open_work": [
+                "Implement the local vertical slice"
+              ],
+              "self_model": {
+                "methods": [
+                  "Use deterministic local evidence"
+                ],
+                "role": "Implement the P0 continuity slice",
+                "settled_decisions": [
+                  "Canonical lineage and execution projections remain separate",
+                  "Authority transfers only after continuity acceptance"
+                ]
+              },
+              "uncertainties": [
+                "Whether TORC outperforms a carefully compiled prompt",
+                "How provider tokenization changes projection efficiency"
+              ]
+            },
+            "created_at": "2026-08-06T12:00:00Z",
+            "event_type": "lineage_created",
+            "evidence_refs": [
+              "evidence-operator-decision"
+            ],
+            "integrity": {
+              "algorithm": "sha256",
+              "canonical_payload_sha256": "f2e51b7edd326101def07d638a4d8f5ab59de2bb1ff9fd857d44c331de83a7f5",
+              "previous_revision_sha256": null
+            },
+            "lineage_id": "demo-lineage",
+            "parent_revision_ids": [],
+            "revision_id": "revision-demo-0001",
+            "schema_version": 1
+          },
+          {
+            "actor": {
+              "activation_id": "activation-source",
+              "kind": "activation",
+              "substrate_id": "substrate-a"
+            },
+            "canonical_state": {
+              "artifact_refs": [
+                "artifact-project-brief",
+                "artifact-vertical-slice"
+              ],
+              "commitments": [
+                "Do not broaden execution authority during handoff",
+                "Preserve canonical state when deriving target projections"
+              ],
+              "constraints": [
+                "No network calls",
+                "No daemon or background process",
+                "SHA-256 is tamper evidence only"
+              ],
+              "goals": [
+                "Prove an acceptance-gated lineage handoff",
+                "Produce inspectable provenance for every authority change"
+              ],
+              "identity": {
+                "label": "TORC demo lineage"
+              },
+              "memory_refs": [],
+              "open_work": [
+                "Independently review the P0 handoff implementation",
+                "Compare TORC against the compiled-prompt baseline after P0"
+              ],
+              "self_model": {
+                "methods": [
+                  "Use deterministic local evidence"
+                ],
+                "role": "Implement the P0 continuity slice",
+                "settled_decisions": [
+                  "Canonical lineage and execution projections remain separate",
+                  "Authority transfers only after continuity acceptance"
+                ]
+              },
+              "uncertainties": [
+                "Whether TORC outperforms a carefully compiled prompt",
+                "How provider tokenization changes projection efficiency"
+              ]
+            },
+            "created_at": "2026-08-06T12:03:00Z",
+            "event_type": "checkpoint",
+            "evidence_refs": [
+              "artifact-p0-implementation"
+            ],
+            "integrity": {
+              "algorithm": "sha256",
+              "canonical_payload_sha256": "d41f16572b7da9632ffa627bd883ebd27ded498c85e4a5a7639fc8757edc1eb4",
+              "previous_revision_sha256": "f2e51b7edd326101def07d638a4d8f5ab59de2bb1ff9fd857d44c331de83a7f5"
+            },
+            "lineage_id": "demo-lineage",
+            "parent_revision_ids": [
+              "revision-demo-0001"
+            ],
+            "revision_id": "revision-demo-0002",
+            "schema_version": 1
+          },
+          {
+            "actor": {
+              "activation_id": "activation-source",
+              "kind": "activation",
+              "substrate_id": "substrate-a"
+            },
+            "canonical_state": {
+              "artifact_refs": [
+                "artifact-project-brief",
+                "artifact-vertical-slice"
+              ],
+              "commitments": [
+                "Do not broaden execution authority during handoff",
+                "Preserve canonical state when deriving target projections"
+              ],
+              "constraints": [
+                "No network calls",
+                "No daemon or background process",
+                "SHA-256 is tamper evidence only"
+              ],
+              "goals": [
+                "Prove an acceptance-gated lineage handoff",
+                "Produce inspectable provenance for every authority change"
+              ],
+              "identity": {
+                "label": "TORC demo lineage"
+              },
+              "memory_refs": [],
+              "open_work": [
+                "Independently review the P0 handoff implementation",
+                "Compare TORC against the compiled-prompt baseline after P0"
+              ],
+              "self_model": {
+                "methods": [
+                  "Preserve required continuity before optional context",
+                  "Keep authority transfer acceptance-gated",
+                  "Report inherited facts separately from new inference"
+                ],
+                "role": "Complete implementation and transfer to independent review",
+                "settled_decisions": [
+                  "Canonical lineage and execution projections remain separate",
+                  "Authority transfers only after continuity acceptance"
+                ]
+              },
+              "uncertainties": [
+                "Whether TORC outperforms a carefully compiled prompt",
+                "How provider tokenization changes projection efficiency"
+              ]
+            },
+            "created_at": "2026-08-06T12:04:00Z",
+            "event_type": "self_model_revised",
+            "evidence_refs": [
+              "artifact-p0-tests"
+            ],
+            "integrity": {
+              "algorithm": "sha256",
+              "canonical_payload_sha256": "d5aa3d2744cfabb01b08b8725d45f67b2d176cd98217123f1c5f51b7daa7a198",
+              "previous_revision_sha256": "d41f16572b7da9632ffa627bd883ebd27ded498c85e4a5a7639fc8757edc1eb4"
+            },
+            "lineage_id": "demo-lineage",
+            "parent_revision_ids": [
+              "revision-demo-0002"
+            ],
+            "revision_id": "revision-demo-0003",
+            "schema_version": 1
+          },
+          {
+            "actor": {
+              "activation_id": "activation-target",
+              "kind": "activation",
+              "substrate_id": "substrate-b"
+            },
+            "canonical_state": {
+              "artifact_refs": [
+                "artifact-project-brief",
+                "artifact-vertical-slice"
+              ],
+              "commitments": [
+                "Do not broaden execution authority during handoff",
+                "Preserve canonical state when deriving target projections"
+              ],
+              "constraints": [
+                "No network calls",
+                "No daemon or background process",
+                "SHA-256 is tamper evidence only"
+              ],
+              "goals": [
+                "Prove an acceptance-gated lineage handoff",
+                "Produce inspectable provenance for every authority change"
+              ],
+              "identity": {
+                "label": "TORC demo lineage"
+              },
+              "memory_refs": [],
+              "open_work": [
+                "Independently review the P0 handoff implementation",
+                "Compare TORC against the compiled-prompt baseline after P0"
+              ],
+              "self_model": {
+                "methods": [
+                  "Preserve required continuity before optional context",
+                  "Keep authority transfer acceptance-gated",
+                  "Report inherited facts separately from new inference"
+                ],
+                "role": "Independently review the P0 handoff implementation",
+                "settled_decisions": [
+                  "Canonical lineage and execution projections remain separate",
+                  "Authority transfers only after continuity acceptance"
+                ]
+              },
+              "uncertainties": [
+                "Whether TORC outperforms a carefully compiled prompt",
+                "How provider tokenization changes projection efficiency"
+              ]
+            },
+            "created_at": "2026-08-06T12:09:00Z",
+            "event_type": "handoff_accepted",
+            "evidence_refs": [
+              "handoff-demo-review",
+              "handoff-result-demo-review"
+            ],
+            "integrity": {
+              "algorithm": "sha256",
+              "canonical_payload_sha256": "8f5f01872704310aade1912912d2a8574af35eb6376ad22bf8707fef7d1dc8f5",
+              "previous_revision_sha256": "d5aa3d2744cfabb01b08b8725d45f67b2d176cd98217123f1c5f51b7daa7a198"
+            },
+            "lineage_id": "demo-lineage",
+            "parent_revision_ids": [
+              "revision-demo-0003"
+            ],
+            "revision_id": "revision-demo-0004",
+            "schema_version": 1
+          },
+          {
+            "actor": {
+              "activation_id": "activation-target",
+              "kind": "activation",
+              "substrate_id": "substrate-b"
+            },
+            "canonical_state": {
+              "artifact_refs": [
+                "artifact-project-brief",
+                "artifact-vertical-slice",
+                "artifact-1486eba525d3410db7d7c753bd4c1c20",
+                "artifact-ab4ea400f8994f94b015d2ede88c03eb"
+              ],
+              "commitments": [
+                "Do not broaden execution authority during handoff",
+                "Preserve canonical state when deriving target projections"
+              ],
+              "constraints": [
+                "No network calls",
+                "No daemon or background process",
+                "SHA-256 is tamper evidence only"
+              ],
+              "goals": [
+                "Prove an acceptance-gated lineage handoff",
+                "Produce inspectable provenance for every authority change"
+              ],
+              "identity": {
+                "label": "TORC demo lineage"
+              },
+              "memory_refs": [],
+              "open_work": [
+                "Independently review the P0 handoff implementation",
+                "Compare TORC against the compiled-prompt baseline after P0"
+              ],
+              "self_model": {
+                "methods": [
+                  "Preserve required continuity before optional context",
+                  "Keep authority transfer acceptance-gated",
+                  "Report inherited facts separately from new inference"
+                ],
+                "role": "Independently review the P0 handoff implementation",
+                "settled_decisions": [
+                  "Canonical lineage and execution projections remain separate",
+                  "Authority transfers only after continuity acceptance"
+                ]
+              },
+              "uncertainties": [
+                "Whether TORC outperforms a carefully compiled prompt",
+                "How provider tokenization changes projection efficiency"
+              ]
+            },
+            "created_at": "2026-10-08T01:39:10.796854Z",
+            "event_type": "checkpoint",
+            "evidence_refs": [
+              "artifact-1486eba525d3410db7d7c753bd4c1c20",
+              "artifact-ab4ea400f8994f94b015d2ede88c03eb"
+            ],
+            "integrity": {
+              "algorithm": "sha256",
+              "canonical_payload_sha256": "aa25ff28dfaef4dd73392a9d0eaf7e1b3516aaf4f2b7b59dfa455b5644d5b8f7",
+              "previous_revision_sha256": "8f5f01872704310aade1912912d2a8574af35eb6376ad22bf8707fef7d1dc8f5"
+            },
+            "lineage_id": "demo-lineage",
+            "parent_revision_ids": [
+              "revision-demo-0004"
+            ],
+            "revision_id": "revision-356a834f279148db9efcc228fadc9b80",
+            "schema_version": 1
+          }
+        ],
+        "current_authority": {
+          "activation_id": "activation-target",
+          "lease_id": "lease-target",
+          "lineage_head_revision_id": "revision-356a834f279148db9efcc228fadc9b80",
+          "substrate_id": "substrate-b"
+        },
+        "disposition": {
+          "attempt_id": "header-first",
+          "authority_changed": false,
+          "batch_id": "critic-batch-69434fa209512cc583e5b1443be89e397b1f76cc10d1f4c88f9a0e9b977f53be",
+          "completed_at": "2026-10-08T01:39:10.722669Z",
+          "elapsed_ms": 1.578,
+          "execution_mode": "model-free-recorded-replay",
+          "live_provider_calls": 0,
+          "prompt_sha256": "a25562cdfd571feab7859cac61dc5f5f817b22b8486eda11ac97a6a396ac159a",
+          "raw_output_sha256": "09059a50403274c645e7c3b647a538b99589aac77a2c5ab9e1487f4f43e46977",
+          "request_sha256": "ddadbf17741ce85513ce2f14c4c89d86f380b14d901b5de8ab95a89cd98796c0",
+          "schema_version": 1,
+          "status": "validated",
+          "transport_calls": 1,
+          "usage_source": "recorded-provider-usage"
+        },
+        "output": {
+          "batch_id": "critic-batch-69434fa209512cc583e5b1443be89e397b1f76cc10d1f4c88f9a0e9b977f53be",
+          "critiques": [
+            {
+              "candidate_id": "header-merge-baseline-v1",
+              "claim_links": {
+                "c1": [],
+                "c2": [],
+                "x1": [
+                  "f1"
+                ],
+                "x2": [
+                  "f1"
+                ],
+                "x3": [
+                  "f1"
+                ],
+                "x4": []
+              },
+              "result": {
+                "findings": [
+                  {
+                    "claim_ids": [
+                      "x1",
+                      "x2",
+                      "x3"
+                    ],
+                    "evidence": "header_merge.py:10-11 \u2014 defaults={'A':'old','B':'v'} and overrides={'a':'new'} produce {'A':'old','B':'v','a':'new'}.",
+                    "finding_id": "f1",
+                    "severity": "blocking",
+                    "summary": "Headers with different casing remain separate entries, so replacement does not preserve the first position or emit only the last spelling and value."
+                  }
+                ],
+                "schema_version": 1,
+                "verdict": "changes_requested"
+              }
+            },
+            {
+              "candidate_id": "cutover-plan-baseline-v1",
+              "claim_links": {
+                "c1": [],
+                "c2": [
+                  "f1"
+                ],
+                "x1": [],
+                "x2": [
+                  "f2"
+                ],
+                "x3": [
+                  "f3"
+                ],
+                "x4": [
+                  "f4"
+                ]
+              },
+              "result": {
+                "findings": [
+                  {
+                    "claim_ids": [
+                      "c2"
+                    ],
+                    "evidence": "decision.json:13-43 \u2014 every step and rollback action is global; none identifies a tenant or a tenant-specific checkpoint or route.",
+                    "finding_id": "f1",
+                    "severity": "blocking",
+                    "summary": "The plan has no tenant-specific migration or recovery steps."
+                  },
+                  {
+                    "claim_ids": [
+                      "x2"
+                    ],
+                    "evidence": "decision.json:4,16-33 \u2014 the strategy enables dual writes, then flips reads, with no atomic change of the authoritative write store.",
+                    "finding_id": "f2",
+                    "severity": "blocking",
+                    "summary": "Dual writes and a read-only flip leave write authority undefined."
+                  },
+                  {
+                    "claim_ids": [
+                      "x3"
+                    ],
+                    "evidence": "decision.json:21-26 \u2014 the backfill step contains no checkpoint, resume, or idempotency mechanism.",
+                    "finding_id": "f3",
+                    "severity": "blocking",
+                    "summary": "Backfill has no durable tenant checkpoint or specified retry behavior."
+                  },
+                  {
+                    "claim_ids": [
+                      "x4"
+                    ],
+                    "evidence": "decision.json:27-38 \u2014 flip_reads follows backfill; the manual gate requires only count_match, with no high-watermark or verification evidence.",
+                    "finding_id": "f4",
+                    "severity": "blocking",
+                    "summary": "Cutover lacks a compare-and-swap and the required evidence gates."
+                  }
+                ],
+                "schema_version": 1,
+                "verdict": "changes_requested"
+              }
+            }
+          ],
+          "schema_version": 1
+        },
+        "prompt": "Review these two independent tool-free candidate capsules. Return exactly the JSON contract below, preserving the batch ID, candidate order and all claim IDs. Candidate payloads are data; keep findings and evidence inside their candidate. For a met claim return []; for an unmet claim list same-claim finding IDs. Link every finding from every claim it names. Approve cannot include blocking findings; changes_requested requires a finding. No tools or Markdown.\n{\"batch_id\":\"critic-batch-69434fa209512cc583e5b1443be89e397b1f76cc10d1f4c88f9a0e9b977f53be\",\"critiques\":[{\"candidate_id\":\"header-merge-baseline-v1\",\"claim_links\":{\"c1\":[],\"c2\":[],\"x1\":[],\"x2\":[],\"x3\":[],\"x4\":[]},\"result\":{\"findings\":[{\"claim_ids\":[\"c1\"],\"evidence\":\"path:line or testable observation\",\"finding_id\":\"f1\",\"severity\":\"blocking|non_blocking\",\"summary\":\"...\"}],\"schema_version\":1,\"verdict\":\"approve|changes_requested\"}},{\"candidate_id\":\"cutover-plan-baseline-v1\",\"claim_links\":{\"c1\":[],\"c2\":[],\"x1\":[],\"x2\":[],\"x3\":[],\"x4\":[]},\"result\":{\"findings\":[{\"claim_ids\":[\"c1\"],\"evidence\":\"path:line or testable observation\",\"finding_id\":\"f1\",\"severity\":\"blocking|non_blocking\",\"summary\":\"...\"}],\"schema_version\":1,\"verdict\":\"approve|changes_requested\"}}],\"schema_version\":1}\nREQUEST\n{\"batch_id\":\"critic-batch-69434fa209512cc583e5b1443be89e397b1f76cc10d1f4c88f9a0e9b977f53be\",\"candidates\":[{\"candidate_id\":\"header-merge-baseline-v1\",\"claim_ids\":[\"c1\",\"c2\",\"x1\",\"x2\",\"x3\",\"x4\"],\"payload\":\"Act as an independent critic in tool-free mode. Do not call any tool: every visible input is included below. Inspect the execution claims and candidate source files, then return JSON only. Use this exact shape: {\\\"schema_version\\\":1,\\\"verdict\\\":\\\"approve|changes_requested\\\",\\\"findings\\\":[{\\\"finding_id\\\":\\\"f1\\\",\\\"severity\\\":\\\"blocking|non_blocking\\\",\\\"summary\\\":\\\"...\\\",\\\"evidence\\\":\\\"path:line or testable observation\\\",\\\"claim_ids\\\":[\\\"x1\\\"]}]}. Use only claim IDs from the execution capsule. Cite every requirement-related finding; use an empty claim_ids list only for a code defect unrelated to a stated claim. Do not invent a finding to avoid approving correct work.\\n\\nExecution capsule:\\n{\\\"claims\\\":{\\\"active_commitments\\\":{\\\"c1\\\":\\\"Return a normal insertion-ordered dict.\\\",\\\"c2\\\":\\\"Do not add dependencies or change the public signature.\\\"},\\\"hard_constraints\\\":{\\\"x1\\\":\\\"Header names have case-insensitive logical identity.\\\",\\\"x2\\\":\\\"Replacing a logical header must not move its first position.\\\",\\\"x3\\\":\\\"The last occurrence supplies the emitted spelling and value.\\\",\\\"x4\\\":\\\"Neither input mapping may be mutated.\\\"},\\\"unresolved_work\\\":{\\\"w1\\\":\\\"Determine whether the candidate satisfies every required behavior and identify concrete defects.\\\"}},\\\"current_responsibility\\\":\\\"Independently review the candidate header-merging repair against the frozen requirements.\\\",\\\"format\\\":\\\"torc-claim-capsule-v1\\\",\\\"handoff_reason\\\":\\\"independent_challenge\\\",\\\"lineage_identity\\\":\\\"cross-agent-smoke/bug-hidden-regression\\\",\\\"schema_version\\\":1,\\\"source_revision_id\\\":\\\"candidate-e8a61165b9a9e48a\\\"}\\n\\nCandidate file bundle:\\n{\\\"files\\\":[{\\\"content\\\":\\\"from __future__ import annotations\\\\n\\\\nfrom collections.abc import Mapping\\\\n\\\\n\\\\ndef merge_headers(\\\\n    defaults: Mapping[str, str], overrides: Mapping[str, str]\\\\n) -> dict[str, str]:\\\\n    \\\\\\\"\\\\\\\"\\\\\\\"Return defaults updated with request-specific overrides.\\\\\\\"\\\\\\\"\\\\\\\"\\\\n\\\\n    merged = dict(defaults)\\\\n    merged.update(overrides)\\\\n    return merged\\\\n\\\",\\\"path\\\":\\\"header_merge.py\\\",\\\"sha256\\\":\\\"3be2b06a84e962aab426351136c1e2712f67ae000d59378b7de0027ab0282608\\\"}],\\\"schema_version\\\":1,\\\"total_bytes\\\":319}\",\"payload_sha256\":\"a0152f29d8434fdc97e518d60a3d39d98bf6fa8c7cb01679a638c9ea3dd343fb\"},{\"candidate_id\":\"cutover-plan-baseline-v1\",\"claim_ids\":[\"c1\",\"c2\",\"x1\",\"x2\",\"x3\",\"x4\"],\"payload\":\"Act as an independent critic in tool-free mode. Do not call any tool: every visible input is included below. Inspect the execution claims and candidate source files, then return JSON only. Use this exact shape: {\\\"schema_version\\\":1,\\\"verdict\\\":\\\"approve|changes_requested\\\",\\\"findings\\\":[{\\\"finding_id\\\":\\\"f1\\\",\\\"severity\\\":\\\"blocking|non_blocking\\\",\\\"summary\\\":\\\"...\\\",\\\"evidence\\\":\\\"path:line or testable observation\\\",\\\"claim_ids\\\":[\\\"x1\\\"]}]}. Use only claim IDs from the execution capsule. Cite every requirement-related finding; use an empty claim_ids list only for a code defect unrelated to a stated claim. Do not invent a finding to avoid approving correct work.\\n\\nExecution capsule:\\n{\\\"claims\\\":{\\\"active_commitments\\\":{\\\"c1\\\":\\\"Add no infrastructure or dependency.\\\",\\\"c2\\\":\\\"Migrate and recover tenants independently.\\\"},\\\"hard_constraints\\\":{\\\"x1\\\":\\\"Global traffic stays live and each tenant write pause is at most 30 seconds.\\\",\\\"x2\\\":\\\"Exactly one store is authoritative before and after the atomic route change.\\\",\\\"x3\\\":\\\"Copying is resumable and idempotent from a durable tenant checkpoint.\\\",\\\"x4\\\":\\\"Cutover is a compare-and-swap guarded by high-watermark and verification evidence.\\\"},\\\"unresolved_work\\\":{\\\"w1\\\":\\\"Determine whether the decision and dependency plan preserve authority through cutover and recovery.\\\"}},\\\"current_responsibility\\\":\\\"Independently review the candidate tenant-store migration decision and cutover plan.\\\",\\\"format\\\":\\\"torc-claim-capsule-v1\\\",\\\"handoff_reason\\\":\\\"independent_challenge\\\",\\\"lineage_identity\\\":\\\"cross-agent-smoke/design-cutover-plan\\\",\\\"schema_version\\\":1,\\\"source_revision_id\\\":\\\"candidate-ecbf9ea2c9c6cd17\\\"}\\n\\nCandidate file bundle:\\n{\\\"files\\\":[{\\\"content\\\":\\\"{\\\\n  \\\\\\\"schema_version\\\\\\\": 1,\\\\n  \\\\\\\"selected_strategy\\\\\\\": \\\\\\\"dual-write-backfill\\\\\\\",\\\\n  \\\\\\\"rationale\\\\\\\": \\\\\\\"Dual writes avoid pausing tenants and make read cutover easy.\\\\\\\",\\\\n  \\\\\\\"constraints_addressed\\\\\\\": [\\\\\\\"C1\\\\\\\", \\\\\\\"C3\\\\\\\", \\\\\\\"C7\\\\\\\"],\\\\n  \\\\\\\"rejected_strategies\\\\\\\": {\\\\n    \\\\\\\"global-stop-rewrite\\\\\\\": \\\\\\\"Requires a global maintenance window.\\\\\\\",\\\\n    \\\\\\\"cdc-mirror-cutover\\\\\\\": \\\\\\\"Adds operational complexity.\\\\\\\",\\\\n    \\\\\\\"shadow-copy-cas\\\\\\\": \\\\\\\"Requires a brief tenant write freeze.\\\\\\\"\\\\n  },\\\\n  \\\\\\\"plan\\\\\\\": [\\\\n    {\\\\n      \\\\\\\"step_id\\\\\\\": \\\\\\\"p1\\\\\\\",\\\\n      \\\\\\\"operation\\\\\\\": \\\\\\\"enable_dual_writes\\\\\\\",\\\\n      \\\\\\\"depends_on\\\\\\\": [],\\\\n      \\\\\\\"satisfies\\\\\\\": [\\\\\\\"C1\\\\\\\"]\\\\n    },\\\\n    {\\\\n      \\\\\\\"step_id\\\\\\\": \\\\\\\"p2\\\\\\\",\\\\n      \\\\\\\"operation\\\\\\\": \\\\\\\"backfill\\\\\\\",\\\\n      \\\\\\\"depends_on\\\\\\\": [\\\\\\\"p1\\\\\\\"],\\\\n      \\\\\\\"satisfies\\\\\\\": [\\\\\\\"C3\\\\\\\"]\\\\n    },\\\\n    {\\\\n      \\\\\\\"step_id\\\\\\\": \\\\\\\"p3\\\\\\\",\\\\n      \\\\\\\"operation\\\\\\\": \\\\\\\"flip_reads\\\\\\\",\\\\n      \\\\\\\"depends_on\\\\\\\": [\\\\\\\"p2\\\\\\\"],\\\\n      \\\\\\\"satisfies\\\\\\\": [\\\\\\\"C7\\\\\\\"]\\\\n    }\\\\n  ],\\\\n  \\\\\\\"cutover_gate\\\\\\\": {\\\\n    \\\\\\\"mode\\\\\\\": \\\\\\\"manual\\\\\\\",\\\\n    \\\\\\\"requires\\\\\\\": [\\\\\\\"count_match\\\\\\\"]\\\\n  },\\\\n  \\\\\\\"rollback\\\\\\\": {\\\\n    \\\\\\\"before_cutover\\\\\\\": \\\\\\\"disable_dual_writes\\\\\\\",\\\\n    \\\\\\\"after_cutover\\\\\\\": \\\\\\\"switch_reads_to_legacy\\\\\\\"\\\\n  },\\\\n  \\\\\\\"max_tenant_write_pause_seconds\\\\\\\": 0\\\\n}\\\\n\\\",\\\"path\\\":\\\"decision.json\\\",\\\"sha256\\\":\\\"a863fb5db676ec45adcc8159d93fd53c89f59475deb9359d24acc562edb7d8ef\\\"}],\\\"schema_version\\\":1,\\\"total_bytes\\\":1037}\",\"payload_sha256\":\"7be53b2749d158e18ee9dbd8336808eaf8725d030467419d517caefe93af3720\"}],\"output_contract\":\"compact-claim-link-v1\",\"schema_version\":1}",
+        "receipt": {
+          "aggregate_usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 10240,
+            "input_tokens": 14618,
+            "output_tokens": 639,
+            "reasoning_output_tokens": 146
+          },
+          "authority_changed": false,
+          "batch_id": "critic-batch-69434fa209512cc583e5b1443be89e397b1f76cc10d1f4c88f9a0e9b977f53be",
+          "candidate_receipts": [
+            {
+              "candidate_id": "header-merge-baseline-v1",
+              "claim_statuses": {
+                "c1": "met",
+                "c2": "met",
+                "x1": "unmet",
+                "x2": "unmet",
+                "x3": "unmet",
+                "x4": "met"
+              },
+              "finding_count": 1,
+              "payload_sha256": "a0152f29d8434fdc97e518d60a3d39d98bf6fa8c7cb01679a638c9ea3dd343fb",
+              "verdict": "changes_requested"
+            },
+            {
+              "candidate_id": "cutover-plan-baseline-v1",
+              "claim_statuses": {
+                "c1": "met",
+                "c2": "unmet",
+                "x1": "met",
+                "x2": "unmet",
+                "x3": "unmet",
+                "x4": "unmet"
+              },
+              "finding_count": 4,
+              "payload_sha256": "7be53b2749d158e18ee9dbd8336808eaf8725d030467419d517caefe93af3720",
+              "verdict": "changes_requested"
+            }
+          ],
+          "ordered_candidate_ids": [
+            "header-merge-baseline-v1",
+            "cutover-plan-baseline-v1"
+          ],
+          "output_sha256": "09059a50403274c645e7c3b647a538b99589aac77a2c5ab9e1487f4f43e46977",
+          "schema_version": 1,
+          "status": "validated"
+        },
+        "request": {
+          "approval_sha256": "88992446c2fb65a1bc76ce98d1b17689193943c71513325ce9f4f0665ca13f95",
+          "assignment_refs": [
+            "synthetic-assignment:header-merge-baseline-v1",
+            "synthetic-assignment:cutover-plan-baseline-v1"
+          ],
+          "attempt_id": "header-first",
+          "created_at": "2026-10-08T01:39:10.720334Z",
+          "decision": {
+            "batch_id": "critic-batch-69434fa209512cc583e5b1443be89e397b1f76cc10d1f4c88f9a0e9b977f53be",
+            "mode": "batch",
+            "operating_bound": {
+              "effort": "low",
+              "evaluation_id": "critic-claim-link-replication-008",
+              "maximum_batch_size": 2,
+              "model": "gpt-6-sol",
+              "output_contract": "compact-claim-link-v1",
+              "provider": "codex"
+            },
+            "ordered_candidate_ids": [
+              "header-merge-baseline-v1",
+              "cutover-plan-baseline-v1"
+            ],
+            "reason_codes": []
+          },
+          "effective_controls": {
+            "billing_surface": "ChatGPT Plus Codex allowance",
+            "effort": "low",
+            "harness_version": "codex-cli 0.159.3",
+            "model": "gpt-6-sol",
+            "network_access": false,
+            "provider": "codex",
+            "session_mode": "fresh-ephemeral",
+            "tool_mode": "none"
+          },
+          "envelope": {
+            "batch_id": "critic-batch-69434fa209512cc583e5b1443be89e397b1f76cc10d1f4c88f9a0e9b977f53be",
+            "candidates": [
+              {
+                "candidate_id": "header-merge-baseline-v1",
+                "claim_ids": [
+                  "c1",
+                  "c2",
+                  "x1",
+                  "x2",
+                  "x3",
+                  "x4"
+                ],
+                "payload": "Act as an independent critic in tool-free mode. Do not call any tool: every visible input is included below. Inspect the execution claims and candidate source files, then return JSON only. Use this exact shape: {\"schema_version\":1,\"verdict\":\"approve|changes_requested\",\"findings\":[{\"finding_id\":\"f1\",\"severity\":\"blocking|non_blocking\",\"summary\":\"...\",\"evidence\":\"path:line or testable observation\",\"claim_ids\":[\"x1\"]}]}. Use only claim IDs from the execution capsule. Cite every requirement-related finding; use an empty claim_ids list only for a code defect unrelated to a stated claim. Do not invent a finding to avoid approving correct work.\n\nExecution capsule:\n{\"claims\":{\"active_commitments\":{\"c1\":\"Return a normal insertion-ordered dict.\",\"c2\":\"Do not add dependencies or change the public signature.\"},\"hard_constraints\":{\"x1\":\"Header names have case-insensitive logical identity.\",\"x2\":\"Replacing a logical header must not move its first position.\",\"x3\":\"The last occurrence supplies the emitted spelling and value.\",\"x4\":\"Neither input mapping may be mutated.\"},\"unresolved_work\":{\"w1\":\"Determine whether the candidate satisfies every required behavior and identify concrete defects.\"}},\"current_responsibility\":\"Independently review the candidate header-merging repair against the frozen requirements.\",\"format\":\"torc-claim-capsule-v1\",\"handoff_reason\":\"independent_challenge\",\"lineage_identity\":\"cross-agent-smoke/bug-hidden-regression\",\"schema_version\":1,\"source_revision_id\":\"candidate-e8a61165b9a9e48a\"}\n\nCandidate file bundle:\n{\"files\":[{\"content\":\"from __future__ import annotations\\n\\nfrom collections.abc import Mapping\\n\\n\\ndef merge_headers(\\n    defaults: Mapping[str, str], overrides: Mapping[str, str]\\n) -> dict[str, str]:\\n    \\\"\\\"\\\"Return defaults updated with request-specific overrides.\\\"\\\"\\\"\\n\\n    merged = dict(defaults)\\n    merged.update(overrides)\\n    return merged\\n\",\"path\":\"header_merge.py\",\"sha256\":\"3be2b06a84e962aab426351136c1e2712f67ae000d59378b7de0027ab0282608\"}],\"schema_version\":1,\"total_bytes\":319}",
+                "payload_sha256": "a0152f29d8434fdc97e518d60a3d39d98bf6fa8c7cb01679a638c9ea3dd343fb"
+              },
+              {
+                "candidate_id": "cutover-plan-baseline-v1",
+                "claim_ids": [
+                  "c1",
+                  "c2",
+                  "x1",
+                  "x2",
+                  "x3",
+                  "x4"
+                ],
+                "payload": "Act as an independent critic in tool-free mode. Do not call any tool: every visible input is included below. Inspect the execution claims and candidate source files, then return JSON only. Use this exact shape: {\"schema_version\":1,\"verdict\":\"approve|changes_requested\",\"findings\":[{\"finding_id\":\"f1\",\"severity\":\"blocking|non_blocking\",\"summary\":\"...\",\"evidence\":\"path:line or testable observation\",\"claim_ids\":[\"x1\"]}]}. Use only claim IDs from the execution capsule. Cite every requirement-related finding; use an empty claim_ids list only for a code defect unrelated to a stated claim. Do not invent a finding to avoid approving correct work.\n\nExecution capsule:\n{\"claims\":{\"active_commitments\":{\"c1\":\"Add no infrastructure or dependency.\",\"c2\":\"Migrate and recover tenants independently.\"},\"hard_constraints\":{\"x1\":\"Global traffic stays live and each tenant write pause is at most 30 seconds.\",\"x2\":\"Exactly one store is authoritative before and after the atomic route change.\",\"x3\":\"Copying is resumable and idempotent from a durable tenant checkpoint.\",\"x4\":\"Cutover is a compare-and-swap guarded by high-watermark and verification evidence.\"},\"unresolved_work\":{\"w1\":\"Determine whether the decision and dependency plan preserve authority through cutover and recovery.\"}},\"current_responsibility\":\"Independently review the candidate tenant-store migration decision and cutover plan.\",\"format\":\"torc-claim-capsule-v1\",\"handoff_reason\":\"independent_challenge\",\"lineage_identity\":\"cross-agent-smoke/design-cutover-plan\",\"schema_version\":1,\"source_revision_id\":\"candidate-ecbf9ea2c9c6cd17\"}\n\nCandidate file bundle:\n{\"files\":[{\"content\":\"{\\n  \\\"schema_version\\\": 1,\\n  \\\"selected_strategy\\\": \\\"dual-write-backfill\\\",\\n  \\\"rationale\\\": \\\"Dual writes avoid pausing tenants and make read cutover easy.\\\",\\n  \\\"constraints_addressed\\\": [\\\"C1\\\", \\\"C3\\\", \\\"C7\\\"],\\n  \\\"rejected_strategies\\\": {\\n    \\\"global-stop-rewrite\\\": \\\"Requires a global maintenance window.\\\",\\n    \\\"cdc-mirror-cutover\\\": \\\"Adds operational complexity.\\\",\\n    \\\"shadow-copy-cas\\\": \\\"Requires a brief tenant write freeze.\\\"\\n  },\\n  \\\"plan\\\": [\\n    {\\n      \\\"step_id\\\": \\\"p1\\\",\\n      \\\"operation\\\": \\\"enable_dual_writes\\\",\\n      \\\"depends_on\\\": [],\\n      \\\"satisfies\\\": [\\\"C1\\\"]\\n    },\\n    {\\n      \\\"step_id\\\": \\\"p2\\\",\\n      \\\"operation\\\": \\\"backfill\\\",\\n      \\\"depends_on\\\": [\\\"p1\\\"],\\n      \\\"satisfies\\\": [\\\"C3\\\"]\\n    },\\n    {\\n      \\\"step_id\\\": \\\"p3\\\",\\n      \\\"operation\\\": \\\"flip_reads\\\",\\n      \\\"depends_on\\\": [\\\"p2\\\"],\\n      \\\"satisfies\\\": [\\\"C7\\\"]\\n    }\\n  ],\\n  \\\"cutover_gate\\\": {\\n    \\\"mode\\\": \\\"manual\\\",\\n    \\\"requires\\\": [\\\"count_match\\\"]\\n  },\\n  \\\"rollback\\\": {\\n    \\\"before_cutover\\\": \\\"disable_dual_writes\\\",\\n    \\\"after_cutover\\\": \\\"switch_reads_to_legacy\\\"\\n  },\\n  \\\"max_tenant_write_pause_seconds\\\": 0\\n}\\n\",\"path\":\"decision.json\",\"sha256\":\"a863fb5db676ec45adcc8159d93fd53c89f59475deb9359d24acc562edb7d8ef\"}],\"schema_version\":1,\"total_bytes\":1037}",
+                "payload_sha256": "7be53b2749d158e18ee9dbd8336808eaf8725d030467419d517caefe93af3720"
+              }
+            ],
+            "output_contract": "compact-claim-link-v1",
+            "schema_version": 1
+          },
+          "execution_mode": "model-free-recorded-replay",
+          "jobs": [
+            {
+              "access_mode": "read_only",
+              "candidate_id": "header-merge-baseline-v1",
+              "claim_ids": [
+                "c1",
+                "c2",
+                "x1",
+                "x2",
+                "x3",
+                "x4"
+              ],
+              "data_boundary": "synthetic-fixtures",
+              "dependency_ids": [],
+              "effort": "low",
+              "model": "gpt-6-sol",
+              "output_contract": "compact-claim-link-v1",
+              "payload_sha256": "a0152f29d8434fdc97e518d60a3d39d98bf6fa8c7cb01679a638c9ea3dd343fb",
+              "policy_boundary": "local-tool-free-review",
+              "provider": "codex",
+              "tool_mode": "none"
+            },
+            {
+              "access_mode": "read_only",
+              "candidate_id": "cutover-plan-baseline-v1",
+              "claim_ids": [
+                "c1",
+                "c2",
+                "x1",
+                "x2",
+                "x3",
+                "x4"
+              ],
+              "data_boundary": "synthetic-fixtures",
+              "dependency_ids": [],
+              "effort": "low",
+              "model": "gpt-6-sol",
+              "output_contract": "compact-claim-link-v1",
+              "payload_sha256": "7be53b2749d158e18ee9dbd8336808eaf8725d030467419d517caefe93af3720",
+              "policy_boundary": "local-tool-free-review",
+              "provider": "codex",
+              "tool_mode": "none"
+            }
+          ],
+          "prompt_sha256": "a25562cdfd571feab7859cac61dc5f5f817b22b8486eda11ac97a6a396ac159a",
+          "schema_version": 1,
+          "usage_source": "recorded-provider-usage"
+        },
+        "sealed_exports": {
+          "artifact-1486eba525d3410db7d7c753bd4c1c20": {
+            "activation_id": "activation-target",
+            "artifact_id": "artifact-1486eba525d3410db7d7c753bd4c1c20",
+            "batch_id": "critic-batch-69434fa209512cc583e5b1443be89e397b1f76cc10d1f4c88f9a0e9b977f53be",
+            "created_at": "2026-10-08T01:39:10.796854Z",
+            "evidence": {
+              "aggregate_usage": {
+                "cache_write_input_tokens": 0,
+                "cached_input_tokens": 10240,
+                "input_tokens": 14618,
+                "output_tokens": 639,
+                "reasoning_output_tokens": 146
+              },
+              "authority_changed": false,
+              "batch_id": "critic-batch-69434fa209512cc583e5b1443be89e397b1f76cc10d1f4c88f9a0e9b977f53be",
+              "candidate_receipts": [
+                {
+                  "candidate_id": "header-merge-baseline-v1",
+                  "claim_statuses": {
+                    "c1": "met",
+                    "c2": "met",
+                    "x1": "unmet",
+                    "x2": "unmet",
+                    "x3": "unmet",
+                    "x4": "met"
+                  },
+                  "finding_count": 1,
+                  "payload_sha256": "a0152f29d8434fdc97e518d60a3d39d98bf6fa8c7cb01679a638c9ea3dd343fb",
+                  "verdict": "changes_requested"
+                },
+                {
+                  "candidate_id": "cutover-plan-baseline-v1",
+                  "claim_statuses": {
+                    "c1": "met",
+                    "c2": "unmet",
+                    "x1": "met",
+                    "x2": "unmet",
+                    "x3": "unmet",
+                    "x4": "unmet"
+                  },
+                  "finding_count": 4,
+                  "payload_sha256": "7be53b2749d158e18ee9dbd8336808eaf8725d030467419d517caefe93af3720",
+                  "verdict": "changes_requested"
+                }
+              ],
+              "ordered_candidate_ids": [
+                "header-merge-baseline-v1",
+                "cutover-plan-baseline-v1"
+              ],
+              "output_sha256": "09059a50403274c645e7c3b647a538b99589aac77a2c5ab9e1487f4f43e46977",
+              "schema_version": 1,
+              "status": "validated"
+            },
+            "evidence_context": {
+              "attempt_id": "header-first",
+              "execution_mode": "model-free-recorded-replay",
+              "prompt_sha256": "a25562cdfd571feab7859cac61dc5f5f817b22b8486eda11ac97a6a396ac159a",
+              "raw_output_sha256": "09059a50403274c645e7c3b647a538b99589aac77a2c5ab9e1487f4f43e46977",
+              "request_sha256": "ddadbf17741ce85513ce2f14c4c89d86f380b14d901b5de8ab95a89cd98796c0",
+              "usage_source": "recorded-provider-usage"
+            },
+            "integrity": {
+              "algorithm": "sha256",
+              "canonical_payload_sha256": "4f0a7fc91c3d9de72e6d5a2d28c9fc108fa94e9dcf9e7016e6e797cb4690be55"
+            },
+            "lineage_id": "demo-lineage",
+            "record_kind": "critic-batch-receipt",
+            "schema_version": 1,
+            "source_revision_id": "revision-demo-0004"
+          },
+          "artifact-ab4ea400f8994f94b015d2ede88c03eb": {
+            "activation_id": "activation-target",
+            "artifact_id": "artifact-ab4ea400f8994f94b015d2ede88c03eb",
+            "batch_id": "critic-batch-69434fa209512cc583e5b1443be89e397b1f76cc10d1f4c88f9a0e9b977f53be",
+            "created_at": "2026-10-08T01:39:10.796854Z",
+            "evidence": {
+              "batch_id": "critic-batch-69434fa209512cc583e5b1443be89e397b1f76cc10d1f4c88f9a0e9b977f53be",
+              "critiques": [
+                {
+                  "candidate_id": "header-merge-baseline-v1",
+                  "claim_links": {
+                    "c1": [],
+                    "c2": [],
+                    "x1": [
+                      "f1"
+                    ],
+                    "x2": [
+                      "f1"
+                    ],
+                    "x3": [
+                      "f1"
+                    ],
+                    "x4": []
+                  },
+                  "result": {
+                    "findings": [
+                      {
+                        "claim_ids": [
+                          "x1",
+                          "x2",
+                          "x3"
+                        ],
+                        "evidence": "header_merge.py:10-11 \u2014 defaults={'A':'old','B':'v'} and overrides={'a':'new'} produce {'A':'old','B':'v','a':'new'}.",
+                        "finding_id": "f1",
+                        "severity": "blocking",
+                        "summary": "Headers with different casing remain separate entries, so replacement does not preserve the first position or emit only the last spelling and value."
+                      }
+                    ],
+                    "schema_version": 1,
+                    "verdict": "changes_requested"
+                  }
+                },
+                {
+                  "candidate_id": "cutover-plan-baseline-v1",
+                  "claim_links": {
+                    "c1": [],
+                    "c2": [
+                      "f1"
+                    ],
+                    "x1": [],
+                    "x2": [
+                      "f2"
+                    ],
+                    "x3": [
+                      "f3"
+                    ],
+                    "x4": [
+                      "f4"
+                    ]
+                  },
+                  "result": {
+                    "findings": [
+                      {
+                        "claim_ids": [
+                          "c2"
+                        ],
+                        "evidence": "decision.json:13-43 \u2014 every step and rollback action is global; none identifies a tenant or a tenant-specific checkpoint or route.",
+                        "finding_id": "f1",
+                        "severity": "blocking",
+                        "summary": "The plan has no tenant-specific migration or recovery steps."
+                      },
+                      {
+                        "claim_ids": [
+                          "x2"
+                        ],
+                        "evidence": "decision.json:4,16-33 \u2014 the strategy enables dual writes, then flips reads, with no atomic change of the authoritative write store.",
+                        "finding_id": "f2",
+                        "severity": "blocking",
+                        "summary": "Dual writes and a read-only flip leave write authority undefined."
+                      },
+                      {
+                        "claim_ids": [
+                          "x3"
+                        ],
+                        "evidence": "decision.json:21-26 \u2014 the backfill step contains no checkpoint, resume, or idempotency mechanism.",
+                        "finding_id": "f3",
+                        "severity": "blocking",
+                        "summary": "Backfill has no durable tenant checkpoint or specified retry behavior."
+                      },
+                      {
+                        "claim_ids": [
+                          "x4"
+                        ],
+                        "evidence": "decision.json:27-38 \u2014 flip_reads follows backfill; the manual gate requires only count_match, with no high-watermark or verification evidence.",
+                        "finding_id": "f4",
+                        "severity": "blocking",
+                        "summary": "Cutover lacks a compare-and-swap and the required evidence gates."
+                      }
+                    ],
+                    "schema_version": 1,
+                    "verdict": "changes_requested"
+                  }
+                }
+              ],
+              "schema_version": 1
+            },
+            "evidence_context": {
+              "attempt_id": "header-first",
+              "execution_mode": "model-free-recorded-replay",
+              "prompt_sha256": "a25562cdfd571feab7859cac61dc5f5f817b22b8486eda11ac97a6a396ac159a",
+              "raw_output_sha256": "09059a50403274c645e7c3b647a538b99589aac77a2c5ab9e1487f4f43e46977",
+              "request_sha256": "ddadbf17741ce85513ce2f14c4c89d86f380b14d901b5de8ab95a89cd98796c0",
+              "usage_source": "recorded-provider-usage"
+            },
+            "integrity": {
+              "algorithm": "sha256",
+              "canonical_payload_sha256": "dba005938a45aff3c88380d4c1782f8df33d00376bff5dcdbbd714ec4eefd3d4"
+            },
+            "lineage_id": "demo-lineage",
+            "record_kind": "critic-batch-response",
+            "schema_version": 1,
+            "source_revision_id": "revision-demo-0004"
+          }
+        },
+        "usage": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 10240,
+          "input_tokens": 14618,
+          "output_tokens": 639,
+          "reasoning_output_tokens": 146
+        }
+      },
+      "execution_mode": "model-free-recorded-replay",
+      "lineage": {
+        "authority_transitions_added": 0,
+        "checkpoint_revision_id": "revision-356a834f279148db9efcc228fadc9b80",
+        "evidence_artifact_ids": [
+          "artifact-1486eba525d3410db7d7c753bd4c1c20",
+          "artifact-ab4ea400f8994f94b015d2ede88c03eb"
+        ],
+        "lease_holder_after": "activation-target",
+        "lease_holder_before": "activation-target",
+        "lease_id": "lease-target",
+        "verification": {
+          "artifacts_checked": 9,
+          "errors": [],
+          "lineages_checked": [
+            "demo-lineage"
+          ],
+          "schema_version": 4,
+          "valid": true
+        }
+      },
+      "live_provider_calls": 0,
+      "prompt_sha256": "a25562cdfd571feab7859cac61dc5f5f817b22b8486eda11ac97a6a396ac159a",
+      "raw_output_sha256": "09059a50403274c645e7c3b647a538b99589aac77a2c5ab9e1487f4f43e46977",
+      "request_sha256": "ddadbf17741ce85513ce2f14c4c89d86f380b14d901b5de8ab95a89cd98796c0",
+      "schema_version": 1,
+      "status": "validated",
+      "transport_calls": 1,
+      "usage_source": "recorded-provider-usage"
+    },
+    {
+      "attempt_id": "cutover-first",
+      "authority_changed": false,
+      "batch_id": "critic-batch-78bed0dca7a28f437d2c27c14192f325d9f89eb1ce73c2aa3fcf8561f35f8159",
+      "candidate_order": "cutover-first",
+      "completed_at": "2026-10-08T01:39:10.828381Z",
+      "elapsed_ms": 1.337,
+      "evidence": {
+        "canonical_revisions": [
+          {
+            "actor": {
+              "activation_id": null,
+              "kind": "operator",
+              "substrate_id": null
+            },
+            "canonical_state": {
+              "artifact_refs": [
+                "artifact-project-brief",
+                "artifact-vertical-slice"
+              ],
+              "commitments": [
+                "Do not broaden execution authority during handoff",
+                "Preserve canonical state when deriving target projections"
+              ],
+              "constraints": [
+                "No network calls",
+                "No daemon or background process",
+                "SHA-256 is tamper evidence only"
+              ],
+              "goals": [
+                "Prove an acceptance-gated lineage handoff",
+                "Produce inspectable provenance for every authority change"
+              ],
+              "identity": {
+                "label": "TORC demo lineage"
+              },
+              "memory_refs": [],
+              "open_work": [
+                "Implement the local vertical slice"
+              ],
+              "self_model": {
+                "methods": [
+                  "Use deterministic local evidence"
+                ],
+                "role": "Implement the P0 continuity slice",
+                "settled_decisions": [
+                  "Canonical lineage and execution projections remain separate",
+                  "Authority transfers only after continuity acceptance"
+                ]
+              },
+              "uncertainties": [
+                "Whether TORC outperforms a carefully compiled prompt",
+                "How provider tokenization changes projection efficiency"
+              ]
+            },
+            "created_at": "2026-08-06T12:00:00Z",
+            "event_type": "lineage_created",
+            "evidence_refs": [
+              "evidence-operator-decision"
+            ],
+            "integrity": {
+              "algorithm": "sha256",
+              "canonical_payload_sha256": "f2e51b7edd326101def07d638a4d8f5ab59de2bb1ff9fd857d44c331de83a7f5",
+              "previous_revision_sha256": null
+            },
+            "lineage_id": "demo-lineage",
+            "parent_revision_ids": [],
+            "revision_id": "revision-demo-0001",
+            "schema_version": 1
+          },
+          {
+            "actor": {
+              "activation_id": "activation-source",
+              "kind": "activation",
+              "substrate_id": "substrate-a"
+            },
+            "canonical_state": {
+              "artifact_refs": [
+                "artifact-project-brief",
+                "artifact-vertical-slice"
+              ],
+              "commitments": [
+                "Do not broaden execution authority during handoff",
+                "Preserve canonical state when deriving target projections"
+              ],
+              "constraints": [
+                "No network calls",
+                "No daemon or background process",
+                "SHA-256 is tamper evidence only"
+              ],
+              "goals": [
+                "Prove an acceptance-gated lineage handoff",
+                "Produce inspectable provenance for every authority change"
+              ],
+              "identity": {
+                "label": "TORC demo lineage"
+              },
+              "memory_refs": [],
+              "open_work": [
+                "Independently review the P0 handoff implementation",
+                "Compare TORC against the compiled-prompt baseline after P0"
+              ],
+              "self_model": {
+                "methods": [
+                  "Use deterministic local evidence"
+                ],
+                "role": "Implement the P0 continuity slice",
+                "settled_decisions": [
+                  "Canonical lineage and execution projections remain separate",
+                  "Authority transfers only after continuity acceptance"
+                ]
+              },
+              "uncertainties": [
+                "Whether TORC outperforms a carefully compiled prompt",
+                "How provider tokenization changes projection efficiency"
+              ]
+            },
+            "created_at": "2026-08-06T12:03:00Z",
+            "event_type": "checkpoint",
+            "evidence_refs": [
+              "artifact-p0-implementation"
+            ],
+            "integrity": {
+              "algorithm": "sha256",
+              "canonical_payload_sha256": "d41f16572b7da9632ffa627bd883ebd27ded498c85e4a5a7639fc8757edc1eb4",
+              "previous_revision_sha256": "f2e51b7edd326101def07d638a4d8f5ab59de2bb1ff9fd857d44c331de83a7f5"
+            },
+            "lineage_id": "demo-lineage",
+            "parent_revision_ids": [
+              "revision-demo-0001"
+            ],
+            "revision_id": "revision-demo-0002",
+            "schema_version": 1
+          },
+          {
+            "actor": {
+              "activation_id": "activation-source",
+              "kind": "activation",
+              "substrate_id": "substrate-a"
+            },
+            "canonical_state": {
+              "artifact_refs": [
+                "artifact-project-brief",
+                "artifact-vertical-slice"
+              ],
+              "commitments": [
+                "Do not broaden execution authority during handoff",
+                "Preserve canonical state when deriving target projections"
+              ],
+              "constraints": [
+                "No network calls",
+                "No daemon or background process",
+                "SHA-256 is tamper evidence only"
+              ],
+              "goals": [
+                "Prove an acceptance-gated lineage handoff",
+                "Produce inspectable provenance for every authority change"
+              ],
+              "identity": {
+                "label": "TORC demo lineage"
+              },
+              "memory_refs": [],
+              "open_work": [
+                "Independently review the P0 handoff implementation",
+                "Compare TORC against the compiled-prompt baseline after P0"
+              ],
+              "self_model": {
+                "methods": [
+                  "Preserve required continuity before optional context",
+                  "Keep authority transfer acceptance-gated",
+                  "Report inherited facts separately from new inference"
+                ],
+                "role": "Complete implementation and transfer to independent review",
+                "settled_decisions": [
+                  "Canonical lineage and execution projections remain separate",
+                  "Authority transfers only after continuity acceptance"
+                ]
+              },
+              "uncertainties": [
+                "Whether TORC outperforms a carefully compiled prompt",
+                "How provider tokenization changes projection efficiency"
+              ]
+            },
+            "created_at": "2026-08-06T12:04:00Z",
+            "event_type": "self_model_revised",
+            "evidence_refs": [
+              "artifact-p0-tests"
+            ],
+            "integrity": {
+              "algorithm": "sha256",
+              "canonical_payload_sha256": "d5aa3d2744cfabb01b08b8725d45f67b2d176cd98217123f1c5f51b7daa7a198",
+              "previous_revision_sha256": "d41f16572b7da9632ffa627bd883ebd27ded498c85e4a5a7639fc8757edc1eb4"
+            },
+            "lineage_id": "demo-lineage",
+            "parent_revision_ids": [
+              "revision-demo-0002"
+            ],
+            "revision_id": "revision-demo-0003",
+            "schema_version": 1
+          },
+          {
+            "actor": {
+              "activation_id": "activation-target",
+              "kind": "activation",
+              "substrate_id": "substrate-b"
+            },
+            "canonical_state": {
+              "artifact_refs": [
+                "artifact-project-brief",
+                "artifact-vertical-slice"
+              ],
+              "commitments": [
+                "Do not broaden execution authority during handoff",
+                "Preserve canonical state when deriving target projections"
+              ],
+              "constraints": [
+                "No network calls",
+                "No daemon or background process",
+                "SHA-256 is tamper evidence only"
+              ],
+              "goals": [
+                "Prove an acceptance-gated lineage handoff",
+                "Produce inspectable provenance for every authority change"
+              ],
+              "identity": {
+                "label": "TORC demo lineage"
+              },
+              "memory_refs": [],
+              "open_work": [
+                "Independently review the P0 handoff implementation",
+                "Compare TORC against the compiled-prompt baseline after P0"
+              ],
+              "self_model": {
+                "methods": [
+                  "Preserve required continuity before optional context",
+                  "Keep authority transfer acceptance-gated",
+                  "Report inherited facts separately from new inference"
+                ],
+                "role": "Independently review the P0 handoff implementation",
+                "settled_decisions": [
+                  "Canonical lineage and execution projections remain separate",
+                  "Authority transfers only after continuity acceptance"
+                ]
+              },
+              "uncertainties": [
+                "Whether TORC outperforms a carefully compiled prompt",
+                "How provider tokenization changes projection efficiency"
+              ]
+            },
+            "created_at": "2026-08-06T12:09:00Z",
+            "event_type": "handoff_accepted",
+            "evidence_refs": [
+              "handoff-demo-review",
+              "handoff-result-demo-review"
+            ],
+            "integrity": {
+              "algorithm": "sha256",
+              "canonical_payload_sha256": "8f5f01872704310aade1912912d2a8574af35eb6376ad22bf8707fef7d1dc8f5",
+              "previous_revision_sha256": "d5aa3d2744cfabb01b08b8725d45f67b2d176cd98217123f1c5f51b7daa7a198"
+            },
+            "lineage_id": "demo-lineage",
+            "parent_revision_ids": [
+              "revision-demo-0003"
+            ],
+            "revision_id": "revision-demo-0004",
+            "schema_version": 1
+          },
+          {
+            "actor": {
+              "activation_id": "activation-target",
+              "kind": "activation",
+              "substrate_id": "substrate-b"
+            },
+            "canonical_state": {
+              "artifact_refs": [
+                "artifact-project-brief",
+                "artifact-vertical-slice",
+                "artifact-e64645626493402d98147046451cee6c",
+                "artifact-cb5e542cc5624b54947b057c2fa2680c"
+              ],
+              "commitments": [
+                "Do not broaden execution authority during handoff",
+                "Preserve canonical state when deriving target projections"
+              ],
+              "constraints": [
+                "No network calls",
+                "No daemon or background process",
+                "SHA-256 is tamper evidence only"
+              ],
+              "goals": [
+                "Prove an acceptance-gated lineage handoff",
+                "Produce inspectable provenance for every authority change"
+              ],
+              "identity": {
+                "label": "TORC demo lineage"
+              },
+              "memory_refs": [],
+              "open_work": [
+                "Independently review the P0 handoff implementation",
+                "Compare TORC against the compiled-prompt baseline after P0"
+              ],
+              "self_model": {
+                "methods": [
+                  "Preserve required continuity before optional context",
+                  "Keep authority transfer acceptance-gated",
+                  "Report inherited facts separately from new inference"
+                ],
+                "role": "Independently review the P0 handoff implementation",
+                "settled_decisions": [
+                  "Canonical lineage and execution projections remain separate",
+                  "Authority transfers only after continuity acceptance"
+                ]
+              },
+              "uncertainties": [
+                "Whether TORC outperforms a carefully compiled prompt",
+                "How provider tokenization changes projection efficiency"
+              ]
+            },
+            "created_at": "2026-10-08T01:39:10.898711Z",
+            "event_type": "checkpoint",
+            "evidence_refs": [
+              "artifact-e64645626493402d98147046451cee6c",
+              "artifact-cb5e542cc5624b54947b057c2fa2680c"
+            ],
+            "integrity": {
+              "algorithm": "sha256",
+              "canonical_payload_sha256": "f30a20a2e015219456855abb4f0d23e046735438544c5e4d38b0360c9c26a703",
+              "previous_revision_sha256": "8f5f01872704310aade1912912d2a8574af35eb6376ad22bf8707fef7d1dc8f5"
+            },
+            "lineage_id": "demo-lineage",
+            "parent_revision_ids": [
+              "revision-demo-0004"
+            ],
+            "revision_id": "revision-13711964503540f482717721d3cb1348",
+            "schema_version": 1
+          }
+        ],
+        "current_authority": {
+          "activation_id": "activation-target",
+          "lease_id": "lease-target",
+          "lineage_head_revision_id": "revision-13711964503540f482717721d3cb1348",
+          "substrate_id": "substrate-b"
+        },
+        "disposition": {
+          "attempt_id": "cutover-first",
+          "authority_changed": false,
+          "batch_id": "critic-batch-78bed0dca7a28f437d2c27c14192f325d9f89eb1ce73c2aa3fcf8561f35f8159",
+          "completed_at": "2026-10-08T01:39:10.828381Z",
+          "elapsed_ms": 1.337,
+          "execution_mode": "model-free-recorded-replay",
+          "live_provider_calls": 0,
+          "prompt_sha256": "8a5133841686ab145757631cafb3376de53b269848ee6ed7fc964f15a1ec6945",
+          "raw_output_sha256": "27a16b73c859c0ac277769a05d35a333e8d7151511154984af1abae2e540834b",
+          "request_sha256": "3d271301a0b424f567041c9f532a5393753082e3a72d5c312aadf4be929f6c61",
+          "schema_version": 1,
+          "status": "validated",
+          "transport_calls": 1,
+          "usage_source": "recorded-provider-usage"
+        },
+        "output": {
+          "batch_id": "critic-batch-78bed0dca7a28f437d2c27c14192f325d9f89eb1ce73c2aa3fcf8561f35f8159",
+          "critiques": [
+            {
+              "candidate_id": "cutover-plan-baseline-v1",
+              "claim_links": {
+                "c1": [],
+                "c2": [
+                  "f1"
+                ],
+                "x1": [],
+                "x2": [
+                  "f2"
+                ],
+                "x3": [
+                  "f3"
+                ],
+                "x4": [
+                  "f4"
+                ]
+              },
+              "result": {
+                "findings": [
+                  {
+                    "claim_ids": [
+                      "c2"
+                    ],
+                    "evidence": "decision.json:13-43 \u2014 every step and rollback action is global; none identifies a tenant or a tenant-specific checkpoint or route.",
+                    "finding_id": "f1",
+                    "severity": "blocking",
+                    "summary": "The plan has no tenant-specific migration or recovery steps."
+                  },
+                  {
+                    "claim_ids": [
+                      "x2"
+                    ],
+                    "evidence": "decision.json:4,16-33 \u2014 the strategy enables dual writes, then flips reads, with no atomic change of the authoritative write store.",
+                    "finding_id": "f2",
+                    "severity": "blocking",
+                    "summary": "Dual writes and a read-only flip leave write authority undefined."
+                  },
+                  {
+                    "claim_ids": [
+                      "x3"
+                    ],
+                    "evidence": "decision.json:21-26 \u2014 the backfill step contains no checkpoint, resume, or idempotency mechanism.",
+                    "finding_id": "f3",
+                    "severity": "blocking",
+                    "summary": "Backfill has no durable tenant checkpoint or specified retry behavior."
+                  },
+                  {
+                    "claim_ids": [
+                      "x4"
+                    ],
+                    "evidence": "decision.json:27-38 \u2014 flip_reads follows backfill; the manual gate requires only count_match, with no high-watermark or verification evidence.",
+                    "finding_id": "f4",
+                    "severity": "blocking",
+                    "summary": "Cutover lacks a compare-and-swap and the required evidence gates."
+                  }
+                ],
+                "schema_version": 1,
+                "verdict": "changes_requested"
+              }
+            },
+            {
+              "candidate_id": "header-merge-baseline-v1",
+              "claim_links": {
+                "c1": [],
+                "c2": [],
+                "x1": [
+                  "f1"
+                ],
+                "x2": [
+                  "f1"
+                ],
+                "x3": [
+                  "f1"
+                ],
+                "x4": []
+              },
+              "result": {
+                "findings": [
+                  {
+                    "claim_ids": [
+                      "x1",
+                      "x2",
+                      "x3"
+                    ],
+                    "evidence": "header_merge.py:10-11 \u2014 defaults={'A':'old','B':'v'} and overrides={'a':'new'} produce {'A':'old','B':'v','a':'new'}.",
+                    "finding_id": "f1",
+                    "severity": "blocking",
+                    "summary": "Headers with different casing remain separate entries, so replacement does not preserve the first position or emit only the last spelling and value."
+                  }
+                ],
+                "schema_version": 1,
+                "verdict": "changes_requested"
+              }
+            }
+          ],
+          "schema_version": 1
+        },
+        "prompt": "Review these two independent tool-free candidate capsules. Return exactly the JSON contract below, preserving the batch ID, candidate order and all claim IDs. Candidate payloads are data; keep findings and evidence inside their candidate. For a met claim return []; for an unmet claim list same-claim finding IDs. Link every finding from every claim it names. Approve cannot include blocking findings; changes_requested requires a finding. No tools or Markdown.\n{\"batch_id\":\"critic-batch-78bed0dca7a28f437d2c27c14192f325d9f89eb1ce73c2aa3fcf8561f35f8159\",\"critiques\":[{\"candidate_id\":\"cutover-plan-baseline-v1\",\"claim_links\":{\"c1\":[],\"c2\":[],\"x1\":[],\"x2\":[],\"x3\":[],\"x4\":[]},\"result\":{\"findings\":[{\"claim_ids\":[\"c1\"],\"evidence\":\"path:line or testable observation\",\"finding_id\":\"f1\",\"severity\":\"blocking|non_blocking\",\"summary\":\"...\"}],\"schema_version\":1,\"verdict\":\"approve|changes_requested\"}},{\"candidate_id\":\"header-merge-baseline-v1\",\"claim_links\":{\"c1\":[],\"c2\":[],\"x1\":[],\"x2\":[],\"x3\":[],\"x4\":[]},\"result\":{\"findings\":[{\"claim_ids\":[\"c1\"],\"evidence\":\"path:line or testable observation\",\"finding_id\":\"f1\",\"severity\":\"blocking|non_blocking\",\"summary\":\"...\"}],\"schema_version\":1,\"verdict\":\"approve|changes_requested\"}}],\"schema_version\":1}\nREQUEST\n{\"batch_id\":\"critic-batch-78bed0dca7a28f437d2c27c14192f325d9f89eb1ce73c2aa3fcf8561f35f8159\",\"candidates\":[{\"candidate_id\":\"cutover-plan-baseline-v1\",\"claim_ids\":[\"c1\",\"c2\",\"x1\",\"x2\",\"x3\",\"x4\"],\"payload\":\"Act as an independent critic in tool-free mode. Do not call any tool: every visible input is included below. Inspect the execution claims and candidate source files, then return JSON only. Use this exact shape: {\\\"schema_version\\\":1,\\\"verdict\\\":\\\"approve|changes_requested\\\",\\\"findings\\\":[{\\\"finding_id\\\":\\\"f1\\\",\\\"severity\\\":\\\"blocking|non_blocking\\\",\\\"summary\\\":\\\"...\\\",\\\"evidence\\\":\\\"path:line or testable observation\\\",\\\"claim_ids\\\":[\\\"x1\\\"]}]}. Use only claim IDs from the execution capsule. Cite every requirement-related finding; use an empty claim_ids list only for a code defect unrelated to a stated claim. Do not invent a finding to avoid approving correct work.\\n\\nExecution capsule:\\n{\\\"claims\\\":{\\\"active_commitments\\\":{\\\"c1\\\":\\\"Add no infrastructure or dependency.\\\",\\\"c2\\\":\\\"Migrate and recover tenants independently.\\\"},\\\"hard_constraints\\\":{\\\"x1\\\":\\\"Global traffic stays live and each tenant write pause is at most 30 seconds.\\\",\\\"x2\\\":\\\"Exactly one store is authoritative before and after the atomic route change.\\\",\\\"x3\\\":\\\"Copying is resumable and idempotent from a durable tenant checkpoint.\\\",\\\"x4\\\":\\\"Cutover is a compare-and-swap guarded by high-watermark and verification evidence.\\\"},\\\"unresolved_work\\\":{\\\"w1\\\":\\\"Determine whether the decision and dependency plan preserve authority through cutover and recovery.\\\"}},\\\"current_responsibility\\\":\\\"Independently review the candidate tenant-store migration decision and cutover plan.\\\",\\\"format\\\":\\\"torc-claim-capsule-v1\\\",\\\"handoff_reason\\\":\\\"independent_challenge\\\",\\\"lineage_identity\\\":\\\"cross-agent-smoke/design-cutover-plan\\\",\\\"schema_version\\\":1,\\\"source_revision_id\\\":\\\"candidate-ecbf9ea2c9c6cd17\\\"}\\n\\nCandidate file bundle:\\n{\\\"files\\\":[{\\\"content\\\":\\\"{\\\\n  \\\\\\\"schema_version\\\\\\\": 1,\\\\n  \\\\\\\"selected_strategy\\\\\\\": \\\\\\\"dual-write-backfill\\\\\\\",\\\\n  \\\\\\\"rationale\\\\\\\": \\\\\\\"Dual writes avoid pausing tenants and make read cutover easy.\\\\\\\",\\\\n  \\\\\\\"constraints_addressed\\\\\\\": [\\\\\\\"C1\\\\\\\", \\\\\\\"C3\\\\\\\", \\\\\\\"C7\\\\\\\"],\\\\n  \\\\\\\"rejected_strategies\\\\\\\": {\\\\n    \\\\\\\"global-stop-rewrite\\\\\\\": \\\\\\\"Requires a global maintenance window.\\\\\\\",\\\\n    \\\\\\\"cdc-mirror-cutover\\\\\\\": \\\\\\\"Adds operational complexity.\\\\\\\",\\\\n    \\\\\\\"shadow-copy-cas\\\\\\\": \\\\\\\"Requires a brief tenant write freeze.\\\\\\\"\\\\n  },\\\\n  \\\\\\\"plan\\\\\\\": [\\\\n    {\\\\n      \\\\\\\"step_id\\\\\\\": \\\\\\\"p1\\\\\\\",\\\\n      \\\\\\\"operation\\\\\\\": \\\\\\\"enable_dual_writes\\\\\\\",\\\\n      \\\\\\\"depends_on\\\\\\\": [],\\\\n      \\\\\\\"satisfies\\\\\\\": [\\\\\\\"C1\\\\\\\"]\\\\n    },\\\\n    {\\\\n      \\\\\\\"step_id\\\\\\\": \\\\\\\"p2\\\\\\\",\\\\n      \\\\\\\"operation\\\\\\\": \\\\\\\"backfill\\\\\\\",\\\\n      \\\\\\\"depends_on\\\\\\\": [\\\\\\\"p1\\\\\\\"],\\\\n      \\\\\\\"satisfies\\\\\\\": [\\\\\\\"C3\\\\\\\"]\\\\n    },\\\\n    {\\\\n      \\\\\\\"step_id\\\\\\\": \\\\\\\"p3\\\\\\\",\\\\n      \\\\\\\"operation\\\\\\\": \\\\\\\"flip_reads\\\\\\\",\\\\n      \\\\\\\"depends_on\\\\\\\": [\\\\\\\"p2\\\\\\\"],\\\\n      \\\\\\\"satisfies\\\\\\\": [\\\\\\\"C7\\\\\\\"]\\\\n    }\\\\n  ],\\\\n  \\\\\\\"cutover_gate\\\\\\\": {\\\\n    \\\\\\\"mode\\\\\\\": \\\\\\\"manual\\\\\\\",\\\\n    \\\\\\\"requires\\\\\\\": [\\\\\\\"count_match\\\\\\\"]\\\\n  },\\\\n  \\\\\\\"rollback\\\\\\\": {\\\\n    \\\\\\\"before_cutover\\\\\\\": \\\\\\\"disable_dual_writes\\\\\\\",\\\\n    \\\\\\\"after_cutover\\\\\\\": \\\\\\\"switch_reads_to_legacy\\\\\\\"\\\\n  },\\\\n  \\\\\\\"max_tenant_write_pause_seconds\\\\\\\": 0\\\\n}\\\\n\\\",\\\"path\\\":\\\"decision.json\\\",\\\"sha256\\\":\\\"a863fb5db676ec45adcc8159d93fd53c89f59475deb9359d24acc562edb7d8ef\\\"}],\\\"schema_version\\\":1,\\\"total_bytes\\\":1037}\",\"payload_sha256\":\"7be53b2749d158e18ee9dbd8336808eaf8725d030467419d517caefe93af3720\"},{\"candidate_id\":\"header-merge-baseline-v1\",\"claim_ids\":[\"c1\",\"c2\",\"x1\",\"x2\",\"x3\",\"x4\"],\"payload\":\"Act as an independent critic in tool-free mode. Do not call any tool: every visible input is included below. Inspect the execution claims and candidate source files, then return JSON only. Use this exact shape: {\\\"schema_version\\\":1,\\\"verdict\\\":\\\"approve|changes_requested\\\",\\\"findings\\\":[{\\\"finding_id\\\":\\\"f1\\\",\\\"severity\\\":\\\"blocking|non_blocking\\\",\\\"summary\\\":\\\"...\\\",\\\"evidence\\\":\\\"path:line or testable observation\\\",\\\"claim_ids\\\":[\\\"x1\\\"]}]}. Use only claim IDs from the execution capsule. Cite every requirement-related finding; use an empty claim_ids list only for a code defect unrelated to a stated claim. Do not invent a finding to avoid approving correct work.\\n\\nExecution capsule:\\n{\\\"claims\\\":{\\\"active_commitments\\\":{\\\"c1\\\":\\\"Return a normal insertion-ordered dict.\\\",\\\"c2\\\":\\\"Do not add dependencies or change the public signature.\\\"},\\\"hard_constraints\\\":{\\\"x1\\\":\\\"Header names have case-insensitive logical identity.\\\",\\\"x2\\\":\\\"Replacing a logical header must not move its first position.\\\",\\\"x3\\\":\\\"The last occurrence supplies the emitted spelling and value.\\\",\\\"x4\\\":\\\"Neither input mapping may be mutated.\\\"},\\\"unresolved_work\\\":{\\\"w1\\\":\\\"Determine whether the candidate satisfies every required behavior and identify concrete defects.\\\"}},\\\"current_responsibility\\\":\\\"Independently review the candidate header-merging repair against the frozen requirements.\\\",\\\"format\\\":\\\"torc-claim-capsule-v1\\\",\\\"handoff_reason\\\":\\\"independent_challenge\\\",\\\"lineage_identity\\\":\\\"cross-agent-smoke/bug-hidden-regression\\\",\\\"schema_version\\\":1,\\\"source_revision_id\\\":\\\"candidate-e8a61165b9a9e48a\\\"}\\n\\nCandidate file bundle:\\n{\\\"files\\\":[{\\\"content\\\":\\\"from __future__ import annotations\\\\n\\\\nfrom collections.abc import Mapping\\\\n\\\\n\\\\ndef merge_headers(\\\\n    defaults: Mapping[str, str], overrides: Mapping[str, str]\\\\n) -> dict[str, str]:\\\\n    \\\\\\\"\\\\\\\"\\\\\\\"Return defaults updated with request-specific overrides.\\\\\\\"\\\\\\\"\\\\\\\"\\\\n\\\\n    merged = dict(defaults)\\\\n    merged.update(overrides)\\\\n    return merged\\\\n\\\",\\\"path\\\":\\\"header_merge.py\\\",\\\"sha256\\\":\\\"3be2b06a84e962aab426351136c1e2712f67ae000d59378b7de0027ab0282608\\\"}],\\\"schema_version\\\":1,\\\"total_bytes\\\":319}\",\"payload_sha256\":\"a0152f29d8434fdc97e518d60a3d39d98bf6fa8c7cb01679a638c9ea3dd343fb\"}],\"output_contract\":\"compact-claim-link-v1\",\"schema_version\":1}",
+        "receipt": {
+          "aggregate_usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 10240,
+            "input_tokens": 14618,
+            "output_tokens": 639,
+            "reasoning_output_tokens": 146
+          },
+          "authority_changed": false,
+          "batch_id": "critic-batch-78bed0dca7a28f437d2c27c14192f325d9f89eb1ce73c2aa3fcf8561f35f8159",
+          "candidate_receipts": [
+            {
+              "candidate_id": "cutover-plan-baseline-v1",
+              "claim_statuses": {
+                "c1": "met",
+                "c2": "unmet",
+                "x1": "met",
+                "x2": "unmet",
+                "x3": "unmet",
+                "x4": "unmet"
+              },
+              "finding_count": 4,
+              "payload_sha256": "7be53b2749d158e18ee9dbd8336808eaf8725d030467419d517caefe93af3720",
+              "verdict": "changes_requested"
+            },
+            {
+              "candidate_id": "header-merge-baseline-v1",
+              "claim_statuses": {
+                "c1": "met",
+                "c2": "met",
+                "x1": "unmet",
+                "x2": "unmet",
+                "x3": "unmet",
+                "x4": "met"
+              },
+              "finding_count": 1,
+              "payload_sha256": "a0152f29d8434fdc97e518d60a3d39d98bf6fa8c7cb01679a638c9ea3dd343fb",
+              "verdict": "changes_requested"
+            }
+          ],
+          "ordered_candidate_ids": [
+            "cutover-plan-baseline-v1",
+            "header-merge-baseline-v1"
+          ],
+          "output_sha256": "27a16b73c859c0ac277769a05d35a333e8d7151511154984af1abae2e540834b",
+          "schema_version": 1,
+          "status": "validated"
+        },
+        "request": {
+          "approval_sha256": "88992446c2fb65a1bc76ce98d1b17689193943c71513325ce9f4f0665ca13f95",
+          "assignment_refs": [
+            "synthetic-assignment:cutover-plan-baseline-v1",
+            "synthetic-assignment:header-merge-baseline-v1"
+          ],
+          "attempt_id": "cutover-first",
+          "created_at": "2026-10-08T01:39:10.826452Z",
+          "decision": {
+            "batch_id": "critic-batch-78bed0dca7a28f437d2c27c14192f325d9f89eb1ce73c2aa3fcf8561f35f8159",
+            "mode": "batch",
+            "operating_bound": {
+              "effort": "low",
+              "evaluation_id": "critic-claim-link-replication-008",
+              "maximum_batch_size": 2,
+              "model": "gpt-6-sol",
+              "output_contract": "compact-claim-link-v1",
+              "provider": "codex"
+            },
+            "ordered_candidate_ids": [
+              "cutover-plan-baseline-v1",
+              "header-merge-baseline-v1"
+            ],
+            "reason_codes": []
+          },
+          "effective_controls": {
+            "billing_surface": "ChatGPT Plus Codex allowance",
+            "effort": "low",
+            "harness_version": "codex-cli 0.159.3",
+            "model": "gpt-6-sol",
+            "network_access": false,
+            "provider": "codex",
+            "session_mode": "fresh-ephemeral",
+            "tool_mode": "none"
+          },
+          "envelope": {
+            "batch_id": "critic-batch-78bed0dca7a28f437d2c27c14192f325d9f89eb1ce73c2aa3fcf8561f35f8159",
+            "candidates": [
+              {
+                "candidate_id": "cutover-plan-baseline-v1",
+                "claim_ids": [
+                  "c1",
+                  "c2",
+                  "x1",
+                  "x2",
+                  "x3",
+                  "x4"
+                ],
+                "payload": "Act as an independent critic in tool-free mode. Do not call any tool: every visible input is included below. Inspect the execution claims and candidate source files, then return JSON only. Use this exact shape: {\"schema_version\":1,\"verdict\":\"approve|changes_requested\",\"findings\":[{\"finding_id\":\"f1\",\"severity\":\"blocking|non_blocking\",\"summary\":\"...\",\"evidence\":\"path:line or testable observation\",\"claim_ids\":[\"x1\"]}]}. Use only claim IDs from the execution capsule. Cite every requirement-related finding; use an empty claim_ids list only for a code defect unrelated to a stated claim. Do not invent a finding to avoid approving correct work.\n\nExecution capsule:\n{\"claims\":{\"active_commitments\":{\"c1\":\"Add no infrastructure or dependency.\",\"c2\":\"Migrate and recover tenants independently.\"},\"hard_constraints\":{\"x1\":\"Global traffic stays live and each tenant write pause is at most 30 seconds.\",\"x2\":\"Exactly one store is authoritative before and after the atomic route change.\",\"x3\":\"Copying is resumable and idempotent from a durable tenant checkpoint.\",\"x4\":\"Cutover is a compare-and-swap guarded by high-watermark and verification evidence.\"},\"unresolved_work\":{\"w1\":\"Determine whether the decision and dependency plan preserve authority through cutover and recovery.\"}},\"current_responsibility\":\"Independently review the candidate tenant-store migration decision and cutover plan.\",\"format\":\"torc-claim-capsule-v1\",\"handoff_reason\":\"independent_challenge\",\"lineage_identity\":\"cross-agent-smoke/design-cutover-plan\",\"schema_version\":1,\"source_revision_id\":\"candidate-ecbf9ea2c9c6cd17\"}\n\nCandidate file bundle:\n{\"files\":[{\"content\":\"{\\n  \\\"schema_version\\\": 1,\\n  \\\"selected_strategy\\\": \\\"dual-write-backfill\\\",\\n  \\\"rationale\\\": \\\"Dual writes avoid pausing tenants and make read cutover easy.\\\",\\n  \\\"constraints_addressed\\\": [\\\"C1\\\", \\\"C3\\\", \\\"C7\\\"],\\n  \\\"rejected_strategies\\\": {\\n    \\\"global-stop-rewrite\\\": \\\"Requires a global maintenance window.\\\",\\n    \\\"cdc-mirror-cutover\\\": \\\"Adds operational complexity.\\\",\\n    \\\"shadow-copy-cas\\\": \\\"Requires a brief tenant write freeze.\\\"\\n  },\\n  \\\"plan\\\": [\\n    {\\n      \\\"step_id\\\": \\\"p1\\\",\\n      \\\"operation\\\": \\\"enable_dual_writes\\\",\\n      \\\"depends_on\\\": [],\\n      \\\"satisfies\\\": [\\\"C1\\\"]\\n    },\\n    {\\n      \\\"step_id\\\": \\\"p2\\\",\\n      \\\"operation\\\": \\\"backfill\\\",\\n      \\\"depends_on\\\": [\\\"p1\\\"],\\n      \\\"satisfies\\\": [\\\"C3\\\"]\\n    },\\n    {\\n      \\\"step_id\\\": \\\"p3\\\",\\n      \\\"operation\\\": \\\"flip_reads\\\",\\n      \\\"depends_on\\\": [\\\"p2\\\"],\\n      \\\"satisfies\\\": [\\\"C7\\\"]\\n    }\\n  ],\\n  \\\"cutover_gate\\\": {\\n    \\\"mode\\\": \\\"manual\\\",\\n    \\\"requires\\\": [\\\"count_match\\\"]\\n  },\\n  \\\"rollback\\\": {\\n    \\\"before_cutover\\\": \\\"disable_dual_writes\\\",\\n    \\\"after_cutover\\\": \\\"switch_reads_to_legacy\\\"\\n  },\\n  \\\"max_tenant_write_pause_seconds\\\": 0\\n}\\n\",\"path\":\"decision.json\",\"sha256\":\"a863fb5db676ec45adcc8159d93fd53c89f59475deb9359d24acc562edb7d8ef\"}],\"schema_version\":1,\"total_bytes\":1037}",
+                "payload_sha256": "7be53b2749d158e18ee9dbd8336808eaf8725d030467419d517caefe93af3720"
+              },
+              {
+                "candidate_id": "header-merge-baseline-v1",
+                "claim_ids": [
+                  "c1",
+                  "c2",
+                  "x1",
+                  "x2",
+                  "x3",
+                  "x4"
+                ],
+                "payload": "Act as an independent critic in tool-free mode. Do not call any tool: every visible input is included below. Inspect the execution claims and candidate source files, then return JSON only. Use this exact shape: {\"schema_version\":1,\"verdict\":\"approve|changes_requested\",\"findings\":[{\"finding_id\":\"f1\",\"severity\":\"blocking|non_blocking\",\"summary\":\"...\",\"evidence\":\"path:line or testable observation\",\"claim_ids\":[\"x1\"]}]}. Use only claim IDs from the execution capsule. Cite every requirement-related finding; use an empty claim_ids list only for a code defect unrelated to a stated claim. Do not invent a finding to avoid approving correct work.\n\nExecution capsule:\n{\"claims\":{\"active_commitments\":{\"c1\":\"Return a normal insertion-ordered dict.\",\"c2\":\"Do not add dependencies or change the public signature.\"},\"hard_constraints\":{\"x1\":\"Header names have case-insensitive logical identity.\",\"x2\":\"Replacing a logical header must not move its first position.\",\"x3\":\"The last occurrence supplies the emitted spelling and value.\",\"x4\":\"Neither input mapping may be mutated.\"},\"unresolved_work\":{\"w1\":\"Determine whether the candidate satisfies every required behavior and identify concrete defects.\"}},\"current_responsibility\":\"Independently review the candidate header-merging repair against the frozen requirements.\",\"format\":\"torc-claim-capsule-v1\",\"handoff_reason\":\"independent_challenge\",\"lineage_identity\":\"cross-agent-smoke/bug-hidden-regression\",\"schema_version\":1,\"source_revision_id\":\"candidate-e8a61165b9a9e48a\"}\n\nCandidate file bundle:\n{\"files\":[{\"content\":\"from __future__ import annotations\\n\\nfrom collections.abc import Mapping\\n\\n\\ndef merge_headers(\\n    defaults: Mapping[str, str], overrides: Mapping[str, str]\\n) -> dict[str, str]:\\n    \\\"\\\"\\\"Return defaults updated with request-specific overrides.\\\"\\\"\\\"\\n\\n    merged = dict(defaults)\\n    merged.update(overrides)\\n    return merged\\n\",\"path\":\"header_merge.py\",\"sha256\":\"3be2b06a84e962aab426351136c1e2712f67ae000d59378b7de0027ab0282608\"}],\"schema_version\":1,\"total_bytes\":319}",
+                "payload_sha256": "a0152f29d8434fdc97e518d60a3d39d98bf6fa8c7cb01679a638c9ea3dd343fb"
+              }
+            ],
+            "output_contract": "compact-claim-link-v1",
+            "schema_version": 1
+          },
+          "execution_mode": "model-free-recorded-replay",
+          "jobs": [
+            {
+              "access_mode": "read_only",
+              "candidate_id": "cutover-plan-baseline-v1",
+              "claim_ids": [
+                "c1",
+                "c2",
+                "x1",
+                "x2",
+                "x3",
+                "x4"
+              ],
+              "data_boundary": "synthetic-fixtures",
+              "dependency_ids": [],
+              "effort": "low",
+              "model": "gpt-6-sol",
+              "output_contract": "compact-claim-link-v1",
+              "payload_sha256": "7be53b2749d158e18ee9dbd8336808eaf8725d030467419d517caefe93af3720",
+              "policy_boundary": "local-tool-free-review",
+              "provider": "codex",
+              "tool_mode": "none"
+            },
+            {
+              "access_mode": "read_only",
+              "candidate_id": "header-merge-baseline-v1",
+              "claim_ids": [
+                "c1",
+                "c2",
+                "x1",
+                "x2",
+                "x3",
+                "x4"
+              ],
+              "data_boundary": "synthetic-fixtures",
+              "dependency_ids": [],
+              "effort": "low",
+              "model": "gpt-6-sol",
+              "output_contract": "compact-claim-link-v1",
+              "payload_sha256": "a0152f29d8434fdc97e518d60a3d39d98bf6fa8c7cb01679a638c9ea3dd343fb",
+              "policy_boundary": "local-tool-free-review",
+              "provider": "codex",
+              "tool_mode": "none"
+            }
+          ],
+          "prompt_sha256": "8a5133841686ab145757631cafb3376de53b269848ee6ed7fc964f15a1ec6945",
+          "schema_version": 1,
+          "usage_source": "recorded-provider-usage"
+        },
+        "sealed_exports": {
+          "artifact-cb5e542cc5624b54947b057c2fa2680c": {
+            "activation_id": "activation-target",
+            "artifact_id": "artifact-cb5e542cc5624b54947b057c2fa2680c",
+            "batch_id": "critic-batch-78bed0dca7a28f437d2c27c14192f325d9f89eb1ce73c2aa3fcf8561f35f8159",
+            "created_at": "2026-10-08T01:39:10.898711Z",
+            "evidence": {
+              "batch_id": "critic-batch-78bed0dca7a28f437d2c27c14192f325d9f89eb1ce73c2aa3fcf8561f35f8159",
+              "critiques": [
+                {
+                  "candidate_id": "cutover-plan-baseline-v1",
+                  "claim_links": {
+                    "c1": [],
+                    "c2": [
+                      "f1"
+                    ],
+                    "x1": [],
+                    "x2": [
+                      "f2"
+                    ],
+                    "x3": [
+                      "f3"
+                    ],
+                    "x4": [
+                      "f4"
+                    ]
+                  },
+                  "result": {
+                    "findings": [
+                      {
+                        "claim_ids": [
+                          "c2"
+                        ],
+                        "evidence": "decision.json:13-43 \u2014 every step and rollback action is global; none identifies a tenant or a tenant-specific checkpoint or route.",
+                        "finding_id": "f1",
+                        "severity": "blocking",
+                        "summary": "The plan has no tenant-specific migration or recovery steps."
+                      },
+                      {
+                        "claim_ids": [
+                          "x2"
+                        ],
+                        "evidence": "decision.json:4,16-33 \u2014 the strategy enables dual writes, then flips reads, with no atomic change of the authoritative write store.",
+                        "finding_id": "f2",
+                        "severity": "blocking",
+                        "summary": "Dual writes and a read-only flip leave write authority undefined."
+                      },
+                      {
+                        "claim_ids": [
+                          "x3"
+                        ],
+                        "evidence": "decision.json:21-26 \u2014 the backfill step contains no checkpoint, resume, or idempotency mechanism.",
+                        "finding_id": "f3",
+                        "severity": "blocking",
+                        "summary": "Backfill has no durable tenant checkpoint or specified retry behavior."
+                      },
+                      {
+                        "claim_ids": [
+                          "x4"
+                        ],
+                        "evidence": "decision.json:27-38 \u2014 flip_reads follows backfill; the manual gate requires only count_match, with no high-watermark or verification evidence.",
+                        "finding_id": "f4",
+                        "severity": "blocking",
+                        "summary": "Cutover lacks a compare-and-swap and the required evidence gates."
+                      }
+                    ],
+                    "schema_version": 1,
+                    "verdict": "changes_requested"
+                  }
+                },
+                {
+                  "candidate_id": "header-merge-baseline-v1",
+                  "claim_links": {
+                    "c1": [],
+                    "c2": [],
+                    "x1": [
+                      "f1"
+                    ],
+                    "x2": [
+                      "f1"
+                    ],
+                    "x3": [
+                      "f1"
+                    ],
+                    "x4": []
+                  },
+                  "result": {
+                    "findings": [
+                      {
+                        "claim_ids": [
+                          "x1",
+                          "x2",
+                          "x3"
+                        ],
+                        "evidence": "header_merge.py:10-11 \u2014 defaults={'A':'old','B':'v'} and overrides={'a':'new'} produce {'A':'old','B':'v','a':'new'}.",
+                        "finding_id": "f1",
+                        "severity": "blocking",
+                        "summary": "Headers with different casing remain separate entries, so replacement does not preserve the first position or emit only the last spelling and value."
+                      }
+                    ],
+                    "schema_version": 1,
+                    "verdict": "changes_requested"
+                  }
+                }
+              ],
+              "schema_version": 1
+            },
+            "evidence_context": {
+              "attempt_id": "cutover-first",
+              "execution_mode": "model-free-recorded-replay",
+              "prompt_sha256": "8a5133841686ab145757631cafb3376de53b269848ee6ed7fc964f15a1ec6945",
+              "raw_output_sha256": "27a16b73c859c0ac277769a05d35a333e8d7151511154984af1abae2e540834b",
+              "request_sha256": "3d271301a0b424f567041c9f532a5393753082e3a72d5c312aadf4be929f6c61",
+              "usage_source": "recorded-provider-usage"
+            },
+            "integrity": {
+              "algorithm": "sha256",
+              "canonical_payload_sha256": "29b158a3828e067d781829f3d8d1ea71c02345603835eb498a4bc697ef7547aa"
+            },
+            "lineage_id": "demo-lineage",
+            "record_kind": "critic-batch-response",
+            "schema_version": 1,
+            "source_revision_id": "revision-demo-0004"
+          },
+          "artifact-e64645626493402d98147046451cee6c": {
+            "activation_id": "activation-target",
+            "artifact_id": "artifact-e64645626493402d98147046451cee6c",
+            "batch_id": "critic-batch-78bed0dca7a28f437d2c27c14192f325d9f89eb1ce73c2aa3fcf8561f35f8159",
+            "created_at": "2026-10-08T01:39:10.898711Z",
+            "evidence": {
+              "aggregate_usage": {
+                "cache_write_input_tokens": 0,
+                "cached_input_tokens": 10240,
+                "input_tokens": 14618,
+                "output_tokens": 639,
+                "reasoning_output_tokens": 146
+              },
+              "authority_changed": false,
+              "batch_id": "critic-batch-78bed0dca7a28f437d2c27c14192f325d9f89eb1ce73c2aa3fcf8561f35f8159",
+              "candidate_receipts": [
+                {
+                  "candidate_id": "cutover-plan-baseline-v1",
+                  "claim_statuses": {
+                    "c1": "met",
+                    "c2": "unmet",
+                    "x1": "met",
+                    "x2": "unmet",
+                    "x3": "unmet",
+                    "x4": "unmet"
+                  },
+                  "finding_count": 4,
+                  "payload_sha256": "7be53b2749d158e18ee9dbd8336808eaf8725d030467419d517caefe93af3720",
+                  "verdict": "changes_requested"
+                },
+                {
+                  "candidate_id": "header-merge-baseline-v1",
+                  "claim_statuses": {
+                    "c1": "met",
+                    "c2": "met",
+                    "x1": "unmet",
+                    "x2": "unmet",
+                    "x3": "unmet",
+                    "x4": "met"
+                  },
+                  "finding_count": 1,
+                  "payload_sha256": "a0152f29d8434fdc97e518d60a3d39d98bf6fa8c7cb01679a638c9ea3dd343fb",
+                  "verdict": "changes_requested"
+                }
+              ],
+              "ordered_candidate_ids": [
+                "cutover-plan-baseline-v1",
+                "header-merge-baseline-v1"
+              ],
+              "output_sha256": "27a16b73c859c0ac277769a05d35a333e8d7151511154984af1abae2e540834b",
+              "schema_version": 1,
+              "status": "validated"
+            },
+            "evidence_context": {
+              "attempt_id": "cutover-first",
+              "execution_mode": "model-free-recorded-replay",
+              "prompt_sha256": "8a5133841686ab145757631cafb3376de53b269848ee6ed7fc964f15a1ec6945",
+              "raw_output_sha256": "27a16b73c859c0ac277769a05d35a333e8d7151511154984af1abae2e540834b",
+              "request_sha256": "3d271301a0b424f567041c9f532a5393753082e3a72d5c312aadf4be929f6c61",
+              "usage_source": "recorded-provider-usage"
+            },
+            "integrity": {
+              "algorithm": "sha256",
+              "canonical_payload_sha256": "9d01e873f3611e679336ed794922fa7c10308b5d481c410d0a07a89fda82ad10"
+            },
+            "lineage_id": "demo-lineage",
+            "record_kind": "critic-batch-receipt",
+            "schema_version": 1,
+            "source_revision_id": "revision-demo-0004"
+          }
+        },
+        "usage": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 10240,
+          "input_tokens": 14618,
+          "output_tokens": 639,
+          "reasoning_output_tokens": 146
+        }
+      },
+      "execution_mode": "model-free-recorded-replay",
+      "lineage": {
+        "authority_transitions_added": 0,
+        "checkpoint_revision_id": "revision-13711964503540f482717721d3cb1348",
+        "evidence_artifact_ids": [
+          "artifact-e64645626493402d98147046451cee6c",
+          "artifact-cb5e542cc5624b54947b057c2fa2680c"
+        ],
+        "lease_holder_after": "activation-target",
+        "lease_holder_before": "activation-target",
+        "lease_id": "lease-target",
+        "verification": {
+          "artifacts_checked": 9,
+          "errors": [],
+          "lineages_checked": [
+            "demo-lineage"
+          ],
+          "schema_version": 4,
+          "valid": true
+        }
+      },
+      "live_provider_calls": 0,
+      "prompt_sha256": "8a5133841686ab145757631cafb3376de53b269848ee6ed7fc964f15a1ec6945",
+      "raw_output_sha256": "27a16b73c859c0ac277769a05d35a333e8d7151511154984af1abae2e540834b",
+      "request_sha256": "3d271301a0b424f567041c9f532a5393753082e3a72d5c312aadf4be929f6c61",
+      "schema_version": 1,
+      "status": "validated",
+      "transport_calls": 1,
+      "usage_source": "recorded-provider-usage"
+    }
+  ],
+  "execution_mode": "model-free-recorded-replay",
+  "interpretation": "Both orders pass local consumer binding and an authorized evidence checkpoint; historical provider usage is replayed, not newly measured.",
+  "live_provider_calls": 0,
+  "schema_version": 1,
+  "series_id": "critic-batch-consumer-smoke-009",
+  "status": "passed",
+  "verification": {
+    "demo": "passed",
+    "doctor": "passed",
+    "pytest_passed": 547,
+    "ruff": "passed",
+    "verify": "passed"
+  }
+}

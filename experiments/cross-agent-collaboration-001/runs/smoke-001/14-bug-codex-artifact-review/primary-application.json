@@ -1,0 +1,1 @@
+{"applied":[{"after_sha256":"5c4409118f6a848d9247e4219153bb87cba37068e9d51110f09d78c69e181153","before_sha256":"3be2b06a84e962aab426351136c1e2712f67ae000d59378b7de0027ab0282608","bytes":683,"path":"header_merge.py"}],"interface":"patch-artifact-v1","schema_version":1}

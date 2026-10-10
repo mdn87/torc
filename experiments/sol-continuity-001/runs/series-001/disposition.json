@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "series_id": "sol-continuity-001-calibration",
+  "disposition": "apparatus_shakeout_excluded",
+  "reason": "The rendered prompts appended evidence references to inherited value strings while the assignment required verbatim copying and the oracle expected references to remain separate",
+  "comparative_use": "forbidden",
+  "preserved_outputs": [
+    {
+      "run_id": "cal-v1-compiled-low",
+      "sha256": "c45de9fbebec6956937f28b257f644ce11a30e1acde325ae552e504eaea77934"
+    },
+    {
+      "run_id": "cal-v1-compiled-xhigh",
+      "sha256": "06a0acc4263f9af3496ca280700caed096ef88785ab9cb64511e63ac08d5ecd7"
+    },
+    {
+      "run_id": "cal-v1-torc-low",
+      "sha256": "a03f409a0994d6805a407190ced190bbc80007ab830fac372afad756ebbed319"
+    },
+    {
+      "run_id": "cal-v1-torc-xhigh",
+      "sha256": "d5528d8646aea3bdec87935cfb7ba1123c2ddb0718f2fac7da6e289d237a08e9"
+    }
+  ],
+  "correction": "series-002-manifest.json"
+}

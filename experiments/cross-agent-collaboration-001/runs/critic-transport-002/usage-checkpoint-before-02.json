@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "series_id": "critic-transport-002-confirmation",
+  "observed_at": "2026-10-03T07:30:10.583Z",
+  "source": "codex app-server account/rateLimits/read",
+  "ordinary_usage_allowed": true,
+  "plan_type": "plus",
+  "primary": {
+    "used_percent": 1,
+    "window_duration_minutes": 300,
+    "resets_at": 1791030600
+  },
+  "secondary": {
+    "used_percent": 16,
+    "window_duration_minutes": 10080,
+    "resets_at": 1791598771
+  },
+  "reset_credits_available": 2,
+  "reset_credits_consumed": 0,
+  "stop_threshold_percent": 75,
+  "decision": "proceed"
+}

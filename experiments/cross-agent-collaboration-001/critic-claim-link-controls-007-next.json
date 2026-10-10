@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "series_id": "critic-claim-link-controls-007",
+  "status": "historical_checkpoint_completed",
+  "series_final_status": "capability_confirmed",
+  "completed_at_commit": "d1b9782",
+  "completed_calls": 1,
+  "planned_calls": 3,
+  "completed_run_ids": [
+    "01-header-direct"
+  ],
+  "last_result": {
+    "quality_passed": true,
+    "input_tokens": 13678,
+    "output_tokens": 303,
+    "completion_ms": 9801.489
+  },
+  "usage_at_pause": {
+    "observed_at": "2026-10-04T20:45:23.992Z",
+    "five_hour_used_percent": 60,
+    "weekly_used_percent": 53,
+    "reset_credits_consumed": 0
+  },
+  "frozen_controls": {
+    "plan_sha256": "9fc95c66dbfe0b94068cab9bfb73f390f49015e53f5b2dd6d5f543f28afaa706",
+    "apparatus_revision": "02d5327d89b51599110cc5f5789426c6eb459987",
+    "automatic_retries": 0,
+    "stop_threshold_percent": 60
+  },
+  "next_cell": {
+    "run_id": "02-cutover-direct",
+    "mode": "direct",
+    "candidate_order": [
+      "cutover-plan-baseline-v1"
+    ],
+    "prompt_bytes": 4173,
+    "prompt_sha256": "b3c70735b9ddd4060c65779979d25267412add0f4d3be41fa44d4f3fc5bf1dcc"
+  },
+  "resume_commands": [
+    "python experiments/cross-agent-collaboration-001/codex_usage_snapshot.py --stop-threshold 60",
+    "python experiments/cross-agent-collaboration-001/critic_claim_link_controls.py",
+    "python experiments/cross-agent-collaboration-001/critic_claim_link_controls.py --run-id 02-cutover-direct --run-dir experiments/cross-agent-collaboration-001/runs/critic-claim-link-controls-007/02-cutover-direct --expected-plan-sha256 9fc95c66dbfe0b94068cab9bfb73f390f49015e53f5b2dd6d5f543f28afaa706 --expected-prompt-sha256 b3c70735b9ddd4060c65779979d25267412add0f4d3be41fa44d4f3fc5bf1dcc --execute"
+  ],
+  "resume_rule": "Historical only: all planned cells subsequently completed. Do not run these commands again."
+}

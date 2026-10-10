@@ -1,0 +1,5 @@
+{"type":"thread.started","thread_id":"01a100ab-c882-7181-8685-3d6f630f412a"}
+{"type":"item.completed","item":{"id":"item_0","type":"error","message":"Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`."}}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_1","type":"agent_message","text":"{\"schema_version\":1,\"verdict\":\"changes_requested\",\"findings\":[{\"finding_id\":\"f1\",\"severity\":\"blocking\",\"summary\":\"legacy_route still has a separate routing table instead of directly delegating to route_request.\",\"evidence\":\"routing.py:14-19\",\"claim_ids\":[\"x1\"]},{\"finding_id\":\"f2\",\"severity\":\"blocking\",\"summary\":\"dispatch and dispatch_batch still call legacy_route instead of route_request.\",\"evidence\":\"routing.py:22-26\",\"claim_ids\":[\"c1\"]}]}"}}
+{"type":"turn.completed","usage":{"input_tokens":13496,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":109,"reasoning_output_tokens":0}}

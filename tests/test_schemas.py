@@ -23,6 +23,13 @@ CASES = (
     ("score-report.schema.json", "score-report.example.json"),
     ("artifact-manifest.schema.json", "artifact-manifest.example.json"),
     ("thread-checkpoint-decision.schema.json", "thread-checkpoint-decision.example.json"),
+    ("execution-capsule.schema.json", "execution-capsule.example.json"),
+    ("experiment-usage.schema.json", "experiment-usage.example.json"),
+    ("experiment-worker-run.schema.json", "experiment-worker-run.example.json"),
+    (
+        "claim-control-envelope.schema.json",
+        "claim-control-envelope.example.json",
+    ),
 )
 
 
@@ -53,6 +60,20 @@ def test_score_report_example_pins_canonical_score_core() -> None:
         (ROOT / "examples" / "score-report.example.json").read_text(encoding="utf-8")
     )
     assert report["score_core_sha256"] == payload_sha256(report["score_core"])
+
+
+def test_claim_control_example_pins_execution_capsule() -> None:
+    capsule = json.loads(
+        (ROOT / "examples" / "execution-capsule.example.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    control = json.loads(
+        (ROOT / "examples" / "claim-control-envelope.example.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert control["capsule_sha256"] == payload_sha256(capsule)
 
 
 def test_handoff_schema_requires_context_only_for_failure_recovery() -> None:

@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "series_id": "codex-native-capability-001",
+  "status": "capability_rejected",
+  "question": "Can the local Codex app-server expose enough native subagent topology and per-thread usage to run the context-transport pilot under ChatGPT Plus instead of separate API billing?",
+  "candidate": {
+    "candidate_id": "refactor-baseline-v1",
+    "fixture_id": "refactor-superseded-path",
+    "source_plan": "critic-transport-series-002-plan.json",
+    "candidate_workspace_tree_sha256": "8adde67f95bbeec5342ba29880e982dcb30adade419a471e6509c31e8b9f5a00",
+    "critic_context": "claim-capsule-candidate-v1"
+  },
+  "provider_controls": {
+    "billing_surface": "ChatGPT Plus Codex allowance",
+    "harness": "codex app-server stdio",
+    "harness_version": "codex-cli 0.159.3",
+    "root_model": "gpt-6-sol",
+    "root_effort": "low",
+    "subagent_model": "gpt-6-sol",
+    "subagent_effort": "low",
+    "max_concurrent_subagents": 1,
+    "root_thread": "ephemeral",
+    "sandbox": "readOnly",
+    "network_access": false,
+    "tools": "collaboration only"
+  },
+  "call_budget": {
+    "maximum_root_turns": 1,
+    "maximum_spawn_calls": 1,
+    "maximum_subagent_turns": 1,
+    "stop_threshold_percent": 60,
+    "reset_credits_allowed": 0
+  },
+  "success_requires": [
+    "one completed root turn and exactly one completed child thread",
+    "a child parentThreadId or equivalent relationship to the root",
+    "one spawnAgent item whose model, effort, receiver thread, and prompt are observable",
+    "separate final token-usage totals for root and child threads, or a documented aggregate that can be reconciled",
+    "a schema-valid critic result with deterministic defect recall",
+    "no shell, file, web, MCP, app, or plugin tool call"
+  ],
+  "decision": {
+    "on_success": "replace the separately billed three-call API pilot with a newly frozen Plus-backed local Codex series",
+    "on_missing_topology_or_usage": "preserve and exclude the probe, then retain the Responses API pilot as the only controlled opaque-context test",
+    "on_extra_agent_or_tool": "preserve and exclude the probe before any retry",
+    "on_quality_failure": "preserve the result and do not infer transport cost from it"
+  },
+  "limitations": [
+    "The normalized local collaboration item may expose the child task prompt but not the provider's encrypted wire artifact.",
+    "A successful local probe measures Codex-native delegation under Plus; it does not create a portable Claude handoff.",
+    "The capability probe is apparatus evidence, not a quality comparison.",
+    "Do not run while the current-window usage snapshot is at or above 60 percent."
+  ],
+  "runner": {
+    "path": "codex_native_probe_runner.py",
+    "run_directory": "runs/codex-native-capability-001/01-native-isolated",
+    "default_behavior": "print the redacted model-free request plan",
+    "live_gate": "requires status ready, exact plan/prompt/version arguments, clean apparatus, and a fresh below-60-percent usage snapshot",
+    "failure_behavior": "preserve sanitized immutable evidence and mark the only call excluded; do not retry automatically"
+  },
+  "outcome": {
+    "run_directory": "runs/codex-native-capability-001/01-native-isolated",
+    "disposition": "excluded",
+    "calls_consumed": 1,
+    "retry_allowed": false,
+    "reason": "The app-server exposed one child's activity and separate usage but no spawnAgent item, child settings, or observable child prompt/model/effort, so the frozen provenance requirement was not met."
+  }
+}

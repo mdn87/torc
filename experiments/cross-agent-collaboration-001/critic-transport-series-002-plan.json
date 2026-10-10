@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "series_id": "critic-transport-002-confirmation",
+  "status": "frozen_before_live_runs",
+  "frozen_at": "2026-10-03T03:05:41Z",
+  "apparatus_revision": "188568bf4b8dddf02e7b1fcd4ea012785bda5881",
+  "apparatus_inputs": [
+    {
+      "path": "experiments/cross-agent-collaboration-001/critic_replay.py",
+      "sha256": "fa7c1fea5ddde22bb296bd0a11f6f646946d3c90d3dd7a4c465cd1d130cb7223"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/critic_probe_score.py",
+      "sha256": "3a0bea22e6db70d775b316801454ef9bd190f317554c0a21460499472eaaa2a7"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/workflow_runner.py",
+      "sha256": "1ddb06b6d1a584ac289b600014901636b7b7d915b504073ee97c7f8e238d558b"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/worker_runner.py",
+      "sha256": "6888871ef69a63979db5a07530879ddef1c0a8a0209c978bde7ef16d61da6054"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/fixture_control.py",
+      "sha256": "1709e33fcec84091e2f746cc3cd0fbf327172e1513d35affaf95bf2fef4deca5"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/smoke-manifest.json",
+      "sha256": "410df6ae9e8b2a7950180b0905034a8881561a5fbcfc056de5004a40ef9fb6c0"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/fixtures-manifest.json",
+      "sha256": "81feb1eff70ab1d81a4e9f38fc4454c534e42d7cf40fbdcd58e04404406dca11"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/handoffs/refactor-superseded-path.json",
+      "sha256": "25161061ada68cf85fcff0b15c7bd92c8d1fd0f7c707911c329f088630b64606"
+    },
+    {
+      "path": "experiments/cross-agent-collaboration-001/handoffs/release-policy-interaction.json",
+      "sha256": "d9ccafa9866423f81bc737d866f2f303db7cbc0d7b0d75e6bb42bab12ff058cd"
+    },
+    {
+      "path": "src/torc/execution_capsules.py",
+      "sha256": "3ebb1874f4a8a35ffea6dc1893ae9bdfaea9ca5c053ff51260766c626a76b986"
+    },
+    {
+      "path": "src/torc/canonical.py",
+      "sha256": "424fe3640a094f6dd34fa2b4c7b3ce374eada88685243c6a4dbf01b3b8653838"
+    }
+  ],
+  "question": "Does claim-capsule-candidate-v1 reduce critic context without reducing deterministic defect recall relative to full-visible-bundle-v1?",
+  "provider_controls": {
+    "provider": "codex",
+    "model": "gpt-6-sol",
+    "effort": "low",
+    "tool_mode": "none",
+    "harness_version": "codex-cli 0.159.3"
+  },
+  "transports": [
+    "claim-capsule-candidate-v1",
+    "full-visible-bundle-v1"
+  ],
+  "candidates": [
+    {
+      "candidate_id": "refactor-baseline-v1",
+      "fixture_id": "refactor-superseded-path",
+      "source": "hash-pinned agent-visible fixture baseline",
+      "candidate_workspace_tree_sha256": "8adde67f95bbeec5342ba29880e982dcb30adade419a471e6509c31e8b9f5a00",
+      "expected_accepted": false,
+      "required_defect_areas": [
+        {
+          "area_id": "production_uses_superseded_route",
+          "acceptable_claim_ids": ["d1", "s1", "c1"],
+          "evidence_term_groups": [
+            ["dispatch", "dispatch_batch", "production caller"],
+            ["legacy_route", "superseded"]
+          ]
+        },
+        {
+          "area_id": "legacy_route_duplicates_current_logic",
+          "acceptable_claim_ids": ["d1", "x1"],
+          "evidence_term_groups": [
+            ["legacy_route"],
+            ["delegate", "duplicate", "route_request"]
+          ]
+        }
+      ]
+    },
+    {
+      "candidate_id": "release-policy-baseline-v1",
+      "fixture_id": "release-policy-interaction",
+      "source": "hash-pinned agent-visible fixture baseline",
+      "candidate_workspace_tree_sha256": "93213ff481c8b41b7a500a9b7f04bf7388d88e06b06811d6ca39da86f77b2cc1",
+      "expected_accepted": false,
+      "required_defect_areas": [
+        {
+          "area_id": "digest_comparison_not_constant_time",
+          "acceptable_claim_ids": ["x1"],
+          "evidence_term_groups": [
+            ["digest"],
+            ["compare_digest", "constant-time", "constant time"]
+          ]
+        },
+        {
+          "area_id": "paths_not_validated_or_segment_matched",
+          "acceptable_claim_ids": ["x2", "x3"],
+          "evidence_term_groups": [
+            ["path", "root"],
+            ["segment", "prefix", "normalize", "normalized"]
+          ]
+        },
+        {
+          "area_id": "rename_source_not_checked",
+          "acceptable_claim_ids": ["x4"],
+          "evidence_term_groups": [
+            ["rename", "from_path", "source"],
+            ["scope", "validate", "allowed"]
+          ]
+        },
+        {
+          "area_id": "malformed_and_unknown_records_not_fail_closed",
+          "acceptable_claim_ids": ["x5"],
+          "evidence_term_groups": [
+            ["malformed", "unknown", "missing"],
+            ["fail closed", "exception", "deny"]
+          ]
+        }
+      ]
+    }
+  ],
+  "repeats_per_transport_per_candidate": 3,
+  "counterbalanced_order_per_candidate": [
+    "claim-capsule-candidate-v1",
+    "full-visible-bundle-v1",
+    "full-visible-bundle-v1",
+    "claim-capsule-candidate-v1",
+    "claim-capsule-candidate-v1",
+    "full-visible-bundle-v1"
+  ],
+  "measures": [
+    "changes_requested rate",
+    "required defect-area recall",
+    "unsupported finding count",
+    "valid claim citation count",
+    "prompt bytes",
+    "provider-reported input and output tokens",
+    "completion time"
+  ],
+  "gates_before_live_runs": [
+    "Add model-free baseline source support to critic_replay.py.",
+    "Add a deterministic finding scorer and tests for both candidates.",
+    "Freeze this plan with apparatus and candidate hashes before the first call.",
+    "Verify that neither critic transport contains hidden tests or scoring rules."
+  ],
+  "gate_evidence": [
+    {
+      "gate": "baseline_source_support",
+      "status": "passed",
+      "evidence": "tests/test_cross_agent_critic_replay.py exercises dry planning and one-call execution from a pinned fixture baseline."
+    },
+    {
+      "gate": "deterministic_scoring",
+      "status": "passed",
+      "evidence": "tests/test_cross_agent_critic_probe_score.py covers both candidates and fail-closed hash drift."
+    },
+    {
+      "gate": "apparatus_and_candidate_freeze",
+      "status": "passed",
+      "evidence": "This plan pins the tested apparatus revision, apparatus input hashes, candidate tree hashes, defect areas, and scoring terms before any series call."
+    },
+    {
+      "gate": "critic_input_isolation",
+      "status": "passed",
+      "evidence": "Fixture staging copies only agent-visible trees; prompt tests verify scoring-contract markers and oracle files are absent from both transports."
+    }
+  ],
+  "usage_plan": {
+    "estimated_reported_input_tokens_per_candidate": 89900,
+    "basis": "Three compact calls at about 13.4k and three full calls at about 16.6k from series 001.",
+    "session_split": "Run at most one six-call candidate block per usage window and recheck the provider snapshot after three calls.",
+    "credits": "Do not consume reset credits without explicit operator approval."
+  },
+  "stop_rules": [
+    "Preserve and exclude any run with a candidate, claim capsule, model, effort, or transport hash mismatch.",
+    "Stop the block if a harness failure repeats or current-window usage reaches 75 percent.",
+    "Do not edit candidates, expected defect areas, or scoring after live output is observed.",
+    "Do not make a general quality claim from these two candidates alone."
+  ],
+  "cross_provider_follow_up": "After Claude organization policy permits inference, repeat only the compact arm as a separately frozen series; do not merge tokenizer totals."
+}

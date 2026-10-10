@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "series_id": "critic-claim-link-replication-008",
+  "status": "ready",
+  "frozen_at": "2026-10-05T17:20:01Z",
+  "apparatus_revision": "cfcbffd6c6e8f613d1ad4639a77eebb3fb0fd567",
+  "question": "With two observations per candidate order, do new-fixture claim-link batches retain quality and remain below matched direct input and completion cost?",
+  "source_capability": {
+    "plan_path": "experiments/cross-agent-collaboration-001/critic-claim-link-generalization-006-plan.json"
+  },
+  "prior_batches": [
+    {
+      "order": "header_first",
+      "result_path": "experiments/cross-agent-collaboration-001/runs/critic-claim-link-generalization-006/01-header-first/result.json"
+    },
+    {
+      "order": "cutover_first",
+      "result_path": "experiments/cross-agent-collaboration-001/runs/critic-claim-link-controls-007/03-cutover-first-batch/result.json"
+    }
+  ],
+  "matched_direct_baseline": {
+    "analysis_path": "experiments/cross-agent-collaboration-001/critic-claim-link-controls-007-analysis.json",
+    "summed_input_tokens": 27671,
+    "summed_completion_ms": 28964.679
+  },
+  "apparatus_inputs": [
+    {"path": "experiments/cross-agent-collaboration-001/critic_claim_link_replication.py", "sha256": "23ff2dd710c758c398c50857439f78a9ef9bf97fced205c9b82ef3b7f372f232"},
+    {"path": "experiments/cross-agent-collaboration-001/critic_claim_link_controls.py", "sha256": "fffd1cdba6b0315a4641bfa66cb4fdd8f8e43e8bbac376115dea09fed4dffc1a"},
+    {"path": "experiments/cross-agent-collaboration-001/critic_claim_link_generalization.py", "sha256": "e462c1028533bac2105a5917242f207797df8c7d3a4f3c7df8c8d5acd8eab059"},
+    {"path": "experiments/cross-agent-collaboration-001/critic_claim_link_probe.py", "sha256": "446233209f47e6eca5320563d6c7cb7f1e7787558798841edd6f05e30e3b17fc"},
+    {"path": "experiments/cross-agent-collaboration-001/codex_usage_snapshot.py", "sha256": "1ae8ff50ac7ee339929a0e9463da3e21f22c4bda9ab7ec869b3f4ead318d4183"},
+    {"path": "experiments/cross-agent-collaboration-001/fixture_control.py", "sha256": "1709e33fcec84091e2f746cc3cd0fbf327172e1513d35affaf95bf2fef4deca5"},
+    {"path": "experiments/cross-agent-collaboration-001/native_context_request.py", "sha256": "05b995813b0d406909455a4675d8da032031a6a9114af0a2a98cc9cb4b4a01be"},
+    {"path": "experiments/cross-agent-collaboration-001/workflow_runner.py", "sha256": "1ddb06b6d1a584ac289b600014901636b7b7d915b504073ee97c7f8e238d558b"},
+    {"path": "experiments/cross-agent-collaboration-001/worker_runner.py", "sha256": "6888871ef69a63979db5a07530879ddef1c0a8a0209c978bde7ef16d61da6054"},
+    {"path": "experiments/cross-agent-collaboration-001/smoke-manifest.json", "sha256": "410df6ae9e8b2a7950180b0905034a8881561a5fbcfc056de5004a40ef9fb6c0"},
+    {"path": "experiments/cross-agent-collaboration-001/fixtures-manifest.json", "sha256": "81feb1eff70ab1d81a4e9f38fc4454c534e42d7cf40fbdcd58e04404406dca11"},
+    {"path": "experiments/cross-agent-collaboration-001/handoffs/bug-hidden-regression.json", "sha256": "220b99ab00b289399ef603db75dbda9bb18647b98b3e7d660e5a55c2f6978465"},
+    {"path": "experiments/cross-agent-collaboration-001/handoffs/design-cutover-plan.json", "sha256": "b48de5ec39c6943175a295a4496ba2170512b8dc97770088f73ff3f0e925f310"},
+    {"path": "experiments/cross-agent-collaboration-001/critic-claim-link-generalization-006-plan.json", "sha256": "20c4d7693b2be54c42b50d17e2c5515506b7a9cb6064fac8d8a7189899f19ceb"},
+    {"path": "experiments/cross-agent-collaboration-001/critic-claim-link-controls-007-analysis.json", "sha256": "ab22ae27cdc3afd54826e24d31327ade126b26343534797edfa7734865648000"},
+    {"path": "experiments/cross-agent-collaboration-001/runs/critic-claim-link-generalization-006/01-header-first/result.json", "sha256": "22add5a6cd579e6901f4e620a1125ef418bd76d2fe77f5ae5f49177b1649ace2"},
+    {"path": "experiments/cross-agent-collaboration-001/runs/critic-claim-link-controls-007/03-cutover-first-batch/result.json", "sha256": "aec21898f1abbaf8b8c971fd1281dea56fc20199cd443b91d8a6c45eba7ce1f6"},
+    {"path": "src/torc/execution_capsules.py", "sha256": "3ebb1874f4a8a35ffea6dc1893ae9bdfaea9ca5c053ff51260766c626a76b986"},
+    {"path": "src/torc/canonical.py", "sha256": "424fe3640a094f6dd34fa2b4c7b3ce374eada88685243c6a4dbf01b3b8653838"}
+  ],
+  "provider_controls": {
+    "provider": "codex",
+    "billing_surface": "ChatGPT Plus Codex allowance",
+    "harness_version": "codex-cli 0.159.3",
+    "model": "gpt-6-sol",
+    "effort": "low",
+    "session_mode": "fresh-ephemeral",
+    "tool_mode": "none",
+    "network_access": false
+  },
+  "reviewable_claim_categories": [
+    "active_commitments",
+    "hard_constraints",
+    "settled_decisions",
+    "superseded_directions"
+  ],
+  "schedule": [
+    {
+      "run_index": 1,
+      "run_id": "01-header-first",
+      "order": "header_first",
+      "prompt_bytes": 6669,
+      "prompt_sha256": "394425d79ff5bc2fcd4c5975fafa03f621d8c7c9c7224fcb941f157d5000ab49",
+      "candidate_order": [
+        "header-merge-baseline-v1",
+        "cutover-plan-baseline-v1"
+      ]
+    },
+    {
+      "run_index": 2,
+      "run_id": "02-cutover-first",
+      "order": "cutover_first",
+      "prompt_bytes": 6669,
+      "prompt_sha256": "6ad4714cbbb5f7371740eb2a31b5214437bb635b26bb1f2509ae1a879891677a",
+      "candidate_order": [
+        "cutover-plan-baseline-v1",
+        "header-merge-baseline-v1"
+      ]
+    }
+  ],
+  "call_budget": {
+    "maximum_calls": 2,
+    "automatic_retries": 0,
+    "stop_threshold_percent": 60,
+    "series_directory": "runs/critic-claim-link-replication-008",
+    "reset_credits": "do not consume without explicit operator approval"
+  },
+  "confirmation_thresholds": {
+    "quality": "all four fresh candidate critiques have every expected claim status, expected verdict, same-claim finding links, and zero unlinked findings",
+    "maximum_median_input_ratio_to_summed_direct": 0.75,
+    "maximum_median_completion_ratio_to_summed_direct": 1.0,
+    "order_check": "each order has two quality-passing observations when its prior batch is included"
+  },
+  "interpretation_limits": [
+    "The earlier observation in each order predates this replication plan and must remain identified separately.",
+    "Two observations per order support a bounded replication result, not a universal latency distribution.",
+    "Keep batch size two and do not generalize to mutable, dependent, or mixed-policy work."
+  ],
+  "stop_rules": [
+    "Run exactly one scheduled cell per invocation and never retry automatically.",
+    "Commit every attempted cell before starting another.",
+    "Stop after any excluded run, structured quality failure, provider drift, or current-window usage at or above 60 percent.",
+    "Do not edit candidate orders, prompt hashes, baselines, or thresholds after the first live call."
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lugos.local/schemas/claim-control-envelope.schema.json",
+  "title": "TORC claim capsule control envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "format",
+    "projection_id",
+    "source_revision_id",
+    "target_substrate",
+    "capsule_sha256",
+    "claim_sources"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "format": {"const": "torc-claim-control-v1"},
+    "projection_id": {"type": "string", "minLength": 1},
+    "source_revision_id": {"type": "string", "minLength": 1},
+    "target_substrate": {"type": "string", "minLength": 1},
+    "capsule_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "claim_sources": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-z][a-z0-9]*[1-9][0-9]*$": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["section_id", "position", "source_ref"],
+          "properties": {
+            "section_id": {"type": "string", "minLength": 1},
+            "position": {"type": "integer", "minimum": 0},
+            "source_ref": {"type": "string", "minLength": 1}
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "series_id": "critic-claim-link-generalization-006",
+  "status": "capability_confirmed",
+  "design": {
+    "fresh_batch_calls": 1,
+    "new_fixture_shapes": [
+      "Python implementation defect",
+      "JSON architecture and cutover plan"
+    ],
+    "candidate_order": [
+      "header-merge-baseline-v1",
+      "cutover-plan-baseline-v1"
+    ],
+    "matched_direct_controls_available": false
+  },
+  "structured_quality": {
+    "correct_claim_status_count": 12,
+    "reviewable_claim_status_count": 12,
+    "correct_verdict_count": 2,
+    "candidate_count": 2,
+    "linked_finding_count": 5,
+    "unlinked_finding_count": 0
+  },
+  "descriptive_cost": {
+    "prompt_bytes": 6669,
+    "input_tokens": 14618,
+    "output_tokens": 666,
+    "completion_ms": 19253.713,
+    "input_difference_percent_vs_prior_confirmed_batch_median": 0.54,
+    "completion_difference_percent_vs_prior_confirmed_batch_median": 2.368,
+    "batch_savings_claim_allowed": false
+  },
+  "interpretation": "The compact claim-link contract preserved complete structured quality in one batch spanning two new fixture shapes. Its absolute cost was close to the prior confirmed two-fixture batch, but no savings claim is valid without matched direct controls for these candidates.",
+  "next_gate": "Collect one compact claim-link direct control per new candidate, then a reversed-order batch; repeat only if quality and usage gates justify a confirmation series."
+}

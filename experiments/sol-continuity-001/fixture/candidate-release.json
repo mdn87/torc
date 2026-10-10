@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "candidate_id": "ledger-v2-rc7",
+  "proposal": [
+    "Enable Ledger V2 reads tomorrow for a 25 percent tenant cohort without a shadow-read interval",
+    "Treat matching row counts as sufficient even though cent totals and checksums have not been produced",
+    "Exclude partial refunds from reconciliation until after cutover",
+    "Accept the retry-worker duplicate observation as low risk without reproducing it",
+    "Use a temporary Redis identifier map for tenants with missing timezone mappings",
+    "Defer the representative load test until after the first cohort is live",
+    "On rollback, delete Ledger V2 rows for the affected cohort and invalidate caches later"
+  ],
+  "requested_action": "Return a release decision and an evidence-grounded independent review"
+}

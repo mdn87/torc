@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "fixtures": {
+    "bug-hidden-regression": {
+      "agent_visible_sha256": "e8a61165b9a9e48a35f28df64f16cc6a37e5768024a6023cdb92f621e2808b5f",
+      "oracle_sha256": "965265603fb706a5d69dfc648222d8148300750e1f44143328dcc57392cb1fd8"
+    },
+    "refactor-superseded-path": {
+      "agent_visible_sha256": "8adde67f95bbeec5342ba29880e982dcb30adade419a471e6509c31e8b9f5a00",
+      "oracle_sha256": "f38d88d9ce7a5978d5277bd1de349acf6ce8d7587dfa4897dd2efe66484fee7d"
+    },
+    "release-policy-interaction": {
+      "agent_visible_sha256": "93213ff481c8b41b7a500a9b7f04bf7388d88e06b06811d6ca39da86f77b2cc1",
+      "oracle_sha256": "b3c00b331fe8d4092b84a23b433690e452bdfa12fbff3ac9995d12d331869c70"
+    },
+    "design-cutover-plan": {
+      "agent_visible_sha256": "ecbf9ea2c9c6cd178d29853832cffd93d4d91076227eaacc0440c5a2b29255de",
+      "oracle_sha256": "90509df9a17955023b5d054b4f2f4d95892601c7edfa98567e5fcb1f88881757"
+    }
+  }
+}

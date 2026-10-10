@@ -1,0 +1,42 @@
+{
+  "lineage_identity": "cross-agent-smoke/design-cutover-plan",
+  "current_responsibility": "Independently review the candidate tenant-store migration decision and cutover plan.",
+  "sections": [
+    {
+      "section_id": "hard_constraints",
+      "claim_prefix": "x",
+      "values": [
+        "Global traffic stays live and each tenant write pause is at most 30 seconds.",
+        "Exactly one store is authoritative before and after the atomic route change.",
+        "Copying is resumable and idempotent from a durable tenant checkpoint.",
+        "Cutover is a compare-and-swap guarded by high-watermark and verification evidence."
+      ],
+      "source_refs": [
+        "fixtures/design-cutover-plan/agent-visible/TASK.md#hard-constraints-c1",
+        "fixtures/design-cutover-plan/agent-visible/TASK.md#hard-constraints-c2-c5",
+        "fixtures/design-cutover-plan/agent-visible/TASK.md#hard-constraints-c3",
+        "fixtures/design-cutover-plan/agent-visible/TASK.md#hard-constraints-c4"
+      ]
+    },
+    {
+      "section_id": "active_commitments",
+      "claim_prefix": "c",
+      "values": [
+        "Add no infrastructure or dependency.",
+        "Migrate and recover tenants independently."
+      ],
+      "source_refs": [
+        "fixtures/design-cutover-plan/agent-visible/TASK.md#hard-constraints-c6",
+        "fixtures/design-cutover-plan/agent-visible/TASK.md#hard-constraints-c7"
+      ]
+    },
+    {
+      "section_id": "unresolved_work",
+      "claim_prefix": "w",
+      "values": [
+        "Determine whether the decision and dependency plan preserve authority through cutover and recovery."
+      ],
+      "source_refs": ["cross-agent-collaboration-001#critic-assignment"]
+    }
+  ]
+}
