@@ -1,0 +1,11 @@
+== R2-01: after a mislabeled rollback_applied checkpoint, later operations are refused ==
+  verify: False ['rollback_context_invalid']
+  ordinary checkpoint: refused -> IntegrityError: lineage integrity failed: rollback_context_invalid (revision-b9e3653cbe2b4e1e88e
+  carry: refused -> IntegrityError: lineage integrity failed: rollback_context_invalid (revision-b9e3653cbe2b4e1e88e
+
+== R2-02: the reconstruction template carries optional content the projection omitted ==
+  projection budget: {'estimated_used': 117, 'limit': 120, 'unit': 'words'} | omitted: {'settled-decisions.remainder': 'budget', 'methods': 'budget'}
+  template settled_decisions: 60
+  brief lists settled_decisions as a continuity requirement: True
+  brief tells the recipient to copy the template: True
+  template bytes: 5263 | brief bytes: 2593
