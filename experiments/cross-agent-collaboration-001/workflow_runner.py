@@ -168,10 +168,23 @@ def _editable_paths(manifest: dict[str, Any], fixture_id: str) -> list[str]:
     return paths
 
 
+def _bundle_order(workspace: Path, path: Path) -> tuple[list[str], str]:
+    """Order bundle entries the same way on every platform.
+
+    Sorting Path objects is case-insensitive only on Windows, where the live runs
+    were recorded, so a case-sensitive host rendered a different prompt for the
+    same workspace. Lower-cased parts reproduce every recorded prompt hash; the
+    original path breaks ties between names that differ only by case.
+    """
+
+    relative = path.relative_to(workspace)
+    return [part.lower() for part in relative.parts], relative.as_posix()
+
+
 def _visible_file_bundle(workspace: Path) -> dict[str, Any]:
     files: list[dict[str, Any]] = []
     total_bytes = 0
-    for path in sorted(workspace.rglob("*")):
+    for path in sorted(workspace.rglob("*"), key=lambda item: _bundle_order(workspace, item)):
         relative = path.relative_to(workspace)
         if not path.is_file() or any(part in _BUNDLE_IGNORED_PARTS for part in relative.parts):
             continue
