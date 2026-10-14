@@ -13,6 +13,7 @@ TORC must earn a narrow place in Lugos rather than duplicate existing modules.
 | lugos-mcp and CLI | Shared command and tool surfaces | Expose a thin TORC surface after the local contract stabilizes | Reimplement TORC domain logic in every surface |
 | HUD or mission-control | Read-oriented operator visibility | Render lineage head, active bearer, pending handoff, provenance, and fit rationale | Mutate lineage state without an explicitly designed and authorized command path |
 | Harnesses such as Codex or Claude | Actual model execution and tool use | Implement adapters that load projections and return structured checkpoints or reconstructions | Define canonical lineage identity or silently claim authority |
+| Cormac | Minimum workflow kernel and termination predicate: weight, at most one playbook, finalize against a current Lugos Audit receipt; in harness mode, context injection, routing reminders, `ask` up to the operator's ceiling, and a disposable verdict ledger that is telemetry, not evidence | Reference the Lugos Audit receipt id that an agent-driven `lugos thread capture` names; treat Cormac's session-start and finalize hooks as the eventual plug points for the source and target harness adapters | Treat a Cormac receipt as checkpoint acceptance; require Cormac to hold, check, or transfer a lease; read the verdict ledger as evidence or lineage; accept a pickup, capture, or receipt minted by a Cormac hook, which Cormac must never produce (see `cormac/docs/integration-boundaries.md`) |
 
 ## Assignment and lineage are different
 
