@@ -17,9 +17,19 @@ payload hashes before constructing the envelope. On return it requires exact
 candidate order, complete claim coverage, same-claim finding links, and no
 unlinked findings. Any mismatch rejects the entire response.
 
-Usage remains one aggregate provider record. The adapter refuses invented
-per-candidate token allocations. Its receipt is derived evidence and explicitly
-records that no lineage authority changed.
+Usage contract revision 1 accepts only `input_tokens`, `output_tokens`,
+`cached_input_tokens`, `cache_write_input_tokens`, and `reasoning_output_tokens`.
+Validation runs in this order: a dictionary containing both input and output
+counters (otherwise `aggregate provider usage is incomplete`); string keys
+(`provider usage keys must be strings`); only those five names
+(`unsupported aggregate provider usage field`); and non-negative integers,
+excluding booleans (`provider usage values must be non-negative integers`).
+Present counters are copied exactly, including zero; missing optional counters
+stay absent and present `None` is rejected. Callers must project provider records
+to these fields before the call and retain the original provider record separately.
+Usage stays in `aggregate_usage`, with no invented per-candidate share. Receipt
+schema version 1 is unchanged: this is derived evidence and records that no
+lineage authority changed.
 
 The owning Lugos execution adapter may serialize the envelope for its provider
 and persist the receipt. TORC core should only supply or reference the claim
@@ -35,7 +45,6 @@ Envelope construction and response validation recompute the decision from its
 retained operating bound and supplied jobs. Changing payload hashes, claims,
 controls, or order therefore invalidates the decision. A finding must be linked
 from every claim it names, so partial attribution cannot mark a named claim met.
-Aggregate usage rejects boolean counters and non-string keys.
 Job descriptors enforce immutable tuple IDs and valid scalar types. Malformed
 nested JSON values fail with an adapter error. An approval may contain only
 nonblocking findings; a changes-requested verdict must contain a finding.

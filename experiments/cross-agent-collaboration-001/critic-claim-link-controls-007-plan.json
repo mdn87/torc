@@ -63,11 +63,11 @@
     },
     {
       "path": "experiments/cross-agent-collaboration-001/critic-claim-link-generalization-006-plan.json",
-      "sha256": "20c4d7693b2be54c42b50d17e2c5515506b7a9cb6064fac8d8a7189899f19ceb"
+      "sha256": "41871e2f221d5d34ca6073e376dd1ccfcb740d0b77a1944251d978a7baa915fb"
     },
     {
       "path": "src/torc/execution_capsules.py",
-      "sha256": "3ebb1874f4a8a35ffea6dc1893ae9bdfaea9ca5c053ff51260766c626a76b986"
+      "sha256": "17c5dc9d7601831f560802697bf7e62d5813f741dd638ed658283aef9c6f782e"
     },
     {
       "path": "src/torc/canonical.py",

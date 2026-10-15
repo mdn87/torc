@@ -13,6 +13,88 @@ EXPERIMENT = ROOT / "experiments" / "cross-agent-collaboration-001"
 sys.path.insert(0, str(EXPERIMENT))
 import critic_batch_adapter as adapter  # noqa: E402
 
+from torc.experiment_usage import TOKEN_FIELDS  # noqa: E402
+
+USAGE_FIELDS = {
+    "input_tokens",
+    "output_tokens",
+    "cached_input_tokens",
+    "cache_write_input_tokens",
+    "reasoning_output_tokens",
+}
+
+
+def test_aggregate_usage_contract_matches_documented_token_fields():
+    assert getattr(adapter, "AGGREGATE_USAGE_FIELDS", None) == USAGE_FIELDS == set(TOKEN_FIELDS)
+
+
+@pytest.mark.parametrize(
+    "extra",
+    [
+        "banana",
+        "total_tokens",
+        "uncached_input_tokens",
+        "inputTokens",
+        "per_candidate",
+        "candidate_usage",
+        "provider_usage",
+        "",
+        "INPUT_TOKENS",
+    ],
+)
+def test_unknown_aggregate_usage_fields_reject(extra):
+    with pytest.raises(
+        adapter.CriticBatchAdapterError, match="^unsupported aggregate provider usage field$"
+    ):
+        adapter._validate_usage({"input_tokens": 1, "output_tokens": 2, extra: 3})
+
+
+@pytest.mark.parametrize("field", sorted(USAGE_FIELDS))
+@pytest.mark.parametrize("value", [None, True, False, -1, 1.0, "1", {}])
+def test_present_usage_counters_must_be_non_negative_integers(field, value):
+    with pytest.raises(
+        adapter.CriticBatchAdapterError,
+        match="^provider usage values must be non-negative integers$",
+    ):
+        adapter._validate_usage({"input_tokens": 1, "output_tokens": 2, field: value})
+
+
+@pytest.mark.parametrize("mask", range(8))
+def test_missing_optional_usage_counters_stay_absent(mask):
+    usage = {"input_tokens": 0, "output_tokens": 2**64}
+    for bit, field in enumerate(sorted(USAGE_FIELDS - set(usage))):
+        if mask & (1 << bit):
+            usage[field] = 0
+    validated = adapter._validate_usage(usage)
+    assert validated == usage
+    assert validated is not usage
+    jobs, _ = _eligible()
+    decision = adapter.decide_batch(jobs, batching_requested=True, operating_bound=_bound())
+    receipt = adapter.validate_response(decision, jobs, _response(decision), aggregate_usage=usage)
+    assert receipt["aggregate_usage"] == usage
+    assert receipt["schema_version"] == 1
+
+
+@pytest.mark.parametrize(
+    "usage,message",
+    [
+        (None, "aggregate provider usage is incomplete"),
+        ({"output_tokens": 1, "banana": 0}, "aggregate provider usage is incomplete"),
+        ({"input_tokens": 1, 2: 0}, "aggregate provider usage is incomplete"),
+        (
+            {"input_tokens": 1, "output_tokens": 2, 0: -1, "banana": 1},
+            "provider usage keys must be strings",
+        ),
+        (
+            {"input_tokens": -1, "output_tokens": 2, "banana": 0},
+            "unsupported aggregate provider usage field",
+        ),
+    ],
+)
+def test_aggregate_usage_rejection_order(usage, message):
+    with pytest.raises(adapter.CriticBatchAdapterError, match=f"^{message}$"):
+        adapter._validate_usage(usage)
+
 
 def _job(candidate_id: str, payload: str) -> adapter.CriticJob:
     return adapter.CriticJob(
@@ -185,7 +267,9 @@ def test_per_candidate_usage_is_rejected() -> None:
     jobs, _ = _eligible()
     decision = adapter.decide_batch(jobs, batching_requested=True, operating_bound=_bound())
 
-    with pytest.raises(adapter.CriticBatchAdapterError, match="must not be manufactured"):
+    with pytest.raises(
+        adapter.CriticBatchAdapterError, match="unsupported aggregate provider usage field"
+    ):
         adapter.validate_response(
             decision,
             jobs,
@@ -219,7 +303,9 @@ def test_decision_cannot_be_reused_with_changed_jobs(changes: dict[str, object])
         adapter.build_envelope(decision, changed, payloads)
     with pytest.raises(adapter.CriticBatchAdapterError, match="bound batch decision"):
         adapter.validate_response(
-            decision, changed, _response(decision),
+            decision,
+            changed,
+            _response(decision),
             aggregate_usage={"input_tokens": 1, "output_tokens": 1},
         )
 
@@ -232,15 +318,20 @@ def test_finding_must_link_to_every_claim_it_names() -> None:
 
     with pytest.raises(adapter.CriticBatchAdapterError, match="every named claim"):
         adapter.validate_response(
-            decision, jobs, response,
+            decision,
+            jobs,
+            response,
             aggregate_usage={"input_tokens": 1, "output_tokens": 1},
         )
 
 
-@pytest.mark.parametrize("usage", [
-    {"input_tokens": True, "output_tokens": 1},
-    {"input_tokens": 1, "output_tokens": 1, 3: 1},
-])
+@pytest.mark.parametrize(
+    "usage",
+    [
+        {"input_tokens": True, "output_tokens": 1},
+        {"input_tokens": 1, "output_tokens": 1, 3: 1},
+    ],
+)
 def test_malformed_usage_fails_with_adapter_error(usage: dict[object, object]) -> None:
     jobs, _ = _eligible()
     decision = adapter.decide_batch(jobs, batching_requested=True, operating_bound=_bound())

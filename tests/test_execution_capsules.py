@@ -107,3 +107,77 @@ def test_claim_capsule_rejects_ambiguous_or_unknown_claims() -> None:
     _, control = _fixture_capsule()
     with pytest.raises(ValueError, match="unknown claim id"):
         resolve_claim_sources(control, ["missing1"])
+
+
+def _section(section_id: str, prefix: str, count: int) -> dict:
+    return dict(
+        section_id=section_id,
+        claim_prefix=prefix,
+        values=[f"{section_id} value {i}" for i in range(1, count + 1)],
+        source_refs=[f"revision-1:{section_id}:{i}" for i in range(1, count + 1)],
+    )
+
+
+def _compile(sections):
+    return compile_claim_capsule(
+        projection_id="projection-1",
+        lineage_identity="lineage",
+        current_responsibility="responsibility",
+        source_revision_id="revision-1",
+        handoff_reason="model_succession",
+        target_substrate="target",
+        sections=sections,
+    )
+
+
+@pytest.mark.parametrize("count,reverse", [(11, False), (11, True), (12, False), (12, True)])
+def test_generated_claim_handle_collision_is_rejected(count, reverse):
+    sections = [_section("first", "c", count), _section("second", "c1", count - 10)]
+    with pytest.raises(ValueError, match="^claim id collision: c11$"):
+        _compile(sections[::-1] if reverse else sections)
+
+
+def test_overlapping_prefixes_without_collisions_preserve_bytes_and_sources():
+    capsule, control = _compile([_section("first", "c", 10), _section("second", "c1", 1)])
+    handles = [key for section in capsule["claims"].values() for key in section]
+    assert len(handles) == len(set(handles)) == len(control["claim_sources"]) == 11
+    assert set(handles) == set(control["claim_sources"])
+    assert resolve_claim_sources(control, handles) == {
+        **{f"c{i}": f"revision-1:first:{i}" for i in range(1, 11)},
+        "c11": "revision-1:second:1",
+    }
+    assert (
+        payload_sha256(capsule)
+        == control["capsule_sha256"]
+        == "4540d0fff4b0dbbb8a0119eb6b1d2068b5f7c65333a3b325674e94ce69787ef1"
+    )
+    assert (
+        payload_sha256(control)
+        == "431be48b87f8d32ce9161b70ed0763e47475f4830b1c9daa3555f3c3d6587b34"
+    )
+
+
+@pytest.mark.parametrize(
+    "second,message",
+    [
+        (_section("second", "c", 1), "duplicate claim prefix: c"),
+        (_section("first", "d", 1), "duplicate capsule section: first"),
+    ],
+)
+def test_duplicate_capsule_headers_still_reject(second, message):
+    with pytest.raises(ValueError, match=f"^{message}$"):
+        _compile([_section("first", "c", 1), second])
+
+
+def test_existing_fixture_capsule_bytes_and_handles_are_unchanged():
+    capsule, control = _fixture_capsule()
+    assert (
+        control["capsule_sha256"]
+        == "a44a2f76cf37df591054bcf4ce078cebbe943b7d639815a62fc1c287513be4e3"
+    )
+    assert len(canonical_json(capsule).encode("utf-8")) == 2243
+    assert set(control["claim_sources"]) == {
+        f"{prefix}{i}"
+        for prefix, count in [("c", 5), ("d", 4), ("s", 2), ("u", 3), ("w", 5), ("x", 5)]
+        for i in range(1, count + 1)
+    }

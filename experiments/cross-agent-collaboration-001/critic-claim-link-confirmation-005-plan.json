@@ -74,7 +74,7 @@
     },
     {
       "path": "src/torc/execution_capsules.py",
-      "sha256": "3ebb1874f4a8a35ffea6dc1893ae9bdfaea9ca5c053ff51260766c626a76b986"
+      "sha256": "17c5dc9d7601831f560802697bf7e62d5813f741dd638ed658283aef9c6f782e"
     },
     {
       "path": "src/torc/canonical.py",

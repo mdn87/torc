@@ -37,11 +37,11 @@
     {"path": "experiments/cross-agent-collaboration-001/fixtures-manifest.json", "sha256": "81feb1eff70ab1d81a4e9f38fc4454c534e42d7cf40fbdcd58e04404406dca11"},
     {"path": "experiments/cross-agent-collaboration-001/handoffs/bug-hidden-regression.json", "sha256": "220b99ab00b289399ef603db75dbda9bb18647b98b3e7d660e5a55c2f6978465"},
     {"path": "experiments/cross-agent-collaboration-001/handoffs/design-cutover-plan.json", "sha256": "b48de5ec39c6943175a295a4496ba2170512b8dc97770088f73ff3f0e925f310"},
-    {"path": "experiments/cross-agent-collaboration-001/critic-claim-link-generalization-006-plan.json", "sha256": "20c4d7693b2be54c42b50d17e2c5515506b7a9cb6064fac8d8a7189899f19ceb"},
+    {"path": "experiments/cross-agent-collaboration-001/critic-claim-link-generalization-006-plan.json", "sha256": "41871e2f221d5d34ca6073e376dd1ccfcb740d0b77a1944251d978a7baa915fb"},
     {"path": "experiments/cross-agent-collaboration-001/critic-claim-link-controls-007-analysis.json", "sha256": "ab22ae27cdc3afd54826e24d31327ade126b26343534797edfa7734865648000"},
     {"path": "experiments/cross-agent-collaboration-001/runs/critic-claim-link-generalization-006/01-header-first/result.json", "sha256": "22add5a6cd579e6901f4e620a1125ef418bd76d2fe77f5ae5f49177b1649ace2"},
     {"path": "experiments/cross-agent-collaboration-001/runs/critic-claim-link-controls-007/03-cutover-first-batch/result.json", "sha256": "aec21898f1abbaf8b8c971fd1281dea56fc20199cd443b91d8a6c45eba7ce1f6"},
-    {"path": "src/torc/execution_capsules.py", "sha256": "3ebb1874f4a8a35ffea6dc1893ae9bdfaea9ca5c053ff51260766c626a76b986"},
+    {"path": "src/torc/execution_capsules.py", "sha256": "17c5dc9d7601831f560802697bf7e62d5813f741dd638ed658283aef9c6f782e"},
     {"path": "src/torc/canonical.py", "sha256": "424fe3640a094f6dd34fa2b4c7b3ce374eada88685243c6a4dbf01b3b8653838"}
   ],
   "provider_controls": {
