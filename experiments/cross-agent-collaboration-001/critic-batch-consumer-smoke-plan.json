@@ -41,7 +41,7 @@
   "evidence_inputs": [
     {
       "path": "experiments/cross-agent-collaboration-001/critic-claim-link-replication-008-plan.json",
-      "sha256": "6c86dfd75034393dc2589637eb0eeda958e79199ccfd876b8ac01e3f5a0645db"
+      "sha256": "12cca8e981907067cfb50b24a19a93982672525ac1063900b4a7e96d6575e278"
     },
     {
       "path": "experiments/cross-agent-collaboration-001/critic-claim-link-replication-008-analysis.json",
@@ -49,7 +49,7 @@
     },
     {
       "path": "experiments/cross-agent-collaboration-001/critic-claim-link-generalization-006-plan.json",
-      "sha256": "20c4d7693b2be54c42b50d17e2c5515506b7a9cb6064fac8d8a7189899f19ceb"
+      "sha256": "41871e2f221d5d34ca6073e376dd1ccfcb740d0b77a1944251d978a7baa915fb"
     },
     {
       "path": "experiments/cross-agent-collaboration-001/runs/critic-claim-link-replication-008/01-header-first/output.json",

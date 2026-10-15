@@ -15,6 +15,11 @@ if str(SRC) not in sys.path:
 
 from torc.canonical import canonical_json  # noqa: E402
 
+AGGREGATE_USAGE_FIELDS = frozenset({
+    "input_tokens", "output_tokens", "cached_input_tokens",
+    "cache_write_input_tokens", "reasoning_output_tokens",
+})
+
 
 class CriticBatchAdapterError(RuntimeError):
     """Raised when an adapter request or response fails closed."""
@@ -242,8 +247,8 @@ def _validate_usage(usage: dict[str, Any]) -> dict[str, int]:
         raise CriticBatchAdapterError("aggregate provider usage is incomplete")
     if any(not isinstance(key, str) for key in usage):
         raise CriticBatchAdapterError("provider usage keys must be strings")
-    if any("candidate" in key or key.startswith("per_") for key in usage):
-        raise CriticBatchAdapterError("per-candidate usage must not be manufactured")
+    if any(key not in AGGREGATE_USAGE_FIELDS for key in usage):
+        raise CriticBatchAdapterError("unsupported aggregate provider usage field")
     validated = {}
     for key, value in usage.items():
         if type(value) is not int or value < 0:
