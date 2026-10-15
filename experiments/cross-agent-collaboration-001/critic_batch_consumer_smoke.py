@@ -222,7 +222,90 @@ def consume_pair(
     return disposition
 
 
-def recorded_transport(prompt: str) -> tuple[str, dict[str, int]]:
+def project_usage(native: dict[str, Any]) -> dict[str, int]:
+    """Keep only reported counters; absent/None values never become zero."""
+    from torc.experiment_usage import TOKEN_FIELDS
+    return {key: value for key, value in native.items()
+            if key in TOKEN_FIELDS and type(value) is int}
+
+
+class OwnerLedger:
+    """In-process execution-owner stand-in for this recorded replay only.
+
+    Production callers must supply an owner-controlled durable reader. This
+    object demonstrates the interface; it is not a security boundary, provider
+    attestation, or durable accounting service.
+    """
+
+    def __init__(self) -> None:
+        self._records: dict[str, dict | None] = {}
+
+    def wrap(self, attempt_id: str, transport: Callable) -> Callable:
+        def capture(prompt: str) -> tuple[str, dict]:
+            if attempt_id in self._records:
+                raise adapter.CriticBatchAdapterError("duplicate owner record")
+            self._records[attempt_id] = None
+            raw, native_usage = transport(prompt)
+            usage = json.loads(canonical_json(native_usage))
+            self._records[attempt_id] = {
+                "attempt_id": attempt_id, "prompt_sha256": _sha(prompt),
+                "raw_output_sha256": _sha(raw), "usage": usage,
+                "usage_sha256": _sha(canonical_json(usage)),
+            }
+            return raw, native_usage
+        return capture
+
+    def get(self, attempt_id: str) -> dict | None:
+        return json.loads(canonical_json(self._records.get(attempt_id)))
+
+    def ids(self) -> list[str]:
+        return list(self._records)
+
+
+def account_attempts(owner: OwnerLedger, root: Path) -> list[dict]:
+    """Account all owner attempts, including rejected or lost consumer evidence.
+
+    Status is consumer-written and is not proof of outcome. Missing capture is
+    unknown spend, not zero. Each damaged consumer record is isolated.
+    """
+    rows = []
+    for attempt_id in owner.ids():
+        captured = owner.get(attempt_id)
+        usage = None if captured is None else project_usage(captured["usage"])
+        row = {"attempt_id": attempt_id, "usage": usage, "status": None, "issues": []}
+        issues = row["issues"]
+        if captured is None:
+            issues.append("no owner usage")
+        elif not {"input_tokens", "output_tokens"} <= usage.keys():
+            issues.append("owner usage incomplete")
+        directory = root / attempt_id
+        if not directory.is_dir():
+            issues.append("attempt directory missing")
+            rows.append(row)
+            continue
+        try:
+            if not (directory / "disposition.json").exists():
+                issues.append("disposition missing")
+            else:
+                disposition = _object(directory / "disposition.json")
+                if not isinstance(disposition.get("status"), str):
+                    raise ValueError("missing status")
+                row["status"] = disposition["status"]
+        except Exception:
+            issues.append("attempt record unreadable")
+        try:
+            consumer_usage = (_object(directory / "usage.json")
+                              if (directory / "usage.json").exists() else None)
+            if captured is not None and consumer_usage != usage:
+                issues.append("usage differs from owner capture")
+        except Exception:
+            if "attempt record unreadable" not in issues:
+                issues.append("attempt record unreadable")
+        rows.append(row)
+    return rows
+
+
+def recorded_native_transport(prompt: str) -> tuple[str, dict[str, Any]]:
     """Local stand-in echoes the request ID around already recorded critique evidence."""
     envelope = json.loads(prompt.split("\nREQUEST\n", 1)[1])
     run = EXPERIMENT / "runs" / "critic-claim-link-replication-008" / "01-header-first"
@@ -232,13 +315,12 @@ def recorded_transport(prompt: str) -> tuple[str, dict[str, int]]:
         "critiques": [by_id[item["candidate_id"]] for item in envelope["candidates"]],
     }
     counters = _object(run / "phase" / "worker-run.json")["usage"]
-    usage = {
-        key: value for key, value in counters.items()
-        if key in {"input_tokens", "output_tokens", "cached_input_tokens",
-                   "cache_write_input_tokens", "reasoning_output_tokens"}
-        and type(value) is int
-    }
-    return canonical_json(response), usage
+    return canonical_json(response), counters
+
+
+def recorded_transport(prompt: str) -> tuple[str, dict[str, int]]:
+    raw, native_usage = recorded_native_transport(prompt)
+    return raw, project_usage(native_usage)
 
 
 def link_smoke_to_lineage(
@@ -246,6 +328,8 @@ def link_smoke_to_lineage(
     state_dir: Path,
     jobs: tuple[adapter.CriticJob, ...],
     approval: dict[str, Any],
+    *,
+    owner: OwnerLedger | None = None,
 ) -> dict[str, Any]:
     """Exercise the ordinary authorized checkpoint on a fresh deterministic demo store."""
     disposition = _object(output_dir / "disposition.json")
@@ -293,6 +377,18 @@ def link_smoke_to_lineage(
         decision, jobs, response, aggregate_usage=usage
     ):
         raise adapter.CriticBatchAdapterError("persisted receipt drifted")
+    capture = None if owner is None else owner.get(output_dir.name)
+    if capture is None:
+        raise adapter.CriticBatchAdapterError("owner usage capture is required")
+    if (capture.get("attempt_id") != output_dir.name
+            or capture.get("prompt_sha256") != _sha(prompt)
+            or capture.get("raw_output_sha256") != _sha(raw_output)
+            or capture.get("usage_sha256") != _sha(canonical_json(capture.get("usage")))
+            or project_usage(capture["usage"]) != usage
+            or usage != receipt["aggregate_usage"]):
+        raise adapter.CriticBatchAdapterError("owner usage binding drifted")
+    if len(raw_output.encode("utf-8")) > approval["maximum_output_bytes"]:
+        raise adapter.CriticBatchAdapterError("response exceeds output budget")
     run_demo(state_dir)
     with Store(state_dir) as store:
         before = store.current_authority("demo-lineage")
@@ -302,10 +398,10 @@ def link_smoke_to_lineage(
         linked = link_batch_evidence(
             store, lineage_id="demo-lineage", activation_id=before["activation_id"],
             decision=decision, jobs=jobs, receipt=receipt, response=response,
-            evidence_context={key: disposition[key] for key in (
+            evidence_context={**{key: disposition[key] for key in (
                 "execution_mode", "usage_source", "attempt_id", "request_sha256",
                 "prompt_sha256", "raw_output_sha256",
-            )},
+            )}, "owner_usage_sha256": capture["usage_sha256"]},
         )
         after = store.current_authority("demo-lineage")
         verification = verify_store(store, "demo-lineage")
@@ -339,18 +435,26 @@ def main(argv: list[str] | None = None) -> int:
     try:
         approval = load_approval()
         jobs, payloads = load_pair(args.order)
+        owner = OwnerLedger()
+        captured_transport = owner.wrap(args.output_dir.name, recorded_native_transport)
+
+        def transport(prompt: str) -> tuple[str, dict[str, int]]:
+            raw, native_usage = captured_transport(prompt)
+            return raw, project_usage(native_usage)
+
         result = consume_pair(
             jobs, payloads, output_dir=args.output_dir, approval=approval,
             effective_controls=approval["controls"], batching_requested=True,
-            authority_check=lambda: True, transport=recorded_transport,
+            authority_check=lambda: True, transport=transport,
         )
         result["execution_mode"] = "model-free-recorded-replay"
         result["live_provider_calls"] = 0
         result["usage_source"] = "recorded-provider-usage"
         if result["status"] == "validated" and args.state_dir is not None:
             result["lineage"] = link_smoke_to_lineage(
-                args.output_dir, args.state_dir, jobs, approval
+                args.output_dir, args.state_dir, jobs, approval, owner=owner,
             )
+        result["accounting"] = account_attempts(owner, args.output_dir.parent)
         print(canonical_json(result))
         return 0 if result["status"] == "validated" else 1
     except (adapter.CriticBatchAdapterError, OSError, ValueError, TorcError) as exc:
