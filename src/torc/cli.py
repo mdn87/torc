@@ -57,6 +57,8 @@ from .operator import (
     validate_lineage_creation,
     validate_substrate,
 )
+from .p5_capsules import CapsuleCompositionError
+from .p5_capsules import derive as derive_capsule
 from .store import Store
 from .verify import verify_store
 from .visibility import build_lineage_explanation, render_lineage_explanation
@@ -144,6 +146,15 @@ def build_parser() -> argparse.ArgumentParser:
     verify.add_argument("--state-dir", type=Path, required=True)
     verify.add_argument("--lineage")
     verify.add_argument("--json", action="store_true", dest="as_json")
+
+    projection = subparsers.add_parser("projection", help="Read verified derived projections.")
+    projection_commands = projection.add_subparsers(dest="projection_command", required=True)
+    capsule = projection_commands.add_parser("capsule", help="Render a stored P5 carry as claims.")
+    capsule.add_argument("--state-dir", type=Path, required=True)
+    capsule.add_argument("--projection", required=True)
+    capsule.add_argument("--record-sha256", required=True,
+                         help="Expected record hash returned by the original carry operation.")
+    capsule.add_argument("--json", action="store_true", dest="as_json")
 
     lineage = subparsers.add_parser(
         "lineage", help="Operate a real local lineage through its authority lease."
@@ -852,6 +863,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.command == "doctor":
         return _run_doctor(args.as_json)
     try:
+        if args.command == "projection":
+            with Store(args.state_dir, read_only=True) as store:
+                capsule, control, record = derive_capsule(
+                    store, args.projection, args.record_sha256,
+                )
+            _print_payload({
+                "report_kind": "projection_capsule", "ok": True, "trusted": True,
+                "canonical": False, "authority_transferred": False,
+                "capsule": capsule, "control": control, "composition": record,
+            }, args.as_json)
+            return 0
         if args.command == "demo":
             payload = run_demo(args.state_dir)
             _print_payload(payload, args.as_json)
@@ -1015,6 +1037,13 @@ def main(argv: Sequence[str] | None = None) -> int:
             "error": type(exc).__name__,
             "detail": str(exc),
         }
+        if args.command == "projection":
+            payload.update({
+                "report_kind": "projection_capsule", "trusted": False,
+                "canonical": False, "authority_transferred": False,
+            })
+            if isinstance(exc, CapsuleCompositionError):
+                payload.update({"code": exc.code, "verification_errors": exc.errors})
         _print_payload(payload, getattr(args, "as_json", False))
         return 1
 
