@@ -7,7 +7,8 @@ from pathlib import Path
 
 import pytest
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "experiments/cross-agent-collaboration-001"))
+EXPERIMENT = Path(__file__).resolve().parents[1] / "experiments/cross-agent-collaboration-001"
+sys.path.insert(0, str(EXPERIMENT))
 import critic_batch_consumer_smoke as smoke  # noqa: E402
 
 
@@ -47,7 +48,9 @@ def test_original_usage_and_authority_are_preserved(tmp_path):
     assert usage == {"input_tokens": 14618, "output_tokens": 639,
                      "cached_input_tokens": 10240, "cache_write_input_tokens": 0,
                      "reasoning_output_tokens": 146}
-    linked = smoke.link_smoke_to_lineage(tmp_path / "attempt", tmp_path / "state", jobs, approval, owner=owner)
+    linked = smoke.link_smoke_to_lineage(
+        tmp_path / "attempt", tmp_path / "state", jobs, approval, owner=owner,
+    )
     assert linked["authority_transitions_added"] == 0
     assert linked["verification"]["valid"]
     # Reads cannot mutate the owner's retained native record.
@@ -104,7 +107,9 @@ def test_unreported_usage_is_not_zero_filled(tmp_path):
     owner, jobs, approval, result = run_attempt(tmp_path, native=native)
     assert result["status"] == "validated"
     assert "cache_write_input_tokens" not in smoke.project_usage(owner.get("attempt")["usage"])
-    smoke.link_smoke_to_lineage(tmp_path / "attempt", tmp_path / "state", jobs, approval, owner=owner)
+    smoke.link_smoke_to_lineage(
+        tmp_path / "attempt", tmp_path / "state", jobs, approval, owner=owner,
+    )
 
 
 def test_rehashed_raw_output_is_rejected_by_owner_binding(tmp_path):
@@ -126,7 +131,8 @@ def test_relabelled_attempt_cannot_borrow_owner_capture(tmp_path):
     request["attempt_id"] = "replacement"
     (root / "request.json").write_text(json.dumps(request))
     disposition = json.loads((root / "disposition.json").read_text())
-    disposition.update(attempt_id="replacement", request_sha256=smoke._sha(smoke.canonical_json(request)))
+    disposition.update(attempt_id="replacement",
+                       request_sha256=smoke._sha(smoke.canonical_json(request)))
     (root / "disposition.json").write_text(json.dumps(disposition))
     with pytest.raises(smoke.adapter.CriticBatchAdapterError, match="owner usage capture"):
         smoke.link_smoke_to_lineage(root, tmp_path / "state", jobs, approval, owner=owner)

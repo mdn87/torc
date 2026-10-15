@@ -23,7 +23,8 @@ def attempt(request, tmp_path, monkeypatch):
     plan_path = tmp_path / "plan.json"
     root = tmp_path / "experiment"
     if runner is batch:
-        shutil.copytree(EXPERIMENT / "runs/critic-transport-002", root / "runs/critic-transport-002")
+        baseline_path = Path("runs/critic-transport-002")
+        shutil.copytree(EXPERIMENT / baseline_path, root / baseline_path)
     monkeypatch.setattr(runner, "PLAN_PATH", plan_path)
     monkeypatch.setattr(runner, "EXPERIMENT_ROOT", root)
     manifest = copy.deepcopy(batch.workflow.load_manifest())
@@ -59,7 +60,8 @@ def attempt(request, tmp_path, monkeypatch):
             run_dir = series._resolve_run_dir(plan, plan["counterbalanced_schedule"][0])
             kwargs = {"run_index": 1}
             error = series.CriticBatchSeriesError
-        return run_dir, error, lambda: (runner.execute_probe if runner is batch else runner.execute_run)(
+        invoke = runner.execute_probe if runner is batch else runner.execute_run
+        return run_dir, error, lambda: invoke(
             run_dir=run_dir, expected_plan_sha256=probe["plan_sha256"],
             expected_prompt_sha256=probe["prompt_sha256"], **kwargs,
         )

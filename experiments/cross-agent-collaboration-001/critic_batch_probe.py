@@ -264,7 +264,8 @@ def preflight_inputs(
             raise ValueError("timeout_seconds must be numeric in [0.001, 4294967.295)")
         (canonical_json(public_probe) + "\n").encode("utf-8")
         if series:
-            (canonical_json({"apparatus_revision": plan["apparatus_revision"]}) + "\n").encode("utf-8")
+            attempt = {"apparatus_revision": plan["apparatus_revision"]}
+            (canonical_json(attempt) + "\n").encode("utf-8")
     except (workflow.WorkflowRunnerError, KeyError, TypeError, ValueError) as exc:
         if isinstance(exc, UnicodeError):
             detail = "frozen reservation records must encode as UTF-8"

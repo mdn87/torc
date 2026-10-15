@@ -21,7 +21,7 @@
     },
     {
       "path": "experiments/cross-agent-collaboration-001/critic_batch_probe.py",
-      "sha256": "a50cb91138880694a6062c1b247f8028bd751990cff282225d347133671ac79a"
+      "sha256": "35a0fbb313fdabcf0dd9f5a8b448a5ccf2586a46a9454fba9681e3dcc3ca51c1"
     },
     {
       "path": "experiments/cross-agent-collaboration-001/codex_usage_snapshot.py",
