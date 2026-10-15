@@ -181,13 +181,18 @@ def execute_run(
     if expected_run_dir.exists():
         raise CriticBatchSeriesError(f"run directory already exists: {run_dir}")
     _assert_next_run(plan, run_index)
+    public_probe = {key: value for key, value in probe.items() if key != "prompt"}
+    try:
+        settings, effort, timeout = batch.preflight_inputs(plan, public_probe, series=True)
+    except batch.CriticBatchProbeError as exc:
+        raise CriticBatchSeriesError(str(exc)) from exc
+    apparatus_revision = plan["apparatus_revision"]
     threshold = plan["call_budget"]["stop_threshold_percent"]
     checkpoint = codex_usage_snapshot.read_snapshot(stop_threshold_percent=threshold)
     if checkpoint["decision"] != "proceed":
         raise CriticBatchSeriesError("current usage reached the batch stop threshold")
 
     expected_run_dir.mkdir(parents=True)
-    public_probe = {key: value for key, value in probe.items() if key != "prompt"}
     _write_json(expected_run_dir / "probe-plan.json", public_probe)
     _write_json(expected_run_dir / "usage-checkpoint.json", checkpoint)
     attempt_path = expected_run_dir / "attempt.json"
@@ -196,12 +201,11 @@ def execute_run(
         {
             "schema_version": 1,
             "status": "reserved",
-            "apparatus_revision": plan["apparatus_revision"],
+            "apparatus_revision": apparatus_revision,
             "retry_requires_plan_change": True,
         },
     )
     phase_dir = expected_run_dir / "phase"
-    settings = workflow._provider_settings(workflow.load_manifest(), "codex")
     error: Exception | None = None
     record: dict[str, Any] | None = None
     try:
@@ -211,12 +215,12 @@ def execute_run(
             settings=settings,
             workspace=workspace,
             prompt=probe["prompt"],
-            effort=plan["provider_controls"]["effort"],
+            effort=effort,
             role="critic",
             tool_mode="none",
             session_mode="fresh-ephemeral",
             session_id=None,
-            timeout_seconds=workflow.load_manifest()["timeout_seconds"],
+            timeout_seconds=timeout,
             output_dir=phase_dir,
         )
         output = workflow._phase_output_object("codex", phase_dir)

@@ -233,6 +233,52 @@ def _write_json(path: Path, value: dict[str, Any]) -> None:
     path.write_text(canonical_json(value) + "\n", encoding="utf-8")
 
 
+def preflight_inputs(
+    plan: dict[str, Any], public_probe: dict[str, Any], *, series: bool = False,
+) -> tuple[dict[str, Any], str, float]:
+    """Validate frozen inputs before reserving a run or querying live usage.
+
+    Host observations still belong to the recorded attempt. Error details omit
+    raw values so malformed Unicode cannot break the CLI's JSON error output.
+    """
+    try:
+        manifest = workflow.load_manifest()
+        settings = workflow._provider_settings(manifest, "codex")
+        if settings.get("provider") != "codex":
+            raise ValueError("provider must be codex")
+        if settings.get("transport") not in worker_runner.TRANSPORTS:
+            raise ValueError("transport is unsupported")
+        effort = plan["provider_controls"]["effort"]
+        for field, value in [(name, settings.get(name)) for name in
+                             ("executable", "model", "harness_version")] + [("effort", effort)]:
+            if not isinstance(value, str) or not value.strip() or not value.isprintable():
+                raise ValueError(f"{field} must be a nonempty printable string")
+            if field in {"model", "effort"} and len(value) > 256:
+                raise ValueError(f"{field} exceeds 256 characters")
+            if field == "harness_version" and (value != value.strip() or len(value) > 200):
+                raise ValueError("harness_version must be trimmed and at most 200 characters")
+        timeout = manifest["timeout_seconds"]
+        # Popen's Windows wait uses milliseconds; 0xFFFFFFFF means infinite.
+        if (isinstance(timeout, bool) or not isinstance(timeout, (int, float))
+                or not 0.001 <= timeout < 4294967.295):
+            raise ValueError("timeout_seconds must be numeric in [0.001, 4294967.295)")
+        (canonical_json(public_probe) + "\n").encode("utf-8")
+        if series:
+            attempt = {"apparatus_revision": plan["apparatus_revision"]}
+            (canonical_json(attempt) + "\n").encode("utf-8")
+    except (workflow.WorkflowRunnerError, KeyError, TypeError, ValueError) as exc:
+        if isinstance(exc, UnicodeError):
+            detail = "frozen reservation records must encode as UTF-8"
+        elif isinstance(exc, (KeyError, TypeError)):
+            detail = "required frozen configuration field is missing or malformed"
+        elif isinstance(exc, workflow.WorkflowRunnerError):
+            detail = "workflow manifest or codex settings are invalid"
+        else:
+            detail = str(exc)
+        raise CriticBatchProbeError(f"preflight: {detail}") from exc
+    return settings, effort, timeout
+
+
 def execute_probe(
     *,
     run_dir: Path,
@@ -254,6 +300,12 @@ def execute_probe(
         raise CriticBatchProbeError("run directory does not match the frozen plan")
     if resolved_run.exists():
         raise CriticBatchProbeError(f"run directory already exists: {resolved_run}")
+    public_probe = {key: value for key, value in probe.items() if key != "prompt"}
+    settings, effort, timeout = preflight_inputs(plan, public_probe)
+    try:
+        baseline = _baseline(plan)
+    except (CriticBatchProbeError, KeyError, TypeError, ValueError, OSError) as exc:
+        raise CriticBatchProbeError("preflight: matched direct baseline is invalid") from exc
     apparatus_revision = workflow._apparatus_revision()
     threshold = plan["call_budget"]["stop_threshold_percent"]
     checkpoint = codex_usage_snapshot.read_snapshot(
@@ -263,7 +315,6 @@ def execute_probe(
         raise CriticBatchProbeError("current usage reached the batch stop threshold")
 
     resolved_run.mkdir(parents=True)
-    public_probe = {key: value for key, value in probe.items() if key != "prompt"}
     _write_json(resolved_run / "probe-plan.json", public_probe)
     _write_json(resolved_run / "usage-checkpoint.json", checkpoint)
     _write_json(
@@ -276,7 +327,6 @@ def execute_probe(
         },
     )
     phase_dir = resolved_run / "phase"
-    settings = workflow._provider_settings(workflow.load_manifest(), "codex")
     error: Exception | None = None
     record: dict[str, Any] | None = None
     try:
@@ -289,12 +339,12 @@ def execute_probe(
                 / "agent-visible"
             ),
             prompt=probe["prompt"],
-            effort=plan["provider_controls"]["effort"],
+            effort=effort,
             role="critic",
             tool_mode="none",
             session_mode="fresh-ephemeral",
             session_id=None,
-            timeout_seconds=workflow.load_manifest()["timeout_seconds"],
+            timeout_seconds=timeout,
             output_dir=phase_dir,
         )
         batch = workflow._phase_output_object("codex", phase_dir)
@@ -324,7 +374,6 @@ def execute_probe(
             f"batch probe excluded; evidence preserved: {error}"
         ) from error
     assert record is not None
-    baseline = _baseline(plan)
     input_tokens = record["usage"]["input_tokens"]
     completion_ms = record["timing"]["completion_ms"]
     input_ratio = input_tokens / baseline["summed_median_input_tokens"]

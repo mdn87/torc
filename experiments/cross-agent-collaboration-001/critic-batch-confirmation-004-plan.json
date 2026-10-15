@@ -13,11 +13,11 @@
   "apparatus_inputs": [
     {
       "path": "experiments/cross-agent-collaboration-001/critic_batch_series.py",
-      "sha256": "7df2f0e05eaf439b77dc63e87f88df652680a14a0b4c4ef7f96e8a723166213a"
+      "sha256": "7e42a7fe1db2783da973589d1af4232f687d8f37c98be61ef5bc67b24827e13e"
     },
     {
       "path": "experiments/cross-agent-collaboration-001/critic_batch_probe.py",
-      "sha256": "742c200dbe79d2ca1d7a04aeab3c3cf95e5d293781f2e11c8df5aa7eb564651a"
+      "sha256": "35a0fbb313fdabcf0dd9f5a8b448a5ccf2586a46a9454fba9681e3dcc3ca51c1"
     },
     {
       "path": "experiments/cross-agent-collaboration-001/codex_usage_snapshot.py",
