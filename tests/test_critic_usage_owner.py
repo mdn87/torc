@@ -115,8 +115,8 @@ def test_unreported_usage_is_not_zero_filled(tmp_path):
 def test_rehashed_raw_output_is_rejected_by_owner_binding(tmp_path):
     owner, jobs, approval, _ = run_attempt(tmp_path)
     root = tmp_path / "attempt"
-    raw = (root / "output.json").read_text() + " "
-    (root / "output.json").write_text(raw)
+    raw = (root / "output.json").read_bytes().decode("utf-8") + " "
+    (root / "output.json").write_bytes(raw.encode("utf-8"))
     disposition = json.loads((root / "disposition.json").read_text())
     disposition["raw_output_sha256"] = smoke._sha(raw)
     (root / "disposition.json").write_text(json.dumps(disposition))
