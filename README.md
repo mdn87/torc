@@ -110,6 +110,11 @@ experiment lanes. P5 proves the mechanism on a deterministic fixture; it does
 not yet show that a receiving agent performs better. See
 `docs/p5-receiver-carry.md`.
 
+`torc projection capsule` now provides a read-only consumer for a stored P5
+carry. It requires the projection ID and record hash from the carry response,
+checks lineage integrity, and preserves every selected claim and omitted-field
+record without moving authority. See [the capsule consumer](docs/p5-capsule-consumer.md).
+
 The portable continuity work came from [Reed Newman](https://github.com/ReedNewman)
 (PR #26, merged through #28 with his history intact). It separates the compact
 execution capsule a receiving agent reads from the control envelope TORC keeps
