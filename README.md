@@ -99,7 +99,7 @@ its next operation. See
 `docs/thread-checkpoint-authority.md`.
 
 P5 builds the center of the concept (`docs/decisions/0004-torc-is-always-in-charge.md`).
-Compiler `p5-1` sizes the carry from the receiving substrate's descriptor, fits
+Compiler `p5-2` sizes the carry from the receiving substrate's descriptor, fits
 optional state item by item, and reads the lineage history, so work that one
 bearer silently dropped from its summary still reaches the next one. Checkpoints
 and `lineage status` ask the bearer to account for what it dropped and to

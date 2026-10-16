@@ -26,8 +26,8 @@ from .store import Store
 COMPILER_VERSION = "p0-1"
 POLICY_VERSION = "p0-1"
 
-RECEIVER_COMPILER_VERSION = "p5-1"
-RECEIVER_POLICY_VERSION = "p5-1"
+RECEIVER_COMPILER_VERSION = "p5-2"
+RECEIVER_POLICY_VERSION = "p5-2"
 CARRY_PURPOSES = ("handoff", "session_start")
 CARRY_SHARE_PERCENT = 5
 CARRY_FLOOR = {"words": 200, "characters": 1200}
@@ -356,6 +356,9 @@ def compile_receiver_projection(
             omit("changes-since-receiver", source_ref, "budget")
 
     optional_specs = [
+        # A saved working method can determine the receiver's first action.
+        # Preserve it after unresolved history and before descriptive context.
+        ("methods", f"{source_revision_id}:self_model", 82, self_model.get("methods", [])),
         ("goals", f"{source_revision_id}:goals", 80, state["goals"]),
         (
             "settled-decisions",
@@ -364,7 +367,6 @@ def compile_receiver_projection(
             self_model.get("settled_decisions", []),
         ),
         ("uncertainties", f"{source_revision_id}:uncertainties", 60, state["uncertainties"]),
-        ("methods", f"{source_revision_id}:self_model", 50, self_model.get("methods", [])),
         ("artifact-refs", f"{source_revision_id}:artifact_refs", 40, state["artifact_refs"]),
         ("memory-refs", f"{source_revision_id}:memory_refs", 30, state["memory_refs"]),
     ]

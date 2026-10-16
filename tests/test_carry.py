@@ -91,6 +91,18 @@ def _validate(schema_name: str, record: dict[str, Any]) -> None:
     Draft202012Validator(schema, format_checker=FormatChecker()).validate(record)
 
 
+def test_small_carry_preserves_working_method_before_optional_context(tmp_path):
+    with Store(tmp_path) as store:
+        _build(store)
+        before = store.current_authority(LINEAGE)
+        carry = _carry(store, "receiver-small.json")
+        assert store.current_authority(LINEAGE) == before
+    assert _sections(carry)["methods"]["content"] == ["Write the failing test first"]
+    assert DROPPED_WORK in json.dumps(carry["included_sections"])
+    assert DROPPED_CONSTRAINT in json.dumps(carry["included_sections"])
+    assert carry["budget"]["estimated_used"] <= carry["budget"]["limit"]
+
+
 def test_p0_loses_the_dropped_work_and_p5_carries_it(tmp_path: Path) -> None:
     with Store(tmp_path) as store:
         revisions = _build(store)
@@ -120,7 +132,7 @@ def test_p0_loses_the_dropped_work_and_p5_carries_it(tmp_path: Path) -> None:
     assert sections["unaccounted-constraints-1"]["content"]["item"] == DROPPED_CONSTRAINT
     assert COMPLETED_WORK not in json.dumps(carry["included_sections"])
     assert sections["receiver-fit"]["content"]["history_revisions_read"] == 4
-    assert carry["compiler_version"] == "p5-1"
+    assert carry["compiler_version"] == "p5-2"
     _validate("execution-projection.schema.json", carry)
 
 
@@ -150,13 +162,10 @@ def test_carry_is_sized_and_shaped_by_the_receiver_from_unchanged_history(
 
     # The small receiver still gets both dropped items before any optional state.
     assert {"unaccounted-constraints-1", "unaccounted-open_work-2"} <= set(_sections(small))
-    assert _sections(small)["settled-decisions"]["content"] == [
-        "Exports are written as UTF-8 JSON"
-    ]
+    assert _sections(small)["methods"]["content"] == ["Write the failing test first"]
     assert _omitted(small) == {
-        "settled-decisions.remainder": "budget",
+        "settled-decisions": "budget",
         "uncertainties": "budget",
-        "methods": "budget",
         "artifact-refs": "capability_irrelevant",
     }
     assert _omitted(large) == {}
@@ -388,7 +397,7 @@ def test_new_bearer_is_asked_to_restate_the_self_model_until_it_does(
         )["boundary"]["self_model"]
         verification = verify_store(store, LINEAGE)
 
-    assert projection["compiler_version"] == "p5-1"
+    assert projection["compiler_version"] == "p5-2"
     assert projection["budget"]["limit"] == 10000
     assert _sections(projection)["self-model-provenance"]["content"]["restatement_due"] is True
     assert DROPPED_WORK in brief

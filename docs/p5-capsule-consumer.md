@@ -30,7 +30,7 @@ The Python boundary is `torc.p5_capsules.derive(store, projection_id, hash)`.
 Before publishing a supplied triple, call
 `verify(store, projection_id, hash, capsule, control, composition)`. Both use
 one SQLite read snapshot. They check row/payload agreement, the sealed hash,
-the expected hash, compiler and policy `p5-1`, and the whole lineage integrity
+the expected hash, matching compiler/policy pairs `p5-1` or `p5-2`, and the whole lineage integrity
 gate used by carry. Verification compares the full objects with a fresh
 rendering, including section placement, source mappings and extra keys.
 

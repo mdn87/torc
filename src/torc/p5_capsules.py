@@ -87,7 +87,8 @@ def _lookup(store: Store, projection_id: str, record_sha256: str) -> dict[str, A
         raise CapsuleCompositionError("projection_hash_invalid")
     if projection["integrity"]["canonical_payload_sha256"] != record_sha256:
         raise CapsuleCompositionError("projection_hash_unexpected")
-    if any(projection.get(key) != "p5-1" for key in ("compiler_version", "policy_version")):
+    versions = (projection.get("compiler_version"), projection.get("policy_version"))
+    if versions not in (("p5-1", "p5-1"), ("p5-2", "p5-2")):
         raise CapsuleCompositionError("projection_compiler_unsupported")
     verification = verify_store(store, projection["lineage_id"])
     if not verification["valid"]:
