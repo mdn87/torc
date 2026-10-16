@@ -64,7 +64,7 @@ def _prepared(root, receiver="receiver-small.json", **kwargs):
     [
         ("receiver-small.json", None, 8),
         ("receiver-large.json", None, 12),
-        ("receiver-large.json", 80, 7),
+        ("receiver-large.json", 80, 6),
     ],
 )
 def test_derive_and_verify_preserve_the_fitted_projection(tmp_path, receiver, cap, count):
@@ -83,7 +83,7 @@ def test_derive_and_verify_preserve_the_fitted_projection(tmp_path, receiver, ca
     assert record["redactions"] == projection["redactions"]
     assert record["authority_transferred"] is False
     assert record["target_substrate_id"] == projection["target_substrate_id"]
-    assert record["compiler_version"] == record["policy_version"] == "p5-1"
+    assert record["compiler_version"] == record["policy_version"] == "p5-2"
     assert record["projection_record_sha256"] == _pair(projection)[1]
     assert record["capsule_sha256"] == payload_sha256(capsule)
     assert record["control_sha256"] == payload_sha256(control)
@@ -95,7 +95,7 @@ def test_derive_and_verify_preserve_the_fitted_projection(tmp_path, receiver, ca
             "unaccounted-constraints-1": {"za1": "Never write outside the state directory"},
             "unaccounted-open_work-2": {"zb1": "Handle exports larger than memory"},
             "goals": {"g1": "Ship a lineage export command", "g2": "Document the export command"},
-            "settled-decisions": {"d1": "Exports are written as UTF-8 JSON"},
+            "methods": {"m1": "Write the failing test first"},
         }
         assert record["claim_paths"]["zb1"] == {
             "projection_section_id": "unaccounted-open_work-2",
@@ -114,6 +114,22 @@ def test_expected_hash_is_required_even_for_a_valid_stored_projection(tmp_path):
     with _unchanged(tmp_path) as store:
         with pytest.raises(CapsuleCompositionError, match="projection_hash_unexpected"):
             derive(store, projection["projection_id"], "0" * 64)
+
+
+def test_historical_p5_1_projection_still_renders_without_recompilation(tmp_path):
+    from torc.p5_capsules import derive
+
+    projection, _ = _prepared(tmp_path, receiver="receiver-large.json")
+    legacy = copy.deepcopy(projection)
+    legacy["projection_id"] = "historical-projection"
+    legacy["compiler_version"] = legacy["policy_version"] = "p5-1"
+    legacy = seal_record(legacy)
+    with Store(tmp_path) as store:
+        store.insert_hashed_record("projections", legacy["projection_id"], legacy)
+    with _unchanged(tmp_path) as store:
+        capsule, _, record = derive(store, *_pair(legacy))
+    assert record["compiler_version"] == "p5-1"
+    assert capsule["claims"]["methods"]["m1"] == "Write the failing test first"
 
 
 def _reseal_composition(capsule, control, record):
@@ -164,7 +180,9 @@ def test_resealed_output_tampering_is_rejected(tmp_path, change, code):
         elif change == "drop_history":
             del capsule["claims"]["unaccounted-open_work-2"]
         elif change == "add_omitted":
-            capsule["claims"]["settled-decisions"]["d2"] = "The export schema is versioned from 1"
+            capsule["claims"]["settled-decisions"] = {
+                "d2": "The export schema is versioned from 1"
+            }
         elif change == "omit_evidence":
             del record["omitted_sections"]
         elif change == "role":

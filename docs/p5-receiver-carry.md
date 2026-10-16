@@ -23,7 +23,7 @@ bearing agent does the thinking; TORC notices, asks, shapes, and records.
 
 ## What a carry is
 
-A carry is an execution projection compiled by compiler `p5-1` for one
+A carry is an execution projection compiled by compiler `p5-2` for one
 receiving substrate. It uses the existing projection record shape
 (`schemas/execution-projection.schema.json`), is stored as an immutable
 projection, and stays a derived, non-canonical artifact. Receiving a carry
@@ -53,7 +53,16 @@ Sections are considered in this order.
 |---|---|
 | Required | `identity-role`, `constraints`, `commitments`, `open-work`, the purpose section, `receiver-fit`, `self-model-provenance` |
 | History | one `unaccounted-*` section per unaccounted drop (priority 90), then `changes-since-receiver` (priority 85) |
-| Optional head state | `goals` 80, `settled-decisions` 70, `uncertainties` 60, `methods` 50, `artifact-refs` 40, `memory-refs` 30 |
+| Optional head state | `methods` 82, `goals` 80, `settled-decisions` 70, `uncertainties` 60, `artifact-refs` 40, `memory-refs` 30 |
+
+Compiler and policy `p5-2` move saved working methods ahead of descriptive
+context. The October 2026 live receiver comparison found that the 100-word
+`p5-1` carry omitted “Write the failing test first”; its four receivers chose
+implementation before that test, while all four history-baseline receivers
+chose the test. This is evidence from one fixture, not general superiority.
+Required continuity and unresolved history retain their priority. Methods
+can still be omitted when the budget cannot fit them; omissions remain explicit.
+Existing `p5-1` projections remain immutable and renderable.
 
 - The purpose section is `handoff-purpose` for a handoff and `session-purpose`
   for a session start. `session-purpose` states who holds authority and whether
