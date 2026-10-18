@@ -33,3 +33,6 @@ Thumbs.db
 .worktrees/
 .Codex/handoff.md
 .Codex/handoff-history/
+
+# Local dias agent state
+.dias/
