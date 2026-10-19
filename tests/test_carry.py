@@ -565,6 +565,38 @@ def test_verify_detects_a_tampered_or_misattributed_carry(tmp_path: Path) -> Non
     assert "projection_hash_mismatch" in {error["code"] for error in tampered["errors"]}
 
 
+def test_verify_allows_ancestor_citations_only_from_known_p5_compilers(tmp_path: Path) -> None:
+    with Store(tmp_path) as store:
+        _build(store)
+        carry = _carry(store, "receiver-large.json")
+        body = {key: value for key, value in carry.items() if key != "integrity"}
+        for projection_id, version in (
+            ("projection-p5-1", "p5-1"),
+            ("projection-p5-9", "p5-9"),
+        ):
+            store.insert_hashed_record(
+                "projections",
+                projection_id,
+                seal_record(
+                    body | {"projection_id": projection_id, "compiler_version": version}
+                ),
+            )
+        report = verify_store(store, LINEAGE)
+
+    own = f"{carry['source_revision_id']}:"
+    ancestor_citations = [
+        section
+        for section in carry["included_sections"] + carry["omitted_sections"]
+        if not section["source_ref"].startswith(own)
+    ]
+    assert ancestor_citations, "the fixture carry must cite an ancestor revision"
+    # A forged version that merely looks like a p5 compiler gets no ancestor
+    # allowance; the known earlier version keeps it.
+    assert [(error["code"], error["record_id"]) for error in report["errors"]] == [
+        ("projection_source_ref_invalid", "projection-p5-9")
+    ] * len(ancestor_citations)
+
+
 def test_cli_checkpoint_resolutions_and_carry(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:

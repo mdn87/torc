@@ -27,6 +27,9 @@ COMPILER_VERSION = "p0-1"
 POLICY_VERSION = "p0-1"
 
 RECEIVER_COMPILER_VERSION = "p5-2"
+# The receiver compilers whose projections may cite the source revision's
+# ancestors (verify.py). An unknown version gets no such allowance.
+RECEIVER_COMPILER_VERSIONS = frozenset({"p5-1", RECEIVER_COMPILER_VERSION})
 RECEIVER_POLICY_VERSION = "p5-2"
 CARRY_PURPOSES = ("handoff", "session_start")
 CARRY_SHARE_PERCENT = 5
