@@ -13,6 +13,7 @@ from .canonical import canonical_json, record_hash_is_valid
 from .errors import BranchError, HandoffError, InvalidInputError, NotFoundError, TorcError
 from .handoffs import validate_recovery_context
 from .history import validate_resolution_shape, validate_resolutions
+from .projections import RECEIVER_COMPILER_VERSIONS
 from .rollbacks import validate_rollback_context
 from .store import Store
 from .vocabulary import REVISION_EVENT_TYPES
@@ -512,7 +513,7 @@ def _verify_immutable_records(
                 projection["source_revision_id"],
             )
         source_prefixes = [f"{projection['source_revision_id']}:"]
-        if str(projection["compiler_version"]).startswith("p5-"):
+        if projection["compiler_version"] in RECEIVER_COMPILER_VERSIONS:
             # A receiver-fitted projection may cite the source revision's ancestors.
             ancestor = parent_ids.get(projection["source_revision_id"])
             while ancestor in parent_ids and f"{ancestor}:" not in source_prefixes:
