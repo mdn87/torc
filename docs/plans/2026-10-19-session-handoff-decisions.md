@@ -130,3 +130,21 @@ retain equal access to the public task history. These prepared capsule contexts
 are larger in bytes than the plain compiled baseline; no token saving or agent
 success has been measured. Native sessions are not fabricated. Live lane/cap,
 scoring isolation, telemetry semantics and frozen preregistration remain gates.
+
+
+## 2026-10-20 — distinguish general verification from blinded scoring
+
+The existing general verifier permits root reads. A controlled sentinel was
+visible outside its workspace, so it cannot establish blinded scoring. The
+experiment's trusted-fixture adapter instead uses the existing narrow Autowork
+projection and owned process runner, protects its runtime under `.codex`, and
+retains input/runtime hashes and process teardown evidence. It does not introduce
+a model executor, accept live candidates, or grant authority to a receiver.
+
+Broader path probes falsified a blanket interpretation of the previous sandbox
+pass: shared `/tmp` and `/var/tmp` remained accessible. Explicit denials in the
+execution owner (`b7b77d30`) close those roots while candidate grants still work.
+The prior per-user-temp result remains historical evidence, not erased proof.
+The scorer archive retains every owned qualification attempt and both failed
+runs. Passing trusted controls is one readiness gate; it is not live admission,
+verified agent success, or evidence of token savings.

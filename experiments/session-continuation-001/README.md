@@ -154,9 +154,9 @@ a model-free sandbox probe qualifies live whole-task telemetry or native resume.
 | Requirement | Current evidence |
 |---|---|
 | Real repository tasks and hidden acceptance | Baseline/reference/defect controls pass |
-| Exact worker/scorer input separation | Staging implemented; scorer runtime still unqualified |
+| Exact worker/scorer input separation | Staging and narrow trusted scorer runtime qualified; live packet admission remains |
 | Equal-access compiled and verified capsule contexts | Implemented with reproducible exact-byte verification |
-| Execution sandbox | Fixed model-free macOS workspace-write effects pass |
+| Execution sandbox | Mac effects pass, including per-user temp, `/tmp` and `/var/tmp` boundaries |
 | Native session creation/resume and cache-state evidence | Not run; needs authorized lane and cap |
 | Every attempt, timeout, failure and fallback captured | Offline accounting exists; live capture/coverage qualification remains |
 | Counter semantics | 0.163.0 format retained; totals and cross-request semantics unqualified |
@@ -167,17 +167,77 @@ a model-free sandbox probe qualifies live whole-task telemetry or native resume.
 ## Verified repository state
 
 [Readiness report](readiness-report.json): still not ready for live comparisons.
-Autowork fix `79e701c1e5c1fc2b44029a3b4be99c17b0693344` is applied to the
-configured controller, preserving its local provider policy. A fresh controller
+Autowork fixes `79e701c1` and `b7b77d30` are applied to the configured
+controller, preserving its local provider policy. A fresh controller
 qualification passes; existing MCP processes were not restarted. No model calls,
 credential changes, hooks, retry coordinator or parent submodule-pointer update
 were performed.
 
-TORC: 857 tests pass, Ruff passes, doctor has no missing paths, and demo/verify
+TORC: 865 tests pass, Ruff passes, doctor has no missing paths, and demo/verify
 checks seven artifacts without errors. Context replay matches the retained
-report. Autowork: 767 focused tests pass with three opt-in skips; the standalone
-sandbox regression also passes. Its broader suite remains non-green: 65 failures
+report. The initial Autowork repair passed 767 focused tests with three opt-in
+skips; the newer scorer follow-up is detailed below. The earlier full suite is
+non-green: 65 failures
 against 136 in the untouched baseline, with no introduced failed test IDs.
 Both repositories have valid quick audit receipts. The Autowork commit retains
 the detailed test inventories in `autowork/docs/torc-readiness-verification.json`.
 No general effectiveness or token-saving conclusion is warranted.
+
+## Blinded scorer runtime qualification
+
+The follow-up [scorer report](scoring-qualification-report.json) and
+[raw evidence archive](scoring-evidence.zip) preserve five runs and all 61 owned
+process attempts, including failed qualifications. The latest run uses configured
+Autowork commit `b7b77d30` and passes the trusted historical fixture path. Both
+references pass; both baselines and both material mutants fail. Runtime and
+original scoring inputs remain unchanged. Private sibling reads, sibling writes,
+and protected runtime writes are denied. A host network positive control succeeds
+and the same connection is denied inside the scorer sandbox.
+
+The general Autowork verifier grants root-read access and is **not a blinded
+scorer**. This adapter uses Autowork's existing narrow provider projection and
+owned-subprocess runner. Each case has a separate packet and a protected virtualenv
+under `.codex/runtime`; the worker workspace, arm labels, usage, other scoring
+packets and control receipts remain outside it. Only pinned historical code and
+its deliberate mutations are accepted by this qualification command. It accepts
+no worker candidate and grants no live trial or scoring admission.
+
+This qualification found another Mac path boundary: the minimal profile still
+allowed sibling access under `/tmp` and `/var/tmp` after the earlier per-user-temp
+probe passed. The Autowork follow-up explicitly denies those roots and their
+`/private` aliases, retaining the more-specific candidate grant. Real regression
+probes now exercise candidate writes and sibling read/write denial in all three
+temporary locations. The final targeted Autowork suite passes 83 tests, with two
+gated native capability checks skipped. The previously reported full-suite
+baseline comparison belongs to `79e701c1`; it was not rerun for this follow-up.
+
+Reproduce with the declared macOS system Python and a dedicated runtime (package
+installation is preparation, outside the scorer sandbox):
+
+```sh
+scorer_root=$(mktemp -d)
+python3 -m venv --copies "$scorer_root/runtime"
+"$scorer_root/runtime/bin/python" -m pip install \
+  'pytest==8.4.2' 'jsonschema==4.26.0' 'PyYAML==6.0.3'
+python3 experiments/session-continuation-001/scoring_qualification.py \
+  --autowork-source <explicit-controller-checkout>/autowork \
+  --runtime "$scorer_root/runtime" --destination "$scorer_root/evidence"
+```
+
+The script refuses drift in its inspected owner sources. It records interpreter,
+package, policy, source and runtime hashes, and publishes each start before release
+and each result after Autowork teardown. Run directories retain complete output
+and owner receipts. Compare control outcomes and effect checks across reproductions;
+absolute paths, timestamps, process identities and virtualenv hashes vary.
+
+The initial failure exposed the temporary-root gap. The next run's effects passed
+but its report classifier expected a pytest summary suppressed by the repository's
+quiet setting; the preserved raw output shows the actual test outcomes. Later
+runs correct that classifier, cover both temporary aliases and add the explicit
+network control. No failure was deleted or turned into a successful live trial.
+
+Live admission must still bind a frozen, blinded packet to a stopped worker and
+this qualified policy/runtime. Native session behavior, all-attempt live capture,
+usage semantics and an explicit lane/resource cap remain outstanding. The current
+TORC suite passes 865 tests; Ruff, doctor and demo/verify also pass. No token savings
+or agent effectiveness has been measured.

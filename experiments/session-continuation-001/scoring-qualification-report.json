@@ -1,0 +1,478 @@
+{
+  "archive_sha256": "7b20aaf11ba475726c76c1d109fcecab00ba3cb4cb177422cb1c29ef99326e89",
+  "evidence_archive": "scoring-evidence.zip",
+  "latest_passed": true,
+  "live_model_calls": 0,
+  "live_scoring_admitted": false,
+  "owned_process_attempts": 61,
+  "runs": [
+    {
+      "archive_prefix": "01-initial",
+      "attempt_count": 12,
+      "cases": [
+        {
+          "exit_code": 1,
+          "inputs_unchanged": null,
+          "interrupted": false,
+          "kind": "baseline",
+          "runtime_unchanged": true,
+          "task": "capsule-context",
+          "timed_out": false
+        },
+        {
+          "exit_code": 0,
+          "inputs_unchanged": null,
+          "interrupted": false,
+          "kind": "reference",
+          "runtime_unchanged": true,
+          "task": "capsule-context",
+          "timed_out": false
+        },
+        {
+          "exit_code": 1,
+          "inputs_unchanged": null,
+          "interrupted": false,
+          "kind": "mutant",
+          "runtime_unchanged": true,
+          "task": "capsule-context",
+          "timed_out": false
+        },
+        {
+          "exit_code": 1,
+          "inputs_unchanged": null,
+          "interrupted": false,
+          "kind": "baseline",
+          "runtime_unchanged": true,
+          "task": "whole-task-usage",
+          "timed_out": false
+        },
+        {
+          "exit_code": 0,
+          "inputs_unchanged": null,
+          "interrupted": false,
+          "kind": "reference",
+          "runtime_unchanged": true,
+          "task": "whole-task-usage",
+          "timed_out": false
+        },
+        {
+          "exit_code": 1,
+          "inputs_unchanged": null,
+          "interrupted": false,
+          "kind": "mutant",
+          "runtime_unchanged": true,
+          "task": "whole-task-usage",
+          "timed_out": false
+        }
+      ],
+      "effects": {
+        "candidate_write_allowed": true,
+        "legacy_private_read_visible": true,
+        "outside-write-denied": false,
+        "private_read_denied": false,
+        "runtime-write-denied": true,
+        "runtime_imports": true,
+        "runtime_info": {
+          "packages": {
+            "PyYAML": "6.0.3",
+            "jsonschema": "4.26.0",
+            "pytest": "8.4.2"
+          },
+          "prefix": "/private/tmp/torc-scoring-qualification-20261020/capsule-context-baseline/.codex/runtime",
+          "python": "3.14.4 (main, Apr  7 2026, 13:13:20) [Clang 21.0.0 (clang-2100.0.123.102)]"
+        }
+      },
+      "live_model_calls": 0,
+      "live_scoring_admitted": false,
+      "observed_at": "2026-10-20T05:19:19.710268+00:00",
+      "owner_source_sha256": {
+        "agent_assignment.py": "06b90de048d7135408e27b05143af7946b214c5f21ddde9a7331adfbe84ea266",
+        "owned_subprocess.py": "d850094cdf965c1c3a7e4f0daa035d40bc1d1c52d515257595bf2ae073d8ddf8",
+        "process_owner.py": "e9b5a16c19b9ec70bbfc0e7364983fbe3ff31f31573d3cfdb111f8dacf3b1543",
+        "provider_safety.py": "926e6e1e0c123cf915eadfc392e1c3eebbc54c11eca2b0d6623addaa1d487b89",
+        "route_supervisor.py": "10d0296421ad003d6c902a9cfb2ac18407528139ac500130ef21cf79cef41894",
+        "verification.py": "07f55e76147ed0ae3ab8f66d86eb2c8b34ed8cda9d6711c68de1f05391f896eb"
+      },
+      "report_sha256": "bab492576be4b9fad0e680a92169df8b31aa3c68a716c17e27ec3267d464d27f",
+      "run_id": "01-initial",
+      "runtime_tree_sha256": "8f1a9a78ba035d6d06c5bb438d80f75d872b283950c87a88e5a12415c13b1eab",
+      "source_sha256": "f28e8d0bbbe0a866dc0e44b93372e62bd824966993c455a545cd9e7833df7f1e",
+      "trusted_fixture_path_passed": false
+    },
+    {
+      "archive_prefix": "02-tmp-fix",
+      "attempt_count": 12,
+      "cases": [
+        {
+          "exit_code": 1,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "baseline",
+          "runtime_unchanged": true,
+          "task": "capsule-context",
+          "timed_out": false
+        },
+        {
+          "exit_code": 0,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "reference",
+          "runtime_unchanged": true,
+          "task": "capsule-context",
+          "timed_out": false
+        },
+        {
+          "exit_code": 1,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "mutant",
+          "runtime_unchanged": true,
+          "task": "capsule-context",
+          "timed_out": false
+        },
+        {
+          "exit_code": 1,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "baseline",
+          "runtime_unchanged": true,
+          "task": "whole-task-usage",
+          "timed_out": false
+        },
+        {
+          "exit_code": 0,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "reference",
+          "runtime_unchanged": true,
+          "task": "whole-task-usage",
+          "timed_out": false
+        },
+        {
+          "exit_code": 1,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "mutant",
+          "runtime_unchanged": true,
+          "task": "whole-task-usage",
+          "timed_out": false
+        }
+      ],
+      "effects": {
+        "candidate_write_allowed": true,
+        "legacy_private_read_visible": true,
+        "outside-write-denied": true,
+        "private_read_denied": true,
+        "runtime-write-denied": true,
+        "runtime_imports": true,
+        "runtime_info": {
+          "packages": {
+            "PyYAML": "6.0.3",
+            "jsonschema": "4.26.0",
+            "pytest": "8.4.2"
+          },
+          "prefix": "/private/tmp/torc-scoring-qualification-fixed-20261020/capsule-context-baseline/.codex/runtime",
+          "python": "3.14.4 (main, Apr  7 2026, 13:13:20) [Clang 21.0.0 (clang-2100.0.123.102)]"
+        }
+      },
+      "live_model_calls": 0,
+      "live_scoring_admitted": false,
+      "observed_at": "2026-10-20T05:21:31.031220+00:00",
+      "owner_source_sha256": {
+        "agent_assignment.py": "06b90de048d7135408e27b05143af7946b214c5f21ddde9a7331adfbe84ea266",
+        "owned_subprocess.py": "d850094cdf965c1c3a7e4f0daa035d40bc1d1c52d515257595bf2ae073d8ddf8",
+        "process_owner.py": "e9b5a16c19b9ec70bbfc0e7364983fbe3ff31f31573d3cfdb111f8dacf3b1543",
+        "provider_safety.py": "5f7051e18f2859f13f64b6ea2f8a65be2035d3e6907e5f58c07505cd630f1416",
+        "route_supervisor.py": "10d0296421ad003d6c902a9cfb2ac18407528139ac500130ef21cf79cef41894",
+        "verification.py": "07f55e76147ed0ae3ab8f66d86eb2c8b34ed8cda9d6711c68de1f05391f896eb"
+      },
+      "report_sha256": "c8eddc942c4dbe5ef79a54378b0f0013c8f1503f3551e57a3325f61296c7fa9f",
+      "run_id": "02-tmp-fix",
+      "runtime_tree_sha256": "8f1a9a78ba035d6d06c5bb438d80f75d872b283950c87a88e5a12415c13b1eab",
+      "source_sha256": "ecddef715517d8aa8ae6e08bc5fdb9900490d6117a24334765864ed28d5f6dee",
+      "trusted_fixture_path_passed": false
+    },
+    {
+      "archive_prefix": "03-output-check",
+      "attempt_count": 12,
+      "cases": [
+        {
+          "exit_code": 1,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "baseline",
+          "runtime_unchanged": true,
+          "task": "capsule-context",
+          "timed_out": false
+        },
+        {
+          "exit_code": 0,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "reference",
+          "runtime_unchanged": true,
+          "task": "capsule-context",
+          "timed_out": false
+        },
+        {
+          "exit_code": 1,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "mutant",
+          "runtime_unchanged": true,
+          "task": "capsule-context",
+          "timed_out": false
+        },
+        {
+          "exit_code": 1,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "baseline",
+          "runtime_unchanged": true,
+          "task": "whole-task-usage",
+          "timed_out": false
+        },
+        {
+          "exit_code": 0,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "reference",
+          "runtime_unchanged": true,
+          "task": "whole-task-usage",
+          "timed_out": false
+        },
+        {
+          "exit_code": 1,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "mutant",
+          "runtime_unchanged": true,
+          "task": "whole-task-usage",
+          "timed_out": false
+        }
+      ],
+      "effects": {
+        "candidate_write_allowed": true,
+        "legacy_private_read_visible": true,
+        "outside-write-denied": true,
+        "private_read_denied": true,
+        "runtime-write-denied": true,
+        "runtime_imports": true,
+        "runtime_info": {
+          "packages": {
+            "PyYAML": "6.0.3",
+            "jsonschema": "4.26.0",
+            "pytest": "8.4.2"
+          },
+          "prefix": "/private/tmp/torc-scoring-qualification-final-20261020/capsule-context-baseline/.codex/runtime",
+          "python": "3.14.4 (main, Apr  7 2026, 13:13:20) [Clang 21.0.0 (clang-2100.0.123.102)]"
+        }
+      },
+      "live_model_calls": 0,
+      "live_scoring_admitted": false,
+      "observed_at": "2026-10-20T05:22:43.199258+00:00",
+      "owner_source_sha256": {
+        "agent_assignment.py": "06b90de048d7135408e27b05143af7946b214c5f21ddde9a7331adfbe84ea266",
+        "owned_subprocess.py": "d850094cdf965c1c3a7e4f0daa035d40bc1d1c52d515257595bf2ae073d8ddf8",
+        "process_owner.py": "e9b5a16c19b9ec70bbfc0e7364983fbe3ff31f31573d3cfdb111f8dacf3b1543",
+        "provider_safety.py": "5f7051e18f2859f13f64b6ea2f8a65be2035d3e6907e5f58c07505cd630f1416",
+        "route_supervisor.py": "10d0296421ad003d6c902a9cfb2ac18407528139ac500130ef21cf79cef41894",
+        "verification.py": "07f55e76147ed0ae3ab8f66d86eb2c8b34ed8cda9d6711c68de1f05391f896eb"
+      },
+      "report_sha256": "9f350f4229419e5430bac36af4358c13d0874a29f66b244150da9a5769b89d53",
+      "run_id": "03-output-check",
+      "runtime_tree_sha256": "8f1a9a78ba035d6d06c5bb438d80f75d872b283950c87a88e5a12415c13b1eab",
+      "source_sha256": "b70acffbd3d9d8c1dde07e96552d050e9c2aa435f7f464d77e14d6a1394d8fe6",
+      "trusted_fixture_path_passed": true
+    },
+    {
+      "archive_prefix": "04-all-temp-fix",
+      "attempt_count": 12,
+      "cases": [
+        {
+          "exit_code": 1,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "baseline",
+          "runtime_unchanged": true,
+          "task": "capsule-context",
+          "timed_out": false
+        },
+        {
+          "exit_code": 0,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "reference",
+          "runtime_unchanged": true,
+          "task": "capsule-context",
+          "timed_out": false
+        },
+        {
+          "exit_code": 1,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "mutant",
+          "runtime_unchanged": true,
+          "task": "capsule-context",
+          "timed_out": false
+        },
+        {
+          "exit_code": 1,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "baseline",
+          "runtime_unchanged": true,
+          "task": "whole-task-usage",
+          "timed_out": false
+        },
+        {
+          "exit_code": 0,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "reference",
+          "runtime_unchanged": true,
+          "task": "whole-task-usage",
+          "timed_out": false
+        },
+        {
+          "exit_code": 1,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "mutant",
+          "runtime_unchanged": true,
+          "task": "whole-task-usage",
+          "timed_out": false
+        }
+      ],
+      "effects": {
+        "candidate_write_allowed": true,
+        "legacy_private_read_visible": true,
+        "outside-write-denied": true,
+        "private_read_denied": true,
+        "runtime-write-denied": true,
+        "runtime_imports": true,
+        "runtime_info": {
+          "packages": {
+            "PyYAML": "6.0.3",
+            "jsonschema": "4.26.0",
+            "pytest": "8.4.2"
+          },
+          "prefix": "/private/tmp/torc-scoring-qualification-all-temp-20261020/capsule-context-baseline/.codex/runtime",
+          "python": "3.14.4 (main, Apr  7 2026, 13:13:20) [Clang 21.0.0 (clang-2100.0.123.102)]"
+        }
+      },
+      "live_model_calls": 0,
+      "live_scoring_admitted": false,
+      "observed_at": "2026-10-20T05:23:50.517940+00:00",
+      "owner_source_sha256": {
+        "agent_assignment.py": "06b90de048d7135408e27b05143af7946b214c5f21ddde9a7331adfbe84ea266",
+        "owned_subprocess.py": "d850094cdf965c1c3a7e4f0daa035d40bc1d1c52d515257595bf2ae073d8ddf8",
+        "process_owner.py": "e9b5a16c19b9ec70bbfc0e7364983fbe3ff31f31573d3cfdb111f8dacf3b1543",
+        "provider_safety.py": "0e08d22e4fd4c25c82bdb69e25a4854946881bb7090e05ce2deca09f1e353b1b",
+        "route_supervisor.py": "10d0296421ad003d6c902a9cfb2ac18407528139ac500130ef21cf79cef41894",
+        "verification.py": "07f55e76147ed0ae3ab8f66d86eb2c8b34ed8cda9d6711c68de1f05391f896eb"
+      },
+      "report_sha256": "35901dc312aea39061ed8469f29ae57295856a5dc67da1fa9611bb7e800fc929",
+      "run_id": "04-all-temp-fix",
+      "runtime_tree_sha256": "8f1a9a78ba035d6d06c5bb438d80f75d872b283950c87a88e5a12415c13b1eab",
+      "source_sha256": "e2f5832ec9207ac39e187d54bd7626bd95c4393959eee5aa7eb31331d2532f06",
+      "trusted_fixture_path_passed": true
+    },
+    {
+      "archive_prefix": "05-controller",
+      "attempt_count": 13,
+      "cases": [
+        {
+          "exit_code": 1,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "baseline",
+          "runtime_unchanged": true,
+          "task": "capsule-context",
+          "timed_out": false
+        },
+        {
+          "exit_code": 0,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "reference",
+          "runtime_unchanged": true,
+          "task": "capsule-context",
+          "timed_out": false
+        },
+        {
+          "exit_code": 1,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "mutant",
+          "runtime_unchanged": true,
+          "task": "capsule-context",
+          "timed_out": false
+        },
+        {
+          "exit_code": 1,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "baseline",
+          "runtime_unchanged": true,
+          "task": "whole-task-usage",
+          "timed_out": false
+        },
+        {
+          "exit_code": 0,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "reference",
+          "runtime_unchanged": true,
+          "task": "whole-task-usage",
+          "timed_out": false
+        },
+        {
+          "exit_code": 1,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "mutant",
+          "runtime_unchanged": true,
+          "task": "whole-task-usage",
+          "timed_out": false
+        }
+      ],
+      "effects": {
+        "candidate_write_allowed": true,
+        "legacy_private_read_visible": true,
+        "network_denied": true,
+        "network_positive_control": true,
+        "outside-write-denied": true,
+        "private_read_denied": true,
+        "runtime-write-denied": true,
+        "runtime_imports": true,
+        "runtime_info": {
+          "packages": {
+            "PyYAML": "6.0.3",
+            "jsonschema": "4.26.0",
+            "pytest": "8.4.2"
+          },
+          "prefix": "/private/tmp/torc-scoring-qualified-controller-20261020/capsule-context-baseline/.codex/runtime",
+          "python": "3.14.4 (main, Apr  7 2026, 13:13:20) [Clang 21.0.0 (clang-2100.0.123.102)]"
+        }
+      },
+      "live_model_calls": 0,
+      "live_scoring_admitted": false,
+      "observed_at": "2026-10-20T05:25:25.665162+00:00",
+      "owner_source_sha256": {
+        "agent_assignment.py": "06b90de048d7135408e27b05143af7946b214c5f21ddde9a7331adfbe84ea266",
+        "owned_subprocess.py": "d850094cdf965c1c3a7e4f0daa035d40bc1d1c52d515257595bf2ae073d8ddf8",
+        "process_owner.py": "e9b5a16c19b9ec70bbfc0e7364983fbe3ff31f31573d3cfdb111f8dacf3b1543",
+        "provider_safety.py": "0e08d22e4fd4c25c82bdb69e25a4854946881bb7090e05ce2deca09f1e353b1b",
+        "route_supervisor.py": "10d0296421ad003d6c902a9cfb2ac18407528139ac500130ef21cf79cef41894",
+        "verification.py": "07f55e76147ed0ae3ab8f66d86eb2c8b34ed8cda9d6711c68de1f05391f896eb"
+      },
+      "report_sha256": "52041e5cf8762bb9b85015c86b81d0ec9b9b2e2f26f480bd493cd21575854a39",
+      "run_id": "05-controller",
+      "runtime_tree_sha256": "8f1a9a78ba035d6d06c5bb438d80f75d872b283950c87a88e5a12415c13b1eab",
+      "source_sha256": "57a6ab74efb34ca7d785ab0933e9273bbcb1ffa3f1226b19795016f6c19aee99",
+      "trusted_fixture_path_passed": true
+    }
+  ],
+  "schema_version": 1
+}

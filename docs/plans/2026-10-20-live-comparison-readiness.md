@@ -68,3 +68,13 @@ pass. Scoped Autowork commit `79e701c1` is applied to the configured controller;
 767 focused tests and fresh model-free workspace effects pass. Its full suite
 still has 65 baseline failures (136 before; no introduced failure IDs).
 The detailed readiness report explicitly remains `not_ready_for_live_comparisons`.
+
+Scorer follow-up: `scoring_qualification.py` now proves both trusted task control
+triples through Autowork's narrow profile and owned process runner, with protected
+runtime, blinded packet boundaries and a network effect check. All 61 attempts
+across five runs are archived, including failures. It accepts no worker candidate.
+The general root-read verifier cannot serve this blinded role. The new diagnostics
+also exposed shared Mac temporary-root access; Autowork `b7b77d30` closes `/tmp`
+and `/var/tmp` plus their aliases, with three-location regression evidence.
+Live scoring still requires terminal-worker evidence and frozen-packet admission.
+The lane/resource question remains pending; no live calls were made.
