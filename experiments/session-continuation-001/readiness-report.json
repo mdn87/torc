@@ -29,6 +29,12 @@
   "hooks_installed": false,
   "live_model_calls": 0,
   "live_scoring_admitted": false,
+  "next_input_required": "provider/billing lane and total invocation/time cap including seeds and qualification canaries",
+  "offline_lane_audit": {
+    "autowork_commit": "b7b77d30ca23e30e7d55756a12d5ad2cf87e7de9",
+    "dispatch_metrics_source": "final attempt.stdout; insufficient alone for whole-task inventory",
+    "native_seed_path": "current safety projection uses --ephemeral; persisted native seed/resume remains unqualified"
+  },
   "qualification_report": "fixed-qualification-report.json",
   "remaining_gates": [
     "explicit live lane and resource cap",

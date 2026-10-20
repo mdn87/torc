@@ -78,3 +78,26 @@ also exposed shared Mac temporary-root access; Autowork `b7b77d30` closes `/tmp`
 and `/var/tmp` plus their aliases, with three-location regression evidence.
 Live scoring still requires terminal-worker evidence and frozen-packet admission.
 The lane/resource question remains pending; no live calls were made.
+
+Final offline audit at Autowork `b7b77d30`: `provider_safety.py` adds
+`--ephemeral` to the execution projection. Installed Codex 0.163.0 help defines
+this as not persisting session files. The current path therefore does not
+establish a persisted seed for the required native-resume arms. This does not
+prove that Codex cannot resume sessions; it identifies an unqualified owner
+path. Do not remove the flag globally or fabricate native session state.
+`dispatcher.py` builds usage metrics from `attempt.stdout` for its final attempt.
+Those metrics alone are not an inventory of every attempted start, request or
+fallback. The offline accounting engine cannot repair evidence never exported.
+
+Next work is lane-dependent. First obtain the provider/billing lane and a total
+model-invocation/time ceiling covering seeds and qualification canaries as well
+as comparative arms. Then qualify the owner's persistent-session boundary and
+all-attempt export, retaining missing counters and stopping on ambiguous usage
+semantics. Freeze the lane/model/effort, all four arm bindings, blinded admission,
+observation collection and analysis before comparative outputs. Do not silently
+drop native arms or report savings using only successful final attempts.
+
+The scoped fixes are complete; the overall goal is awaiting that material lane
+and resource decision. Further lane-specific execution changes or live probes
+must not be inferred from approval of the two scoped Autowork repairs. Existing
+reports remain readiness evidence, with zero live calls and no measured savings.
