@@ -1,5 +1,10 @@
 # Session continuation: first local evidence slice
 
+The next bounded milestone adds [existing-capsule integration and offline
+whole-task accounting](offline-milestone.md), with a [reproducible synthetic
+report](offline-report.json). It preserves the first slice below and runs no
+live model trials. Token savings remain unmeasured.
+
 This slice parses synthetic Claude-shaped transcript prefixes and writes an
 immutable capture manifest plus read-only reconciliation report. It makes no
 model calls and changes no TORC authority state. It does **not** measure token

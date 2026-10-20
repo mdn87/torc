@@ -132,6 +132,12 @@ portable current pointer only after acceptance, and renders accepted snapshots
 as standalone read-only HTML. It has no provider SDK dependency. See
 `docs/artifacts/README.md`.
 
+The offline session-continuation milestone pairs the existing verified capsule
+with separate recovery evidence and accounts for whole-task recorded usage,
+including failed attempts, fallback, missing counters and cumulative updates.
+Its [synthetic replay report](docs/experiments/session-continuation-001/offline-milestone.md)
+establishes mechanics only; token savings and live model trials remain unmeasured.
+
 ## Baseline setup
 
 ```powershell
