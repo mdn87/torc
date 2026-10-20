@@ -30,32 +30,41 @@ the previous preparation envelope records the completed offline batch.
 
 Lead retains integration, statistical decisions and verification. Qualified
 Autowork delegation is optional for independent work; no generic child is
-relabeled as an attested worker. No parent edits, credential changes, hooks,
-retry coordinator, paid fallback, provider substitution or live model calls
-are implied by readiness preparation.
+relabeled as an attested worker. The operator subsequently approved scoped
+Autowork fixes for workspace isolation and the Codex 0.163.0 usage contract.
+This expansion excludes credential changes and model calls. Hooks, retry
+coordination, paid fallback and parent submodule-pointer changes remain excluded.
 
-Authoritative platform: macOS/Python 3.14. The workload packer is portable
-Python and Git; execution isolation is host-specific and must be separately
-qualified on each host. Windows/Linux execution are not assumed equivalent.
+Authoritative platform: macOS/Python 3.14. Workload preparation is portable
+Python/Git; execution isolation must be qualified on each host separately.
 
-Current evidence: local Claude is 2.1.296 and Codex is 0.163.0. The historical
-cross-agent runner inherits environment state, selects one usage object and can
-raise on session mismatch before writing raw output. It is not qualified for
-this comparison. The October 18 Autowork report qualifies macOS read-only
-capabilities only; its short-lived attestation and unresolved Claude isolated
-authentication do not establish current workspace-write or native-resume
-readiness. No repair of those components is included here.
+Completed preparation: real historical task pack and hidden acceptance controls;
+equal-access compiled/capsule contexts using the existing verifier; deterministic
+exact-byte/source/workspace receipts. The capsule is larger in bytes in both
+current tasks. No token-efficiency or task-success claim follows from this.
 
-Progress in this goal turn: step 1 is implemented in
-`experiments/session-continuation-001/workloads.py`, with pinned baseline,
-historical reference and defective-control validation. Both real task references
-pass and both meaningful defects fail; protected edits reject before scoring.
-The current model-free workspace qualification attempt stops at the existing
-provider-safety gate: this Autowork checkout does not accept Codex 0.163.0.
-Its failure is retained, not replaced by the older read-only attestation.
+Corrected lane diagnosis: the initial adjacent-checkout version failure was not
+from the configured controller. With its existing local macOS policy, the
+configured controller failed on the home-virtualenv interpreter; system Python
+then exposed an outside temporary-directory write. A one-variable reproduction
+proved inherited `:workspace` grants caused that violation. Scoped Autowork
+changes start with `:read-only` and explicitly grant candidate writes; the full
+existing model-free macOS effect check passes. Code/version/policy hashes and
+all prior failures remain in the experiment receipts.
 
-Fresh repository evidence: 851 tests passed, Ruff passed, doctor reported no
-missing paths, demo/verify checked seven artifacts without errors, and local
-documentation links passed. Readiness is still incomplete. Next independent
-work is task-specific context compilation and capture/scoring integration;
-actual lane/session qualification and resource selection remain outstanding.
+The Autowork parser now retains the 0.163.0 raw counter format and cache writes
+through versioned dispatch/probe records. This is format-only evidence from the
+installed binary, generated protocol and synthetic tests. Unknowns stay null;
+ambiguous completions are not summed. Native session behavior, counter overlap,
+complete all-attempt capture and isolated scoring remain unqualified. Explicit
+live lane/resource selection is still pending. The objective remains active.
+
+See `experiments/session-continuation-001/README.md` for exact reproduction
+commands, report links and the current readiness table. A passing offline test
+or expired capability receipt cannot authorize or substitute for a live pilot.
+
+Verification milestone: TORC 857 tests, Ruff, doctor and seven-artifact demo/verify
+pass. Scoped Autowork commit `79e701c1` is applied to the configured controller;
+767 focused tests and fresh model-free workspace effects pass. Its full suite
+still has 65 baseline failures (136 before; no introduced failure IDs).
+The detailed readiness report explicitly remains `not_ready_for_live_comparisons`.

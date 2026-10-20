@@ -74,57 +74,110 @@ task and cumulative-counter summation in the accounting task both fail.
 Protected-source changes reject before scoring. This proves useful acceptance
 discrimination, not live worker performance or independent scorer isolation.
 
-## Current lane evidence
+## Task-specific context preparation
 
-Installed versions observed on this host are Claude Code `2.1.296` and Codex
-`0.163.0`. The current Autowork checkout is
-`27006c5a2ee60693796a0a3177e9dbbd15c981fc`. Its provider-safety registry does not
-accept that Codex version. The [retained qualification attempt](qualification-report.json)
-failed with `ProviderSafetyError: unsupported Codex version '0.163.0'` before
-the sandbox effect checks, with zero model calls. This does not establish a Mac
-runtime fault, remote host/service fault, or a passed workspace isolation check.
-
-Reproduce the bounded qualification attempt on this macOS host:
+`contexts.py` builds both deterministic context arms from each public task brief
+and its retained investigation. It uses the existing capsule derivation and
+verifier, checks exact delivered bytes and actual lineage head, and records the
+same recovery-report hash for both arms. The private operator-authored lineage
+is preparation state, not a fabricated native session. Its held recovery report
+has unknown quiescence and grants no retry or receiving authority.
 
 ```sh
-python3 experiments/session-continuation-001/qualification.py > qualification-report.json
+context_root=$(mktemp -d)
+python3 experiments/session-continuation-001/contexts.py replay \
+  --destination "$context_root/prepared" > "$context_root/report.json"
+diff -u experiments/session-continuation-001/contexts-report.json "$context_root/report.json"
 ```
 
-Exit 1 and a failed JSON report are expected with the current provider policy.
-The script pins the inspected Autowork capability-source hash, refuses other
-platforms, and adds a refusal for model execution. It uses the existing owner's
-deterministic macOS sandbox route, including its strict-config negative control;
-it does not replace provider policy or credential isolation. Source changes
-require inspecting that route again before updating the pin. No provider-policy
-file, credential, parent repository file, host service or hook was changed.
+The [retained context report](contexts-report.json) is deterministic and pins
+source code, workspace and arm assets. To verify a prepared task, run
+`contexts.py verify --root <prepared-task> --expected-manifest-id <external-pin>`.
+The complete manifests and private preparation state remain under the chosen
+output directory. They must not be exposed wholesale to a worker.
 
-The older October 18 read-only attestation is historical evidence, not a current
-workspace-write or resume qualification. The cross-agent experiment's existing
-launcher also needs a new qualified integration for this task: it inherits
-environment state, selects one usage snapshot and can reject session identity
-before saving raw output. Its frozen implementation has not been modified here.
+These are byte counts, **not measured token savings**:
+
+| Task | Compiled context / prompt bytes | Capsule context / prompt bytes |
+|---|---:|---:|
+| Capsule context integration | 2728 / 3999 | 2969 / 4240 |
+| Whole-task accounting | 2620 / 3893 | 2953 / 4226 |
+
+The capsule is larger than the plain compiled baseline here. The capsule budget
+omits the uncertainty section on the first task; all arms retain access to the
+same complete public brief. Native arms, task success, elapsed time, repeated
+investigation and whole-task usage have not been measured.
+
+## Current lane evidence
+
+The initial [qualification attempt](qualification-report.json) inspected the
+adjacent development checkout at `27006c5`, which rejected Codex 0.163.0.
+That was not the operator-configured controller. The configured controller at
+`7699b3c` already carries an untracked macOS 0.163.0 policy from October 18.
+The qualifier now requires an explicit `--autowork-source` path.
+
+Two fresh failures from the configured controller are retained:
+
+- [Project virtualenv interpreter](configured-qualification-report.json): the
+  sandbox could not execute the home-directory Python. Candidate access failed;
+  apparent negative effects were not independent evidence because the commands
+  never started.
+- [System interpreter](system-python-qualification-report.json): candidate read
+  and write worked, but writing outside the candidate succeeded. This was a real
+  workspace isolation failure, not a remote service diagnosis.
+
+The operator explicitly expanded scope to the two Autowork fixes. Autowork's
+workspace-write projection inherited `:workspace`, retaining shared temporary
+write access. Starting from `:read-only` with the existing explicit candidate
+write grant blocks the same outside sentinel and allows candidate writes.
+The [fixed qualification](fixed-qualification-report.json) passes the existing
+model-free macOS effect checks and retains source hashes, executable identity,
+policy hash and usage missingness. Its attestation is short-lived evidence of
+that run, not a reusable grant. No credential protections were relaxed.
+
+Reproduce on macOS with a system interpreter readable under the policy:
+
+```sh
+python3 experiments/session-continuation-001/qualification.py \
+  --autowork-source <explicit-controller-checkout>/autowork > qualification.json
+```
+
+The qualifier pins the inspected capability-source versions and refuses model
+execution. The Autowork change also adds format-only Codex 0.163.0 raw counters,
+including cache writes in new immutable record versions. Ambiguous completions
+and missing fields remain unknown. Derived totals remain null for 0.163.0 until
+counter semantics are independently established. Neither a parser unit test nor
+a model-free sandbox probe qualifies live whole-task telemetry or native resume.
 
 ## Readiness still required
 
 | Requirement | Current evidence |
 |---|---|
-| Real repository tasks and hidden acceptance | Implemented; baseline/reference/defect controls pass |
-| Exact worker/scorer input separation | Implemented in staging; runtime read isolation unqualified |
-| Task-specific equal-access compiled and verified capsule contexts | Common task/history inputs prepared; context compilation remains |
-| Qualified execution and scoring sandbox | Blocked at current Codex provider-version admission |
-| Actual native session creation/resume and cache-state evidence | Not run; requires authorized lane and resource cap |
-| Complete usage across attempts, timeouts, failures and fallbacks | Accounting exists; live exporter/capture qualification remains |
-| Repeated-investigation and operator-effort observations | Rubric and collection integration remain |
-| Explicit operator lane/resource ceiling | Awaiting selection; no default permission inferred |
-| Frozen live preregistration and verified launch procedure | Incomplete pending the above |
+| Real repository tasks and hidden acceptance | Baseline/reference/defect controls pass |
+| Exact worker/scorer input separation | Staging implemented; scorer runtime still unqualified |
+| Equal-access compiled and verified capsule contexts | Implemented with reproducible exact-byte verification |
+| Execution sandbox | Fixed model-free macOS workspace-write effects pass |
+| Native session creation/resume and cache-state evidence | Not run; needs authorized lane and cap |
+| Every attempt, timeout, failure and fallback captured | Offline accounting exists; live capture/coverage qualification remains |
+| Counter semantics | 0.163.0 format retained; totals and cross-request semantics unqualified |
+| Repeated-investigation and operator-effort observations | [Draft blinded rubric](investigation-rubric.md); collection integration remains |
+| Operator lane/resource ceiling | Pending; no live authority inferred |
+| Frozen live preregistration and launch procedure | Incomplete pending these gates |
 
-The live-readiness goal remains active. The next independent work is to compile
-task-specific contexts and finish capture/scoring integration contracts. A
-qualified execution-owner route and explicit resource choice are still needed
-before any seed, canary or comparative model call. No credential repair, paid
-fallback or alternate provider is silently authorized by these artifacts.
+## Verified repository state
 
-Repository verification on macOS/Python 3.14: **851 tests passed**, including
-the retained reference-report comparison; Ruff and local documentation links
-passed; doctor found no missing paths; demo/verify checked seven artifacts
-without errors. These checks do not change the failed lane qualification.
+[Readiness report](readiness-report.json): still not ready for live comparisons.
+Autowork fix `79e701c1e5c1fc2b44029a3b4be99c17b0693344` is applied to the
+configured controller, preserving its local provider policy. A fresh controller
+qualification passes; existing MCP processes were not restarted. No model calls,
+credential changes, hooks, retry coordinator or parent submodule-pointer update
+were performed.
+
+TORC: 857 tests pass, Ruff passes, doctor has no missing paths, and demo/verify
+checks seven artifacts without errors. Context replay matches the retained
+report. Autowork: 767 focused tests pass with three opt-in skips; the standalone
+sandbox regression also passes. Its broader suite remains non-green: 65 failures
+against 136 in the untouched baseline, with no introduced failed test IDs.
+Both repositories have valid quick audit receipts. The Autowork commit retains
+the detailed test inventories in `autowork/docs/torc-readiness-verification.json`.
+No general effectiveness or token-saving conclusion is warranted.

@@ -1,0 +1,44 @@
+{
+  "authority_or_capsule_verifier_changed": false,
+  "autowork_checks": {
+    "baseline_full_failed": 136,
+    "focused_opt_in_skips": 3,
+    "focused_passed": 767,
+    "full_failed": 65,
+    "full_passed": 3627,
+    "full_skipped": 46,
+    "introduced_failure_ids": [],
+    "lint_baseline_findings": 24,
+    "lint_introduced_findings": 0,
+    "offline_sandbox_contract_and_effect_tests_passed": 2
+  },
+  "autowork_commit": "79e701c1e5c1fc2b44029a3b4be99c17b0693344",
+  "contexts_report": "contexts-report.json",
+  "controller_workspace_qualification": "passed",
+  "credential_changes": false,
+  "effectiveness_measured": false,
+  "existing_mcp_service_restarted": false,
+  "hooks_installed": false,
+  "live_model_calls": 0,
+  "qualification_report": "fixed-qualification-report.json",
+  "remaining_gates": [
+    "explicit live lane and resource cap",
+    "native seed/resume and warm/cold cache evidence",
+    "complete live attempt/fallback capture and counter semantics",
+    "isolated acceptance scorer runtime",
+    "blinded observation collection",
+    "frozen lane-specific preregistration and verified launch procedure"
+  ],
+  "retry_coordinator_added": false,
+  "schema_version": 1,
+  "status": "not_ready_for_live_comparisons",
+  "token_savings_measured": false,
+  "torc_checks": {
+    "demo": "passed",
+    "doctor": "passed",
+    "pytest_passed": 857,
+    "ruff": "passed",
+    "verify_artifacts_checked": 7,
+    "verify_errors": []
+  }
+}

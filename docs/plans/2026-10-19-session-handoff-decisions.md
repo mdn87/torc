@@ -105,3 +105,28 @@ that it reviewed only the captured authoring prompt, not the referenced plans,
 repository citations or first-PR scope. Its zero findings therefore provide no
 substantive sign-off for this implementation. The root checked the inputs and
 made the decisions above; no further review round is scheduled.
+
+
+## 2026-10-20 — scoped execution-owner repairs and readiness evidence
+
+The operator explicitly expanded scope to Autowork's observed workspace-isolation
+failure and missing Codex 0.163.0 usage contract, excluding credentials and model
+calls. These repairs remain in Autowork (`79e701c1`), not TORC core. The configured
+controller differs from the adjacent development checkout: the latter's version
+admission failure was not evidence of configured-controller health.
+
+A controlled macOS reproduction isolated inherited `:workspace` temporary write
+grants as the cause. Starting from `:read-only` with explicit candidate writes
+passes the same outside sentinel and the existing full model-free effect check.
+The home-virtualenv interpreter remains denied; no broader home access was added.
+New usage records retain cache-write counters, preserve old canonical records,
+and leave unqualified totals null. Format support does not qualify live coverage
+or cumulative-counter semantics. Existing all-attempt TORC accounting is unchanged.
+
+Task-context preparation uses the existing capsule owner and exact-byte verifier.
+The separate held recovery report grants neither retry nor receiver authority;
+the actual head is checked and preparation state remains unchanged. Both arms
+retain equal access to the public task history. These prepared capsule contexts
+are larger in bytes than the plain compiled baseline; no token saving or agent
+success has been measured. Native sessions are not fabricated. Live lane/cap,
+scoring isolation, telemetry semantics and frozen preregistration remain gates.
