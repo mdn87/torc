@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "objective": "Finalize the bounded session-handoff token-efficiency plan and implement its first read-only synthetic capture and reconciliation slice.",
+  "success_evidence": [
+    "Interrupted synthetic transcript yields an exact prefix hash, scoped operation identity, coverage hold and actionable report.",
+    "Persistence survives process interruption and concurrent identical publication without modifying prior artifacts.",
+    "Existing authority store remains byte-for-byte unchanged; full suite and doctor/demo/verify pass.",
+    "Protocol separates context benefit from reconciliation and defines all-attempt token accounting without claiming savings."
+  ],
+  "non_goals": [
+    "No authority store, lease, acceptance, capsule verifier or parent repository changes.",
+    "No live hooks, providers, cost adviser, tool execution, retry coordinator or automatic continuation.",
+    "No model trials or rollout in this implementation batch."
+  ],
+  "accepted_threats": [
+    "Single trusted local operator; no defense against malicious filesystem writers.",
+    "SHA-256 is integrity evidence, not authentication or secrecy.",
+    "Synthetic transcripts do not establish live Claude Code coverage or token savings.",
+    "Process interruption only; power-loss and network/shared filesystem durability are unproven."
+  ],
+  "estimates": {
+    "elapsed_hours": 3,
+    "production_loc": 650,
+    "test_loc": 450,
+    "changed_files": 18,
+    "runtime_processes": 0,
+    "operator_steps": 1
+  },
+  "observed": {
+    "elapsed_hours": 0.36,
+    "production_loc": 355,
+    "test_loc": 312,
+    "changed_files": 17,
+    "runtime_processes": 0,
+    "operator_steps": 1
+  },
+  "vertical_slice": {
+    "status": "passed",
+    "evidence": "38 focused tests and documented synthetic replay passed on macOS. Interrupted prefix produces held report; store dump and state-file hashes unchanged. Full suite: 794 passed; Ruff, doctor, temporary demo and verify passed. Token savings remain unmeasured. Built wheel and direct wheel imports passed; plan is 6,251 words and new Markdown links resolve."
+  },
+  "architecture_triggers": [],
+  "review_rounds_used": 1,
+  "scope_policy_sha256": "a44baa88f0fb914b144db7c0830bc47f236c122ad0765bd2e5f06c754bc8d4b4",
+  "parent_envelope_sha256": null,
+  "operator_override_id": null
+}

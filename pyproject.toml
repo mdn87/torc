@@ -22,7 +22,7 @@ dev = [
 torc = "torc.cli:main"
 
 [tool.setuptools]
-packages = ["torc", "torc.artifacts", "torc.schemas"]
+packages = ["torc", "torc.artifacts", "torc.schemas", "torc.harness_capture"]
 
 [tool.setuptools.package-dir]
 "" = "src"

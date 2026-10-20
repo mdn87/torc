@@ -1,0 +1,1 @@
+{"type":"assistant","message":{"content":[{"type":"tool_use","id":"tool-1","name":"Write","input":{"file_path":"src/example.py","content":"fixture value"}}]}}
