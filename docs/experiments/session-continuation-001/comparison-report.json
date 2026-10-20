@@ -1,0 +1,248 @@
+{
+  "baseline_commit": "9d96039",
+  "cases": {
+    "complete_synthetic": {
+      "adoption_authorized": false,
+      "analysis": "trial-analysis/8a28f5fec50b5cd4f1320fd1fd470ad0e845d2ae8ffe63ffd58078a45ec1eb2a.json",
+      "attempt_count": 24,
+      "comparisons": [
+        {
+          "alpha": 0.05,
+          "baseline": "compiled_prompt",
+          "complete_pair_median_diagnostic": 0.0,
+          "complete_primary_cost_pairs": 2,
+          "complete_primary_score_pairs": 2,
+          "median_savings_fraction": 0.0,
+          "median_savings_interval": {
+            "lower": null,
+            "reason": "too_few_independent_workloads",
+            "upper": null
+          },
+          "primary_metric_differences": {
+            "elapsed_seconds": {
+              "complete_primary_pairs": 0,
+              "median_torc_minus_baseline": null
+            },
+            "operator_seconds": {
+              "complete_primary_pairs": 0,
+              "median_torc_minus_baseline": null
+            },
+            "repeated_investigation_count": {
+              "complete_primary_pairs": 0,
+              "median_torc_minus_baseline": null
+            }
+          },
+          "primary_workload_pairs": 2,
+          "savings_target_met": false,
+          "savings_unavailable_reason": null,
+          "scheduled_arm_runs": 8,
+          "stratum": "cold",
+          "success_difference": 0.0,
+          "success_difference_lower_bound": -0.841886116991581,
+          "success_gains": 0,
+          "success_losses": 0,
+          "success_noninferiority_passed": false,
+          "success_point_sensitivity": {
+            "best": 0.0,
+            "worst": 0.0
+          }
+        }
+      ],
+      "criteria_met": false,
+      "critical_failure_count": 0,
+      "fallback_attempt_count": 8,
+      "known_attempt_count": 24,
+      "missing_trial_ids": [],
+      "results": "trial-results/8015af4559151272dd1432f06289c977ee210fbeb49a856c1941fff31cbc9a32.json",
+      "trial_count": 8
+    },
+    "false_completion": {
+      "adoption_authorized": false,
+      "analysis": "trial-analysis/a42fbbb96c6860a43935a1a802afc4dcd37550bb51404db8074dfcfcac80649e.json",
+      "attempt_count": 24,
+      "comparisons": [
+        {
+          "alpha": 0.05,
+          "baseline": "compiled_prompt",
+          "complete_pair_median_diagnostic": 0.0,
+          "complete_primary_cost_pairs": 2,
+          "complete_primary_score_pairs": 2,
+          "median_savings_fraction": 0.0,
+          "median_savings_interval": {
+            "lower": null,
+            "reason": "too_few_independent_workloads",
+            "upper": null
+          },
+          "primary_metric_differences": {
+            "elapsed_seconds": {
+              "complete_primary_pairs": 0,
+              "median_torc_minus_baseline": null
+            },
+            "operator_seconds": {
+              "complete_primary_pairs": 0,
+              "median_torc_minus_baseline": null
+            },
+            "repeated_investigation_count": {
+              "complete_primary_pairs": 0,
+              "median_torc_minus_baseline": null
+            }
+          },
+          "primary_workload_pairs": 2,
+          "savings_target_met": false,
+          "savings_unavailable_reason": null,
+          "scheduled_arm_runs": 8,
+          "stratum": "cold",
+          "success_difference": 0.0,
+          "success_difference_lower_bound": -0.841886116991581,
+          "success_gains": 0,
+          "success_losses": 0,
+          "success_noninferiority_passed": false,
+          "success_point_sensitivity": {
+            "best": 0.0,
+            "worst": 0.0
+          }
+        }
+      ],
+      "criteria_met": false,
+      "critical_failure_count": 1,
+      "fallback_attempt_count": 8,
+      "known_attempt_count": 24,
+      "missing_trial_ids": [],
+      "results": "trial-results/8f6bb6d8cd6e7bfcce197ed31b25d76023c4e24fbda72cccc74d4cefc168ad8b.json",
+      "trial_count": 8
+    },
+    "missing_trial": {
+      "adoption_authorized": false,
+      "analysis": "trial-analysis/0ce0691166068d59168981da87a767949544243d5ace2e7259c69343ceeeee89.json",
+      "attempt_count": null,
+      "comparisons": [
+        {
+          "alpha": 0.05,
+          "baseline": "compiled_prompt",
+          "complete_pair_median_diagnostic": 0.0,
+          "complete_primary_cost_pairs": 1,
+          "complete_primary_score_pairs": 1,
+          "median_savings_fraction": null,
+          "median_savings_interval": {
+            "lower": null,
+            "reason": "incomplete_endpoint",
+            "upper": null
+          },
+          "primary_metric_differences": {
+            "elapsed_seconds": {
+              "complete_primary_pairs": 0,
+              "median_torc_minus_baseline": null
+            },
+            "operator_seconds": {
+              "complete_primary_pairs": 0,
+              "median_torc_minus_baseline": null
+            },
+            "repeated_investigation_count": {
+              "complete_primary_pairs": 0,
+              "median_torc_minus_baseline": null
+            }
+          },
+          "primary_workload_pairs": 2,
+          "savings_target_met": false,
+          "savings_unavailable_reason": "missing_or_excluded_trial_usage_or_nonpositive_baseline",
+          "scheduled_arm_runs": 8,
+          "stratum": "cold",
+          "success_difference": null,
+          "success_difference_lower_bound": null,
+          "success_gains": 0,
+          "success_losses": 0,
+          "success_noninferiority_passed": false,
+          "success_point_sensitivity": {
+            "best": 0.5,
+            "worst": 0.0
+          }
+        }
+      ],
+      "criteria_met": false,
+      "critical_failure_count": 0,
+      "fallback_attempt_count": null,
+      "known_attempt_count": 21,
+      "missing_trial_ids": [
+        "97a0aa14d8c4186b034222336955f74e79f435405334d3cb3c89296a33139911"
+      ],
+      "results": "trial-results/afdd2c463a3895c92ed79599166455c974bb5423a55bd663328393476a2ef09c.json",
+      "trial_count": 7
+    },
+    "missing_usage": {
+      "adoption_authorized": false,
+      "analysis": "trial-analysis/a244866605dae80947594c2742bfa3e2edf6d9d61fa1f6a85253cf9e1a4d4e6c.json",
+      "attempt_count": 24,
+      "comparisons": [
+        {
+          "alpha": 0.05,
+          "baseline": "compiled_prompt",
+          "complete_pair_median_diagnostic": 0.0,
+          "complete_primary_cost_pairs": 2,
+          "complete_primary_score_pairs": 2,
+          "median_savings_fraction": null,
+          "median_savings_interval": {
+            "lower": null,
+            "reason": "incomplete_endpoint",
+            "upper": null
+          },
+          "primary_metric_differences": {
+            "elapsed_seconds": {
+              "complete_primary_pairs": 0,
+              "median_torc_minus_baseline": null
+            },
+            "operator_seconds": {
+              "complete_primary_pairs": 0,
+              "median_torc_minus_baseline": null
+            },
+            "repeated_investigation_count": {
+              "complete_primary_pairs": 0,
+              "median_torc_minus_baseline": null
+            }
+          },
+          "primary_workload_pairs": 2,
+          "savings_target_met": false,
+          "savings_unavailable_reason": "missing_or_excluded_trial_usage_or_nonpositive_baseline",
+          "scheduled_arm_runs": 8,
+          "stratum": "cold",
+          "success_difference": 0.0,
+          "success_difference_lower_bound": -0.841886116991581,
+          "success_gains": 0,
+          "success_losses": 0,
+          "success_noninferiority_passed": false,
+          "success_point_sensitivity": {
+            "best": 0.0,
+            "worst": 0.0
+          }
+        }
+      ],
+      "criteria_met": false,
+      "critical_failure_count": 0,
+      "fallback_attempt_count": 8,
+      "known_attempt_count": 24,
+      "missing_trial_ids": [],
+      "results": "trial-results/351f3c01da111ff1c1ec4f3fbce2a70d7843af100a48a6505593a609cbece5a3.json",
+      "trial_count": 8
+    }
+  },
+  "conclusion": "Effectiveness and token savings remain unmeasured. No live calls occurred.",
+  "evidence_kind": "duplicated_synthetic_mechanics_only",
+  "launch_authorized": false,
+  "live_model_trials": 0,
+  "manifest": "trial-manifest/d569f3a8faa9de7288fe2691d92196c90f8bbe8158190907c42c51e784effc47.json",
+  "manifest_id": "923518637fb12aed368cf6bb6998b7275e10137c26c33813b86093e6de794348",
+  "plan": "trial-plan/409e56eecc95ab844f6ed1e50b3eb5e3add151e6eb8884b675305d3d64b7cfbf.json",
+  "readiness_blockers": [
+    "live admission is not implemented by this offline preparer",
+    "missing lane.provider",
+    "missing lane.model",
+    "missing lane.effort",
+    "missing lane.harness_version",
+    "missing lane.qualification_ref",
+    "missing resources.authorization_ref",
+    "missing telemetry.semantics_ref",
+    "lane counter semantics not qualified"
+  ],
+  "schema_version": "torc.offline_comparison_demo.v0",
+  "source_sha256": "7511b47e6502b47422df3aab1efa002cdfc904749aa0d4bfc71fafac03e78789",
+  "state": "draft"
+}

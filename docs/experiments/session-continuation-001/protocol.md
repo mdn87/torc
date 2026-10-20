@@ -6,6 +6,11 @@ provider run or claim measured token savings. Complete and hash-pin the trial
 manifest before observing any model results. A completed manifest, not this
 skeleton, is the preregistration.
 
+The [offline comparison apparatus](comparison-preparation.md) now pins draft
+inputs and analyzes supplied all-trial evidence. Its synthetic
+[replay report](comparison-report.json) does not complete this preregistration
+or authorize a live run.
+
 ## Questions and frozen rules
 
 Experiment A compares native warm/cold continuation, a deterministic compiled

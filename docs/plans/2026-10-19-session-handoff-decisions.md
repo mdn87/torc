@@ -1,5 +1,14 @@
 # Session-handoff final decisions — October 19, 2026
 
+October 20 continuation: the next bounded step is
+[offline comparison preparation](2026-10-20-continuation-trial-preparation.md).
+It adds pinned Experiment A pilot drafts and all-trial analysis, while leaving
+live admission with the existing execution owner. Draft manifests and synthetic
+confidence arithmetic cannot establish savings, quality or rollout eligibility.
+The [apparatus contract](../experiments/session-continuation-001/comparison-preparation.md)
+records the fixed missingness, pairing and uncertainty rules. Experiment B,
+live-lane qualification and API billing remain subsequent work.
+
 Scope: final disposition of rounds 3 and 4 against TORC `255acea`, followed by
 the bounded first implementation. The operator's current instruction authorizes
 implementation after the decision; the pasted review-only prompt describes the
