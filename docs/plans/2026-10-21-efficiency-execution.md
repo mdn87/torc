@@ -70,9 +70,9 @@ not establish an interrupted implementation.
 
 The first pass preserved three candidate starting states privately: one Cormac
 checkpoint and two AETA partial runs. A subsequent context-limit inventory
-added two Tableforge candidates, bringing collection to **five candidate records
+added three Tableforge candidates, bringing collection to **six candidate records
 across three repositories; zero fixtures are admitted**. Candidate records do
-not establish five qualified independent tasks or satisfy the eight-task gate.
+not establish six qualified independent tasks or satisfy the eight-task gate.
 
 | Candidate | Preserved evidence | Still needed |
 |---|---|---|
@@ -81,6 +81,7 @@ not establish five qualified independent tasks or satisfy the eight-task gate.
 | AETA quality partial run `20260809-052506-7c1f44141c74` | Base `481f3101c51d2352e7e0a648a849a35aa19065f9`, tracked patch, three changed source files, owner records | Original request and usable pre-stop history; concrete unfinished requirement; acceptance and independence from the other AETA case |
 | Tableforge host turn-runner integration | Real automatic compaction `7a357771823e9cae`; base `71688d28684cc38ce070101b8824684a2e31b4cd`; observed pre-edit file matches Git; ten successful literal edits replayed; original task-window history retained | Complete source/provenance review, editable paths, independent acceptance and task independence |
 | Tableforge persistence and recovery | Real automatic compaction `ce13a38287b041c0`; base `d0b245f6c66bb1a58031f2d856aca570c386d528`; two literal scaffold files and original task-window history retained | Confirm all source changes since the observed base are represented; editable paths, independent acceptance and task independence |
+| Tableforge session coordinator | Real automatic compaction `fc1bfc23c279e265`; base `02ded670877a8d52281e5099ee2e6376d53d82ed`; sixteen successful source operations reconstructed, twelve files preserved, original task-window history retained | Source closure, lockfile custody, editable paths, independent acceptance and task independence |
 
 For both AETA candidates, reconstruction of Autowork's inventory digest exactly
 matches the retained stop-time digest, including the untracked module where
@@ -106,8 +107,8 @@ source archives and local machine paths are not publication artifacts.
 
 The additional inventory found 248 recorded context compactions on the
 workstation and 39 on the peer. These are discovery boundaries, not task counts.
-The two Tableforge boundaries follow separate user requests and preserve
-unfinished local implementation. Their task-window records retain text and tool
+The Tableforge records preserve unfinished local implementation; their task
+independence remains an admission check. Their task-window records retain text and tool
 events while excluding hidden reasoning, signatures and later solution events;
 they are acquisition evidence, not frozen experimental prompts.
 
@@ -119,10 +120,41 @@ to `apps/session-host/src/host.ts` that would be lost by trusting the summary.
 
 Reject the Lugos child-contract candidate `a9e0305f6fe0c428` on lane fit: its
 required `.codex/agents/` edits are prohibited by Autowork's current
-`_write_tool_rules`. Do not expand the executor merely to admit it. Remaining
-leads include other Tableforge code boundaries and source-owner work in the
-peer histories; review distinct tasks, state recovery and lane fit before counting
-any of them. No model, benchmark, or scorer-qualification call ran in collection.
+`_write_tool_rules`. Do not expand the executor merely to admit it.
+
+The coordinator reconstruction includes the observed `.gitignore` append and
+copied TypeScript configuration. Its generated lockfile comes from the first
+following commit, `092be94`, with no intervening lockfile write observed. This
+is later artifact custody, not a direct pre-stop read; the receipt preserves
+that distinction for eligibility review. The retained task history contains 182
+text/tool events, excluding hidden reasoning and events after the boundary.
+
+The additional leads do not supply the missing eligible tasks:
+
+- Tableforge turn-runner/speaker boundary `a8f0fb5808634975` followed the source
+  writes. The first subsequent build and tests passed without a code fix; only
+  documentation changed before the commit. Reject it as unfinished code work.
+- Taskmaster watcher boundary `3dc709197de9a4b1` concerns identifying an external
+  process termination and restoring a live Windows scheduled task. Proposed
+  code hardening alone does not satisfy its original acceptance criteria.
+- Cirra boundary `aa8f87da804a5037` belongs to one Cirra/Taskmaster implementation
+  assignment on mirrors without Git metadata. Repeated compactions do not
+  create independent tasks; exact starting trees for both owners are not bound.
+- Agent-mail boundary `f11d15ef4a587a86` precedes implementation of inbox limits
+  across Lugos and its MCP repository. A later clean root-worktree observation
+  does not establish both repositories' exact state at the interruption.
+- Training/git-manager boundary `604498f21ee72bde` contains a recorded attempt
+  to fix porcelain whitespace handling, but the complete interrupted project
+  tree is not bound. Its broader machine-wide reconciliation cannot be silently
+  replaced with a newly invented parser-only assignment.
+
+These are evidence gaps and exclusions, not a claim that every retained session
+has been exhausted. No additional fully recoverable, lane-compatible task is
+established by this pass. The eight-task requirement therefore still prevents
+stages 2–4 from starting. Reopen collection when an original missing request or
+another genuine interruption with recoverable state becomes available; do not
+repeat the same inventories without new evidence. No delegated model, benchmark,
+or scorer-qualification call ran in collection, and no paid API spend occurred.
 
 ## Collection procedure before restarting the study
 
