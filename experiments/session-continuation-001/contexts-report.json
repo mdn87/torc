@@ -1,0 +1,129 @@
+{
+  "evidence_kind": "operator_authored_task_contexts",
+  "live_model_trials": 0,
+  "schema_version": "torc.task_context_preparation.v0",
+  "source_sha256": {
+    "experiments/session-continuation-001/contexts.py": "eca2a4ca51dadcceb5012f574a4a6ef25c25bfa812d7ddc66d0759819791c90b",
+    "experiments/session-continuation-001/workloads.py": "a920f66aad370113dd6b568677491586ca2cb88de158e200e817e2b6f84b1046",
+    "src/torc/canonical.py": "424fe3640a094f6dd34fa2b4c7b3ce374eada88685243c6a4dbf01b3b8653838",
+    "src/torc/continuation_context.py": "81a5ea424db56d8b7c3fbbfffa46e74e8f36b04c8f3be65037d58724a906f790",
+    "src/torc/continuation_trials.py": "8f7e07fa3ee43907c90aa46b9daf4915722ecc344eb4f114022bd807635e2984",
+    "src/torc/execution_capsules.py": "17c5dc9d7601831f560802697bf7e62d5813f741dd638ed658283aef9c6f782e",
+    "src/torc/harness_capture/manifest.py": "a695a00136728323a8d8e01c67e0f382105874b878925fd27665c34a3335ea99",
+    "src/torc/harness_capture/reconcile.py": "7247f20dce5f34efe586d203ee34e4d5c1ef70c7098f2b25d9b249a74df2ae2a",
+    "src/torc/history.py": "382d3b93b37a1126a9dc3e9462ecdfcb4da7d4272a7117b2a7927fbe6270d925",
+    "src/torc/p5_capsules.py": "270a4822c94810d7f9135e1d4158ad09134fee43dba67f37a8f8f700acd2036e",
+    "src/torc/projections.py": "832beefe674bfafbab1f8fb5d4d9150b27042ba008582c609487e902975805fb",
+    "src/torc/store.py": "c87cd2b4f748ef8902efd29f4cd9fb465328b0abac979cb18b4c8e2388e75afb"
+  },
+  "tasks": {
+    "capsule-context": {
+      "arms": {
+        "compiled_prompt": {
+          "context": {
+            "path": "public/compiled_prompt.context",
+            "sha256": "b73e7f5045058d6391c2117fd9726bf17adadea0a036d81600181ea73e68e6d3"
+          },
+          "context_bytes": 2728,
+          "prompt": {
+            "path": "public/compiled_prompt.prompt",
+            "sha256": "2287394ab9c94a36f62024be9c78217607b96350cbd7171931dd683e653893e5"
+          },
+          "prompt_bytes": 3999,
+          "report_sha256": "7c0ab7e6705897729a3103edcaa1b717a742a012c238c45b4e4849c8733772cd"
+        },
+        "torc_capsule": {
+          "context": {
+            "path": "public/torc_capsule.context",
+            "sha256": "372406ac7665a68caec32a00a14e37b81d05bea1f484d3aad8626c9e98559c81"
+          },
+          "context_bytes": 2969,
+          "prompt": {
+            "path": "public/torc_capsule.prompt",
+            "sha256": "3d735eef531e1396edd2ea621072e96be65254ff0f42283c13f28ca4c3d92c67"
+          },
+          "prompt_bytes": 4240,
+          "report_sha256": "7c0ab7e6705897729a3103edcaa1b717a742a012c238c45b4e4849c8733772cd"
+        }
+      },
+      "bridge": {
+        "authority_transferred": false,
+        "binding_id": "sha256:febf33895598cba0da021dac8b47ada990c97aa95bb5f168f4d9d9cbceba7ff2",
+        "hold_list": [],
+        "quiescence": "unknown",
+        "report_sha256": "7c0ab7e6705897729a3103edcaa1b717a742a012c238c45b4e4849c8733772cd",
+        "retry_authorized": false,
+        "scope_holds": [
+          "coverage_incomplete"
+        ],
+        "status": "held"
+      },
+      "canonical_author": "operator briefing",
+      "capsule_omissions": [
+        {
+          "reason": "budget",
+          "section_id": "uncertainties",
+          "source_ref": "capsule-context-r1:uncertainties"
+        }
+      ],
+      "carry_limit_words": 400,
+      "history_kind": "operator-authored briefing; native seed session not yet created",
+      "launch_authorized": false,
+      "manifest_id": "ad4e8b362560900bd93af82c5c0933bdc94d46b475ea62e143779d0ec115d4fc",
+      "native_arms_ready": false,
+      "state_store_unchanged_during_verification": true,
+      "workspace_sha256": "6d4a0cc0c3f61c4a5964c50ce63f0314345e5e437656ebc9cb77d7dd227f2f94"
+    },
+    "whole-task-usage": {
+      "arms": {
+        "compiled_prompt": {
+          "context": {
+            "path": "public/compiled_prompt.context",
+            "sha256": "2838cc64194dbb74526a1ad5f3ea0759cc661477ff34533d8b5fe0a587d855ea"
+          },
+          "context_bytes": 2620,
+          "prompt": {
+            "path": "public/compiled_prompt.prompt",
+            "sha256": "f8e13acb51c1633c14ba8ff4fe739cc188f157ed1d34334fe09b87331f467791"
+          },
+          "prompt_bytes": 3893,
+          "report_sha256": "697fff3da2ae46e6ad9ec57cbf0c4c5b68dd9b650ffd5c510baf05944e717d34"
+        },
+        "torc_capsule": {
+          "context": {
+            "path": "public/torc_capsule.context",
+            "sha256": "7560aa2d24d91eb6a2af9d7deaad39a0ea548b45c529bbe28a79fe39247397d6"
+          },
+          "context_bytes": 2953,
+          "prompt": {
+            "path": "public/torc_capsule.prompt",
+            "sha256": "be828600036538b16f543b0b18856c0594d27b3bd73b7a76ad6a660f1a50117b"
+          },
+          "prompt_bytes": 4226,
+          "report_sha256": "697fff3da2ae46e6ad9ec57cbf0c4c5b68dd9b650ffd5c510baf05944e717d34"
+        }
+      },
+      "bridge": {
+        "authority_transferred": false,
+        "binding_id": "sha256:0703a7ee268d54110935e7dbff9bb2cbc34c26f83a047d58a755d54d740e76c9",
+        "hold_list": [],
+        "quiescence": "unknown",
+        "report_sha256": "697fff3da2ae46e6ad9ec57cbf0c4c5b68dd9b650ffd5c510baf05944e717d34",
+        "retry_authorized": false,
+        "scope_holds": [
+          "coverage_incomplete"
+        ],
+        "status": "held"
+      },
+      "canonical_author": "operator briefing",
+      "capsule_omissions": [],
+      "carry_limit_words": 400,
+      "history_kind": "operator-authored briefing; native seed session not yet created",
+      "launch_authorized": false,
+      "manifest_id": "6df5eb07fb099821391d6ec6d42a34e994e0620996d0c47383dff89b63e9742e",
+      "native_arms_ready": false,
+      "state_store_unchanged_during_verification": true,
+      "workspace_sha256": "2da254707889fc3e4693eb41bc68d0cd1293e6d0721ba7a7f2c3c493f104b317"
+    }
+  }
+}

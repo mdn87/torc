@@ -1,0 +1,15 @@
+{
+  "capability_source_sha256": "6aa24380afdc39eeeb430b2aff9d9a398486d019eb1d69d867fa2f5affbc04e9",
+  "error": "capability effect checks failed or drifted: ['outside_write_blocked']; observation=CandidateSandboxObservation(candidate_read=True, candidate_write=True, outside_write_blocked=False, network_blocked=True, forbidden_integrations_absent=True)",
+  "error_type": "CapabilityProbeFailure",
+  "live_launch_authorized": false,
+  "live_model_calls": 0,
+  "native_resume_qualified": false,
+  "observed_at": "2026-10-20T04:53:13.157876Z",
+  "owner_commit": "7699b3c75d84b5acfed873a00db68bcc71d67271",
+  "platform": "macos",
+  "requested_sandbox": "workspace-write",
+  "schema_version": 1,
+  "status": "failed",
+  "telemetry_qualified": false
+}

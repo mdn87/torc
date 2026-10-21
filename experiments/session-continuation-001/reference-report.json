@@ -1,0 +1,81 @@
+{
+  "all_passed": true,
+  "live_model_trials": 0,
+  "schema_version": 1,
+  "source_sha256": "a920f66aad370113dd6b568677491586ca2cb88de158e200e817e2b6f84b1046",
+  "untrusted_candidate_execution_qualified": false,
+  "workloads": [
+    {
+      "baseline": {
+        "candidate_sha256": "6d4a0cc0c3f61c4a5964c50ce63f0314345e5e437656ebc9cb77d7dd227f2f94",
+        "exit_status": 1
+      },
+      "mutant": {
+        "candidate_sha256": "abeb266d51904be26f8d4cc50b4386102bda7dba49627641480545f5a01bb2da",
+        "exit_status": 1
+      },
+      "protected_change_rejected": true,
+      "reference": {
+        "candidate_sha256": "66193a410fc6c973a82c0dfc9497b119b421c59865dd99d4575deae0577a3ae6",
+        "exit_status": 0
+      },
+      "staged": {
+        "base_commit": "a798bbc4c45527952510a5f3d239f49c5b67a2de",
+        "brief": "capsule-context.md",
+        "common_rules_sha256": "2b4bf9c15b1897f4508e638afeda69726182162d486cad163beaf0f724793455",
+        "editable_paths": [
+          "src/torc/continuation_context.py"
+        ],
+        "evidence_class": "historical_repository_task",
+        "generalization": "pilot only; historical replays are not adoption samples",
+        "hidden_tests": [
+          "tests/test_continuation_context.py"
+        ],
+        "history_kind": "operator-authored briefing; native seed session not yet created",
+        "public_brief_sha256": "53c735f66a12e8f953e3c568dbd985763f749b84ad40e212c46452b13091619f",
+        "reference_commit": "9d96039a0e1fefecfc75948fc31464dc6706fee9",
+        "source_tree_sha256": "e4595265b57c6015e4689f0987193d44abee90e6bedabec128ba237ac0171beb",
+        "worker_may_read_oracle": false,
+        "workload_id": "capsule-context",
+        "workspace_sha256": "6d4a0cc0c3f61c4a5964c50ce63f0314345e5e437656ebc9cb77d7dd227f2f94"
+      },
+      "workload_id": "capsule-context"
+    },
+    {
+      "baseline": {
+        "candidate_sha256": "2da254707889fc3e4693eb41bc68d0cd1293e6d0721ba7a7f2c3c493f104b317",
+        "exit_status": 1
+      },
+      "mutant": {
+        "candidate_sha256": "92c2f3551f92e28a1ea5caec64a5ee3ca3f2c63155d883d1da29378ca46c9288",
+        "exit_status": 1
+      },
+      "protected_change_rejected": true,
+      "reference": {
+        "candidate_sha256": "f07c025f1791a0d55ba98f79cd6c092f8a3715e1f259599d3d9b7f8b9a4bd95a",
+        "exit_status": 0
+      },
+      "staged": {
+        "base_commit": "a798bbc4c45527952510a5f3d239f49c5b67a2de",
+        "brief": "whole-task-usage.md",
+        "common_rules_sha256": "2b4bf9c15b1897f4508e638afeda69726182162d486cad163beaf0f724793455",
+        "editable_paths": [
+          "src/torc/continuation_usage.py"
+        ],
+        "evidence_class": "historical_repository_task",
+        "generalization": "pilot only; historical replays are not adoption samples",
+        "hidden_tests": [
+          "tests/test_continuation_usage.py"
+        ],
+        "history_kind": "operator-authored briefing; native seed session not yet created",
+        "public_brief_sha256": "cd7e299de0665663ba936a575bf84a61c7c81143db50f7ebe45f1a78b32b6a9a",
+        "reference_commit": "9d96039a0e1fefecfc75948fc31464dc6706fee9",
+        "source_tree_sha256": "e4595265b57c6015e4689f0987193d44abee90e6bedabec128ba237ac0171beb",
+        "worker_may_read_oracle": false,
+        "workload_id": "whole-task-usage",
+        "workspace_sha256": "2da254707889fc3e4693eb41bc68d0cd1293e6d0721ba7a7f2c3c493f104b317"
+      },
+      "workload_id": "whole-task-usage"
+    }
+  ]
+}

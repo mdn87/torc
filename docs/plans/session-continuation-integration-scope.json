@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "objective": "Continue a798bbc with existing-capsule integration and offline whole-task usage accounting.",
+  "success_evidence": [
+    "Existing derive/verify reject altered capsules; context substitutions reject; separate recovery evidence survives tight budgets and becomes stale after actual P3 acceptance.",
+    "Synthetic accounting retains failed attempts, fallback, missing counters and raw evidence without adding cumulative totals to deltas.",
+    "Reproducible offline report and full pytest, Ruff, doctor, temporary demo/verify pass."
+  ],
+  "non_goals": [
+    "No live model trials, hooks, retry coordinator or automatic execution.",
+    "No changes to authority, capsule verifier, canonical schema or parent repository.",
+    "No token savings or real billing claims."
+  ],
+  "accepted_threats": [
+    "Trusted single local operator; supplied telemetry inventories and counter semantics require external evidence.",
+    "Hashes prove byte binding, not freshness, authentication or permission.",
+    "Synthetic fixtures establish mechanics only."
+  ],
+  "estimates": {
+    "elapsed_hours": 2,
+    "production_loc": 650,
+    "test_loc": 450,
+    "changed_files": 10,
+    "runtime_processes": 0,
+    "operator_steps": 1
+  },
+  "vertical_slice": {
+    "status": "passed",
+    "evidence": "830 tests and Ruff passed. Doctor, temporary demo and verify passed (7 artifacts, no errors). Independent replay runs match retained report byte-for-byte, with unchanged store dump/files. Existing capsule and authority modules unchanged. Autowork preflight unavailable; no delegate request sent; lead implemented both streams. Elapsed measurement starts at scope-file creation and excludes preceding reading/preflight. Packaging and audit results are recorded in the milestone guide."
+  },
+  "architecture_triggers": [],
+  "review_rounds_used": 1,
+  "scope_policy_sha256": "a44baa88f0fb914b144db7c0830bc47f236c122ad0765bd2e5f06c754bc8d4b4",
+  "parent_envelope_sha256": null,
+  "operator_override_id": null,
+  "observed": {
+    "elapsed_hours": 0.14,
+    "production_loc": 458,
+    "test_loc": 392,
+    "changed_files": 12,
+    "runtime_processes": 0,
+    "operator_steps": 1
+  }
+}

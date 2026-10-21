@@ -1,0 +1,366 @@
+{
+  "schema_version": "synthetic-continuation-accounting-v0",
+  "cases": [
+    {
+      "task_id": "failed-reconstruction-then-fallback",
+      "arm": "torc_capsule",
+      "outcome": "verified_completion",
+      "completion_evidence_ref": "independent-fixture-test",
+      "attempts": [
+        {
+          "attempt_id": "start-before-request",
+          "status": "failed",
+          "context_delivered": true,
+          "arm_independent_setup_failure": false,
+          "requests_complete": true,
+          "fallback_from": null,
+          "requests": []
+        },
+        {
+          "attempt_id": "failed-start",
+          "status": "failed",
+          "context_delivered": true,
+          "arm_independent_setup_failure": false,
+          "requests_complete": true,
+          "fallback_from": null,
+          "requests": [
+            {
+              "request_id": "r1",
+              "role": "root",
+              "phase": "reconstruction"
+            }
+          ],
+          "retry_from": "start-before-request",
+          "local_cpu_seconds": 0.01,
+          "human_inspection_seconds": 2
+        },
+        {
+          "attempt_id": "fallback",
+          "status": "completed",
+          "context_delivered": true,
+          "arm_independent_setup_failure": false,
+          "requests_complete": true,
+          "fallback_from": "failed-start",
+          "requests": [
+            {
+              "request_id": "r2",
+              "role": "subagent",
+              "phase": "fallback"
+            }
+          ]
+        }
+      ],
+      "usage_groups": [
+        {
+          "group_id": "failed",
+          "request_ids": [
+            "r1"
+          ],
+          "mode": "cumulative",
+          "complete": true,
+          "source": "synthetic",
+          "exporter_version": "fixture-v1",
+          "semantics": {
+            "evidence_ref": "fixture-counter-contract-v1",
+            "proxy_compatible": true,
+            "input_cache_nonoverlap": true
+          },
+          "observations": [
+            {
+              "observation_id": "failed-1",
+              "sequence": 1,
+              "usage": {
+                "input_tokens": 4,
+                "cached_input_tokens": 20,
+                "cache_write_input_tokens": 3,
+                "reasoning_output_tokens": 2,
+                "output_tokens": 5
+              },
+              "evidence_ref": "fixture-raw-1"
+            },
+            {
+              "observation_id": "final-failed",
+              "sequence": 2,
+              "usage": {
+                "input_tokens": 10,
+                "cached_input_tokens": 20,
+                "cache_write_input_tokens": 3,
+                "reasoning_output_tokens": 2,
+                "output_tokens": 5
+              },
+              "evidence_ref": "fixture-final-failed"
+            },
+            {
+              "observation_id": "final-failed",
+              "sequence": 2,
+              "usage": {
+                "input_tokens": 10,
+                "cached_input_tokens": 20,
+                "cache_write_input_tokens": 3,
+                "reasoning_output_tokens": 2,
+                "output_tokens": 5
+              },
+              "evidence_ref": "fixture-final-failed"
+            }
+          ]
+        },
+        {
+          "group_id": "fallback",
+          "request_ids": [
+            "r2"
+          ],
+          "mode": "cumulative",
+          "complete": true,
+          "source": "synthetic",
+          "exporter_version": "fixture-v1",
+          "semantics": {
+            "evidence_ref": "fixture-counter-contract-v1",
+            "proxy_compatible": true,
+            "input_cache_nonoverlap": true
+          },
+          "observations": [
+            {
+              "observation_id": "fallback-1",
+              "sequence": 1,
+              "usage": {
+                "input_tokens": 10,
+                "cached_input_tokens": 20,
+                "cache_write_input_tokens": 3,
+                "reasoning_output_tokens": 2,
+                "output_tokens": 5
+              },
+              "evidence_ref": "fixture-raw-1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "missing-fallback-output",
+      "arm": "torc_capsule",
+      "outcome": "verified_completion",
+      "completion_evidence_ref": "independent-fixture-test",
+      "attempts": [
+        {
+          "attempt_id": "start-before-request",
+          "status": "failed",
+          "context_delivered": true,
+          "arm_independent_setup_failure": false,
+          "requests_complete": true,
+          "fallback_from": null,
+          "requests": []
+        },
+        {
+          "attempt_id": "failed-start",
+          "status": "failed",
+          "context_delivered": true,
+          "arm_independent_setup_failure": false,
+          "requests_complete": true,
+          "fallback_from": null,
+          "requests": [
+            {
+              "request_id": "r1",
+              "role": "root",
+              "phase": "reconstruction"
+            }
+          ],
+          "retry_from": "start-before-request",
+          "local_cpu_seconds": 0.01,
+          "human_inspection_seconds": 2
+        },
+        {
+          "attempt_id": "fallback",
+          "status": "completed",
+          "context_delivered": true,
+          "arm_independent_setup_failure": false,
+          "requests_complete": true,
+          "fallback_from": "failed-start",
+          "requests": [
+            {
+              "request_id": "r2",
+              "role": "subagent",
+              "phase": "fallback"
+            }
+          ]
+        }
+      ],
+      "usage_groups": [
+        {
+          "group_id": "failed",
+          "request_ids": [
+            "r1"
+          ],
+          "mode": "cumulative",
+          "complete": true,
+          "source": "synthetic",
+          "exporter_version": "fixture-v1",
+          "semantics": {
+            "evidence_ref": "fixture-counter-contract-v1",
+            "proxy_compatible": true,
+            "input_cache_nonoverlap": true
+          },
+          "observations": [
+            {
+              "observation_id": "failed-1",
+              "sequence": 1,
+              "usage": {
+                "input_tokens": 4,
+                "cached_input_tokens": 20,
+                "cache_write_input_tokens": 3,
+                "reasoning_output_tokens": 2,
+                "output_tokens": 5
+              },
+              "evidence_ref": "fixture-raw-1"
+            },
+            {
+              "observation_id": "final-failed",
+              "sequence": 2,
+              "usage": {
+                "input_tokens": 10,
+                "cached_input_tokens": 20,
+                "cache_write_input_tokens": 3,
+                "reasoning_output_tokens": 2,
+                "output_tokens": 5
+              },
+              "evidence_ref": "fixture-final-failed"
+            },
+            {
+              "observation_id": "final-failed",
+              "sequence": 2,
+              "usage": {
+                "input_tokens": 10,
+                "cached_input_tokens": 20,
+                "cache_write_input_tokens": 3,
+                "reasoning_output_tokens": 2,
+                "output_tokens": 5
+              },
+              "evidence_ref": "fixture-final-failed"
+            }
+          ]
+        },
+        {
+          "group_id": "fallback",
+          "request_ids": [
+            "r2"
+          ],
+          "mode": "cumulative",
+          "complete": true,
+          "source": "synthetic",
+          "exporter_version": "fixture-v1",
+          "semantics": {
+            "evidence_ref": "fixture-counter-contract-v1",
+            "proxy_compatible": true,
+            "input_cache_nonoverlap": true
+          },
+          "observations": [
+            {
+              "observation_id": "fallback-1",
+              "sequence": 1,
+              "usage": {
+                "input_tokens": 10,
+                "cached_input_tokens": 20,
+                "cache_write_input_tokens": 3,
+                "reasoning_output_tokens": 2
+              },
+              "evidence_ref": "fixture-raw-1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "session-counter-spans-attempts",
+      "arm": "torc_capsule",
+      "outcome": "verified_completion",
+      "completion_evidence_ref": "independent-fixture-test",
+      "attempts": [
+        {
+          "attempt_id": "start-before-request",
+          "status": "failed",
+          "context_delivered": true,
+          "arm_independent_setup_failure": false,
+          "requests_complete": true,
+          "fallback_from": null,
+          "requests": []
+        },
+        {
+          "attempt_id": "failed-start",
+          "status": "failed",
+          "context_delivered": true,
+          "arm_independent_setup_failure": false,
+          "requests_complete": true,
+          "fallback_from": null,
+          "requests": [
+            {
+              "request_id": "r1",
+              "role": "root",
+              "phase": "reconstruction"
+            }
+          ],
+          "retry_from": "start-before-request",
+          "local_cpu_seconds": 0.01,
+          "human_inspection_seconds": 2
+        },
+        {
+          "attempt_id": "fallback",
+          "status": "completed",
+          "context_delivered": true,
+          "arm_independent_setup_failure": false,
+          "requests_complete": true,
+          "fallback_from": "failed-start",
+          "requests": [
+            {
+              "request_id": "r2",
+              "role": "subagent",
+              "phase": "fallback"
+            }
+          ]
+        }
+      ],
+      "usage_groups": [
+        {
+          "group_id": "session-total",
+          "request_ids": [
+            "r1",
+            "r2"
+          ],
+          "mode": "cumulative",
+          "complete": true,
+          "source": "synthetic",
+          "exporter_version": "fixture-v1",
+          "semantics": {
+            "evidence_ref": "fixture-counter-contract-v1",
+            "proxy_compatible": true,
+            "input_cache_nonoverlap": true
+          },
+          "observations": [
+            {
+              "observation_id": "session-total-1",
+              "sequence": 1,
+              "usage": {
+                "input_tokens": 20,
+                "cached_input_tokens": 40,
+                "cache_write_input_tokens": 6,
+                "reasoning_output_tokens": 4,
+                "output_tokens": 10
+              },
+              "evidence_ref": "fixture-raw-1"
+            },
+            {
+              "observation_id": "session-total-1",
+              "sequence": 1,
+              "usage": {
+                "input_tokens": 20,
+                "cached_input_tokens": 40,
+                "cache_write_input_tokens": 6,
+                "reasoning_output_tokens": 4,
+                "output_tokens": 10
+              },
+              "evidence_ref": "fixture-raw-1"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

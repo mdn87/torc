@@ -1,0 +1,15 @@
+{
+  "capability_source_sha256": "6aa24380afdc39eeeb430b2aff9d9a398486d019eb1d69d867fa2f5affbc04e9",
+  "error": "unsupported Codex version '0.163.0'",
+  "error_type": "ProviderSafetyError",
+  "live_launch_authorized": false,
+  "live_model_calls": 0,
+  "native_resume_qualified": false,
+  "observed_at": "2026-10-20T04:38:39.300731Z",
+  "owner_commit": "27006c5a2ee60693796a0a3177e9dbbd15c981fc",
+  "platform": "macos",
+  "requested_sandbox": "workspace-write",
+  "schema_version": 1,
+  "status": "failed",
+  "telemetry_qualified": false
+}

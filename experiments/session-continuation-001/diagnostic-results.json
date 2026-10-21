@@ -1,0 +1,1278 @@
+{
+  "accepted_comparisons": 2,
+  "actual_api_cost": null,
+  "admitted_invocations": 8,
+  "adoption_supported": false,
+  "archive_sha256": "22c47eb3b67b374cb6779269151c154b381f5fe6787895bd5e7173cbd64dbbfb",
+  "cohort_id": "continuation-diagnostic-20261021-v1",
+  "completed_comparisons": 6,
+  "limitations": [
+    "Two historical tasks and one run per arm do not support a general quality claim.",
+    "Counters are owner completion observations, not an inventory of provider responses.",
+    "Hidden retries and failed-request usage remain unknown; input/cache fields may overlap.",
+    "Seed expense is separate and included once in the observed whole-pilot totals.",
+    "Elapsed intervals exclude time between trials and the first model-free rescore.",
+    "Malformed trace lines are retained privately; event timestamps and complete intervention capture are unavailable.",
+    "Repeated-investigation rates and operator active time remain unknown.",
+    "The first scorer command and subsequent terminal scope disposition were amended; original outcomes remain retained."
+  ],
+  "manifest_id": "4ee89bb298d20a7891c47de7e68c955533e93ab221f271547ea3a0c5246c90df",
+  "max_invocations": 9,
+  "observed_whole_pilot_incremental_usage": {
+    "cache_write_input_tokens": 0,
+    "cached_input_tokens": 3165056,
+    "input_tokens": 3538693,
+    "output_tokens": 70309,
+    "reasoning_output_tokens": 21759
+  },
+  "paid_api_used": false,
+  "planned_comparisons": 6,
+  "planned_invocations": 8,
+  "provider_coverage_complete": null,
+  "schema_version": 1,
+  "seed_preparation": [
+    {
+      "admission_id": "attempt-662c4af5e3f241d6bcfbb8d7ec1d9705",
+      "elapsed_seconds": 9.038846958021168,
+      "inherited_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "provider_usage": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 0,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "reasoning_output_tokens": 0
+        },
+        "reasoning_output_tokens": 0,
+        "reported_fields": [
+          "input_tokens",
+          "cached_input_tokens",
+          "cache_write_input_tokens",
+          "reasoning_output_tokens",
+          "output_tokens"
+        ],
+        "schema_version": 1,
+        "source": "codex",
+        "supplied": true,
+        "unreported_fields": []
+      },
+      "native_binding_valid": true,
+      "observed_incremental_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 0,
+        "input_tokens": 10764,
+        "output_tokens": 5,
+        "reasoning_output_tokens": 0
+      },
+      "owner_attempt_id": "attempt-1186d718a1d64231a5b76ee69d09e2ad",
+      "owner_result_sha256": "acff2252d68b2d5876afc1106f7e9dfea226d077d1b59dfb82e53bccfa84c58c",
+      "paid_api_used": false,
+      "process_tree_absent": true,
+      "status": "completed",
+      "step": "seed-capsule-context",
+      "terminal_capture_complete": true,
+      "worker_seconds": 6.624595583009068,
+      "workload_id": "capsule-context"
+    },
+    {
+      "admission_id": "attempt-5ac51cb328cf443bbd44677bb85d1db3",
+      "elapsed_seconds": 17.97073724999791,
+      "inherited_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "provider_usage": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 0,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "reasoning_output_tokens": 0
+        },
+        "reasoning_output_tokens": 0,
+        "reported_fields": [
+          "input_tokens",
+          "cached_input_tokens",
+          "cache_write_input_tokens",
+          "reasoning_output_tokens",
+          "output_tokens"
+        ],
+        "schema_version": 1,
+        "source": "codex",
+        "supplied": true,
+        "unreported_fields": []
+      },
+      "native_binding_valid": true,
+      "observed_incremental_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 0,
+        "input_tokens": 10994,
+        "output_tokens": 5,
+        "reasoning_output_tokens": 0
+      },
+      "owner_attempt_id": "attempt-45698556378248339de982cb6928e00f",
+      "owner_result_sha256": "d9db7ffb48060847df9ea4178357e280f180b1ea6fbbe2ba141e980100832e13",
+      "paid_api_used": false,
+      "process_tree_absent": true,
+      "status": "completed",
+      "step": "seed-whole-task-usage",
+      "terminal_capture_complete": true,
+      "worker_seconds": 15.070949500019196,
+      "workload_id": "whole-task-usage"
+    }
+  ],
+  "trials": [
+    {
+      "acceptance_passed": false,
+      "admission_id": "attempt-6249d3c7cf63413b8a9ee7ac14c292f4",
+      "arm": "native_warm",
+      "candidate_sha256": "fe9dd6904f2ca90fc4586fcbb6c1a7bff62b7faed9a7cddd99010ad071bd29f1",
+      "elapsed_seconds": 236.51942983298795,
+      "failed_test_ids": [
+        "tests/test_continuation_usage.py::test_deltas_are_summed_once_and_session_total_is_an_alternative",
+        "tests/test_continuation_usage.py::test_explicit_mixed_observation_modes_reject"
+      ],
+      "inherited_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 0,
+        "input_tokens": 10994,
+        "output_tokens": 5,
+        "provider_usage": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 0,
+          "input_tokens": 10994,
+          "output_tokens": 5,
+          "reasoning_output_tokens": 0
+        },
+        "reasoning_output_tokens": 0,
+        "reported_fields": [
+          "input_tokens",
+          "cached_input_tokens",
+          "cache_write_input_tokens",
+          "reasoning_output_tokens",
+          "output_tokens"
+        ],
+        "schema_version": 1,
+        "source": "codex",
+        "supplied": true,
+        "unreported_fields": []
+      },
+      "malformed_trace_lines": 1,
+      "native_binding_valid": true,
+      "observations": {
+        "candidate_sha256": "fe9dd6904f2ca90fc4586fcbb6c1a7bff62b7faed9a7cddd99010ad071bd29f1",
+        "capture_complete": false,
+        "events": [
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 4
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 9
+          },
+          {
+            "action_kind": "edit",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "unknown",
+            "sequence": 11
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "failure",
+            "sequence": 14
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 16
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 18
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "failure",
+            "sequence": 20
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 22
+          },
+          {
+            "action_kind": "edit",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "unknown",
+            "sequence": 24
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "failure",
+            "sequence": 27
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 30
+          }
+        ],
+        "interventions": {
+          "active_seconds": null,
+          "count": 1
+        },
+        "investigation": {
+          "assessable_event_count": 0,
+          "event_count": 11,
+          "repeated_investigation_count": 0,
+          "repeated_investigation_rate": null,
+          "unknown_event_count": 11
+        },
+        "opaque_id": "trial-00aa1e0ffc72",
+        "owner_receipt_ref": null,
+        "process_tree_absent": true,
+        "redaction": {
+          "content_redacted": true,
+          "fields_retained_privately": [
+            "action",
+            "evidence_ref",
+            "result"
+          ]
+        },
+        "schema_version": "torc.continuation_observations.v0",
+        "timing": {
+          "clock_id": "one_monotonic_clock",
+          "duration_seconds": 236.51942983298795,
+          "intervals": [
+            {
+              "duration_seconds": 236.51942983298795,
+              "phase": "attempt"
+            }
+          ]
+        }
+      },
+      "observed_incremental_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 437120,
+        "input_tokens": 487865,
+        "output_tokens": 13334,
+        "reasoning_output_tokens": 3922
+      },
+      "owner_attempt_id": "attempt-5219d1c75f2b47a18d6cadc155ed1005",
+      "owner_result_sha256": "82487dec4cab888dfbb211937c3726c3afaacc555f000794c9799724804b38cb",
+      "paid_api_used": false,
+      "process_tree_absent": true,
+      "protocol_deviation": true,
+      "scored": true,
+      "scorer_exit_code": 1,
+      "scorer_result_sha256": "dfd3e6c500ade91a3d52ab8f2c5a3bc8c260885f83185825947f7c0f9ec8b095",
+      "status": "held_verification_failed",
+      "step": "00aa1e0ffc72dfa1973e8d0a67c8241e614f9be1e56f3261d0e27d5d67e4bd25",
+      "terminal_capture_complete": true,
+      "worker_seconds": 220.82032175001223,
+      "workload_id": "whole-task-usage"
+    },
+    {
+      "acceptance_passed": false,
+      "admission_id": "attempt-d4dbbdd1881446219a46709d4016592b",
+      "arm": "compiled_prompt",
+      "elapsed_seconds": 290.4969466669718,
+      "inherited_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "provider_usage": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 0,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "reasoning_output_tokens": 0
+        },
+        "reasoning_output_tokens": 0,
+        "reported_fields": [
+          "input_tokens",
+          "cached_input_tokens",
+          "cache_write_input_tokens",
+          "reasoning_output_tokens",
+          "output_tokens"
+        ],
+        "schema_version": 1,
+        "source": "codex",
+        "supplied": true,
+        "unreported_fields": []
+      },
+      "native_binding_valid": true,
+      "observations": null,
+      "observed_incremental_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 586752,
+        "input_tokens": 646945,
+        "output_tokens": 16057,
+        "reasoning_output_tokens": 5358
+      },
+      "owner_attempt_id": "attempt-b58e933568ca4855af91a8050a5cae5b",
+      "owner_result_sha256": "55b2ecd8e2c1fe957da87ca5bff81f8b497eedf13cb0db12e6883b0c201e1add",
+      "paid_api_used": false,
+      "process_tree_absent": true,
+      "protocol_deviation": true,
+      "retained_failure_resolution_sha256": "4c58c1fa58040b89331bf6b85ded290ab9057626b386784bbf0233f7bc01726b",
+      "scored": false,
+      "status": "held_policy_violation",
+      "step": "3b8c24b1f2e30763346ee8f83b93eaef7af3abdf0752d65d65a8daa5b427fc03",
+      "terminal_capture_complete": true,
+      "unscored_reason": "held_policy_violation",
+      "worker_seconds": 284.96358170802705,
+      "workload_id": "whole-task-usage"
+    },
+    {
+      "acceptance_passed": false,
+      "admission_id": "attempt-7b3e6414addf46eb995325de326ee34c",
+      "arm": "torc_capsule",
+      "candidate_sha256": "a9f43d39078f26a599044a9b34eb1eaa2f52a68a4bb7e513f738ba2b4e1069be",
+      "elapsed_seconds": 200.82978029199876,
+      "failed_test_ids": [
+        "tests/test_continuation_usage.py::test_deltas_are_summed_once_and_session_total_is_an_alternative",
+        "tests/test_continuation_usage.py::test_explicit_mixed_observation_modes_reject"
+      ],
+      "inherited_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "provider_usage": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 0,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "reasoning_output_tokens": 0
+        },
+        "reasoning_output_tokens": 0,
+        "reported_fields": [
+          "input_tokens",
+          "cached_input_tokens",
+          "cache_write_input_tokens",
+          "reasoning_output_tokens",
+          "output_tokens"
+        ],
+        "schema_version": 1,
+        "source": "codex",
+        "supplied": true,
+        "unreported_fields": []
+      },
+      "malformed_trace_lines": 1,
+      "native_binding_valid": true,
+      "observations": {
+        "candidate_sha256": "a9f43d39078f26a599044a9b34eb1eaa2f52a68a4bb7e513f738ba2b4e1069be",
+        "capture_complete": false,
+        "events": [
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 4
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 6
+          },
+          {
+            "action_kind": "edit",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "unknown",
+            "sequence": 11
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 15
+          },
+          {
+            "action_kind": "edit",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "unknown",
+            "sequence": 17
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "failure",
+            "sequence": 20
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 23
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 25
+          }
+        ],
+        "interventions": {
+          "active_seconds": null,
+          "count": 0
+        },
+        "investigation": {
+          "assessable_event_count": 0,
+          "event_count": 8,
+          "repeated_investigation_count": 0,
+          "repeated_investigation_rate": null,
+          "unknown_event_count": 8
+        },
+        "opaque_id": "trial-5ad825968a93",
+        "owner_receipt_ref": null,
+        "process_tree_absent": true,
+        "redaction": {
+          "content_redacted": true,
+          "fields_retained_privately": [
+            "action",
+            "evidence_ref",
+            "result"
+          ]
+        },
+        "schema_version": "torc.continuation_observations.v0",
+        "timing": {
+          "clock_id": "one_monotonic_clock",
+          "duration_seconds": 200.82978029199876,
+          "intervals": [
+            {
+              "duration_seconds": 200.82978029199876,
+              "phase": "attempt"
+            }
+          ]
+        }
+      },
+      "observed_incremental_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 292608,
+        "input_tokens": 332935,
+        "output_tokens": 12330,
+        "reasoning_output_tokens": 4162
+      },
+      "owner_attempt_id": "attempt-400a8950541549d082376bfb49363ad6",
+      "owner_result_sha256": "4687f5e7573e0a0dc9e4d0c5752e08c3162329b1d159791239b7429da9ed7f6b",
+      "paid_api_used": false,
+      "process_tree_absent": true,
+      "protocol_deviation": false,
+      "scored": true,
+      "scorer_exit_code": 1,
+      "scorer_result_sha256": "d18626a2673de2ec2284b8061222eca8c627e68a13c9797f3f29cea850f4791d",
+      "status": "held_verification_failed",
+      "step": "5ad825968a9303d4c5ca4460dff7e3881c7c6c6b4530023cfd66604b775f0263",
+      "terminal_capture_complete": true,
+      "worker_seconds": 194.18389133299934,
+      "workload_id": "whole-task-usage"
+    },
+    {
+      "acceptance_passed": false,
+      "admission_id": "attempt-7884c9393ea7480f913ba48bed0ec1f2",
+      "arm": "native_warm",
+      "candidate_sha256": "1f66e400c47a54f7c9c810fc26cb4e9fe8d76e4bc435710e7464faacb7f0afe2",
+      "elapsed_seconds": 146.0741865830496,
+      "failed_test_ids": [
+        "tests/test_continuation_context.py::test_old_stale_report_cannot_be_refreshed_by_binding_it_again"
+      ],
+      "inherited_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 0,
+        "input_tokens": 10764,
+        "output_tokens": 5,
+        "provider_usage": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 0,
+          "input_tokens": 10764,
+          "output_tokens": 5,
+          "reasoning_output_tokens": 0
+        },
+        "reasoning_output_tokens": 0,
+        "reported_fields": [
+          "input_tokens",
+          "cached_input_tokens",
+          "cache_write_input_tokens",
+          "reasoning_output_tokens",
+          "output_tokens"
+        ],
+        "schema_version": 1,
+        "source": "codex",
+        "supplied": true,
+        "unreported_fields": []
+      },
+      "malformed_trace_lines": 0,
+      "native_binding_valid": true,
+      "observations": {
+        "candidate_sha256": "1f66e400c47a54f7c9c810fc26cb4e9fe8d76e4bc435710e7464faacb7f0afe2",
+        "capture_complete": false,
+        "events": [
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 4
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 6
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 9
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 11
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 13
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 15
+          },
+          {
+            "action_kind": "edit",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "unknown",
+            "sequence": 18
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "failure",
+            "sequence": 21
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "failure",
+            "sequence": 24
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 26
+          },
+          {
+            "action_kind": "edit",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "unknown",
+            "sequence": 28
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 30
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 33
+          }
+        ],
+        "interventions": {
+          "active_seconds": null,
+          "count": 0
+        },
+        "investigation": {
+          "assessable_event_count": 0,
+          "event_count": 13,
+          "repeated_investigation_count": 0,
+          "repeated_investigation_rate": null,
+          "unknown_event_count": 13
+        },
+        "opaque_id": "trial-25d814972ed6",
+        "owner_receipt_ref": null,
+        "process_tree_absent": true,
+        "redaction": {
+          "content_redacted": true,
+          "fields_retained_privately": [
+            "action",
+            "evidence_ref",
+            "result"
+          ]
+        },
+        "schema_version": "torc.continuation_observations.v0",
+        "timing": {
+          "clock_id": "one_monotonic_clock",
+          "duration_seconds": 146.0741865830496,
+          "intervals": [
+            {
+              "duration_seconds": 146.0741865830496,
+              "phase": "attempt"
+            }
+          ]
+        }
+      },
+      "observed_incremental_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 568064,
+        "input_tokens": 635797,
+        "output_tokens": 9414,
+        "reasoning_output_tokens": 2747
+      },
+      "owner_attempt_id": "attempt-aaae5b12f159414983337b367347c07f",
+      "owner_result_sha256": "08ff0d1d192def92917281d0414252b23189613d77bc8b5ddae6b8fe9c28a7fd",
+      "paid_api_used": false,
+      "process_tree_absent": true,
+      "protocol_deviation": false,
+      "scored": true,
+      "scorer_exit_code": 1,
+      "scorer_result_sha256": "2103846e633d4584aa25e8456110948a80dc387bb088cbea8c813bce08b050e5",
+      "status": "held_verification_failed",
+      "step": "25d814972ed6cb2d190e8a6bba4aed048c0f2d4023b4e217e4587417934889b1",
+      "terminal_capture_complete": true,
+      "worker_seconds": 138.96462795801926,
+      "workload_id": "capsule-context"
+    },
+    {
+      "acceptance_passed": true,
+      "admission_id": "attempt-6ec430dea8424103b91614d7a30c0c85",
+      "arm": "compiled_prompt",
+      "candidate_sha256": "e4648948b651f7213b59850bfd9b3a686e6767741ef319108812d7f85fa7b88f",
+      "elapsed_seconds": 145.69438558298862,
+      "failed_test_ids": [],
+      "inherited_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "provider_usage": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 0,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "reasoning_output_tokens": 0
+        },
+        "reasoning_output_tokens": 0,
+        "reported_fields": [
+          "input_tokens",
+          "cached_input_tokens",
+          "cache_write_input_tokens",
+          "reasoning_output_tokens",
+          "output_tokens"
+        ],
+        "schema_version": 1,
+        "source": "codex",
+        "supplied": true,
+        "unreported_fields": []
+      },
+      "malformed_trace_lines": 0,
+      "native_binding_valid": true,
+      "observations": {
+        "candidate_sha256": "e4648948b651f7213b59850bfd9b3a686e6767741ef319108812d7f85fa7b88f",
+        "capture_complete": false,
+        "events": [
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 4
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 6
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 9
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 11
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 13
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 15
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 17
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 20
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 21
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 23
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 25
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 27
+          },
+          {
+            "action_kind": "edit",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "unknown",
+            "sequence": 30
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "failure",
+            "sequence": 32
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "failure",
+            "sequence": 35
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 37
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "failure",
+            "sequence": 40
+          },
+          {
+            "action_kind": "edit",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "unknown",
+            "sequence": 43
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 45
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "failure",
+            "sequence": 47
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 49
+          }
+        ],
+        "interventions": {
+          "active_seconds": null,
+          "count": 0
+        },
+        "investigation": {
+          "assessable_event_count": 0,
+          "event_count": 21,
+          "repeated_investigation_count": 0,
+          "repeated_investigation_rate": null,
+          "unknown_event_count": 21
+        },
+        "opaque_id": "trial-a689cbfd7d77",
+        "owner_receipt_ref": null,
+        "process_tree_absent": true,
+        "redaction": {
+          "content_redacted": true,
+          "fields_retained_privately": [
+            "action",
+            "evidence_ref",
+            "result"
+          ]
+        },
+        "schema_version": "torc.continuation_observations.v0",
+        "timing": {
+          "clock_id": "one_monotonic_clock",
+          "duration_seconds": 145.69438558298862,
+          "intervals": [
+            {
+              "duration_seconds": 145.69438558298862,
+              "phase": "attempt"
+            }
+          ]
+        }
+      },
+      "observed_incremental_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 525312,
+        "input_tokens": 578622,
+        "output_tokens": 8904,
+        "reasoning_output_tokens": 1897
+      },
+      "owner_attempt_id": "attempt-e1b4fe0e34a84380a88c795ba2765cf1",
+      "owner_result_sha256": "555c85c16c8350a3cdf17cdc025cf32cd216976536a6cd3d96c20ffe75590603",
+      "paid_api_used": false,
+      "process_tree_absent": true,
+      "protocol_deviation": false,
+      "scored": true,
+      "scorer_exit_code": 0,
+      "scorer_result_sha256": "28386a60a8549fc9deda6e742ddf36303eec68afe64d694469363b6c549cdb98",
+      "status": "completed",
+      "step": "a689cbfd7d77475d24f76aa3970f71fff7a9daf3a3ca58ce54a1518235082631",
+      "terminal_capture_complete": true,
+      "worker_seconds": 139.20580341701861,
+      "workload_id": "capsule-context"
+    },
+    {
+      "acceptance_passed": true,
+      "admission_id": "attempt-a03ec07878954c0a9ad6c67e904b1610",
+      "arm": "torc_capsule",
+      "candidate_sha256": "691028d98a0e11ab3d0f673434d9531474e9143ba2796bce8e8d04bc500de534",
+      "elapsed_seconds": 159.9132730839774,
+      "failed_test_ids": [],
+      "inherited_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "provider_usage": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 0,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "reasoning_output_tokens": 0
+        },
+        "reasoning_output_tokens": 0,
+        "reported_fields": [
+          "input_tokens",
+          "cached_input_tokens",
+          "cache_write_input_tokens",
+          "reasoning_output_tokens",
+          "output_tokens"
+        ],
+        "schema_version": 1,
+        "source": "codex",
+        "supplied": true,
+        "unreported_fields": []
+      },
+      "malformed_trace_lines": 0,
+      "native_binding_valid": true,
+      "observations": {
+        "candidate_sha256": "691028d98a0e11ab3d0f673434d9531474e9143ba2796bce8e8d04bc500de534",
+        "capture_complete": false,
+        "events": [
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 4
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 6
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 10
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 11
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 13
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 15
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 18
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 19
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 22
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 23
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 25
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 28
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 29
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 31
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 33
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 36
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 37
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 40
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 41
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 43
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 46
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 47
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 49
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 51
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 53
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 55
+          },
+          {
+            "action_kind": "edit",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "unknown",
+            "sequence": 58
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "failure",
+            "sequence": 61
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 63
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "failure",
+            "sequence": 66
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "failure",
+            "sequence": 69
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 71
+          },
+          {
+            "action_kind": "edit",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "unknown",
+            "sequence": 73
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "failure",
+            "sequence": 75
+          },
+          {
+            "action_kind": "other",
+            "classification": "unassessable",
+            "relative_seconds": null,
+            "result_status": "success",
+            "sequence": 77
+          }
+        ],
+        "interventions": {
+          "active_seconds": null,
+          "count": 0
+        },
+        "investigation": {
+          "assessable_event_count": 0,
+          "event_count": 35,
+          "repeated_investigation_count": 0,
+          "repeated_investigation_rate": null,
+          "unknown_event_count": 35
+        },
+        "opaque_id": "trial-d01977782551",
+        "owner_receipt_ref": null,
+        "process_tree_absent": true,
+        "redaction": {
+          "content_redacted": true,
+          "fields_retained_privately": [
+            "action",
+            "evidence_ref",
+            "result"
+          ]
+        },
+        "schema_version": "torc.continuation_observations.v0",
+        "timing": {
+          "clock_id": "one_monotonic_clock",
+          "duration_seconds": 159.9132730839774,
+          "intervals": [
+            {
+              "duration_seconds": 159.9132730839774,
+              "phase": "attempt"
+            }
+          ]
+        }
+      },
+      "observed_incremental_usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 755200,
+        "input_tokens": 834771,
+        "output_tokens": 10260,
+        "reasoning_output_tokens": 3673
+      },
+      "owner_attempt_id": "attempt-a7028ba17e984f0b9c3605ab80d2a9ec",
+      "owner_result_sha256": "9b3018a335af3676577efc4309443a0d2f1918956b4f9c2e87351285ae855fc5",
+      "paid_api_used": false,
+      "process_tree_absent": true,
+      "protocol_deviation": false,
+      "scored": true,
+      "scorer_exit_code": 0,
+      "scorer_result_sha256": "27a79d8532f9cc79a8598d13ca106777928be8fd2073ff347c29142ab58cf4fe",
+      "status": "completed",
+      "step": "d01977782551928d12385a0a915692f3f6742620c5c40d932c91f3fc370379f0",
+      "terminal_capture_complete": true,
+      "worker_seconds": 153.31661174999317,
+      "workload_id": "capsule-context"
+    }
+  ],
+  "verified_members": 9236,
+  "whole_task_savings_available": false
+}

@@ -1,0 +1,148 @@
+{
+  "artifacts": {
+    "capsule-bundle": "capsule-bundle/f39053355d064269a8a9f83be8121eb6e10fd0a81a7938a512b621496cb13276.json",
+    "capture": "capture/ad751bf6341dd3d31572df3a1bf9d3d0fef03cc7a00d2079ab81e04123f50fec.json",
+    "compiled_prompt": "context-binding/e473e881ad50a216ad18b5d6087d76f1583e2cafcd5d7987c8ee797991918d07.json",
+    "context-binding": "context-binding/c015bc22be1bafe95d4206eb553d3a92c2fcefe78f1101b58fdcded1aa04a1aa.json",
+    "native_cold": "context-binding/9bc2c4c04d812e08d784cbd13857efbca2b3f71c61eac63ca35f502f4df760e4.json",
+    "native_warm": "context-binding/c56d5d0d18a660b8d17064092cfe657d5a1503fed58a79fd25903b3aa607743b.json",
+    "reconciliation": "reconciliation/6bb6766f727a702db2768cb7950fce8c9e64bf4530aaca894e2fb9ce00aa7ec3.json"
+  },
+  "baseline_commit": "a798bbc",
+  "bridge": {
+    "authority_transferred": false,
+    "binding_id": "sha256:913234f9623c5e28b86ef221ce1c7b6be3be7fd58f3773f6a8e68892d37bfdb4",
+    "hold_list": [
+      "offline-incarnation/tool-1"
+    ],
+    "quiescence": "unknown",
+    "report_sha256": "f080e65cb3ed83ca5690f4c728c80b3c3d57bbdd8f77b7689a876c1805c4fbcc",
+    "retry_authorized": false,
+    "scope_holds": [
+      "coverage_incomplete"
+    ],
+    "status": "held"
+  },
+  "capsule_omits_uncertainties": true,
+  "evidence_kind": "synthetic_mechanics_only",
+  "live_model_trials": 0,
+  "savings_conclusion": "unmeasured; no model trials or adoption evidence",
+  "schema_version": "torc.offline_continuation_report.v0",
+  "source_sha256": {
+    "docs/experiments/session-continuation-001/fixtures/complete.jsonl": "2372e18cd5cf4b1300b1618535751c398e11de421f365eb517fcad2f627b647e",
+    "docs/experiments/session-continuation-001/fixtures/interrupted.jsonl": "9b99816866835a1a5fbcf950afe51cb688dd0b4f01db7704089121f5f04c5d07",
+    "docs/experiments/session-continuation-001/fixtures/offline-usage.json": "f9e72f2b72a46877086001a45c214dfaa0e8966d55277228d9fa120b055177fe",
+    "docs/experiments/session-continuation-001/fixtures/reported-failure.jsonl": "a42a5cada7d6147d0d28d9638dee3cb0709c693f9c790e1bd40484a7dcfed753",
+    "docs/experiments/session-continuation-001/replay.py": "5f542b4d02235718d720a8111aad4ef658ca595ae28166fb6a15b8f87f102725",
+    "examples/p5-dropped-work/receiver-large.json": "8c42870d572cb4fde078e1247a92c6f7f25f8f7b7fd08f61a7a9fffef461d0e1",
+    "examples/p5-dropped-work/receiver-small.json": "d6d67d9dd3e71e25da6f53edc42e9e0eeb3abc541c4aefafaac0d5664cd12688",
+    "examples/p5-dropped-work/resolutions-3.json": "2061b6563e2d3de5d5a78953137c0d83b2be9d9a71ba6e9e1ce176c4aaed5063",
+    "examples/p5-dropped-work/source-substrate.json": "9d3d35fcb9bc0772b6247975476559570c184882bff2923c2ba4eabe8cd1cdf9",
+    "examples/p5-dropped-work/state-1-created.json": "32bf4c02b371303e85ceb0ab2500734928926c6e8ac93531089871b09fb32ae5",
+    "examples/p5-dropped-work/state-2-work-added.json": "bcf6624a32a978e1eece63cdca970aa2e41b36acd758863b1645861b1ceb9044",
+    "examples/p5-dropped-work/state-3-item-completed.json": "0707914f69efeee094e38d821fb177c1f02c432cdb93ac911b0cb144aa29a2dc",
+    "examples/p5-dropped-work/state-4-last-summary.json": "7c98b8b07929ea3ebdd05d84e7baaaa179be0d9b4849f4f8c2dfeaa74928f3b9",
+    "src/torc/canonical.py": "424fe3640a094f6dd34fa2b4c7b3ce374eada88685243c6a4dbf01b3b8653838",
+    "src/torc/continuation_context.py": "81a5ea424db56d8b7c3fbbfffa46e74e8f36b04c8f3be65037d58724a906f790",
+    "src/torc/continuation_usage.py": "66d95a5604144f75ee4677ea087263f54414e56888d353d5c40de17452144f39",
+    "src/torc/execution_capsules.py": "17c5dc9d7601831f560802697bf7e62d5813f741dd638ed658283aef9c6f782e",
+    "src/torc/experiment_usage.py": "3413e9d5ad9bafbca2030f4dbfb67ee4c36a055d164b896fa82a9b272d8632c8",
+    "src/torc/harness_capture/classify.py": "98a81c22d2854d2f51091eddb75c33d073a35e75f00cb58cd5400d53b79d9044",
+    "src/torc/harness_capture/manifest.py": "a695a00136728323a8d8e01c67e0f382105874b878925fd27665c34a3335ea99",
+    "src/torc/harness_capture/parser.py": "849c350a8df97d48805cb3d6305a8546261e9a499f2862fd5f2fbc429a232c34",
+    "src/torc/harness_capture/persist.py": "6dd39bd4f4ccb6be867c3a1c93f467f0d952ca8819929cb4515527adec799f11",
+    "src/torc/harness_capture/reconcile.py": "7247f20dce5f34efe586d203ee34e4d5c1ef70c7098f2b25d9b249a74df2ae2a",
+    "src/torc/history.py": "382d3b93b37a1126a9dc3e9462ecdfcb4da7d4272a7117b2a7927fbe6270d925",
+    "src/torc/p5_capsules.py": "270a4822c94810d7f9135e1d4158ad09134fee43dba67f37a8f8f700acd2036e",
+    "src/torc/projections.py": "832beefe674bfafbab1f8fb5d4d9150b27042ba008582c609487e902975805fb",
+    "src/torc/store.py": "c87cd2b4f748ef8902efd29f4cd9fb465328b0abac979cb18b4c8e2388e75afb",
+    "src/torc/verify.py": "88e18facbb0a73dc3d389bf398f379a40817939890de6355d69dbae5f7c55a7e"
+  },
+  "state_store_unchanged": true,
+  "usage_cases": [
+    {
+      "api_cost": null,
+      "api_cost_unavailable_reason": "no_actual_billing_evidence",
+      "artifact": "usage/136471a4c6198694ed33b956a3af401059ed85282a57a54d46230f3901e3c6b1.json",
+      "attempt_count": 3,
+      "failed_attempt_count": 2,
+      "fallback_attempt_count": 1,
+      "input_sha256": "739e2349feb321422f080c2bd2690febdabe62f220e08deffd7af8800c584204",
+      "known_subtotals": {
+        "cache_write_input_tokens": 6,
+        "cached_input_tokens": 40,
+        "input_tokens": 20,
+        "output_tokens": 10,
+        "reasoning_output_tokens": 4
+      },
+      "proxy_unavailable_reason": null,
+      "request_count": 2,
+      "task_id": "failed-reconstruction-then-fallback",
+      "total_context_tokens": 66,
+      "totals": {
+        "cache_write_input_tokens": 6,
+        "cached_input_tokens": 40,
+        "input_tokens": 20,
+        "output_tokens": 10,
+        "reasoning_output_tokens": 4
+      },
+      "uncached_processed_token_proxy": 36
+    },
+    {
+      "api_cost": null,
+      "api_cost_unavailable_reason": "no_actual_billing_evidence",
+      "artifact": "usage/82f4660686dc56e75344eb00245d158b5cf1879a538573f4361815f901288737.json",
+      "attempt_count": 3,
+      "failed_attempt_count": 2,
+      "fallback_attempt_count": 1,
+      "input_sha256": "cd7fa4cb1b408096100dc51d129f63b1963d0ba40c55737781fa4b514bcfeb29",
+      "known_subtotals": {
+        "cache_write_input_tokens": 6,
+        "cached_input_tokens": 40,
+        "input_tokens": 20,
+        "output_tokens": 5,
+        "reasoning_output_tokens": 4
+      },
+      "proxy_unavailable_reason": "missing_or_unallocated_usage",
+      "request_count": 2,
+      "task_id": "missing-fallback-output",
+      "total_context_tokens": 66,
+      "totals": {
+        "cache_write_input_tokens": 6,
+        "cached_input_tokens": 40,
+        "input_tokens": 20,
+        "output_tokens": null,
+        "reasoning_output_tokens": 4
+      },
+      "uncached_processed_token_proxy": null
+    },
+    {
+      "api_cost": null,
+      "api_cost_unavailable_reason": "no_actual_billing_evidence",
+      "artifact": "usage/6f1145f92846c45ce1777da260c44484582a1e612ba42440d0dae679a6287e4e.json",
+      "attempt_count": 3,
+      "failed_attempt_count": 2,
+      "fallback_attempt_count": 1,
+      "input_sha256": "7bb70a9117ec7b588f106028c5be4cfdd063ee72919bcbeabfaba798151a214e",
+      "known_subtotals": {
+        "cache_write_input_tokens": 6,
+        "cached_input_tokens": 40,
+        "input_tokens": 20,
+        "output_tokens": 10,
+        "reasoning_output_tokens": 4
+      },
+      "proxy_unavailable_reason": null,
+      "request_count": 2,
+      "task_id": "session-counter-spans-attempts",
+      "total_context_tokens": 66,
+      "totals": {
+        "cache_write_input_tokens": 6,
+        "cached_input_tokens": 40,
+        "input_tokens": 20,
+        "output_tokens": 10,
+        "reasoning_output_tokens": 4
+      },
+      "uncached_processed_token_proxy": 36
+    }
+  ]
+}
