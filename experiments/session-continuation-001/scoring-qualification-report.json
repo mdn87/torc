@@ -1,10 +1,10 @@
 {
-  "archive_sha256": "7b20aaf11ba475726c76c1d109fcecab00ba3cb4cb177422cb1c29ef99326e89",
+  "archive_sha256": "e8487ec18a584baed6e0087ec4ffbb1de75b17268029c9a7bc34f0aac8bcbf2b",
   "evidence_archive": "scoring-evidence.zip",
   "latest_passed": true,
   "live_model_calls": 0,
   "live_scoring_admitted": false,
-  "owned_process_attempts": 61,
+  "owned_process_attempts": 74,
   "runs": [
     {
       "archive_prefix": "01-initial",
@@ -471,6 +471,101 @@
       "run_id": "05-controller",
       "runtime_tree_sha256": "8f1a9a78ba035d6d06c5bb438d80f75d872b283950c87a88e5a12415c13b1eab",
       "source_sha256": "57a6ab74efb34ca7d785ab0933e9273bbcb1ffa3f1226b19795016f6c19aee99",
+      "trusted_fixture_path_passed": true
+    },
+    {
+      "archive_prefix": "06-native-owner",
+      "attempt_count": 13,
+      "cases": [
+        {
+          "exit_code": 1,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "baseline",
+          "runtime_unchanged": true,
+          "task": "capsule-context",
+          "timed_out": false
+        },
+        {
+          "exit_code": 0,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "reference",
+          "runtime_unchanged": true,
+          "task": "capsule-context",
+          "timed_out": false
+        },
+        {
+          "exit_code": 1,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "mutant",
+          "runtime_unchanged": true,
+          "task": "capsule-context",
+          "timed_out": false
+        },
+        {
+          "exit_code": 1,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "baseline",
+          "runtime_unchanged": true,
+          "task": "whole-task-usage",
+          "timed_out": false
+        },
+        {
+          "exit_code": 0,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "reference",
+          "runtime_unchanged": true,
+          "task": "whole-task-usage",
+          "timed_out": false
+        },
+        {
+          "exit_code": 1,
+          "inputs_unchanged": true,
+          "interrupted": false,
+          "kind": "mutant",
+          "runtime_unchanged": true,
+          "task": "whole-task-usage",
+          "timed_out": false
+        }
+      ],
+      "effects": {
+        "candidate_write_allowed": true,
+        "legacy_private_read_visible": true,
+        "network_denied": true,
+        "network_positive_control": true,
+        "outside-write-denied": true,
+        "private_read_denied": true,
+        "runtime-write-denied": true,
+        "runtime_imports": true,
+        "runtime_info": {
+          "packages": {
+            "PyYAML": "6.0.3",
+            "jsonschema": "4.26.0",
+            "pytest": "8.4.2"
+          },
+          "prefix": "/private/tmp/torc-scoring-diagnostic-20261021/capsule-context-baseline/.codex/runtime",
+          "python": "3.14.4 (main, Apr  7 2026, 13:13:20) [Clang 21.0.0 (clang-2100.0.123.102)]"
+        }
+      },
+      "live_model_calls": 0,
+      "live_scoring_admitted": false,
+      "observed_at": "2026-10-21T04:40:43.577940+00:00",
+      "owner_source_sha256": {
+        "agent_assignment.py": "06b90de048d7135408e27b05143af7946b214c5f21ddde9a7331adfbe84ea266",
+        "owned_subprocess.py": "d850094cdf965c1c3a7e4f0daa035d40bc1d1c52d515257595bf2ae073d8ddf8",
+        "process_owner.py": "73f72ee41e9df436d3fb4e4433779c44528df4c97b9ae4eba03648bef210fcb3",
+        "provider_safety.py": "f30a9412ffbbb3616ae6d7aea89b53009241beb85632520ebda401b13068c6d9",
+        "route_supervisor.py": "d6a0f8e1f7e24d1eb7529a4161ba60263358ae476f22c8dceed92507cb22e73e",
+        "verification.py": "167ea1b6807a553b3c2cdef49c0e9c8b63102f7adf913cd3d49ed9f6d01261bc"
+      },
+      "report_sha256": "c883780920b70a91b48bf7c7211bd0c47f50cebdf40e097aa5dd6e5865e9b570",
+      "run_id": "06-native-owner",
+      "runtime_tree_sha256": "8f1a9a78ba035d6d06c5bb438d80f75d872b283950c87a88e5a12415c13b1eab",
+      "source_sha256": "688c31bdd539b46de60562d72d68efd5164f43db6eb5e33d2062860c2b45bf8f",
       "trusted_fixture_path_passed": true
     }
   ],

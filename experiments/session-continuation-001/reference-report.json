@@ -2,7 +2,7 @@
   "all_passed": true,
   "live_model_trials": 0,
   "schema_version": 1,
-  "source_sha256": "d8c946913fc3d4a9076314d276334d43fe84438d3fc7ea8ed335dc1e0d886032",
+  "source_sha256": "a920f66aad370113dd6b568677491586ca2cb88de158e200e817e2b6f84b1046",
   "untrusted_candidate_execution_qualified": false,
   "workloads": [
     {

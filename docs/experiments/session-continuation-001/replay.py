@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import sys
 import tempfile
 from pathlib import Path
 
@@ -130,4 +131,5 @@ if __name__ == "__main__":
     parser.add_argument("--output-dir", type=Path, required=True,
                         help="private derived-output directory outside canonical state")
     args = parser.parse_args()
-    print(json.dumps(replay(args.output_dir), sort_keys=True, indent=2))
+    sys.stdout.buffer.write((json.dumps(replay(args.output_dir), sort_keys=True, indent=2)
+                             + "\n").encode("utf-8"))

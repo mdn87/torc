@@ -21,7 +21,8 @@ def test_overlapping_identical_writers_publish_one_complete_artifact(tmp_path):
     assert path.read_bytes() == b'{"value":1}\n'
     assert path.stem == hashlib.sha256(path.read_bytes()).hexdigest()
     assert list((tmp_path / "capture").iterdir()) == [path]
-    assert path.stat().st_mode & 0o777 == 0o600
+    if os.name == "posix":
+        assert path.stat().st_mode & 0o777 == 0o600
 
 
 def test_existing_different_bytes_are_never_overwritten(tmp_path):

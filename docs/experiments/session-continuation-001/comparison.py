@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import sys
 from copy import deepcopy
 from pathlib import Path
 
@@ -153,7 +154,8 @@ def main():
         result = analyze(load(args.manifest), load(args.results)["results"], args.asset_root,
                          expected_manifest_id=args.expected_manifest_id)
         publish(args.output_dir, "trial-analysis", result)
-    print(json.dumps(result, indent=2, sort_keys=True, allow_nan=False))
+    sys.stdout.buffer.write((json.dumps(result, indent=2, sort_keys=True, allow_nan=False)
+                             + "\n").encode("utf-8"))
 
 
 if __name__ == "__main__":

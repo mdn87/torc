@@ -23,12 +23,12 @@ from pathlib import Path
 import workloads
 
 OWNER_HASHES = {
-    "provider_safety.py": "0e08d22e4fd4c25c82bdb69e25a4854946881bb7090e05ce2deca09f1e353b1b",
+    "provider_safety.py": "f30a9412ffbbb3616ae6d7aea89b53009241beb85632520ebda401b13068c6d9",
     "agent_assignment.py": "06b90de048d7135408e27b05143af7946b214c5f21ddde9a7331adfbe84ea266",
     "owned_subprocess.py": "d850094cdf965c1c3a7e4f0daa035d40bc1d1c52d515257595bf2ae073d8ddf8",
-    "verification.py": "07f55e76147ed0ae3ab8f66d86eb2c8b34ed8cda9d6711c68de1f05391f896eb",
-    "process_owner.py": "e9b5a16c19b9ec70bbfc0e7364983fbe3ff31f31573d3cfdb111f8dacf3b1543",
-    "route_supervisor.py": "10d0296421ad003d6c902a9cfb2ac18407528139ac500130ef21cf79cef41894",
+    "verification.py": "167ea1b6807a553b3c2cdef49c0e9c8b63102f7adf913cd3d49ed9f6d01261bc",
+    "process_owner.py": "73f72ee41e9df436d3fb4e4433779c44528df4c97b9ae4eba03648bef210fcb3",
+    "route_supervisor.py": "d6a0f8e1f7e24d1eb7529a4161ba60263358ae476f22c8dceed92507cb22e73e",
 }
 ENTRY = (
     'import os,runpy,sys; os.chdir("workspace"); '

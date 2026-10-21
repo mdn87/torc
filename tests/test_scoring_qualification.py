@@ -68,7 +68,7 @@ def test_retained_scorer_evidence_covers_every_attempt_and_current_source():
     report = json.loads(SCRIPT.with_name("scoring-qualification-report.json").read_text())
     archive = SCRIPT.parent / report["evidence_archive"]
     assert hashlib.sha256(archive.read_bytes()).hexdigest() == report["archive_sha256"]
-    assert report["owned_process_attempts"] == 61
+    assert report["owned_process_attempts"] == 74
     assert report["live_model_calls"] == 0
     assert report["latest_passed"] is True
     assert report["live_scoring_admitted"] is False

@@ -208,7 +208,7 @@ def verify_references(destination):
             new = '_sum([n[f] for n in ordered]) if ordered else None'
         if text.count(old) != 1:
             raise ValueError("historical negative-control site changed")
-        target.write_text(text.replace(old, new))
+        target.write_bytes(text.replace(old, new).encode("utf-8"))
         mutant_dir = destination / identity / "mutant-score"
         job = prepare_score(identity, candidate, mutant_dir)
         mutant = _trusted_test(job, mutant_dir)

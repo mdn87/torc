@@ -4,7 +4,7 @@
   "schema_version": "torc.task_context_preparation.v0",
   "source_sha256": {
     "experiments/session-continuation-001/contexts.py": "eca2a4ca51dadcceb5012f574a4a6ef25c25bfa812d7ddc66d0759819791c90b",
-    "experiments/session-continuation-001/workloads.py": "d8c946913fc3d4a9076314d276334d43fe84438d3fc7ea8ed335dc1e0d886032",
+    "experiments/session-continuation-001/workloads.py": "a920f66aad370113dd6b568677491586ca2cb88de158e200e817e2b6f84b1046",
     "src/torc/canonical.py": "424fe3640a094f6dd34fa2b4c7b3ce374eada88685243c6a4dbf01b3b8653838",
     "src/torc/continuation_context.py": "81a5ea424db56d8b7c3fbbfffa46e74e8f36b04c8f3be65037d58724a906f790",
     "src/torc/continuation_trials.py": "8f7e07fa3ee43907c90aa46b9daf4915722ecc344eb4f114022bd807635e2984",
@@ -69,7 +69,7 @@
       "carry_limit_words": 400,
       "history_kind": "operator-authored briefing; native seed session not yet created",
       "launch_authorized": false,
-      "manifest_id": "d70660a6b10768c7485ce829082dc0c5798afc20e1cc2239374534e2d00ecb1b",
+      "manifest_id": "ad4e8b362560900bd93af82c5c0933bdc94d46b475ea62e143779d0ec115d4fc",
       "native_arms_ready": false,
       "state_store_unchanged_during_verification": true,
       "workspace_sha256": "6d4a0cc0c3f61c4a5964c50ce63f0314345e5e437656ebc9cb77d7dd227f2f94"
@@ -120,7 +120,7 @@
       "carry_limit_words": 400,
       "history_kind": "operator-authored briefing; native seed session not yet created",
       "launch_authorized": false,
-      "manifest_id": "6eb80a7c872a2eec8c0cb1534a414add3f8ee373ab4afadd92900aeaa8fb7519",
+      "manifest_id": "6df5eb07fb099821391d6ec6d42a34e994e0620996d0c47383dff89b63e9742e",
       "native_arms_ready": false,
       "state_store_unchanged_during_verification": true,
       "workspace_sha256": "2da254707889fc3e4693eb41bc68d0cd1293e6d0721ba7a7f2c3c493f104b317"

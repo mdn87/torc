@@ -20,6 +20,8 @@ def publish(root: Path | str, kind: str, payload: dict) -> Path:
     No latest pointer, process coordination or power-loss guarantee is supplied.
     Caller must select a private, ignored derived-output directory, separate
     from the authority store. Raw transcript bytes are not an accepted payload.
+    POSIX files use mode 0600; on Windows privacy depends on the caller's
+    directory ACL because chmod does not establish an NTFS access boundary.
     """
     if not isinstance(kind, str) or not re.fullmatch(r"[a-z][a-z_-]{0,63}", kind):
         raise ValueError("invalid artifact kind")
