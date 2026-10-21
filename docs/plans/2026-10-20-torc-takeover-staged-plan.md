@@ -1,11 +1,11 @@
 # TORC takeover and staged execution plan
 
-This session on 4070pc owns coordination of the remaining session-continuation
+This session on windows-primary owns coordination of the remaining session-continuation
 readiness work. The immediate deliverable is a verified apparatus and a concrete
 launch proposal. Comparative model runs require their own authorization. TORC
 owns the experiment consumers, scoring records, observations and preregistration;
 Autowork owns worker admission, execution, isolation and provider evidence.
-`lugos-host` is an execution host, not a replacement owner of these components.
+`linux-execution-host` is an execution host, not a replacement owner of these components.
 
 ## Recovered state
 
@@ -14,7 +14,7 @@ Autowork owns worker admission, execution, isolation and provider evidence.
   [wip/torc-readiness-takeover](https://github.com/mdn87/torc/tree/wip/torc-readiness-takeover).
   These commits remain unmerged pending inherited-change verification. The local
   inspection worktree is `.torc/takeover-source`, branch `plan/torc-takeover`.
-- The untracked applemac draft was copied to the ignored takeover evidence
+- The untracked macos-primary draft was copied to the ignored takeover evidence
   directory without changing its original. It is historical input, not a new
   authority source. The accepted October 19 decisions supersede its broader
   recovery proposals.
@@ -24,7 +24,7 @@ Autowork owns worker admission, execution, isolation and provider evidence.
   lane. The archive SHA-256 is
   `f0ba4d8ea36f3e63336c90ec833053f81508b56248f194b71024f1dcbb88031a`;
   local verification matched all 467 manifest entries across 468 ZIP members.
-- The single qualification allowance remains on applemac: **9 total, 6 used,
+- The single qualification allowance remains on macos-primary: **9 total, 6 used,
   3 remaining, none pending in the retained report**, 600 seconds per worker,
   no paid fallback. Do not copy or reset this allowance. Planning dispatches
   requested for this takeover are separate development work, not experiment data.
@@ -167,9 +167,9 @@ scores and observations and reports inconclusive/negative outcomes honestly.
 
 | Platform | Current role | Additional evidence needed |
 |---|---|---|
-| 4070pc, Windows/Python 3.14 | Coordination, source custody, portable code and offline tests | Windows path/serialization checks. A planning worker's sandbox does not qualify a comparative worker or blinded scorer. |
-| applemac, macOS/Python 3.14 | Custodian of the original qualification root and native state; existing qualified reference lane | Refresh only evidence invalidated by the selected runtime/policy/host changes; verify exclusive ownership before new writes/calls. |
-| lugos-host, Linux | Optional Autowork worker/scorer host | Inventoried identity and exact source, execution and scorer isolation, native behavior and telemetry qualification on Linux. Mac receipts do not transfer. No reason to migrate native state merely to transfer coordination. |
+| windows-primary, Windows/Python 3.14 | Coordination, source custody, portable code and offline tests | Windows path/serialization checks. A planning worker's sandbox does not qualify a comparative worker or blinded scorer. |
+| macos-primary, macOS/Python 3.14 | Custodian of the original qualification root and native state; existing qualified reference lane | Refresh only evidence invalidated by the selected runtime/policy/host changes; verify exclusive ownership before new writes/calls. |
+| linux-execution-host, Linux | Optional Autowork worker/scorer host | Inventoried identity and exact source, execution and scorer isolation, native behavior and telemetry qualification on Linux. Mac receipts do not transfer. No reason to migrate native state merely to transfer coordination. |
 
 ## Planning evidence and completion status
 
