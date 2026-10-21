@@ -47,11 +47,11 @@ def _public_events(events: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], 
             previous_sequence is not None and sequence <= previous_sequence
         ):
             raise ValueError("event sequence must be ordered and unique integers")
-        relative_seconds = _finite_nonnegative(
-            event.get("relative_seconds"), "event relative_seconds"
-        )
-        if previous_time is not None and relative_seconds < previous_time:
-            raise ValueError("event relative_seconds must be monotonic")
+        relative_seconds = event.get("relative_seconds")
+        if relative_seconds is not None:
+            _finite_nonnegative(relative_seconds, "event relative_seconds")
+            if previous_time is not None and relative_seconds < previous_time:
+                raise ValueError("event relative_seconds must be monotonic")
 
         action_kind = event.get("action_kind", "other")
         result_status = event.get("result_status", "unknown")
@@ -75,7 +75,8 @@ def _public_events(events: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], 
         public.append(item)
         seen.add(sequence)
         previous_sequence = sequence
-        previous_time = relative_seconds
+        if relative_seconds is not None:
+            previous_time = relative_seconds
 
     return public, {
         "event_count": len(events),

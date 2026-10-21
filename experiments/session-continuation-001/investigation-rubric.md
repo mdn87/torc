@@ -75,6 +75,11 @@ classifications and rates remain unassessable until a separate blinded
 assessment exists. Raw owner paths, clock names and arbitrary phase labels
 also remain private.
 
+An ordered action without an event timestamp remains in the packet with
+`relative_seconds: null`. Known timestamps must still be monotonic across
+untimed events. Missing timing is not replaced with zero or inferred from
+the action's position in the trace.
+
 Interval durations are unknown when the monotonic clock is absent or differs
 between intervals. The elapsed span uses the earliest start and latest end;
 overlapping phase intervals are not summed. Operator active time is unknown unless every intervention

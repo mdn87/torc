@@ -126,6 +126,17 @@ def test_incomplete_trace_keeps_repeated_rate_unknown_and_does_not_infer_reads()
     assert public["investigation"]["repeated_investigation_rate"] is None
 
 
+def test_missing_event_time_does_not_reset_monotonic_validation():
+    trace = _trace()
+    trace["events"] = [
+        {"sequence": 1, "relative_seconds": 10},
+        {"sequence": 2},
+        {"sequence": 3, "relative_seconds": 9},
+    ]
+    with pytest.raises(ValueError, match="monotonic"):
+        collect_observations(trace, opaque_id="opaque-L")
+
+
 def test_incomplete_empty_intervention_trace_does_not_convert_silence_to_zero_time():
     trace = _trace()
     trace["complete"] = False
@@ -236,3 +247,14 @@ def test_overlapping_intervals_do_not_double_count_elapsed_time():
     trace["intervals"][1].update(start_monotonic=12, end_monotonic=16)
     public, _ = collect_observations(trace, opaque_id="opaque-J")
     assert public["timing"]["duration_seconds"] == 6
+
+
+def test_ordered_owner_trace_can_retain_actions_without_event_timestamps():
+    trace = _trace()
+    for event in trace["events"]:
+        event.pop("relative_seconds")
+    public, private = collect_observations(trace, opaque_id="opaque-K")
+    assert len(public["events"]) == 2
+    assert all(event["relative_seconds"] is None for event in public["events"])
+    assert private["events"] == trace["events"]
+    assert public["investigation"]["repeated_investigation_rate"] is None
