@@ -85,6 +85,9 @@ def test_no_execution_or_provider_modules_in_capture_import_graph():
 import sys
 from torc.harness_capture import parser, classify, manifest, reconcile, persist
 for name in sys.modules:
+    # Python 3.11 pathlib uses urllib.parse for path serialization, without I/O.
+    if name in {'urllib', 'urllib.parse'}:
+        continue
     assert name.split('.')[0] not in {'socket', 'http', 'urllib', 'requests', 'anthropic', 'openai'}
 assert 'torc.store' not in sys.modules
 assert 'subprocess' not in sys.modules
