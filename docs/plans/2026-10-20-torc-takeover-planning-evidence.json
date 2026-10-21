@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "purpose": "TORC takeover planning; no experiment execution",
+  "source_commit": "26950f65b57a42a7e32681d430146a96f03d54ac",
+  "preserved_branch": "wip/torc-readiness-takeover",
+  "qualification_source_commit": "673d1e5bc0077347eb932f62b1277cc30aa36dec",
+  "qualification_archive_sha256": "f0ba4d8ea36f3e63336c90ec833053f81508b56248f194b71024f1dcbb88031a",
+  "archive_verification": {
+    "archive_sha256": "f0ba4d8ea36f3e63336c90ec833053f81508b56248f194b71024f1dcbb88031a",
+    "archive_members": 468,
+    "manifest_members_checked": 467,
+    "mismatches": []
+  },
+  "preserved_untracked_draft_sha256": "fbcaa076be8d014153c3c00de32b97fbf9963ac66671fdfb8b128fda42cd4495",
+  "qualification_budget": {
+    "cap": 9,
+    "used": 6,
+    "remaining": 3,
+    "pending_in_retained_report": 0,
+    "new_calls_by_takeover_session": 0
+  },
+  "autowork": {
+    "decision_id": "req-9278b8bfe4ff44b6a23fcba2ee5cf1eb",
+    "run_id": "20261021-015432-2f10b73bd282",
+    "workflow": {
+      "id": "autowork.campaign.dispatch",
+      "status": "completed"
+    },
+    "role": "explorer",
+    "route": "codex:terra-medium",
+    "model": "gpt-5.6-terra",
+    "read_only": true,
+    "max_agents": 1,
+    "remote": false,
+    "metered": false,
+    "receipt_ref": ".torc/takeover-evidence/autowork/requests/req-9278b8bfe4ff44b6a23fcba2ee5cf1eb/workflow-receipt.json",
+    "result_ref": ".torc/takeover-evidence/autowork-result-saved-entrypoint.json",
+    "result_sha256": "99a5147a824417c1a8fb615e094279a5f1fc235f4614af552ac479485f097fb4",
+    "retained_prelaunch_failure_run": "20261021-015250-cd7c89c72807",
+    "prelaunch_failure": "Windows multiprocessing could not import the stdin entrypoint; rerun from saved __main__-guarded script",
+    "orca_advice_status": "rejected, not applied; no Orca execution claimed"
+  },
+  "root_disposition": [
+    "Accepted evidence-based distinction between qualification, readiness, authorization and effectiveness.",
+    "Accepted two primary operator gates: comparative-run budget and a material narrowing of measurement claims; added conditional design decision if a cold baseline is infeasible.",
+    "Accepted draft-only manifest, explicit execution-owner admission bridge, four-arm proof, missingness preservation and platform-specific qualification.",
+    "Replaced overlapping broad proposed packages with three disjoint TORC packages: accounting, scorer admission, blinded observations. Shared manifest/analysis/docs stay with root.",
+    "Offline bridge construction and refusal tests do not wait for live budget approval; issuance of live admission does.",
+    "Corrected capability process evidence: 60 capability attempts lack explicit process-tree-absence fields; only the six model-worker outcomes affirm tree absence.",
+    "No extra qualification rerun, retry budget or new authority ledger inferred from the planning recommendation."
+  ],
+  "implementation_status": "not_executed; inherited source held for verification before merge",
+  "takeover_notification_message_id": 688,
+  "old_session_stop_acknowledgment": "not_received_as_of_planning"
+}
