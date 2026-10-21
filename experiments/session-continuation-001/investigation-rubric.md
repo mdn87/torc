@@ -62,3 +62,19 @@ if available. Intervention count may be known while time is unknown. Do not
 convert silence into zero effort or charge unattended elapsed time as active
 operator work. Record corrections and unplanned rescues as protocol deviations;
 retain the original trial and all costs rather than silently replacing it.
+
+## Collector limits
+
+The offline collector is deliberately conservative. It publishes only explicit
+allowlisted action kinds and result statuses; raw commands, paths, outputs,
+evidence references and commentary remain in private provenance. A repeated
+read does not establish repeated investigation. Missing or invalid independent
+classification evidence is unassessable, and incomplete trace coverage makes
+the repeated-investigation rate unknown.
+
+Interval durations are unknown when the monotonic clock is absent or differs
+between intervals. Operator active time is unknown unless every intervention
+has an explicit active-time value; elapsed time is never substituted. Owner
+receipt and process-tree fields are supplied assertions, not authentication,
+and absent assertions remain unknown. The collector performs no assessor model
+calls and does not establish trace completeness, owner identity or causality.
