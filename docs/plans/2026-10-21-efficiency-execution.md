@@ -68,16 +68,19 @@ utility transcripts contained no interruption boundaries. Archived notes mostly
 describe completed milestones or operational work; a planned next feature does
 not establish an interrupted implementation.
 
-Three candidate starting states are now preserved privately: one Cormac
-checkpoint and two AETA partial runs. **Zero fixtures are admitted.** These are
-three candidate records in two repositories, not three qualified independent
-tasks. Their existence does not reduce the required cohort to three.
+The first pass preserved three candidate starting states privately: one Cormac
+checkpoint and two AETA partial runs. A subsequent context-limit inventory
+added two Tableforge candidates, bringing collection to **five candidate records
+across three repositories; zero fixtures are admitted**. Candidate records do
+not establish five qualified independent tasks or satisfy the eight-task gate.
 
 | Candidate | Preserved evidence | Still needed |
 |---|---|---|
-| Cormac PowerShell quotation fix | Exact checkpoint archive; pre-interruption transcript prefix identity; later reference commit | Bind the checkpoint to the transcript's final writes; qualify independent behavioral acceptance and record exposure |
+| Cormac PowerShell quotation fix | Exact checkpoint archive; recorded pre-stop edits reproduce its changed file byte-for-byte; retained pre-stop result has three failing tests | Qualify independent behavioral acceptance and record exposure |
 | AETA concept-search partial run `20260808-230756-286345a7f230` | Base `2a71fb3ad12be2a1d9795aa199520818eeb27de4`, tracked patch, eight changed source/test files including the new untracked module, owner records | Original request and usable pre-stop history; concrete unfinished requirement; acceptance and independence from the other AETA case |
 | AETA quality partial run `20260809-052506-7c1f44141c74` | Base `481f3101c51d2352e7e0a648a849a35aa19065f9`, tracked patch, three changed source files, owner records | Original request and usable pre-stop history; concrete unfinished requirement; acceptance and independence from the other AETA case |
+| Tableforge host turn-runner integration | Real automatic compaction `7a357771823e9cae`; base `71688d28684cc38ce070101b8824684a2e31b4cd`; observed pre-edit file matches Git; ten successful literal edits replayed; original task-window history retained | Complete source/provenance review, editable paths, independent acceptance and task independence |
+| Tableforge persistence and recovery | Real automatic compaction `ce13a38287b041c0`; base `d0b245f6c66bb1a58031f2d856aca570c386d528`; two literal scaffold files and original task-window history retained | Confirm all source changes since the observed base are represented; editable paths, independent acceptance and task independence |
 
 For both AETA candidates, reconstruction of Autowork's inventory digest exactly
 matches the retained stop-time digest, including the untracked module where
@@ -100,6 +103,26 @@ from a solution diff or substitute a task hash for its missing contents.
 Private collection receipts and inventories are retained under
 `.torc/fixture-intake/2026-10-21/` and `.torc/takeover-evidence/`; raw histories,
 source archives and local machine paths are not publication artifacts.
+
+The additional inventory found 248 recorded context compactions on the
+workstation and 39 on the peer. These are discovery boundaries, not task counts.
+The two Tableforge boundaries follow separate user requests and preserve
+unfinished local implementation. Their task-window records retain text and tool
+events while excluding hidden reasoning, signatures and later solution events;
+they are acquisition evidence, not frozen experimental prompts.
+
+Compaction summaries are insufficient custody evidence: preserved recent
+messages can already contain edits that the summary says remain to be done.
+Reconstruct the state at the actual recorded boundary from successful operations
+and observed base content. For host integration, that check recovered ten edits
+to `apps/session-host/src/host.ts` that would be lost by trusting the summary.
+
+Reject the Lugos child-contract candidate `a9e0305f6fe0c428` on lane fit: its
+required `.codex/agents/` edits are prohibited by Autowork's current
+`_write_tool_rules`. Do not expand the executor merely to admit it. Remaining
+leads include other Tableforge code boundaries and source-owner work in the
+peer histories; review distinct tasks, state recovery and lane fit before counting
+any of them. No model, benchmark, or scorer-qualification call ran in collection.
 
 ## Collection procedure before restarting the study
 
