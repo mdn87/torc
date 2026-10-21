@@ -1,9 +1,11 @@
 # Measure whether TORC reduces continuation usage
 
-Status: revised for bounded Autowork/roundtable review; the experiment remains
-proposed. Review assignments are separate from experiment admissions and do not
-reuse the completed cohort's allowance. Matt accepts adding billing evidence
-if needed; retain the existing $2 spending ceiling until explicitly changed.
+Status: reviewed and authorized for staged execution on 2026-10-21. The operator
+subsequently required collecting eight real tasks across at least three
+repositories before proceeding. The fixture gate remains unmet; no comparison
+is admitted. See [execution goals and collection results](2026-10-21-efficiency-execution.md).
+Review assignments are separate from experiment admissions and do not reuse
+the completed cohort's allowance. Retain the existing $2 spending ceiling.
 
 ## What we already know
 
@@ -232,8 +234,9 @@ Each assignment shares a 600-second deadline across its process tree; no owner
 retries, continuation starts or outcome-dependent replacements. Each CLI start
 can issue multiple provider requests; retain those separately in the usage ledger.
 The earlier "32 comparison calls plus two checks" wording understated the owner
-loop. This corrected allowance remains a proposal, not permission to expand an
-approved 34-start budget or reset either old allowance. Model-based preparation
+loop. Staged execution of this corrected allowance was subsequently authorized;
+the fixture and qualification gates still control admission. It does not reset
+either old allowance. Model-based preparation
 would require a newly enumerated allowance, as above.
 Prefer subscription execution; if billing evidence is needed, first check that
 the chosen bounded batch can fit within $2, otherwise present its actual budget
