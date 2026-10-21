@@ -1,6 +1,18 @@
 # Live continuation comparison readiness
 
-Status: **not ready to launch**. This apparatus advances the
+Current status: the authorized three-arm diagnostic is documented in the
+[October 21 results](diagnostic-results.md) and the
+[readiness reconciliation](../../docs/plans/2026-10-21-continuation-readiness.md).
+Reported counters remain incomplete, and no savings or adoption claim is supported.
+The current scorer archive retains 74 model-free process attempts, including the
+earlier failures and the refreshed runtime controls.
+
+The sections below retain the earlier readiness history. Their outstanding gates,
+runtime revisions and test counts describe those earlier checkpoints.
+
+## Historical readiness checkpoint
+
+Earlier status: **not ready to launch**. This apparatus advances the
 [active readiness plan](../../docs/plans/2026-10-20-live-comparison-readiness.md).
 The earlier [offline analyzer](../../docs/experiments/session-continuation-001/comparison-preparation.md)
 remains a draft-only consumer of supplied evidence. No model trial has run.
