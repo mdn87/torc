@@ -3,7 +3,11 @@
 Current status: the authorized three-arm diagnostic is documented in the
 [October 21 results](diagnostic-results.md) and the
 [readiness reconciliation](../../docs/plans/2026-10-21-continuation-readiness.md).
-Reported counters remain incomplete, and no savings or adoption claim is supported.
+CLI-reported token usage was measured across eight invocations. The small pilot
+did not establish a usage advantage; on the portable pair where both passed,
+TORC reported 44.27% more input tokens. The
+[follow-on efficiency plan](../../docs/plans/2026-10-21-measured-efficiency-plan.md)
+defines a Claude-based comparison and an optional billing reconciliation path.
 The current scorer archive retains 74 model-free process attempts, including the
 earlier failures and the refreshed runtime controls.
 
