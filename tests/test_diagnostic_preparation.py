@@ -12,7 +12,8 @@ from torc.continuation_trials import verify_manifest
 
 def test_diagnostic_pins_six_trials_two_seeds_and_no_cold_claim(tmp_path):
     source = Path(__file__).resolve().parents[1] / "experiments/session-continuation-001"
-    spec = importlib.util.spec_from_file_location("continuation_diagnostic", source / "diagnostic.py")
+    spec = importlib.util.spec_from_file_location(
+        "continuation_diagnostic", source / "diagnostic.py")
     module = importlib.util.module_from_spec(spec)
     sys.path.insert(0, str(source))
     try:
