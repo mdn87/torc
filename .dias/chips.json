@@ -1,0 +1,274 @@
+{
+  "schemaVersion": 1,
+  "projectId": "torc",
+  "projectLabel": "TORC",
+  "chips": [
+    {
+      "schemaVersion": 1,
+      "chipId": "torc:select-operator-workflow",
+      "projectId": "torc",
+      "title": "Select the ordinary operator workflow",
+      "summary": "Name the normal workflow that will consume TORC snapshots and define the proof window.",
+      "stage": "done",
+      "sequence": 10,
+      "prereqs": [],
+      "linkedRunIds": [],
+      "confidence": "inferred",
+      "aheadOfPrereqs": null,
+      "timestamps": {
+        "createdAt": "2026-08-27T07:12:00.000Z",
+        "updatedAt": "2026-09-04T02:15:47.000Z"
+      },
+      "evidence": [
+        {
+          "entryId": "ev:ce9eeb339481",
+          "at": "2026-08-27T07:12:00.000Z",
+          "kind": "created",
+          "message": "Derived from the 2026-08-27 milestone report; operator review required before commit."
+        },
+        {
+          "entryId": "ev:2609040t0001",
+          "at": "2026-09-04T02:15:47.000Z",
+          "kind": "stage-change",
+          "message": "ready -> done."
+        },
+        {
+          "entryId": "ev:2609040t0002",
+          "at": "2026-09-04T02:15:47.000Z",
+          "kind": "note",
+          "message": "LIR selected as the consuming workflow: TORC checkpoint authority (cc4fa8f), grants gate continuations (8bc6c77) and thread closure (b6c8fdb), committed since 2026-08-27."
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "chipId": "torc:run-sustained-consumption",
+      "projectId": "torc",
+      "title": "Run sustained snapshot consumption",
+      "summary": "Use TORC continuously in the selected operator workflow rather than as an isolated test.",
+      "stage": "active",
+      "sequence": 20,
+      "prereqs": [
+        "torc:select-operator-workflow"
+      ],
+      "linkedRunIds": [],
+      "confidence": "inferred",
+      "aheadOfPrereqs": null,
+      "timestamps": {
+        "createdAt": "2026-08-27T07:12:00.000Z",
+        "updatedAt": "2026-09-27T19:40:44.000Z"
+      },
+      "evidence": [
+        {
+          "entryId": "ev:23ac32f236ee",
+          "at": "2026-08-27T07:12:00.000Z",
+          "kind": "created",
+          "message": "Derived from the 2026-08-27 milestone report; operator review required before commit."
+        },
+        {
+          "entryId": "ev:2609040t0003",
+          "at": "2026-09-04T02:15:47.000Z",
+          "kind": "stage-change",
+          "message": "planned -> active."
+        },
+        {
+          "entryId": "ev:2609040t0004",
+          "at": "2026-09-04T02:15:47.000Z",
+          "kind": "note",
+          "message": "LIR consumes TORC grants in its thread lifecycle; hardening fixes 4f37389, 975ed8f, 29847de show ongoing use. Sustained-window proof not yet closed."
+        },
+        {
+          "entryId": "ev:260927t0001",
+          "at": "2026-09-27T19:40:44.000Z",
+          "kind": "note",
+          "message": "No new grant-consumption evidence in this repo since 2026-09-03. ADR 0004 (2026-09-20) moved the carry compiler ahead of further authority mechanics; window stays open."
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "chipId": "torc:exercise-recovery-path",
+      "projectId": "torc",
+      "title": "Exercise recovery and rollback",
+      "summary": "Trigger one bounded recovery or rollback path while preserving lineage and operator visibility.",
+      "stage": "planned",
+      "sequence": 30,
+      "prereqs": [
+        "torc:select-operator-workflow"
+      ],
+      "linkedRunIds": [],
+      "confidence": "inferred",
+      "aheadOfPrereqs": null,
+      "timestamps": {
+        "createdAt": "2026-08-27T07:12:00.000Z",
+        "updatedAt": "2026-08-27T07:12:00.000Z"
+      },
+      "evidence": [
+        {
+          "entryId": "ev:5a396810a2aa",
+          "at": "2026-08-27T07:12:00.000Z",
+          "kind": "created",
+          "message": "Derived from the 2026-08-27 milestone report; operator review required before commit."
+        },
+        {
+          "entryId": "ev:2609040t0005",
+          "at": "2026-09-04T02:15:47.000Z",
+          "kind": "note",
+          "message": "fix(lir) 4f37389 recovers committed thread closures in code, but no bounded operator-visible recovery/rollback exercise recorded; stage unchanged."
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "chipId": "torc:retain-operator-evidence",
+      "projectId": "torc",
+      "title": "Retain sustained-use evidence",
+      "summary": "Record consumption, recovery, failures, and operator value, then close or adjust the milestone.",
+      "stage": "planned",
+      "sequence": 40,
+      "prereqs": [
+        "torc:run-sustained-consumption",
+        "torc:exercise-recovery-path"
+      ],
+      "linkedRunIds": [],
+      "confidence": "inferred",
+      "aheadOfPrereqs": null,
+      "timestamps": {
+        "createdAt": "2026-08-27T07:12:00.000Z",
+        "updatedAt": "2026-08-27T07:12:00.000Z"
+      },
+      "evidence": [
+        {
+          "entryId": "ev:1baa0e9430ef",
+          "at": "2026-08-27T07:12:00.000Z",
+          "kind": "created",
+          "message": "Derived from the 2026-08-27 milestone report; operator review required before commit."
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "chipId": "torc:harden-cli-packaging",
+      "projectId": "torc",
+      "title": "Harden CLI input validation and wheel packaging",
+      "summary": "Ship schemas in the wheel, validate operator input before opening a writable store, create lineages atomically, and smoke the installed wheel in CI.",
+      "stage": "done",
+      "sequence": 50,
+      "prereqs": [],
+      "linkedRunIds": [],
+      "confidence": "reported",
+      "aheadOfPrereqs": null,
+      "timestamps": {
+        "createdAt": "2026-09-27T19:40:44.000Z",
+        "updatedAt": "2026-09-27T19:40:44.000Z"
+      },
+      "evidence": [
+        {
+          "entryId": "ev:260927t0002",
+          "at": "2026-09-27T19:40:44.000Z",
+          "kind": "created",
+          "message": "Recorded retroactively from the git log on 2026-09-27; the work landed on master before this chip existed."
+        },
+        {
+          "entryId": "ev:260927t0003",
+          "at": "2026-09-27T19:40:44.000Z",
+          "kind": "note",
+          "message": "Merged 2026-09-19: schemas ship in the wheel, only create may make a database, inspect is read-only, and CI smokes an artifact command from the installed wheel."
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "chipId": "torc:p5-receiver-carry",
+      "projectId": "torc",
+      "title": "P5 receiver-fitted carry",
+      "summary": "Compile the carry for the receiving substrate from canonical history, report unaccounted drops, ask for self-model restatement, and land it on master.",
+      "stage": "active",
+      "sequence": 60,
+      "prereqs": [
+        "torc:harden-cli-packaging"
+      ],
+      "linkedRunIds": [],
+      "confidence": "reported",
+      "aheadOfPrereqs": null,
+      "timestamps": {
+        "createdAt": "2026-09-27T19:40:44.000Z",
+        "updatedAt": "2026-09-27T19:40:44.000Z"
+      },
+      "evidence": [
+        {
+          "entryId": "ev:260927t0004",
+          "at": "2026-09-27T19:40:44.000Z",
+          "kind": "created",
+          "message": "ADR 0004 (2026-09-20) rules that TORC owns what a lineage carries to its next bearer; the compiler and self-model become the main line of work."
+        },
+        {
+          "entryId": "ev:260927t0005",
+          "at": "2026-09-27T19:40:44.000Z",
+          "kind": "note",
+          "message": "Branch commits of 2026-09-20 add compiler p5-1, history reading with unaccounted drops, revision resolutions, boundary asks, a session-start carry command, and 14 carry tests."
+        },
+        {
+          "entryId": "ev:260927t0006",
+          "at": "2026-09-27T19:40:44.000Z",
+          "kind": "note",
+          "message": "Not merged to master as of 2026-09-27. Branch test run and CI matrix result unverified by this assessment; only the checked-out 2026-09-03 commit was run (192 passed)."
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "chipId": "torc:carry-vs-prompt-comparison",
+      "projectId": "torc",
+      "title": "Compare the shaped carry against a compiled prompt",
+      "summary": "Run the deferred live comparison on real work and apply the project-brief hypothesis and kill criteria to the shaped carry.",
+      "stage": "planned",
+      "sequence": 70,
+      "prereqs": [
+        "torc:p5-receiver-carry"
+      ],
+      "linkedRunIds": [],
+      "confidence": "inferred",
+      "aheadOfPrereqs": null,
+      "timestamps": {
+        "createdAt": "2026-09-27T19:40:44.000Z",
+        "updatedAt": "2026-09-27T19:40:44.000Z"
+      },
+      "evidence": [
+        {
+          "entryId": "ev:260927t0007",
+          "at": "2026-09-27T19:40:44.000Z",
+          "kind": "created",
+          "message": "Listed as deferred in the P5 roadmap entry; ADR 0004 notes the P1b tie compared two fixed packets and counts neither way for the shaped carry."
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "chipId": "torc:blocking-boundary-asks",
+      "projectId": "torc",
+      "title": "Blocking boundary asks and cross-branch history",
+      "summary": "Enforce boundary asks instead of advising, and read history across a branch point, once use gives evidence that either is needed.",
+      "stage": "vague",
+      "sequence": 80,
+      "prereqs": [
+        "torc:carry-vs-prompt-comparison"
+      ],
+      "linkedRunIds": [],
+      "confidence": "unknown",
+      "aheadOfPrereqs": null,
+      "timestamps": {
+        "createdAt": "2026-09-27T19:40:44.000Z",
+        "updatedAt": "2026-09-27T19:40:44.000Z"
+      },
+      "evidence": [
+        {
+          "entryId": "ev:260927t0008",
+          "at": "2026-09-27T19:40:44.000Z",
+          "kind": "created",
+          "message": "Deferred items from the P5 doc: blocking enforcement waits for evidence from use; history before a branch point is not read."
+        }
+      ]
+    }
+  ]
+}
