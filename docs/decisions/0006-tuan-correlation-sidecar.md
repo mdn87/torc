@@ -1,6 +1,6 @@
 # ADR 0006: Tuan correlation sidecar for projections
 
-**Status:** Proposed
+**Status:** Accepted 2026-11-02 (operator, in the Tuan P5 review)
 **Date:** 2026-11-02
 
 ## Context
