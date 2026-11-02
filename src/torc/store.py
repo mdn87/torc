@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sqlite3
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -275,6 +276,11 @@ BEGIN SELECT RAISE(ABORT, 'immutable close results cannot be deleted'); END;
 """
 
 _LATEST_SCHEMA_VERSION = 4
+
+# ADR 0006: projections compiled inside a Tuan-correlated process are indexed, by
+# identifier only, in an append-only sidecar next to the database.
+TUAN_CORRELATION_ENV = "TUAN_CORRELATION_ID"
+TUAN_CORRELATION_SIDECAR = "tuan-correlations.jsonl"
 
 
 class Store:
@@ -697,6 +703,28 @@ class Store:
             self.connection.execute(
                 f"INSERT INTO {table} ({columns}) VALUES ({placeholders})", values
             )
+        if table == "projections":
+            self._record_tuan_correlation(record)
+
+    def _record_tuan_correlation(self, record: dict[str, Any]) -> None:
+        """Append `{correlation_id, projection_id, lineage_id, record_sha256, recorded_at}`
+        when the environment carries TUAN_CORRELATION_ID. Never the payload; never fatal."""
+        correlation_id = os.environ.get(TUAN_CORRELATION_ENV, "").strip()
+        if not correlation_id:
+            return
+        integrity = record.get("integrity") if isinstance(record.get("integrity"), dict) else {}
+        line = {
+            "correlation_id": correlation_id,
+            "projection_id": record["projection_id"],
+            "lineage_id": record["lineage_id"],
+            "record_sha256": integrity.get("canonical_payload_sha256"),
+            "recorded_at": utc_now(),
+        }
+        try:
+            with (self.state_dir / TUAN_CORRELATION_SIDECAR).open("a", encoding="utf-8") as handle:
+                handle.write(json.dumps(line, sort_keys=True) + "\n")
+        except OSError:
+            return
 
     def get_hashed_record(
         self, table: str, id_column: str, identifier: str
