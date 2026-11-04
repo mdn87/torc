@@ -4,17 +4,17 @@
   "projectLabel": "TORC",
   "assessmentState": "scored",
   "assessmentScope": "current-milestone",
-  "percentComplete": 70,
+  "percentComplete": 35,
   "milestonePhase": "build-and-validate",
   "portfolioGroup": "agent-platform",
   "displayPriority": 500,
-  "assessedAt": "2026-09-27T19:40:44.000Z",
+  "assessedAt": "2026-10-31T02:20:22.000Z",
   "confidence": "reported",
-  "currentMilestone": "P5 receiver-fitted carry: compile the carry for the receiving substrate from canonical history, report unaccounted drops, and ask for self-model restatement (ADR 0004).",
-  "remainingSummary": "Merge the P5 branch to master with CI green, then run the deferred carry-versus-prompt comparison. Sustained LIR grant use and one recovery exercise stay open.",
-  "nextChipId": "torc:p5-receiver-carry",
+  "currentMilestone": "Measure whether TORC's receiver-fitted carry cuts continuation usage versus a compiled prompt on eight real interrupted tasks. The P5 carry is merged.",
+  "remainingSummary": "Admit eight real tasks (six candidates kept, none admitted), qualify usage capture and scoring, then run and publish the comparison. LIR use and recovery stay open.",
+  "nextChipId": "torc:collect-continuation-fixtures",
   "source": {
-    "label": "Git log through origin master (2026-09-19) and the P5 branch (2026-09-20) reviewed 2026-09-27; 192 tests pass on the checked-out 2026-09-03 commit",
-    "updatedAt": "2026-09-27"
+    "label": "Git log and plans through 2026-10-22 on master, master CI green 2026-10-22, local test run 2026-10-31 (one failure, see handoff)",
+    "updatedAt": "2026-10-31"
   }
 }

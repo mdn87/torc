@@ -56,7 +56,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-08-27T07:12:00.000Z",
-        "updatedAt": "2026-09-27T19:40:44.000Z"
+        "updatedAt": "2026-10-31T02:20:22.000Z"
       },
       "evidence": [
         {
@@ -82,6 +82,12 @@
           "at": "2026-09-27T19:40:44.000Z",
           "kind": "note",
           "message": "No new grant-consumption evidence in this repo since 2026-09-03. ADR 0004 (2026-09-20) moved the carry compiler ahead of further authority mechanics; window stays open."
+        },
+        {
+          "entryId": "ev:261031t0001",
+          "at": "2026-10-31T02:20:22.000Z",
+          "kind": "note",
+          "message": "Still no grant-consumption evidence in this repo through 2026-10-22; effort went to P5 and continuation measurement. Window stays open but is not being worked."
         }
       ]
     },
@@ -101,7 +107,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-08-27T07:12:00.000Z",
-        "updatedAt": "2026-08-27T07:12:00.000Z"
+        "updatedAt": "2026-10-31T02:20:22.000Z"
       },
       "evidence": [
         {
@@ -115,6 +121,12 @@
           "at": "2026-09-04T02:15:47.000Z",
           "kind": "note",
           "message": "fix(lir) 4f37389 recovers committed thread closures in code, but no bounded operator-visible recovery/rollback exercise recorded; stage unchanged."
+        },
+        {
+          "entryId": "ev:261031t0002",
+          "at": "2026-10-31T02:20:22.000Z",
+          "kind": "note",
+          "message": "Roadmap lists recovery, rollback and branch as implemented locally; no exercise inside the selected operator workflow is recorded. Stage unchanged."
         }
       ]
     },
@@ -182,8 +194,8 @@
       "chipId": "torc:p5-receiver-carry",
       "projectId": "torc",
       "title": "P5 receiver-fitted carry",
-      "summary": "Compile the carry for the receiving substrate from canonical history, report unaccounted drops, ask for self-model restatement, and land it on master.",
-      "stage": "active",
+      "summary": "Compile the carry for the receiving substrate from canonical history, report unaccounted drops, and ask for self-model restatement. Merged to master.",
+      "stage": "done",
       "sequence": 60,
       "prereqs": [
         "torc:harden-cli-packaging"
@@ -193,7 +205,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-09-27T19:40:44.000Z",
-        "updatedAt": "2026-09-27T19:40:44.000Z"
+        "updatedAt": "2026-10-31T02:20:22.000Z"
       },
       "evidence": [
         {
@@ -213,6 +225,108 @@
           "at": "2026-09-27T19:40:44.000Z",
           "kind": "note",
           "message": "Not merged to master as of 2026-09-27. Branch test run and CI matrix result unverified by this assessment; only the checked-out 2026-09-03 commit was run (192 passed)."
+        },
+        {
+          "entryId": "ev:261031t0003",
+          "at": "2026-10-31T02:20:22.000Z",
+          "kind": "stage-change",
+          "message": "active -> done."
+        },
+        {
+          "entryId": "ev:261031t0004",
+          "at": "2026-10-31T02:20:22.000Z",
+          "kind": "note",
+          "message": "Merged to master 2026-10-10 (PR 28) after closing the seven pre-merge review findings. Follow-up PRs 30-34 landed 2026-10-15 to 2026-10-19."
+        },
+        {
+          "entryId": "ev:261031t0005",
+          "at": "2026-10-31T02:20:22.000Z",
+          "kind": "note",
+          "message": "Follow-ups: capsule collision and usage-counter rejection, stored-composition verification, working-method retention, and exact compiler-version citations."
+        },
+        {
+          "entryId": "ev:261031t0006",
+          "at": "2026-10-31T02:20:22.000Z",
+          "kind": "note",
+          "message": "Master CI and host-identifier workflows both succeeded on 2026-10-22, read from the run list. The 2026-10-21 readiness record reports 915 local tests passing."
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "chipId": "torc:continuation-diagnostic-pilot",
+      "projectId": "torc",
+      "title": "Run the bounded three-arm continuation diagnostic",
+      "summary": "Compare native resume, compiled prompt and TORC capsule on two historical tasks with every attempt retained. An apparatus check, not an effectiveness study.",
+      "stage": "done",
+      "sequence": 62,
+      "prereqs": [
+        "torc:p5-receiver-carry"
+      ],
+      "linkedRunIds": [],
+      "confidence": "reported",
+      "aheadOfPrereqs": null,
+      "timestamps": {
+        "createdAt": "2026-10-31T02:20:22.000Z",
+        "updatedAt": "2026-10-31T02:20:22.000Z"
+      },
+      "evidence": [
+        {
+          "entryId": "ev:261031t0007",
+          "at": "2026-10-31T02:20:22.000Z",
+          "kind": "created",
+          "message": "Recorded retroactively from the git log and the 2026-10-21 results record; the work landed on master as PR 35 before this chip existed."
+        },
+        {
+          "entryId": "ev:261031t0008",
+          "at": "2026-10-31T02:20:22.000Z",
+          "kind": "note",
+          "message": "Eight admissions ran (two seeds, six comparisons) with no paid API. Two of six comparisons passed the frozen gate, so there is no ranking and no savings claim."
+        },
+        {
+          "entryId": "ev:261031t0009",
+          "at": "2026-10-31T02:20:22.000Z",
+          "kind": "note",
+          "message": "Where both portable arms passed, the TORC capsule reported 44% more input tokens than the compiled prompt. One pair on one workload, not a population effect."
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "chipId": "torc:collect-continuation-fixtures",
+      "projectId": "torc",
+      "title": "Collect eight real interrupted tasks across three repositories",
+      "summary": "Preserve starting trees, history and acceptance checks for naturally stopped work. The operator kept the eight-task gate over a smaller pilot.",
+      "stage": "active",
+      "sequence": 64,
+      "prereqs": [
+        "torc:continuation-diagnostic-pilot"
+      ],
+      "linkedRunIds": [],
+      "confidence": "reported",
+      "aheadOfPrereqs": null,
+      "timestamps": {
+        "createdAt": "2026-10-31T02:20:22.000Z",
+        "updatedAt": "2026-10-31T02:20:22.000Z"
+      },
+      "evidence": [
+        {
+          "entryId": "ev:261031t0010",
+          "at": "2026-10-31T02:20:22.000Z",
+          "kind": "created",
+          "message": "Recorded from the 2026-10-21 execution plan: the operator chose to keep the eight-real-task requirement and collect more cases first."
+        },
+        {
+          "entryId": "ev:261031t0011",
+          "at": "2026-10-31T02:20:22.000Z",
+          "kind": "note",
+          "message": "Six candidate records across three repositories are preserved and none is admitted, so the eight-task gate is unmet and the later study stages wait."
+        },
+        {
+          "entryId": "ev:261031t0012",
+          "at": "2026-10-31T02:20:22.000Z",
+          "kind": "note",
+          "message": "The repo shows no collection work after 2026-10-21 and the plan installs no watcher. Cases must come from naturally stopped work, not manufactured pauses."
         }
       ]
     },
@@ -221,18 +335,19 @@
       "chipId": "torc:carry-vs-prompt-comparison",
       "projectId": "torc",
       "title": "Compare the shaped carry against a compiled prompt",
-      "summary": "Run the deferred live comparison on real work and apply the project-brief hypothesis and kill criteria to the shaped carry.",
+      "summary": "Run the frozen Claude-lane comparison of TORC projection against a compiled prompt on eight real tasks, then publish the result whether it wins or not.",
       "stage": "planned",
       "sequence": 70,
       "prereqs": [
-        "torc:p5-receiver-carry"
+        "torc:p5-receiver-carry",
+        "torc:collect-continuation-fixtures"
       ],
       "linkedRunIds": [],
-      "confidence": "inferred",
+      "confidence": "reported",
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-09-27T19:40:44.000Z",
-        "updatedAt": "2026-09-27T19:40:44.000Z"
+        "updatedAt": "2026-10-31T02:20:22.000Z"
       },
       "evidence": [
         {
@@ -240,6 +355,12 @@
           "at": "2026-09-27T19:40:44.000Z",
           "kind": "created",
           "message": "Listed as deferred in the P5 roadmap entry; ADR 0004 notes the P1b tie compared two fixed packets and counts neither way for the shaped carry."
+        },
+        {
+          "entryId": "ev:261031t0013",
+          "at": "2026-10-31T02:20:22.000Z",
+          "kind": "note",
+          "message": "Scope set 2026-10-21: needs eight real tasks, per-call usage capture in the execution owner and scorer qualification before admission. The $2 paid ceiling stands."
         }
       ]
     },
