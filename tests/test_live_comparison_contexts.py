@@ -7,6 +7,8 @@ from pathlib import Path
 
 import pytest
 
+from torc.retained_replay import retained_runtime
+
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "experiments/session-continuation-001/contexts.py"
 
@@ -87,18 +89,15 @@ def test_prepared_workspace_still_uses_original_independent_scorer(tmp_path):
 
 
 def test_replay_and_public_verify_command(tmp_path):
-    import subprocess
-
-    contexts = _module()
-    actual = contexts.replay(tmp_path / "replay")
-    expected = json.loads((SCRIPT.parent / "contexts-report.json").read_text())
-    assert actual == expected
-    root = tmp_path / "replay/capsule-context"
-    manifest_id = actual["tasks"]["capsule-context"]["manifest_id"]
-    run = subprocess.run([sys.executable, str(SCRIPT), "verify", "--root", str(root),
-                          "--expected-manifest-id", manifest_id], capture_output=True,
-                         text=True, check=True)
-    assert json.loads(run.stdout)["torc_capsule"]["retry_authorized"] is False
+    with retained_runtime(ROOT) as runtime:
+        actual = json.loads(runtime.replay("contexts", tmp_path / "replay").stdout)
+        expected = json.loads((SCRIPT.parent / "contexts-report.json").read_text())
+        assert actual == expected
+        root = tmp_path / "replay/capsule-context"
+        manifest_id = actual["tasks"]["capsule-context"]["manifest_id"]
+        run = runtime.run("contexts", ["verify", "--root", str(root),
+                                       "--expected-manifest-id", manifest_id])
+        assert json.loads(run.stdout)["torc_capsule"]["retry_authorized"] is False
 
 
 def test_too_small_capsule_budget_does_not_publish_a_manifest(tmp_path):

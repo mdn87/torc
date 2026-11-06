@@ -17,6 +17,13 @@ TORC must earn a narrow place in Lugos rather than duplicate existing modules.
 
 ## Assignment and lineage are different
 
+The Mirror experiment extends target-fit projection to human-facing interaction.
+TORC resolves scoped, expiring response settings and selects supplied result facts.
+Native agents own interpretation and result truth; Sulis retains durable preferences;
+Masq owns persona expression; lugos-voice validates and delivers speech with local
+interruption controls. Mirror settings grant no task, tool, or approval authority.
+Transient interaction estimates are not automatically canonical lineage revisions.
+
 An Autowork `AgentAssignment` is the immutable authority for one dispatch. A TORC lineage is the continuity identity spanning dispatches. TORC may link many assignments over time, but it cannot make one assignment larger or transfer its permissions to another activation.
 
 A valid handoff requires both:

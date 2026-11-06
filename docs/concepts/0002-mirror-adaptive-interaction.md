@@ -12,6 +12,12 @@ source: "Design conversation with Matthew Newman on 2026-11-04"
 
 ## Start here when picking this up
 
+Implementation update, 2026-11-06: the [first local experiment](../mirror-response-contract.md)
+now provides versioned response settings and delivery records, a text adapter,
+an opt-in Windows lugos-voice consumer, and a deterministic handoff replay. It
+tests contract delivery and fact preservation; live adaptive behavior remains
+unverified. The original concept and conversation below are preserved.
+
 **Working direction: TORC owns the shared adaptive interaction core and exposes its response contract to lugos-voice and other surfaces.** Native agents contribute interpretations, Sulis supplies durable preferences and history, Masq supplies persona expression, and lugos-voice supplies observations and handles speech delivery.
 
 The design center, in the operator's words:
