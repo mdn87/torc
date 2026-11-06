@@ -64,6 +64,11 @@ lugos-voice consumer is opt-in. This proves supplied-fact preservation and scope
 expiration on fixtures; it does not establish live model adaptation or audible
 delivery. Run it with `torc mirror experiment --output-dir <new-directory> --json`.
 
+Historical continuation reports can be reproduced with their recorded runtime
+using [`python -m torc.retained_replay`](docs/experiments/session-continuation-001/retained-runtime.md).
+This preserves their source hashes as current production code evolves; separate
+tests continue checking current-runtime replay behavior and provenance.
+
 P0 is implemented as a local Python and SQLite vertical slice. It demonstrates
 append-only canonical revisions, deterministic fit and projection, exclusive
 authority, immutable handoff preparation, separate acceptance, transactional
