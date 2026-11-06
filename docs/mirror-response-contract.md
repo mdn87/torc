@@ -121,9 +121,10 @@ The `mirror resolve`, `context`, `project`, and `text` commands accept
 | `project` | `settings`, `result`, `written`, `response_id`, `now`, optional `target_chars` |
 | `text` | `delivery`, independently known `binding`, `response_id`, `now` |
 
-In lugos-voice, `mirrorEnabled: true` opts the Windows Stop hook into a supplied
-`torc_response` object. It remains off by default. Missing or rejected contracts
-follow the existing independently bound original-response path. Selection checks
+In lugos-voice, `mirrorEnabled: true` with a configured managed `speechFloor` opts
+the Windows Stop hook into a supplied `torc_response` object. It remains off by
+default. Without a managed floor, or for missing/rejected contracts, the hook
+uses the existing independently bound original-response path. Selection checks
 the session and message identity available from Stop; it cannot independently
 prove TORC task/turn/revision ownership. Existing queue controls and an absolute
 contract expiry guard govern playback start. Long speech remains subject to the
