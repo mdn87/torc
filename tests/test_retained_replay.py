@@ -24,12 +24,17 @@ DOCS = "docs/experiments/session-continuation-001"
 
 def test_temporary_path_alias_is_resolved_before_historical_execution(tmp_path, monkeypatch):
     original_temporary_directory = replay_module.tempfile.TemporaryDirectory
-    alias_parent = tmp_path / "alias-parent"
-    alias_parent.mkdir()
+    temporary_parent = tmp_path / ("nested-" + "x" * 40)
+    alias_parent = temporary_parent / "alias-parent"
+    alias_parent.mkdir(parents=True)
+    # Reproduce Git for Windows defaults even if the developer enabled long paths.
+    monkeypatch.setenv("GIT_CONFIG_COUNT", "1")
+    monkeypatch.setenv("GIT_CONFIG_KEY_0", "core.longpaths")
+    monkeypatch.setenv("GIT_CONFIG_VALUE_0", "false")
 
     @contextmanager
     def aliased_temporary_directory(**kwargs):
-        with original_temporary_directory(dir=tmp_path, **kwargs) as canonical:
+        with original_temporary_directory(dir=temporary_parent, **kwargs) as canonical:
             # A portable lexical alias exercises the same mismatch as macOS
             # /var -> /private/var without requiring symlink privileges.
             yield str(alias_parent / ".." / Path(canonical).name)

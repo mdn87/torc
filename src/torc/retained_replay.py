@@ -140,7 +140,8 @@ def retained_runtime(repository: Path):
              str(repository), str(snapshot))
         hooks = snapshot / ".git" / "retained-no-hooks"
         hooks.mkdir()
-        _git(snapshot, "-c", "core.autocrlf=false", "-c", f"core.hooksPath={hooks}",
+        _git(snapshot, "-c", "core.autocrlf=false", "-c", "core.longpaths=true",
+             "-c", f"core.hooksPath={hooks}",
              "checkout", "--no-recurse-submodules", "--detach", PINNED_COMMIT)
         verify_retained_assets(repository, snapshot)
         yield RetainedRuntime(snapshot, repository)
