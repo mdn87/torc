@@ -6,10 +6,12 @@ import os
 import shutil
 import subprocess
 import sys
+from contextlib import contextmanager
 from pathlib import Path
 
 import pytest
 
+import torc.retained_replay as replay_module
 from torc.retained_replay import (
     RetainedReplayError,
     retained_runtime,
@@ -18,6 +20,25 @@ from torc.retained_replay import (
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = "docs/experiments/session-continuation-001"
+
+
+def test_temporary_path_alias_is_resolved_before_historical_execution(tmp_path, monkeypatch):
+    original_temporary_directory = replay_module.tempfile.TemporaryDirectory
+    alias_parent = tmp_path / "alias-parent"
+    alias_parent.mkdir()
+
+    @contextmanager
+    def aliased_temporary_directory(**kwargs):
+        with original_temporary_directory(dir=tmp_path, **kwargs) as canonical:
+            # A portable lexical alias exercises the same mismatch as macOS
+            # /var -> /private/var without requiring symlink privileges.
+            yield str(alias_parent / ".." / Path(canonical).name)
+
+    monkeypatch.setattr(replay_module.tempfile, "TemporaryDirectory", aliased_temporary_directory)
+    with retained_runtime(ROOT) as runtime:
+        assert runtime.root == runtime.root.resolve()
+        result = runtime.replay("offline", tmp_path / "aliased-replay")
+        assert result.stdout == (ROOT / DOCS / "offline-report.json").read_bytes()
 
 
 def test_runtime_drift_is_allowed_but_retained_source_and_report_tampering_reject(tmp_path):

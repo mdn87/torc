@@ -133,7 +133,7 @@ def retained_runtime(repository: Path):
             "use a TORC checkout with full Git history and Git on PATH. No history was fetched."
         ) from exc
     with tempfile.TemporaryDirectory(prefix="torc-retained-") as temporary:
-        snapshot = Path(temporary)
+        snapshot = Path(temporary).resolve()
         # --local forbids a network fetch. Shared objects are read from the source,
         # while every ref, index and checkout operation belongs to this disposable clone.
         _git(repository, "clone", "--local", "--shared", "--no-checkout",
