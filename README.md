@@ -57,6 +57,13 @@ The projection may change shape and size. The provenance chain may not be rewrit
 
 ## Current status
 
+The optional [Mirror first experiment](docs/mirror-response-contract.md) adds a
+local response-settings resolver, faithful text/speech projections, and a
+deterministic five-turn replay through one accepted TORC handoff. The Windows
+lugos-voice consumer is opt-in. This proves supplied-fact preservation and scoped
+expiration on fixtures; it does not establish live model adaptation or audible
+delivery. Run it with `torc mirror experiment --output-dir <new-directory> --json`.
+
 P0 is implemented as a local Python and SQLite vertical slice. It demonstrates
 append-only canonical revisions, deterministic fit and projection, exclusive
 authority, immutable handoff preparation, separate acceptance, transactional

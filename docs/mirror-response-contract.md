@@ -90,3 +90,53 @@ Use native adapter integration tests with playback stubbed; hardware playback,
 model compliance, and subjective usefulness remain separate unverified outcomes.
 Record elapsed resolver/render time, retained required facts, and zero added model
 calls. Do not label synthetic fixture results as completed real-world analysis.
+
+## Run it
+
+From a development environment installed from this checkout, use a fresh output
+directory for each run:
+
+```sh
+torc mirror experiment --output-dir .torc/mirror-run-001 --json
+python scripts/check_mirror_voice.py --experiment-dir .torc/mirror-run-001 \
+  --adapter /path/to/lugos-voice/hooks/torc-response.mjs
+```
+
+The second command requires Node and the companion lugos-voice implementation.
+It imports the explicitly supplied local module; it never starts speech playback.
+The first command exports `report.json`, a fixture lineage store, and
+`turns/<stage>/{settings.json,context.txt,delivery.json,written.md}`. An existing
+nonempty output directory is rejected. `--now` accepts an explicit UTC fixture
+clock; otherwise the current UTC time starts the scenario.
+
+The `mirror resolve`, `context`, `project`, and `text` commands accept
+`--input-file <json> --json`. Their request fields match the library boundaries:
+
+| Command | Request fields |
+|---|---|
+| `resolve` | `binding`, `signals`, `now`, optional `ttl_seconds` |
+| `context` | `settings`, independently known `binding`, `now` |
+| `project` | `settings`, `result`, `written`, `response_id`, `now`, optional `target_chars` |
+| `text` | `delivery`, independently known `binding`, `response_id`, `now` |
+
+In lugos-voice, `mirrorEnabled: true` opts the Windows Stop hook into a supplied
+`torc_response` object. It remains off by default. Missing or rejected contracts
+follow the existing independently bound original-response path. Selection checks
+the session and message identity available from Stop; it cannot independently
+prove TORC task/turn/revision ownership. Existing queue controls and an absolute
+contract expiry guard govern playback start. Long speech remains subject to the
+existing interruption and playback timeout limits.
+
+The text adapter exports settings and renders the complete result. Native agent
+context injection, Masq generation from the resolved persona, and live adaptive
+speech are not activated by this experiment.
+
+## First observed result
+
+On Windows, the first local replay retained all 20 required fact occurrences
+across five turns. All nine scenario checks passed, including a verified accepted
+handoff and expiration without canonical promotion. The companion JavaScript
+consumer passed 40 cross-language cases: five accepted projections and 35 fallback
+or rejection cases. Local resolver/render work totaled about 2 ms in that run;
+this is one synthetic timing observation, not a latency benchmark or evidence of
+improved agent behavior. Added model calls: zero.
