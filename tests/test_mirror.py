@@ -94,6 +94,14 @@ def test_return_to_screen_applies_per_setting_and_expiry_recomputes():
     assert resolve_settings(BINDING, signals, now=LATER)["values"]["screen"] == "unknown"
 
 
+def test_current_turn_intent_overrides_an_older_task_request_with_more_scope_keys():
+    settings = resolve_settings(BINDING, [
+        signal("screen", "away", scope={"conversation_id": "session-1", "task_id": "analysis"}),
+        signal("screen", "available", scope={"turn_id": "turn-2"}, observed_at=NOW),
+    ], now=NOW)
+    assert settings["values"]["screen"] == "available"
+
+
 @pytest.mark.parametrize("changes", [
     {"expires_at": None}, {"scope": {}}, {"source": "user"},
 ])

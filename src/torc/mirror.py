@@ -124,8 +124,11 @@ def resolve_settings(binding, signals, *, now, ttl_seconds=300):
             continue
         if any(binding[key] != value for key, value in scope.items()):
             continue
+        specificity = next((rank for rank, key in (
+            (3, "turn_id"), (2, "task_id"), (1, "conversation_id"),
+        ) if key in scope), 0)
         candidates[setting].append((
-            (PRIORITY[kind], len(scope), observed), value,
+            (PRIORITY[kind], specificity, observed), value,
             {"kind": kind, "source": signal["source"], "evidence_refs": sorted(set(refs)),
              "scope": dict(scope), "observed_at": signal["observed_at"],
              "expires_at": signal["expires_at"],

@@ -24,7 +24,9 @@ an empty scope allowed only for established explicit preferences. Inferences
 must name the current task and expire. Quotes and uncertain transcription never
 become user preferences. Current explicit requests, established preferences,
 supported surface observations, inferences, then defaults win **per setting**.
-Within a class, more specific scope then newer evidence wins. Equal-priority
+Within a class, scope ranks turn, task, conversation, then global; newer evidence
+wins within that scope level. Extra scope qualifiers only restrict applicability.
+Equal-priority
 contradictory evidence rejects instead of depending on arrival order. Repeated
 evidence does not gain weight. Screen observations only describe a named surface
 event; user absence is never inferred from silence.
