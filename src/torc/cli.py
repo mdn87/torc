@@ -133,6 +133,17 @@ def build_parser() -> argparse.ArgumentParser:
     doctor = subparsers.add_parser("doctor", help="Verify the repository and P0 surface.")
     doctor.add_argument("--json", action="store_true", dest="as_json")
 
+    mirror = subparsers.add_parser("mirror", help="Resolve and test scoped response projections.")
+    mirror_commands = mirror.add_subparsers(dest="mirror_command", required=True)
+    for action in ("resolve", "context", "project", "text"):
+        command = mirror_commands.add_parser(action)
+        command.add_argument("--input-file", type=Path, required=True)
+        command.add_argument("--json", action="store_true", dest="as_json")
+    mirror_experiment = mirror_commands.add_parser("experiment")
+    mirror_experiment.add_argument("--output-dir", type=Path, required=True)
+    mirror_experiment.add_argument("--now", help="UTC fixture clock (defaults to current UTC).")
+    mirror_experiment.add_argument("--json", action="store_true", dest="as_json")
+
     demo = subparsers.add_parser("demo", help="Run the deterministic P0 handoff.")
     demo.add_argument("--state-dir", type=Path, required=True)
     demo.add_argument("--json", action="store_true", dest="as_json")
@@ -863,6 +874,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.command == "doctor":
         return _run_doctor(args.as_json)
     try:
+        if args.command == "mirror":
+            from .mirror_cli import run_mirror_command
+
+            payload = run_mirror_command(args)
+            _print_payload(payload, args.as_json)
+            return 0 if payload.get("ok", payload.get("passed", True)) else 1
         if args.command == "projection":
             with Store(args.state_dir, read_only=True) as store:
                 capsule, control, record = derive_capsule(

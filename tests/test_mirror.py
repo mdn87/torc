@@ -173,3 +173,20 @@ def test_settings_expire_at_earliest_selected_signal_and_cannot_be_reused():
     assert settings["expires_at"] == "2026-11-06T12:00:30Z"
     with pytest.raises(InvalidInputError):
         render_context(settings, binding=BINDING, now=LATER)
+
+
+@pytest.mark.parametrize("field", ["kind", "setting", "source", "value"])
+def test_malformed_signal_fields_are_domain_errors(field):
+    malformed = signal("screen", "away")
+    malformed[field] = ["not a string"]
+    with pytest.raises(InvalidInputError):
+        resolve_settings(BINDING, [malformed], now=NOW)
+
+
+@pytest.mark.parametrize("binding,now", [
+    (BINDING | {"response_revision": 2**53}, NOW),
+    (BINDING, "2026-11-06T12:00Z"),
+])
+def test_contract_uses_portable_integer_and_timestamp_forms(binding, now):
+    with pytest.raises(InvalidInputError):
+        resolve_settings(binding, [], now=now)

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import textwrap
 from copy import deepcopy
 from datetime import datetime, timedelta
@@ -40,7 +41,9 @@ def _keys(value, keys, name):
 
 
 def _time(value):
-    _require(isinstance(value, str) and value.endswith("Z"), "timestamp must be UTC RFC 3339")
+    _require(isinstance(value, str) and re.fullmatch(
+        r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?Z", value,
+    ), "timestamp must be UTC RFC 3339")
     try:
         parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError as exc:
@@ -66,12 +69,14 @@ def _binding(binding):
     _keys(binding, ["conversation_id", "task_id", "turn_id", "response_revision"], "binding")
     _require(all(_text(binding[key]) for key in ("conversation_id", "task_id", "turn_id")),
              "binding identifiers must be nonempty")
-    _require(type(binding["response_revision"]) is int and binding["response_revision"] > 0,
+    _require(type(binding["response_revision"]) is int
+             and 0 < binding["response_revision"] <= 2**53 - 1,
              "response revision must be a positive integer")
 
 
 def _value(setting, value):
-    _require(setting in DEFAULTS and _text(value), "unknown setting or empty value")
+    _require(isinstance(setting, str) and setting in DEFAULTS and _text(value),
+             "unknown setting or empty value")
     _require(setting not in CHOICES or value in CHOICES[setting], "invalid setting value")
     if setting == "persona_ref":
         _require(len(value) <= 200 and not any(c.isspace() for c in value),
@@ -90,8 +95,8 @@ def resolve_settings(binding, signals, *, now, ttl_seconds=300):
                        "observed_at", "expires_at"], "signal")
         setting, value, kind = signal["setting"], signal["value"], signal["kind"]
         _value(setting, value)
-        _require(kind in PRIORITY, "unknown signal kind")
-        _require(signal["source"] in {
+        _require(isinstance(kind, str) and kind in PRIORITY, "unknown signal kind")
+        _require(isinstance(signal["source"], str) and signal["source"] in {
             "user", "surface", "agent", "quoted", "uncertain_transcript",
         }, "unknown signal source")
         refs, scope = signal["evidence_refs"], signal["scope"]
@@ -184,8 +189,10 @@ def render_context(settings, *, binding, now):
 
 def _result(result, written):
     _keys(result, ["status", "verification", "facts"], "result")
-    _require(result["status"] in {"in_progress", "blocked", "complete"}, "invalid work status")
-    _require(result["verification"] in {"not_run", "partial", "passed", "failed"},
+    _require(isinstance(result["status"], str)
+             and result["status"] in {"in_progress", "blocked", "complete"}, "invalid work status")
+    _require(isinstance(result["verification"], str)
+             and result["verification"] in {"not_run", "partial", "passed", "failed"},
              "invalid verification status")
     facts = result["facts"]
     _require(isinstance(facts, list) and facts, "result requires facts")
@@ -193,7 +200,8 @@ def _result(result, written):
     for fact in facts:
         _keys(fact, ["id", "kind", "text"], "fact")
         _require(_text(fact["id"]) and fact["id"] not in ids, "duplicate or empty fact id")
-        _require(fact["kind"] in FACT_KINDS and _text(fact["text"]), "invalid fact")
+        _require(isinstance(fact["kind"], str) and fact["kind"] in FACT_KINDS
+                 and _text(fact["text"]), "invalid fact")
         _require(fact["text"] in written, "fact is absent from the written result")
         ids.add(fact["id"])
         kinds.add(fact["kind"])
@@ -202,7 +210,8 @@ def _result(result, written):
 
 def project_response(settings, result, written, response_id, *, now, target_chars=240):
     """Select supplied facts without paraphrase. The producer owns their truth/completeness."""
-    _validate_settings(settings, settings.get("binding"), now)
+    binding = settings.get("binding") if isinstance(settings, dict) else None
+    _validate_settings(settings, binding, now)
     _require(_text(written) and _text(response_id), "written result and response id are required")
     _require(type(target_chars) is int and 40 <= target_chars <= 2000, "invalid speech target")
     written = written.strip()
@@ -230,7 +239,9 @@ def validate_delivery(record, *, binding, response_id, written, now):
     _require(record["format"] == DELIVERY_FORMAT, "unsupported delivery version")
     _binding(binding)
     _require(record["binding"] == binding, "delivery binding does not match")
-    _require(_text(record["settings_id"]), "settings reference is required")
+    _require(isinstance(record["settings_id"], str)
+             and re.fullmatch(r"settings-[a-f0-9]{64}", record["settings_id"]),
+             "settings reference is invalid")
     _fresh(record, now)
     _keys(record["source"], ["response_id", "text_sha256"], "source")
     _require(_text(written) and record["written"] == written.strip(), "written source differs")
@@ -261,5 +272,5 @@ def validate_delivery(record, *, binding, response_id, written, now):
 def render_text(record, *, binding, response_id, now):
     """Render the complete result; the caller separately supplies current binding."""
     validate_delivery(record, binding=binding, response_id=response_id,
-                      written=record.get("written"), now=now)
+                      written=record.get("written") if isinstance(record, dict) else None, now=now)
     return record["written"]
