@@ -427,7 +427,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-11-20T05:53:17.067Z",
-        "updatedAt": "2026-11-20T07:07:14Z"
+        "updatedAt": "2026-11-20T07:14:49Z"
       },
       "evidence": [
         {
@@ -450,9 +450,9 @@
         },
         {
           "entryId": "ev:261120-blinded-practice-page",
-          "at": "2026-11-20T07:07:14Z",
+          "at": "2026-11-20T07:14:49Z",
           "kind": "stage-change",
-          "message": "Two blinded practice cases now save and restore attributed reviews. Browser checks passed. Human practice, frozen task context and independent scorer controls remain."
+          "message": "Browser checks passed and both blinded practice reviews were submitted and locked. Freeze the rubric and equal task context, then qualify independent scoring controls."
         }
       ]
     },
