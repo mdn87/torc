@@ -19,8 +19,9 @@ Ctrl+C stops a foreground launcher. Run the same command to resume. If the launc
 already running, open its [local practice page](http://127.0.0.1:8773/).
 
 New databases use questions written for each case. An existing database reopens with
-the questions, evidence, side assignments and answers from that batch. To see the revised
-questions alongside the first batch, use a second database and port.
+the questions, evidence, side assignments and answers from that batch. If a description is
+clarified after locking, **Wording shown during scoring** opens the original text.
+To see the revised questions alongside the first batch, use a second database and port.
 
 ```powershell
 .\.venv\Scripts\python.exe experiments/continuation-review/practice_review.py --reviewer Matt --db .torc/continuation-review/practice-v2.sqlite3 --port 8774 --open

@@ -12,6 +12,8 @@ import pytest
 from torc.canonical import payload_sha256
 
 APP = Path(__file__).resolve().parents[1] / "experiments/continuation-review"
+PICKUP_CONTEXT = ("The calendar already showed the right local time. "
+                  "It still needed to move Saturday and Sunday reminders to Friday.")
 
 
 @pytest.fixture
@@ -24,10 +26,13 @@ def test_each_question_refers_to_visible_evidence_and_original_batch_reopens(app
     original = json.loads((APP / "practice.json").read_text(encoding="utf-8"))
     path = tmp_path / "first.db"
     old = app.ReviewStore(path, "UI test", original).view(history=True)
-    assert app.open_practice(path, "UI test").view(history=True) == old
+    resumed = app.open_practice(path, "UI test")
+    assert resumed.view(history=True) == old
+    assert "clarified_interruption" not in resumed.view()["cards"][1]
     current = app.open_practice(tmp_path / "second.db", "UI test").view()
     assert current["rubric_sha256"] != old["rubric_sha256"]
     books, pickups = current["cards"]
+    assert pickups["interruption"] == PICKUP_CONTEXT
     assert set(current["rubric"]["case_questions"]) == {books["id"], pickups["id"]}
     for questions in current["rubric"]["case_questions"].values():
         assert set(questions) == {"request", "constraints", "usable", "preference", "reason"}
@@ -125,7 +130,13 @@ def test_submissions_revisions_and_lock(app, tmp_path):
     assert store.lock(batch["batch_id"], revisions)["locked_at"]
     with pytest.raises(app.Conflict, match="locked"):
         store.save(*args, 3, complete, submit=False)
-    for card in store.view(history=True)["cards"]:
+    export = store.view(history=True)
+    reopened = app.open_practice(tmp_path / "reviews.db", "UI test")
+    assert reopened.view(history=True) == export
+    pickup = reopened.view()["cards"][1]
+    assert pickup["clarified_interruption"] == PICKUP_CONTEXT
+    assert pickup["interruption"] == export["cards"][1]["interruption"] != PICKUP_CONTEXT
+    for card in export["cards"]:
         assert [row["status"] for row in card["history"]] == ["submitted", "draft", "submitted"]
         assert [row["revision"] for row in card["history"]] == [1, 2, 3]
         assert all(row["binding"] == card["binding"] for row in card["history"])

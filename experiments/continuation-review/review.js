@@ -150,7 +150,10 @@ function display(item, focus = false, revise = false) {
   byId("case-title").textContent = card.title;
   document.title = card.title + " · TORC practice";
   byId("request").textContent = card.request;
-  byId("interruption").textContent = card.interruption;
+  byId("interruption").textContent = card.clarified_interruption ?? card.interruption;
+  byId("scored-context").hidden = !card.clarified_interruption;
+  byId("scored-context").open = false;
+  byId("original-interruption").textContent = card.clarified_interruption ? card.interruption : "";
   byId("success").replaceChildren(...card.success.map(text => element("li", text)));
   const comparison = card.comparison;
   const questions = batch.rubric.case_questions?.[card.id];

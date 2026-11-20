@@ -104,11 +104,12 @@ def validate_answers(answers, rubric, submit):
 
 
 class ReviewStore:
-    def __init__(self, path, reviewer, source, *, previous_source_sha256=None):
+    def __init__(self, path, reviewer, source, *, previous_sources=()):
         if source["mode"] != "practice" or not reviewer.strip():
             raise ValueError("Choose a reviewer name and a practice batch.")
         self.path = path
         self.reviewer = reviewer.strip()
+        self.current_interruptions = {card["id"]: card["interruption"] for card in source["cards"]}
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with self.transaction(write=True) as db:
             schema = db.execute("PRAGMA user_version").fetchone()[0]
@@ -131,7 +132,7 @@ class ReviewStore:
             row = db.execute("SELECT * FROM batch").fetchone()
             if row["reviewer"] != self.reviewer:
                 raise Conflict("Reopen with the original reviewer name or choose a new --db file.")
-            if row["source_sha256"] not in (payload_sha256(source), previous_source_sha256):
+            if row["source_sha256"] not in (payload_sha256(source), *previous_sources):
                 raise Conflict("Practice evidence or rubric changed. Restore its version "
                                "to resume, or choose a new --db file.")
             self.snapshot = json.loads(row["snapshot"])
@@ -165,6 +166,9 @@ class ReviewStore:
             cards = []
             for card in self.cards.values():
                 item = {**card, **self.latest(db, card["id"])}
+                current = self.current_interruptions[card["id"]]
+                if locked_at and not history and current != card["interruption"]:
+                    item["clarified_interruption"] = current
                 if history:
                     rows = db.execute("SELECT * FROM revisions WHERE card_id = ? ORDER BY revision",
                                       (card["id"],))
@@ -298,8 +302,13 @@ def open_practice(path, reviewer):
                   criteria=[{"id": row["id"]} for row in original["rubric"]["criteria"]])
     cards = [{**card, "comparison": revision["comparisons"][card["id"]]}
              for card in original["cards"]]
-    return ReviewStore(path, reviewer, {**original, "rubric": rubric, "cards": cards},
-                       previous_source_sha256=payload_sha256(original))
+    source = {**original, "rubric": rubric, "cards": cards}
+    # Recognize the two shipped sources before applying the copy edit to new reviews.
+    previous_sources = (payload_sha256(original), payload_sha256(source))
+    for card in cards:
+        if card["id"] in revision["interruptions"]:
+            card["interruption"] = revision["interruptions"][card["id"]]
+    return ReviewStore(path, reviewer, source, previous_sources=previous_sources)
 
 
 def main():

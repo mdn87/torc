@@ -1,5 +1,8 @@
 {
   "version": "continuation-quality-practice-2",
+  "interruptions": {
+    "pickup-reminder": "The calendar already showed the right local time. It still needed to move Saturday and Sunday reminders to Friday."
+  },
   "case_questions": {
     "reading-list": {
       "request": "Does the first Title cell contain the whole title “Winter, Again”?",

@@ -72,6 +72,9 @@ def test_practice_in_chromium_after_restart(tmp_path):
             page.locator("#reason").fill("Automated draft.")
             page.get_by_role("button", name="02 Reschedule", exact=False).click()
             api.expect(page.locator("h1")).to_have_text("Reschedule a pickup reminder")
+            api.expect(page.locator("#interruption")).to_contain_text(
+                "move Saturday and Sunday reminders to Friday"
+            )
             calendars = page.get_by_role("table", name="What appears on the calendar")
             api.expect(calendars).to_have_count(2)
             for table in calendars.all():

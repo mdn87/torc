@@ -427,7 +427,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-11-20T05:53:17.067Z",
-        "updatedAt": "2026-11-20T07:32:31Z"
+        "updatedAt": "2026-11-20T07:52:11Z"
       },
       "evidence": [
         {
@@ -459,6 +459,12 @@
           "at": "2026-11-20T07:32:31Z",
           "kind": "note",
           "message": "Practice questions now name the cells or pickup rows to inspect. The original reviews are archived. Equal task context and independent scorer qualification still remain."
+        },
+        {
+          "entryId": "ev:261120-clarify-pickup-context",
+          "at": "2026-11-20T07:52:11Z",
+          "kind": "note",
+          "message": "Both practice batches are locked and exported. The pickup card now says what worked and what remained. The wording used for scoring is preserved."
         }
       ]
     },

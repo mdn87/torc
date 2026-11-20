@@ -8,13 +8,13 @@
   "milestonePhase": "build-and-validate",
   "portfolioGroup": "agent-platform",
   "displayPriority": 500,
-  "assessedAt": "2026-11-20T07:32:31Z",
+  "assessedAt": "2026-11-20T07:52:11Z",
   "confidence": "reported",
   "currentMilestone": "Measure receiver-fitted carry against a compiled prompt on eight real interrupted tasks. P5 is merged; Mirror has a separate completed fixture experiment and partial native trial.",
   "remainingSummary": "Practice now uses case-specific questions. Freeze questions and equal context for the eight tasks, then qualify the independent scorer and Claude accounting.",
   "nextChipId": "torc:qualify-continuation-scoring",
   "source": {
-    "label": "Eight real interruptions recovered. The original practice reviews are archived. Revised questions name visible cells and rows. Scorer qualification is active.",
+    "label": "Eight real interruptions recovered. Both practice batches are locked and archived. The pickup description was clarified. Scorer qualification is active.",
     "updatedAt": "2026-11-20"
   }
 }
