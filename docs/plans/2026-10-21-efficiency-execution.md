@@ -14,6 +14,14 @@ Their six-candidate/zero-admission counts are superseded for fixture feasibility
 benchmark admissions remain zero. Scorer/context and accounting qualification
 are still required before any comparison.
 
+The human review uses questions written for the specific case. Before reviewing real
+outputs, give both sides the same questions and name the cell, row, message or other
+visible behavior the reviewer should inspect. Show the expected behavior beside
+the returned behavior. If the displayed evidence cannot answer a question, the reviewer
+can select **Cannot judge**. Freeze the questions with the case evidence before scoring.
+The [practice page](../../experiments/continuation-review/README.md) demonstrates this
+format. Independent automated correctness and usage accounting keep their own gates.
+
 ## Goals and acceptance
 
 1. **Recover real continuation fixtures.** Establish source history, exact starting

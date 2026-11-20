@@ -47,6 +47,14 @@ def test_practice_in_chromium_after_restart(tmp_path):
             page.on("pageerror", lambda error: errors.append(str(error)))
             page.goto(url)
             api.expect(page.get_by_role("heading", level=1)).to_have_text("Export a reading list")
+            title_question = "Does the first Title cell contain the whole title “Winter, Again”?"
+            api.expect(page.get_by_role("group", name=title_question, exact=True)).to_have_count(2)
+            sheets = page.get_by_role("table", name="How this download opens")
+            first_rows = [sheet.locator("tbody tr").first.locator("td").all_text_contents()
+                          for sheet in sheets.all()]
+            assert sorted(first_rows) == [
+                ["Winter", " Again", "Ada Vale"], ["Winter, Again", "Ada Vale"],
+            ]
             page.screenshot(path=tmp_path / "desktop.png")
             for private_file in ("practice.json", "practice.sqlite3", "practice_review.py"):
                 assert page.request.get(url + private_file).status == 404
@@ -64,6 +72,13 @@ def test_practice_in_chromium_after_restart(tmp_path):
             page.locator("#reason").fill("Automated draft.")
             page.get_by_role("button", name="02 Reschedule", exact=False).click()
             api.expect(page.locator("h1")).to_have_text("Reschedule a pickup reminder")
+            calendars = page.get_by_role("table", name="What appears on the calendar")
+            api.expect(calendars).to_have_count(2)
+            for table in calendars.all():
+                sunday = table.locator("tbody tr").nth(1).locator("td").all_text_contents()
+                assert sunday[:2] == ["Sunday 16:30", "Friday 16:30"]
+            api.expect(page.get_by_role("group", name="Did both weekend pickups move to Friday?",
+                                        exact=True)).to_have_count(2)
             page.reload()
             api.expect(page.locator("h1")).to_have_text("Reschedule a pickup reminder")
             page.close()

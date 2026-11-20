@@ -1,7 +1,9 @@
 """Run the local human-review practice desk from a TORC checkout."""
 
 import argparse
+import csv
 import getpass
+import io
 import json
 import secrets
 import sqlite3
@@ -32,6 +34,22 @@ def card_binding(batch_id, rubric_hash, card):
     return payload_sha256({"batch": batch_id, "rubric": rubric_hash, "card": evidence})
 
 
+def displayed_result(variant, comparison):
+    result = {key: variant[key] for key in ("behavior", "output", "change", "evidence")}
+    if comparison is None:
+        return result
+    if comparison["format"] == "csv":
+        rows = list(csv.reader(io.StringIO(result["output"], newline=""), strict=True))
+    elif comparison["format"] == "schedule":
+        header, *expected = comparison["expected"]
+        rows = [[*header, "Returned pickup"]]
+        for row, actual in zip(expected, result["output"].splitlines(), strict=True):
+            rows.append([*row, " ".join(actual.split())])
+    else:
+        raise ValueError("Unknown practice comparison format.")
+    return {**result, "display_rows": rows}
+
+
 def freeze_practice(source):
     batch_id = str(uuid4())
     rubric_hash = payload_sha256(source["rubric"])
@@ -41,8 +59,10 @@ def freeze_practice(source):
             "id", "title", "request", "interruption", "success", "input_label", "input",
             "output_label",
         )}
-        first, second = ({key: variant[key] for key in ("behavior", "output", "change", "evidence")}
-                         for variant in item["variants"])
+        comparison = item.get("comparison")
+        if comparison is not None:
+            card["comparison"] = comparison
+        first, second = (displayed_result(variant, comparison) for variant in item["variants"])
         if secrets.randbelow(2):
             first, second = second, first
         card["results"] = {"A": first, "B": second}
@@ -84,7 +104,7 @@ def validate_answers(answers, rubric, submit):
 
 
 class ReviewStore:
-    def __init__(self, path, reviewer, source):
+    def __init__(self, path, reviewer, source, *, previous_source_sha256=None):
         if source["mode"] != "practice" or not reviewer.strip():
             raise ValueError("Choose a reviewer name and a practice batch.")
         self.path = path
@@ -111,7 +131,7 @@ class ReviewStore:
             row = db.execute("SELECT * FROM batch").fetchone()
             if row["reviewer"] != self.reviewer:
                 raise Conflict("Reopen with the original reviewer name or choose a new --db file.")
-            if row["source_sha256"] != payload_sha256(source):
+            if row["source_sha256"] not in (payload_sha256(source), previous_source_sha256):
                 raise Conflict("Practice evidence or rubric changed. Restore its version "
                                "to resume, or choose a new --db file.")
             self.snapshot = json.loads(row["snapshot"])
@@ -268,6 +288,20 @@ def make_server(store, port):
     return ThreadingHTTPServer(("127.0.0.1", port), Handler)
 
 
+def open_practice(path, reviewer):
+    original = json.loads((HERE / "practice.json").read_text(encoding="utf-8"))
+    revision = json.loads((HERE / "practice-rubric-v2.json").read_text(encoding="utf-8"))
+    rubric = {key: original["rubric"][key] for key in (
+        "ratings", "preferences", "reason_ratings", "reason_preferences",
+    )}
+    rubric.update(version=revision["version"], case_questions=revision["case_questions"],
+                  criteria=[{"id": row["id"]} for row in original["rubric"]["criteria"]])
+    cards = [{**card, "comparison": revision["comparisons"][card["id"]]}
+             for card in original["cards"]]
+    return ReviewStore(path, reviewer, {**original, "rubric": rubric, "cards": cards},
+                       previous_source_sha256=payload_sha256(original))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--reviewer", default=getpass.getuser(), help="name recorded on each save")
@@ -277,8 +311,7 @@ def main():
     parser.add_argument("--open", action="store_true", help="open the page in the default browser")
     args = parser.parse_args()
     try:
-        source = json.loads((HERE / "practice.json").read_text(encoding="utf-8"))
-        store = ReviewStore(args.db, args.reviewer, source)
+        store = open_practice(args.db, args.reviewer)
         with make_server(store, args.port) as server:
             url = f"http://127.0.0.1:{server.server_port}/"
             print(f"Practice page: {url}\nAnswers: {args.db.resolve()}", flush=True)

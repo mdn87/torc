@@ -1,0 +1,44 @@
+{
+  "version": "continuation-quality-practice-2",
+  "case_questions": {
+    "reading-list": {
+      "request": "Does the first Title cell contain the whole title “Winter, Again”?",
+      "constraints": "Are the headings Title and Author, with “Winter, Again” listed before “Blue Road”?",
+      "usable": "Would you use this sheet as shown, without moving text between cells?",
+      "preference": "Which download would you use for your reading list?",
+      "reason": "Which cell or row led to your choice?"
+    },
+    "pickup-reminder": {
+      "request": "Did both weekend pickups move to Friday?",
+      "constraints": "Did the pickups keep their times of 09:15, 16:30 and 08:00, with Wednesday still on Wednesday?",
+      "usable": "Would you put these three reminders on your calendar without fixing a day or time?",
+      "preference": "Which schedule would you put on your calendar?",
+      "reason": "Which pickup led to your choice?"
+    }
+  },
+  "comparisons": {
+    "reading-list": {
+      "format": "csv",
+      "expected_label": "How the spreadsheet should open",
+      "result_label": "How this download opens",
+      "guide": "Each box below is one spreadsheet cell. Compare the title and author in the first book’s row.",
+      "expected": [
+        ["Title", "Author"],
+        ["Winter, Again", "Ada Vale"],
+        ["Blue Road", "Sam Finch"]
+      ]
+    },
+    "pickup-reminder": {
+      "format": "schedule",
+      "expected_label": "Where each pickup should land",
+      "result_label": "What appears on the calendar",
+      "guide": "Read across each row. Check the returned day first, then compare the clock time with the original.",
+      "expected": [
+        ["Original pickup", "Requested pickup"],
+        ["Saturday 09:15", "Friday 09:15"],
+        ["Sunday 16:30", "Friday 16:30"],
+        ["Wednesday 08:00", "Wednesday 08:00"]
+      ]
+    }
+  }
+}

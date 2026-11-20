@@ -81,19 +81,47 @@ function choices(name, question, options, selected, className) {
   return group;
 }
 
-function resultPanel(side) {
+function evidenceTable(rows, label) {
+  const table = element("table", undefined, "case-table");
+  table.setAttribute("aria-label", label);
+  const header = table.createTHead().insertRow();
+  const width = Math.max(...rows.map(row => row.length));
+  for (let i = 0; i < width; i++) {
+    const heading = element("th", rows[0][i] || "(no heading)");
+    heading.scope = "col";
+    header.append(heading);
+  }
+  const body = table.createTBody();
+  for (const values of rows.slice(1)) {
+    const row = body.insertRow();
+    for (let i = 0; i < width; i++) row.insertCell().textContent = values[i] ?? "";
+  }
+  return table;
+}
+
+function resultPanel(side, questions) {
   const result = card.results[side];
   const panel = element("section", undefined, "result");
   panel.setAttribute("aria-label", "Result " + side);
   const heading = element("h3", "Result ");
   heading.append(element("span", side, "side-letter"));
   const details = document.createElement("details");
-  details.append(element("summary", "Changes and evidence"), element("p", result.change),
-                 element("pre", result.evidence, "evidence"));
-  panel.append(heading, element("p", result.behavior), element("p", card.output_label, "output-label"),
-               element("pre", result.output, "output"), details);
+  details.append(element("summary", "Changes and evidence"));
+  panel.append(heading);
+  const outputLabel = element("p", card.output_label, "output-label");
+  const rawOutput = element("pre", result.output, "output");
+  if (card.comparison) {
+    const label = card.comparison.result_label;
+    panel.append(element("p", label, "output-label"), evidenceTable(result.display_rows, label));
+    details.append(outputLabel, rawOutput, element("p", result.behavior));
+  } else {
+    panel.append(element("p", result.behavior), outputLabel, rawOutput);
+  }
+  details.append(element("p", result.change), element("pre", result.evidence, "evidence"));
+  panel.append(details);
   for (const criterion of batch.rubric.criteria) {
-    panel.append(choices(side + "-" + criterion.id, criterion.question, batch.rubric.ratings,
+    const question = questions?.[criterion.id] ?? criterion.question;
+    panel.append(choices(side + "-" + criterion.id, question, batch.rubric.ratings,
                          card.answers[side][criterion.id], "rating"));
   }
   return panel;
@@ -124,12 +152,24 @@ function display(item, focus = false, revise = false) {
   byId("request").textContent = card.request;
   byId("interruption").textContent = card.interruption;
   byId("success").replaceChildren(...card.success.map(text => element("li", text)));
-  byId("input-label").textContent = card.input_label;
+  const comparison = card.comparison;
+  const questions = batch.rubric.case_questions?.[card.id];
+  byId("input-label").textContent = comparison?.expected_label ?? card.input_label;
+  byId("input").hidden = Boolean(comparison);
   byId("input").textContent = card.input;
-  byId("results").replaceChildren(resultPanel("A"), resultPanel("B"));
-  byId("preference").replaceChildren(choices("preference", batch.rubric.preference_question,
-    batch.rubric.preferences, card.answers.preference));
-  byId("reason-label").textContent = batch.rubric.reason_question;
+  byId("expected").hidden = !comparison;
+  if (comparison) {
+    byId("expected").replaceChildren(element("p", comparison.guide),
+                                     evidenceTable(comparison.expected, comparison.expected_label));
+  }
+  byId("review-instructions").textContent = comparison
+    ? "Imagine you asked for this change. Look at what each result gives you, then decide which one you would use. Both are written practice examples."
+    : "Both results are written examples for practice. Rate each against the original request.";
+  byId("results").replaceChildren(resultPanel("A", questions), resultPanel("B", questions));
+  const preference = questions?.preference ?? batch.rubric.preference_question;
+  byId("preference").replaceChildren(choices("preference", preference, batch.rubric.preferences,
+                                            card.answers.preference));
+  byId("reason-label").textContent = questions?.reason ?? batch.rubric.reason_question;
   byId("reason").value = card.answers.reason;
   byId("reason").readOnly = !editing;
   updateReason();

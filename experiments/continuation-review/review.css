@@ -81,6 +81,10 @@ pre { margin: .35rem 0 0; font: .92rem/1.55 var(--mono); white-space: pre-wrap; 
 .side-letter { border-radius: .2rem; background: #e3efe9; padding: .12rem .45rem; font-size: 1.05rem; }
 .output-label { margin: .95rem 0 .35rem; }
 .output, .evidence { padding: .7rem .8rem; border-radius: .25rem; background: #f1f5f4; }
+.case-table { width: 100%; border-collapse: collapse; margin: .45rem 0 .65rem; background: white; font-size: .94rem; }
+.case-table th, .case-table td { border: 1px solid #b7c9c3; padding: .4rem .5rem; text-align: left; vertical-align: top; overflow-wrap: anywhere; white-space: pre-wrap; }
+.case-table th { background: #e8f0ed; font-weight: 600; }
+#expected p { margin: .25rem 0 .6rem; }
 details { margin: .85rem 0 1.1rem; }
 summary { color: var(--teal); font-weight: 600; font-size: .92rem; }
 details p, .evidence { margin: .55rem 0 0; }

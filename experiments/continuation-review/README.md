@@ -18,12 +18,24 @@ The launcher prints the local address and database path. Leave it running while 
 Ctrl+C stops a foreground launcher. Run the same command to resume. If the launcher is
 already running, open its [local practice page](http://127.0.0.1:8773/).
 
+New databases use questions written for each case. An existing database reopens with
+the questions, evidence, side assignments and answers from that batch. To see the revised
+questions alongside the first batch, use a second database and port.
+
+```powershell
+.\.venv\Scripts\python.exe experiments/continuation-review/practice_review.py --reviewer Matt --db .torc/continuation-review/practice-v2.sqlite3 --port 8774 --open
+```
+
+The two examples can be inspected without entering another rating.
+
 ## Score a case
 
 1. Read the request and success criteria, then inspect A and B. The page randomly assigns
    sides independently on first launch and keeps them fixed in this batch.
-2. Rate each result on fulfilling the request, preserving requirements and previous
-   decisions, and acceptability without substantial correction.
+2. Read the question under each result and inspect the cells or rows it names.
+   For the reading list, check whether the first Title cell holds the whole title
+   “Winter, Again”. For reminders, read across the original, requested and returned
+   pickups. The downloaded CSV and the raw reminder output are in **Changes and evidence**.
 3. Choose an overall preference. Give a short reason for **Cannot judge**, **Neither** or
    **Insufficient evidence**. You can also use the reason field to flag confusing wording.
 4. Wait for **Saved** before closing. **Submit review** advances to the next unfinished case.

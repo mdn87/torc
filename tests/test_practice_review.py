@@ -20,6 +20,26 @@ def app(monkeypatch):
     return importlib.import_module("practice_review")
 
 
+def test_each_question_refers_to_visible_evidence_and_original_batch_reopens(app, tmp_path):
+    original = json.loads((APP / "practice.json").read_text(encoding="utf-8"))
+    path = tmp_path / "first.db"
+    old = app.ReviewStore(path, "UI test", original).view(history=True)
+    assert app.open_practice(path, "UI test").view(history=True) == old
+    current = app.open_practice(tmp_path / "second.db", "UI test").view()
+    assert current["rubric_sha256"] != old["rubric_sha256"]
+    books, pickups = current["cards"]
+    assert set(current["rubric"]["case_questions"]) == {books["id"], pickups["id"]}
+    for questions in current["rubric"]["case_questions"].values():
+        assert set(questions) == {"request", "constraints", "usable", "preference", "reason"}
+    rows = [result["display_rows"][1] for result in books["results"].values()]
+    assert ["Winter, Again", "Ada Vale"] in rows
+    assert ["Winter", " Again", "Ada Vale"] in rows
+    for result in pickups["results"].values():
+        assert result["display_rows"][2][:2] == ["Sunday 16:30", "Friday 16:30"]
+        assert result["display_rows"][2][2] == " ".join(result["output"].splitlines()[1].split())
+    assert not any("comparison" in card for card in old["cards"])
+
+
 def test_review_resumes_exact_display_and_attributed_answers(app, tmp_path):
     path = tmp_path / "practice.sqlite3"
     source = json.loads((APP / "practice.json").read_text(encoding="utf-8"))
