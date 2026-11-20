@@ -3,8 +3,10 @@
 Status: reviewed and authorized for staged execution on 2026-10-21. The operator
 subsequently required collecting eight real tasks across at least three
 repositories before proceeding. The November 20 recovery satisfies fixture
-feasibility with eight tasks across five repositories. No comparison is admitted:
-scorer/context and accounting qualification remain. See
+feasibility with eight tasks across five repositories. Both prompts are frozen
+for every task. Seven pairs passed isolated scoring controls. The settlement
+browser requires a private local connection, and Claude accounting still needs
+qualification. See the [scorer evidence](../evidence/2026-11-20-continuation-scorer-preparation.md) and
 [execution goals and collection results](2026-10-21-efficiency-execution.md).
 Review assignments are separate from experiment admissions and do not reuse
 the completed cohort's allowance. Retain the existing $2 spending ceiling.

@@ -22,6 +22,13 @@ can select **Cannot judge**. Freeze the questions with the case evidence before 
 The [practice page](../../experiments/continuation-review/README.md) demonstrates this
 format. Independent automated correctness and usage accounting keep their own gates.
 
+The eight case-specific question sets and both prompt files for every case are
+now frozen. Rebuilding them from the recovered inputs reproduced all sixteen
+prompts byte for byte. Historical controls have been exercised and the settlement
+browser's local connection is blocked on both isolated scorer hosts. The
+[stage 2 evidence](../evidence/2026-11-20-continuation-scorer-preparation.md)
+records the checks that ran and the requirement that remains.
+
 ## Goals and acceptance
 
 1. **Recover real continuation fixtures.** Establish source history, exact starting

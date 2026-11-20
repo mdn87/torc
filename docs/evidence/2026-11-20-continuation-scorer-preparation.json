@@ -1,0 +1,391 @@
+{
+  "version": 1,
+  "status": "browser_scorer_blocked",
+  "historical_control_pairs": 8,
+  "isolated_control_pairs": 7,
+  "windows_candidates_verified_on_macos": 16,
+  "benchmark_admissions": 0,
+  "experimental_model_calls": 0,
+  "experimental_spend_usd": 0,
+  "human_reviews_of_real_cases": 0,
+  "human_preparation_minutes": null,
+  "inventory_sha256": "37d2e8ef802be0904b9cbd5794e5f02ec3e8b045eec562158b1fe1042f37ad92",
+  "preparation_receipt_sha256": "743f9cd5babd40b660fc87dd594d13ce72d742f620d7236057c83a928ec59ea1",
+  "case_definitions_sha256": "8056e6a0ce0c24fbc2c458e9992406f8d3e3a367b22ded100c3d75f33ef65e37",
+  "preparation_program_sha256": "61a2d9cebf8bafea2993f54cf2154f5ef88cd08dc0a5d560024bf1c4a515c480",
+  "independent_preparations": 2,
+  "p5_carry_limit_words": 400,
+  "omitted_sections": 0,
+  "cases": [
+    {
+      "case": "cormac-powershell-quotes",
+      "shared_workspace_sha256": "9ddf0d309062d85cf6351759acee69e34f52f903f72d4d942f704a50558a5678",
+      "brief_sha256": "36bae3f429b0008ddccea2aba219548b99e9e3b57208beb7b4122726226996a5",
+      "editable_file_count": 1,
+      "prompt_sha256": {
+        "compiled": "712708331d2a8f762025dea7621ff20a65640fd909e9a73888bc30a90942cf4f",
+        "torc": "afdbd9063d3f61e504a084f06946884d68751946a7cc9b248b10ea8cb4b21f4f"
+      },
+      "review_sha256": "3aebb39671c749743de0cc93fca9b101b35df4297b9e6248300f6672c342db64",
+      "native_oracle_files_sha256": "ba74c610a6cdbb3776e68582dab364406d5f0d414adbb6f04979d61f0b742e52",
+      "native_dependency_inputs_sha256": "5991032bc5dadf5d86f60520e741451a13ea9328e525a187904611c23990996f",
+      "historical_controls": {
+        "interrupted": {
+          "files_sha256": "996c3a6790a59c8a848a140b0ebfe7d944cd86344107290cb4c36c97f6f8720e",
+          "observed": "behavior_failed",
+          "phase": "behavior",
+          "exit": 1,
+          "log_sha256": "114e2ff3badfccc7af44e0e1f3eb8550abb735f1520d61fd915b535ff69db2c0"
+        },
+        "reference": {
+          "files_sha256": "cb7e00dee6d5268af63d0cdd71b775659750d59b986c158a4a290f7eeab43b8f",
+          "observed": "accepted",
+          "phase": "behavior",
+          "exit": 0,
+          "log_sha256": "5bda4f8fc0165420e8b84a348679234f7bc8cc5532843d7e34d3e0c30ff83f12"
+        }
+      },
+      "isolated_controls": {
+        "interrupted": {
+          "exit": 1,
+          "receipt_sha256": "f1f1db2e4785906d12332ae20bd5ed076cab1b61f33a8498c80e986cd6fa3330",
+          "inputs_unchanged": true,
+          "owner_completed": true
+        },
+        "reference": {
+          "exit": 0,
+          "receipt_sha256": "5f935ca0e04915463a94655ac596b0eca3353a9f1acb3b889839090cd6b1edb0",
+          "inputs_unchanged": true,
+          "owner_completed": true
+        }
+      }
+    },
+    {
+      "case": "tableforge-coordinator",
+      "shared_workspace_sha256": "3354ab1ccabbcc05617431a33d94e5193bc2b6e2d7def9a88f056f9014ba0a9a",
+      "brief_sha256": "9f0d070e2bccb0855bfa0a236877edc4784fe17b52d3680f8ab535d6aefec0eb",
+      "editable_file_count": 5,
+      "prompt_sha256": {
+        "compiled": "60a03e0006f09e333b7d9e1d33d79e48075556293643607e2870c65d3a6d7fb7",
+        "torc": "1cd9f99586b78369d2e7fb5038095d9f4262d7cc98a7a838edaf8c89d4e232cf"
+      },
+      "review_sha256": "3b10bd578c5f7bfbecd21afe530d5a191498b3b838fb9e51c144402890c9cbec",
+      "native_oracle_files_sha256": "b1aa704f9fb673438731ea3a952be1c37687fbffe30d96c5b68251b7827f3d3e",
+      "native_dependency_inputs_sha256": "e8ec8e4685c0d56b8c92a863a48318e3fb0e6040a61ed91468f0663616763400",
+      "historical_controls": {
+        "interrupted": {
+          "files_sha256": "f5fe5feb5e9489ee12286052850255fffd928f142b796121238709dc52ba36c1",
+          "observed": "behavior_failed",
+          "phase": "behavior",
+          "exit": 1,
+          "log_sha256": "1190fc491a2d0ac60368474d1e1a3b55e1741e9ae1acf1e8c61f9726c5996d2b"
+        },
+        "reference": {
+          "files_sha256": "ba84f17e751fb92c423117cbf10a2741b231944b13a32a89f61967210aa39f6f",
+          "observed": "accepted",
+          "phase": "behavior",
+          "exit": 0,
+          "log_sha256": "8a8cadb67e7a545805d04d4866c9f5908915fdc07370e2b6df3b1fc10216d568"
+        }
+      },
+      "isolated_controls": {
+        "interrupted": {
+          "exit": 1,
+          "receipt_sha256": "2dbcff7bee7e708c1d970571d2e1803bfa5ce000ac46a16c7c3a3650b455a84c",
+          "inputs_unchanged": true,
+          "owner_completed": true
+        },
+        "reference": {
+          "exit": 0,
+          "receipt_sha256": "592b110a2904448761abe065a2779f39a24e61452770583e8f621ac18202e912",
+          "inputs_unchanged": true,
+          "owner_completed": true
+        }
+      }
+    },
+    {
+      "case": "tableforge-persistence",
+      "shared_workspace_sha256": "09bf4bcff0bdf3841fd9c668ec7a67d869a8e85d64f032d89c3d326388510848",
+      "brief_sha256": "575fefa5f10e4d2afdacc5f4b462c567e84499a92d6279198fb2cda71c666b4a",
+      "editable_file_count": 5,
+      "prompt_sha256": {
+        "compiled": "f7988db9fb6a6052ac54b2934ee4f8f9c220d7330358efe72e2caeccc1c965a8",
+        "torc": "7281aab314d7928ac57376347307d5ef151628d04f54de8fd447a094c38e4460"
+      },
+      "review_sha256": "047f8984fc3b41cc5092344274f540e6addd728a75ba866d01e352f6eb109bbf",
+      "native_oracle_files_sha256": "8b9d852abb6a0324fcf564cf0df1ec4a4f5ba6b008390a9e26becc541b6ce5ca",
+      "native_dependency_inputs_sha256": "dc53250e0a8a1890a052a26e85441d9ea02b2b1d08fd287613faf5526fd3b7f2",
+      "historical_controls": {
+        "interrupted": {
+          "files_sha256": "0691b07724008d0f0fc4d25c27ecbf19cc0891a019e551e5527a5c5499a98df2",
+          "observed": "required_module_absent",
+          "phase": "build",
+          "exit": 2,
+          "log_sha256": "ce5f5b55c870132a5da500410c9f4b205d55b3f82c0e19d4a469156e6773780a"
+        },
+        "reference": {
+          "files_sha256": "25f1576b75c8df1c6d4e1f1b1e2271f4acde0100c8adbdb7ee1d0ff316599e16",
+          "observed": "accepted",
+          "phase": "behavior",
+          "exit": 0,
+          "log_sha256": "66813449ac3715277ff889ff26623b6133373cca842a34f3964d7ae6408c5ea8"
+        }
+      },
+      "isolated_controls": {
+        "interrupted": {
+          "exit": 2,
+          "receipt_sha256": "2d662bacff2ca705c0ae095692fced0bd8e22678b6a7096e4f609e2b63a097bb",
+          "inputs_unchanged": true,
+          "owner_completed": true
+        },
+        "reference": {
+          "exit": 0,
+          "receipt_sha256": "f3f3b7743316cd51a2d1d4e18a793ebb9c80e02947a9ab1329ddd4512b7ca01a",
+          "inputs_unchanged": true,
+          "owner_completed": true
+        }
+      }
+    },
+    {
+      "case": "tuan-workflow-forecast",
+      "shared_workspace_sha256": "5941d25feaf6ce40cc17fc1d3e5d17ec00a7496c24a2e0f59e706a8e1eb46433",
+      "brief_sha256": "25a1973ab4f60963f223066403762bd1c4dab035987cc4b94156b7608fc26f2a",
+      "editable_file_count": 1,
+      "prompt_sha256": {
+        "compiled": "52072c6e5735928cef484b02e64dceab3e8f9d5608470e5e390bd88bffad4caf",
+        "torc": "e2bfe99df3d3e6ee6c113a1944a0605c9de548b6478cc944b38feb049f067f37"
+      },
+      "review_sha256": "a3ace8fc723212fae787f42e040797144edfb1db629481af8e76d9e5f87ee6a3",
+      "native_oracle_files_sha256": "eee69adf47697ad11be5fa412f66b28fd9d44a4070b1731d48af21294f36f07c",
+      "native_dependency_inputs_sha256": "443493d33c668040f3028b36ff5584c3bc9b58239118ece35412b48df6d19600",
+      "historical_controls": {
+        "interrupted": {
+          "files_sha256": "03797e8177a840419da9af7aa9d0e391465319602b0af81c09bbbcbc72fdea7a",
+          "observed": "behavior_failed",
+          "phase": "behavior",
+          "exit": 1,
+          "log_sha256": "0fc9ec66ac6b9e1e72cb58bd69284350a6714b62ba9ca342f5d50984f51ae45c"
+        },
+        "reference": {
+          "files_sha256": "a29c7c64723e451388d9a4c907ccaa783d5fa0fab6f27201d255a7e53fbc87e7",
+          "observed": "accepted",
+          "phase": "behavior",
+          "exit": 0,
+          "log_sha256": "451c4f12e4b1bd4bf5233e7032f2bbcf7bd7f7381e85c65b4209793fafa71679"
+        }
+      },
+      "isolated_controls": {
+        "interrupted": {
+          "exit": 1,
+          "receipt_sha256": "722dfb5e16142aaca4d8cdc530384bda596c92da81ffdc2cd0909b9b7b592660",
+          "inputs_unchanged": true,
+          "owner_completed": true
+        },
+        "reference": {
+          "exit": 0,
+          "receipt_sha256": "335eeb5f5e0382659486364001c95baaef6bdf5f759340b7e5c20be93aa494a4",
+          "inputs_unchanged": true,
+          "owner_completed": true
+        }
+      }
+    },
+    {
+      "case": "tuan-incremental-validation",
+      "shared_workspace_sha256": "1c7e9a4bb2077e91ba97477be4ef2fbe4f0d4c0c2962395c4acbbd0aa0b88a6b",
+      "brief_sha256": "1479aa341439107bccafea7fee9752cbc3a064ac0713097b8274dc8cbe9b25bf",
+      "editable_file_count": 2,
+      "prompt_sha256": {
+        "compiled": "4583939181c9b08863db8685d2bdb92eb3f001c9cc1f03701a8fc0ca8d12aba4",
+        "torc": "c129017b00ccaaa460df02ba61edb79a74e370350badd0641689907b13f4bd5d"
+      },
+      "review_sha256": "d1f9a38d03c6d9a6b4b85a4883264d01d969d4775461c6255ec1526588dda5a1",
+      "native_oracle_files_sha256": "26909bf065e11468b81cc79df41ef7020b48530f7fa8c81e382b3fd47b70b3f7",
+      "native_dependency_inputs_sha256": "5991032bc5dadf5d86f60520e741451a13ea9328e525a187904611c23990996f",
+      "historical_controls": {
+        "interrupted": {
+          "files_sha256": "522991fe0cb313f61fe4cdea71ee74cea82c3147b66d703c14d9fd3ec58ecebd",
+          "observed": "behavior_failed",
+          "phase": "behavior",
+          "exit": 1,
+          "log_sha256": "4f8259c5f33174e8ec3d8af1b25aced3968ca7b90e775cb4f9ee58ec372b3dee"
+        },
+        "reference": {
+          "files_sha256": "4ea82adcf2591d129863faa3be0c171e96fd732bcb66940fc2fffc51af237c06",
+          "observed": "accepted",
+          "phase": "behavior",
+          "exit": 0,
+          "log_sha256": "a75583d4e0094a791d3da5d5b2b1c098f123465f54995dd4c7bfac2d891beb80"
+        }
+      },
+      "isolated_controls": {
+        "interrupted": {
+          "exit": 1,
+          "receipt_sha256": "282eea8e1b6fb75411e64201ff4c0d974c01e68f92d15218bda28848fc359187",
+          "inputs_unchanged": true,
+          "owner_completed": true
+        },
+        "reference": {
+          "exit": 0,
+          "receipt_sha256": "0107ffa97c6c24c7e583826f70ab8b7f3997529dc8c924b52f8bcfe4eff44f7b",
+          "inputs_unchanged": true,
+          "owner_completed": true
+        }
+      }
+    },
+    {
+      "case": "autowork-agy-completion",
+      "shared_workspace_sha256": "4e3c63ccf3e1f2ae50c83dd0c9bf2a386eefe336878c928fcf23a9e976b6c7d0",
+      "brief_sha256": "1886c3a6044e69bb344c5f2f5780184433552e8790209c03509e879a563df159",
+      "editable_file_count": 2,
+      "prompt_sha256": {
+        "compiled": "91d93caf43f675a49c143f77385bfb3757e3c492019ebaf6ad60de5fecf42722",
+        "torc": "f7c9ecf582ee0a95bed35ad3a370a4f92115dcbd5c0b8d0fba6a30b31a141896"
+      },
+      "review_sha256": "447e59064f45ccdff95d498bcc14dd23ed240ce0b524cfbdbb14ea6177d89448",
+      "native_oracle_files_sha256": "a045c9e3815ba32fa0dc664b561b6838587d11da7e2aef595c8b000413994d3c",
+      "native_dependency_inputs_sha256": "6b29f03e583c27ac35bc5e3576568e71f8d2f10e23d076a93514f292652c91eb",
+      "historical_controls": {
+        "interrupted": {
+          "files_sha256": "a87b956fc1db8135402d9b012ac201a880d9c7306f8b098d12a1e8e53c5b6ddc",
+          "observed": "behavior_failed",
+          "phase": "behavior",
+          "exit": 1,
+          "log_sha256": "7d3b7a0ee1d1ebd7b7c5fe75bbcdb9b591871f7aecc78e95f52163dea1cd8542"
+        },
+        "reference": {
+          "files_sha256": "635764904bf7ea76a072c9d7f5d649cd28393d3e9ed3b8e9605f4df1364ce978",
+          "observed": "accepted",
+          "phase": "behavior",
+          "exit": 0,
+          "log_sha256": "4bf510aed7d46dc3bf8b4c299c7aa110cc5e982c64d49cf0715e1dd85cfd0d8f"
+        }
+      },
+      "isolated_controls": {
+        "interrupted": {
+          "exit": 1,
+          "receipt_sha256": "d4faaf04974cf2529285611c0d0a37d4c25c240b192dfc2380b12275bffb7242",
+          "inputs_unchanged": true,
+          "owner_completed": true
+        },
+        "reference": {
+          "exit": 0,
+          "receipt_sha256": "65497a5c07b70440fed8f29213c2f8bddb9ead2cb4b7ab002aa806349e58155b",
+          "inputs_unchanged": true,
+          "owner_completed": true
+        }
+      }
+    },
+    {
+      "case": "tableforge-settlement-renderer",
+      "shared_workspace_sha256": "5d9b5952978a64aba4e6c3a9d1a124d1f87764be0b14bb3e9ef4ff0fb7cd7e6b",
+      "brief_sha256": "ca9f2a395fb1ab7effdfdb385fff87232309866798701fb87131bb215e06839c",
+      "editable_file_count": 15,
+      "prompt_sha256": {
+        "compiled": "82cb561565ba5d76ce55790f73afcc9ab3130c7772df270e97fff6b0aaea30b9",
+        "torc": "601dcf4e03a5b542bc8feecc7de0bd01f198ea6e2821608a4719d7f1a075dc09"
+      },
+      "review_sha256": "9b3997836bf8bfa5a777285506d0396b7115bf808998089949b099e87e339487",
+      "native_oracle_files_sha256": "4dcd677a832b6c0c6f34479832ee8bf2fa2fa21ed3f6118e703030930abba95d",
+      "native_dependency_inputs_sha256": "3aa90907c7992548e28f5381a674d7860603e23d863c509c48e4705008cc6ea2",
+      "historical_controls": {
+        "interrupted": {
+          "files_sha256": "3f1d7c4160057df7627229ad7529367290c00d6637d570f8a15daad730cd3315",
+          "observed": "behavior_failed",
+          "phase": "behavior",
+          "exit": 1,
+          "log_sha256": "a16a9751eb4e1a0da13c9758857043f05eb97eaca766e6af33f2bc6ac36b88bb"
+        },
+        "reference": {
+          "files_sha256": "6c678574f24d23d1e77e8be9a2986cccc3b94647b0a25be897996e4b9622f52a",
+          "observed": "accepted",
+          "phase": "behavior",
+          "exit": 0,
+          "log_sha256": "d47a6d385ac348861af57d13e005a9dc4eaf7e2e511f40080388354ae3395243"
+        }
+      },
+      "isolated_controls": {
+        "status": "local_browser_connection_denied",
+        "candidate_score": null
+      }
+    },
+    {
+      "case": "wow-context-channel",
+      "shared_workspace_sha256": "4cb4a6263a3662d29251ffe8a3d19e10cbad81d63bf8759a1dc3a82236598cf2",
+      "brief_sha256": "60f3b0375f17478523e9a3df619bad2ea88244a6b20a1f470075b157fadfc2c4",
+      "editable_file_count": 17,
+      "prompt_sha256": {
+        "compiled": "801fa0af386031662b3e17526c05c6d48cca9d41b76b5b33c8d0841c2579d6e5",
+        "torc": "b3d5eeda3df169cd602909434afacf00be1f4ce94ee43e520678a29923ba8577"
+      },
+      "review_sha256": "ee56f6161b420de98dd90fca79b539374c8d4b9dcf1d667ac326ec24e1240aa4",
+      "native_oracle_files_sha256": "e01427771e19d593797224cf215fcc0887b193da8924f74f422e748da84204ce",
+      "native_dependency_inputs_sha256": "5991032bc5dadf5d86f60520e741451a13ea9328e525a187904611c23990996f",
+      "historical_controls": {
+        "interrupted": {
+          "files_sha256": "01c6800b07c56b5b261517ad669483cf1b299f595d879158a993c3feb703aad8",
+          "observed": "required_module_absent",
+          "phase": "behavior",
+          "exit": 2,
+          "log_sha256": "9ade2bf11e1f6f7feed50aeecb68ec37d0061e7766df42f0cce02c8156a3bd45"
+        },
+        "reference": {
+          "files_sha256": "2608f86585533e10b34c9eff8be102f1275730d5977fc7c3d76b0af51e74fdd0",
+          "observed": "accepted",
+          "phase": "behavior",
+          "exit": 0,
+          "log_sha256": "c88258dfe248b18e73e727d9e17f8586768f7667d42c4c6d1472443c5e029833"
+        }
+      },
+      "isolated_controls": {
+        "interrupted": {
+          "exit": 2,
+          "receipt_sha256": "ff11d92f19bdddbfc8386f50bfcd0302ed3d454c25ee0f6a2e0cc7aa540b80fd",
+          "inputs_unchanged": true,
+          "owner_completed": true
+        },
+        "reference": {
+          "exit": 0,
+          "receipt_sha256": "ced7ced20f69a008a5e72b07d3ccdc2eae6358058d80242efc3b5f6bf866ba27",
+          "inputs_unchanged": true,
+          "owner_completed": true
+        }
+      }
+    }
+  ],
+  "windows_scorer": {
+    "codex_version": "0.163.0",
+    "executable_sha256": "2692c8c7bb2cf8b0aefe638741fc90236f4b824c59578ce84994f9de58200993",
+    "private_read_denied": true,
+    "runtime_write_denied": true,
+    "host_listener_denied": true,
+    "same_job_loopback_denied": true,
+    "same_job_probe_sha256": "93f44e180cb86944e42d712b2391ed7c82190b5a4faed3358cce476df809add2",
+    "node_package_parity": {
+      "tableforge-coordinator": {
+        "normalized_sha256": "75446056c2d7e5e244eb5bfebbf9eda2ace538d30601a8842f9635238c76b1ff",
+        "entries": 1810,
+        "unexplained_differences": 0
+      },
+      "tableforge-persistence": {
+        "normalized_sha256": "704c4a47033cfc296f39a57665f89e8dd71cd76dbd4697a33f2e5da66c3ef558",
+        "entries": 1811,
+        "unexplained_differences": 0
+      }
+    }
+  },
+  "transfer": {
+    "archive_sha256": "dc27fa34f0f91420100135cead917982a1d33baf0e2433c15d4cb966d9964fd9",
+    "candidate_pins_sha256": "fd424458c275d565981024be77a9845952481227121750de5fc10dba4f772e01",
+    "macos_runtime_sha256": "8f1a9a78ba035d6d06c5bb438d80f75d872b283950c87a88e5a12415c13b1eab",
+    "receipt_sha256": "01057058e4c61281bfb1219b3f7514e97baee626f41c746c7649a24ec2f60e99",
+    "host_listener_denied": true,
+    "same_job_loopback_denied": true
+  },
+  "private_driver_sha256": {
+    "check_controls.py": "bd9bf0cf3a92bcfbadf20db67dfb503898a42d1fcafc9a35b04b26af22080dd0",
+    "isolated.py": "36337324cacd48323fbbee591b6b9866d8e415a0b0adc73abb3e12f5c84c4efa",
+    "isolated_node.py": "8b5d14b03603ff6ef2f889cf588ed199318cd3c24af07ae4716b1c174eb3fdb8",
+    "mac_check.py": "48d33de5a9099677c645148b645e45780a787cdc6874b76c6a469119ba2a8611",
+    "dependency_parity.py": "9e5f11210a767c8801b40ed9ee95f1d7f9f2ff7dc73ace0b77d0310b7f78addb"
+  }
+}

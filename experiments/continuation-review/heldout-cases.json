@@ -1,0 +1,308 @@
+{
+  "cormac-powershell-quotes": {
+    "usable": "Could you use the property name as shown without joining any pieces yourself?",
+    "preference": "Which argument list would you use for the Display Name property?",
+    "reason": "Which entry in the list led to your choice?",
+    "request": "Keep a quoted PowerShell argument together when the quote starts after the argument name.",
+    "at_stop": "The parser already handled arguments that started with a quote. A space inside a quote could still split a named argument in two.",
+    "requirements": [
+      "Keep the spelling and order of arguments, including an empty quoted argument.",
+      "Handle embedded quote characters using PowerShell quoting rules. Preserve the existing shell classification."
+    ],
+    "holds": [
+      "Exercise parsing on text. No command from an example needs to run."
+    ],
+    "source_lines": [
+      2041,
+      2094,
+      2111,
+      2121
+    ],
+    "review": [
+      {
+        "label": "Property name",
+        "expected": "One argument containing Display Name",
+        "question": "In the argument list, do Display and Name appear in the same entry?"
+      },
+      {
+        "label": "Empty argument",
+        "expected": "One separate empty quoted argument after the property",
+        "question": "Is there still an entry for the final empty argument?"
+      }
+    ]
+  },
+  "tableforge-coordinator": {
+    "usable": "Could you tell who is selected after Mira leaves?",
+    "preference": "Which roster would you trust to show whose turn it is after Mira leaves?",
+    "reason": "Which roster field or pause message led to your choice?",
+    "request": "Keep the acting player and the writer of a game session consistent when the roster or connected devices change.",
+    "at_stop": "The coordinator had a roster and could select a player. Removing a player or losing the writer still needed handling.",
+    "requirements": [
+      "Clear the acting-player selection when the roster changes. Reject ambiguous or reserved character names.",
+      "Keep a single writer. Pause when the writer is lost and check its epoch and revision on return.",
+      "Keep game-master controls separate from player actions and distinguish an unknown character from an in-game miss."
+    ],
+    "holds": [
+      "Work on the coordinator. Durable journal storage is a separate task."
+    ],
+    "source_lines": [
+      6649,
+      6776,
+      6963,
+      7014
+    ],
+    "review": [
+      {
+        "label": "Acting player after removing Mira",
+        "expected": "No player selected",
+        "question": "After Mira is removed, is the Acting player field empty?"
+      },
+      {
+        "label": "Roster revision",
+        "expected": "2 after the first roster change",
+        "question": "Does the roster revision go from 1 to 2 when Mira is removed?"
+      },
+      {
+        "label": "Writer disconnects",
+        "expected": "Session paused until the writer can resume",
+        "question": "During the gap between disconnect and reconnect, is the session marked paused?"
+      }
+    ]
+  },
+  "tableforge-persistence": {
+    "usable": "Could you tell from the log whether move r1 was already saved?",
+    "preference": "Which recovery record would you use to decide whether to resend r1?",
+    "reason": "Which log entry or reply led to your choice?",
+    "request": "Recover a game session after a writer restarts without applying a move twice.",
+    "at_stop": "The package had its configuration files. It still needed to save accepted moves, keep track of the writer and recover unfinished requests.",
+    "requirements": [
+      "Append each accepted event with its revision before acknowledging the request.",
+      "Allocate one durable writer lease and epoch at restart. Refuse stale writers and mismatched revisions.",
+      "Replay the original outcome for a repeated request ID. Keep an uncommitted request available for resolution."
+    ],
+    "holds": [
+      "Keep the existing coordinator contract and record what the durable log can establish."
+    ],
+    "source_lines": [
+      7340,
+      7348,
+      7366,
+      7385
+    ],
+    "review": [
+      {
+        "label": "Move r1 after the retry",
+        "expected": "One event for r1",
+        "question": "After the restart and retry, is there exactly one entry for r1 in the log?"
+      },
+      {
+        "label": "Reply to the retried move",
+        "expected": "Accepted at revision 1, the original revision",
+        "question": "Does the second reply for r1 still say accepted at revision 1?"
+      },
+      {
+        "label": "Move interrupted before commit",
+        "expected": "Listed for resolution, with no accepted event",
+        "question": "Is the interrupted move on the unresolved list and absent from the accepted log?"
+      }
+    ]
+  },
+  "tuan-workflow-forecast": {
+    "usable": "Could you find the forecasts for this patch using the import reply?",
+    "preference": "Which import reply would you use to find this patch’s forecasts?",
+    "reason": "Which checkpoint or forecast ID led to your choice?",
+    "request": "Create forecasts when a workflow import saves a checkpoint for a newly produced patch.",
+    "at_stop": "The importer already saved workflow events and checkpoints. Its reply still needed to say which forecasts were issued for the patch.",
+    "requirements": [
+      "Issue forecasts only after the checkpoint is durable. Use the patch checkpoint rather than the completion claim.",
+      "Keep the original ingestion acknowledgment. A repeated import must keep the same forecasts.",
+      "If forecast creation fails, report the failure without losing the record of successful ingestion."
+    ],
+    "holds": [
+      "Use recorded events. Live collection and installing hooks are outside this exercise."
+    ],
+    "source_lines": [
+      1912,
+      2077,
+      2119,
+      2128
+    ],
+    "review": [
+      {
+        "label": "Forecasts after importing the same patch twice",
+        "expected": "The same four forecast IDs on both imports",
+        "question": "Do the second import’s four forecast IDs match the four from the first import?"
+      },
+      {
+        "label": "Checkpoint ID on each forecast",
+        "expected": "The ID on the saved patch checkpoint",
+        "question": "Does every forecast row show the same checkpoint ID as the patch row?"
+      },
+      {
+        "label": "Reply when issuing forecasts fails",
+        "expected": "Import acknowledged and forecast error visible",
+        "question": "Can you see both the saved import and a forecast error in that reply?"
+      }
+    ]
+  },
+  "tuan-incremental-validation": {
+    "usable": "Could you tell which events arrived after the saved position?",
+    "preference": "Which result would you use to collect just the new events?",
+    "reason": "Which event ID, count or state led to your choice?",
+    "request": "When collection resumes, validate the new Claude or Codex records without revalidating discarded earlier records.",
+    "at_stop": "Both readers remembered where collection stopped. They still prepared records from before that point and then threw them away.",
+    "requirements": [
+      "Return the same new record IDs and final lifecycle state as a full read of the same session.",
+      "Keep the cursor checks for a changed, shortened or incomplete source. Preserve task identity across the boundary.",
+      "Avoid preparing earlier event records that the incremental read discards."
+    ],
+    "holds": [
+      "Use retained session fixtures. A timing claim requires a separate measurement."
+    ],
+    "source_lines": [
+      5896,
+      5913,
+      5922
+    ],
+    "review": [
+      {
+        "label": "Old events prepared on the second read",
+        "expected": "0 discarded earlier events, for both readers",
+        "question": "Do both the Claude and Codex rows show zero old events prepared and then discarded?"
+      },
+      {
+        "label": "New event IDs",
+        "expected": "Exactly the IDs added after the saved position",
+        "question": "Do the IDs in New events match the IDs added since the first read?"
+      },
+      {
+        "label": "Final task state",
+        "expected": "Same as reading the complete file once",
+        "question": "Do the two Final state cells match for each reader?"
+      }
+    ]
+  },
+  "autowork-agy-completion": {
+    "usable": "Could you tell which program would run for each task?",
+    "preference": "Which set of launches would you use for the Agy and Claude tasks?",
+    "reason": "Which program name or checker setting led to your choice?",
+    "request": "When a profile selects the Agy program, launch it directly. Keep Claude completion checks for Claude work.",
+    "at_stop": "The profile could select Agy for an exploration task. A Claude-only completion check still intercepted that selection.",
+    "requirements": [
+      "Build and run the selected Agy command directly and preserve its result.",
+      "Keep the existing completion checker on the Claude route. Preserve the existing route, quota and workspace restrictions."
+    ],
+    "holds": [
+      "Check command construction with a recording executor. Do not start either provider."
+    ],
+    "source_lines": [
+      3508,
+      3593,
+      3627,
+      3666
+    ],
+    "review": [
+      {
+        "label": "Program selected for Agy",
+        "expected": "Agy",
+        "question": "In the Agy row, is Agy the program that would start?"
+      },
+      {
+        "label": "Completion checker for Agy",
+        "expected": "Off",
+        "question": "In the Agy row, is the Claude completion checker off?"
+      },
+      {
+        "label": "Completion checker for Claude",
+        "expected": "On",
+        "question": "In the Claude row, is the completion checker still on?"
+      }
+    ]
+  },
+  "tableforge-settlement-renderer": {
+    "usable": "Could Player 1 tell whose turn it was after reloading the page?",
+    "preference": "Which board would you use to resume the game after the reload?",
+    "reason": "Which link, round number or move message led to your choice?",
+    "request": "Show Canal Settlements on the two player terminals and the public board.",
+    "at_stop": "Work had started on the board renderer and player page. The pages still needed to work together through the shared game host.",
+    "requirements": [
+      "Render the topology, balances and actions supplied by the selected game package.",
+      "Show controls to the seated player. Show the public projection on the display.",
+      "Use server decisions for accepted and refused actions. Reconnect the same device to its seat and current board after a reload."
+    ],
+    "holds": [
+      "Handle the settlement game. Other games and physical display checks are separate."
+    ],
+    "source_lines": [
+      1063,
+      1092,
+      1144,
+      1146,
+      1157
+    ],
+    "review": [
+      {
+        "label": "Public board",
+        "expected": "A board with no play buttons",
+        "question": "Looking at the public display, can spectators see the board without any play buttons?"
+      },
+      {
+        "label": "Player 1 after a reload",
+        "expected": "Round 2 with the link from A to B still owned by Player 1",
+        "question": "After Player 1 reloads, does the page still show round 2 and Player 1’s link from A to B?"
+      },
+      {
+        "label": "Player 2 clicks during Player 1’s turn",
+        "expected": "A refusal and the same board as before",
+        "question": "After Player 2 clicks out of turn, is the move refused and does the board stay the same?"
+      }
+    ]
+  },
+  "wow-context-channel": {
+    "usable": "Could you tell a duplicate packet from a new one in the displayed readings?",
+    "preference": "Which readings would you use to describe what the helper saw?",
+    "reason": "Which packet or logout field led to your choice?",
+    "request": "Read game context offline from clipboard text or an image. Handle unreliable logout saves.",
+    "at_stop": "The transport options had been investigated. The helper still needed an offline decoder, an opt-in probe and a way to handle zero values saved at logout.",
+    "requirements": [
+      "Define the context envelope, sanitize game text and validate versions, size, freshness and repeated packets.",
+      "Support clipboard and pixel-strip input, with an opt-in probe. Keep the offline format and agent-use limits documented.",
+      "If money and experience both read zero during logout, retain a reliable earlier reading when available or report the values as unknown."
+    ],
+    "holds": [
+      "Retail observations and launch-day game behavior require a real client. Leave those checks open."
+    ],
+    "source_lines": [
+      3202,
+      3215,
+      3291,
+      3304,
+      3309
+    ],
+    "additional_editable_files": [
+      "wow_addon/WoWCompanion/WoWCompanion.lua",
+      "wow_addon/WoWCompanion/WoWCompanion.toc",
+      "wow_helper/character.py",
+      "wow_helper/check.py",
+      "docs/CONTEXT_CHANNEL.md",
+      "THIRD_PARTY_NOTICES.md"
+    ],
+    "review": [
+      {
+        "label": "The same packet read a second time",
+        "expected": "Duplicate",
+        "question": "When the same packet is read again, does the second row say duplicate?"
+      },
+      {
+        "label": "Clipboard and image",
+        "expected": "Same session and sequence number",
+        "question": "For the same packet, do the clipboard and image rows show the same session and sequence number?"
+      },
+      {
+        "label": "Logout with zero values and no earlier reading",
+        "expected": "Money and experience are unavailable",
+        "question": "When there is no earlier reading, are both money and experience shown as unavailable?"
+      }
+    ]
+  }
+}
