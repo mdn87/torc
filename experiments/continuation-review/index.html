@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Continuation review · TORC</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/review.css">
+  <script src="/review.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#case-title">Skip to case</a>
+  <header class="mast">
+    <div class="brand"><span class="mark" aria-hidden="true"></span>TORC</div>
+    <span class="desk">Continuation review</span>
+    <span id="reviewer"></span>
+  </header>
+  <div id="problem" role="alert" hidden>
+    <span id="error-text"></span>
+    <button id="retry" type="button" hidden>Retry save</button>
+    <button id="reload" type="button">Reload saved reviews</button>
+  </div>
+  <div class="workspace">
+    <aside>
+      <div class="queue">
+        <h2>Practice queue</h2>
+        <div id="progress-text">Loading cases…</div>
+        <progress id="progress" aria-labelledby="progress-text" value="0" max="2"></progress>
+        <nav id="cases" aria-label="Practice cases"></nav>
+        <a id="export" href="/api/export" download="practice-review.json">Export answers</a>
+      </div>
+    </aside>
+    <main id="main">
+      <noscript>Enable JavaScript to load and save practice reviews.</noscript>
+      <article id="case" hidden>
+        <div class="case-meta"><span id="position"></span><span id="save-state" role="status"></span></div>
+        <h1 id="case-title" tabindex="-1"></h1>
+        <section class="brief" aria-labelledby="request-label">
+          <h2 id="request-label">Original request</h2>
+          <blockquote id="request"></blockquote>
+          <div class="context">
+            <section><h3>Where work stopped</h3><p id="interruption"></p></section>
+            <section><h3>What success looks like</h3><ul id="success"></ul></section>
+          </div>
+        </section>
+        <section class="sample" aria-labelledby="input-label">
+          <h3 id="input-label"></h3><pre id="input"></pre>
+        </section>
+        <form id="review">
+          <h2 class="section-title">Compare the results</h2>
+          <p class="section-note">Both results are written examples for practice. Rate each against the original request.</p>
+          <div id="results"></div>
+          <section class="decision">
+            <div id="preference"></div>
+            <label id="reason-label" for="reason"></label>
+            <span id="reason-hint"></span>
+            <textarea id="reason" name="reason" maxlength="2000" rows="3" aria-describedby="reason-hint"></textarea>
+          </section>
+          <div class="form-actions">
+            <p id="save-help">Answers save to this computer as you work.</p>
+            <button class="primary" id="submit" type="submit">Submit review</button>
+            <button class="secondary" id="revise" type="button" hidden>Revise answers</button>
+          </div>
+        </form>
+        <section id="finish" hidden>
+          <h2 id="finish-title">Both reviews are submitted</h2>
+          <p id="finish-note">You can revise either review until you lock this practice batch.</p>
+          <button id="lock" type="button" class="secondary">Lock practice batch</button>
+        </section>
+      </article>
+    </main>
+  </div>
+  <dialog id="lock-dialog" aria-labelledby="lock-title">
+    <h2 id="lock-title">Lock both practice reviews?</h2>
+    <p>Your answers and earlier revisions will stay available to read and export. Locking closes editing for this batch.</p>
+    <form method="dialog">
+      <button class="secondary" value="cancel" autofocus>Keep editing</button>
+      <button class="primary" value="lock">Lock both reviews</button>
+    </form>
+  </dialog>
+</body>
+</html>

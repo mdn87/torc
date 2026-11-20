@@ -8,13 +8,13 @@
   "milestonePhase": "build-and-validate",
   "portfolioGroup": "agent-platform",
   "displayPriority": 500,
-  "assessedAt": "2026-11-20T06:21:40.326Z",
+  "assessedAt": "2026-11-20T07:14:49Z",
   "confidence": "reported",
   "currentMilestone": "Measure receiver-fitted carry against a compiled prompt on eight real interrupted tasks. P5 is merged; Mirror has a separate completed fixture experiment and partial native trial.",
-  "remainingSummary": "Eight source-feasible tasks are preserved. Qualify scoring, equal context and Claude accounting before comparison. Native Mirror, sustained use and recovery remain open.",
+  "remainingSummary": "Both practice reviews are locked. Freeze the rubric and equal task context, then qualify the independent scorer and Claude accounting. Mirror and operator work remain.",
   "nextChipId": "torc:qualify-continuation-scoring",
   "source": {
-    "label": "November 20 status review plus eight recovered natural interruptions and local failure/reference checks; no benchmark admissions.",
+    "label": "Eight real interruptions recovered. Both separate practice reviews were submitted and locked. Browser persistence passed. Scorer qualification is active.",
     "updatedAt": "2026-11-20"
   }
 }

@@ -417,7 +417,7 @@
       "projectId": "torc",
       "title": "Qualify scoring and freeze task context",
       "summary": "After eight tasks are eligible, bind source custody, equalize dependencies and prove independent scoring accepts good candidates and rejects broken ones.",
-      "stage": "planned",
+      "stage": "active",
       "sequence": 66,
       "prereqs": [
         "torc:collect-continuation-fixtures"
@@ -427,7 +427,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-11-20T05:53:17.067Z",
-        "updatedAt": "2026-11-20T06:46:19.913Z"
+        "updatedAt": "2026-11-20T07:14:49Z"
       },
       "evidence": [
         {
@@ -447,6 +447,12 @@
           "at": "2026-11-20T06:46:19.913Z",
           "kind": "note",
           "message": "Operator approved a blinded review page with durable per-item answers and two practice cases. Implementation has not started; correctness and usage remain separate."
+        },
+        {
+          "entryId": "ev:261120-blinded-practice-page",
+          "at": "2026-11-20T07:14:49Z",
+          "kind": "stage-change",
+          "message": "Browser checks passed and both blinded practice reviews were submitted and locked. Freeze the rubric and equal task context, then qualify independent scoring controls."
         }
       ]
     },
