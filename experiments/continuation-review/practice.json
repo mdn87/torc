@@ -1,0 +1,75 @@
+{
+  "mode": "practice",
+  "rubric": {
+    "version": "continuation-quality-practice-1",
+    "criteria": [
+      {"id": "request", "question": "Does it fulfill the original request?"},
+      {"id": "constraints", "question": "Does it preserve the requirements and earlier decisions?"},
+      {"id": "usable", "question": "Would you accept it without substantial correction?"}
+    ],
+    "ratings": ["Yes", "Partly", "No", "Cannot judge"],
+    "preference_question": "Which result would you continue with?",
+    "preferences": ["A", "B", "Either", "Neither", "Insufficient evidence"],
+    "reason_ratings": ["Cannot judge"],
+    "reason_preferences": ["Neither", "Insufficient evidence"],
+    "reason_question": "What influenced your choice, or what evidence was missing?"
+  },
+  "cards": [
+    {
+      "id": "reading-list",
+      "title": "Export a reading list",
+      "request": "Let me download my reading list as a CSV so I can open it in a spreadsheet. Keep the books in shelf order and keep every title in a single cell.",
+      "interruption": "The download button already creates a file. The column names and shelf order were agreed on. Formatting the rows was the unfinished part.",
+      "success": [
+        "The first row contains Title and Author.",
+        "Rows follow the shelf order, even when titles sort differently.",
+        "A title containing a comma opens in one cell."
+      ],
+      "input_label": "Books in shelf order",
+      "input": "1. Winter, Again · Ada Vale\n2. Blue Road · Sam Finch",
+      "output_label": "Downloaded CSV",
+      "variants": [
+        {
+          "behavior": "The file lists Winter, Again first. Opening it in a spreadsheet produces two columns on every row.",
+          "output": "Title,Author\n\"Winter, Again\",Ada Vale\nBlue Road,Sam Finch",
+          "change": "Writes the existing shelf rows with a CSV writer. Fields containing a comma are quoted during export.",
+          "evidence": "First data row after import\nTitle  [Winter, Again]\nAuthor [Ada Vale]"
+        },
+        {
+          "behavior": "The file lists Winter, Again first. Opening it in a spreadsheet places the author in a third column on that row.",
+          "output": "Title,Author\nWinter, Again,Ada Vale\nBlue Road,Sam Finch",
+          "change": "Writes the existing shelf rows by joining each title and author with a comma during export.",
+          "evidence": "First data row after import\nTitle  [Winter]\nAuthor [ Again]\n       [Ada Vale]"
+        }
+      ]
+    },
+    {
+      "id": "pickup-reminder",
+      "title": "Reschedule a pickup reminder",
+      "request": "Move weekend pickup reminders back to Friday. Keep the original time of day and leave weekday reminders where they are.",
+      "interruption": "The calendar already displays reminders in local time. The remaining change belongs in the date rule used when a reminder is scheduled.",
+      "success": [
+        "Saturday and Sunday reminders move to the preceding Friday.",
+        "The local time of day stays the same.",
+        "A reminder already on a weekday keeps its date and time."
+      ],
+      "input_label": "Three local pickup times",
+      "input": "Saturday  09:15\nSunday    16:30\nWednesday 08:00",
+      "output_label": "Scheduled reminders",
+      "variants": [
+        {
+          "behavior": "Both weekend pickups move to Friday at 09:00. The Wednesday pickup stays at 08:00.",
+          "output": "Friday    09:00\nFriday    09:00\nWednesday 08:00",
+          "change": "For weekend entries, creates a replacement on the preceding Friday using the calendar's default reminder time.",
+          "evidence": "Sunday 16:30 → Friday 09:00\nThe calendar shows one reminder for this pickup."
+        },
+        {
+          "behavior": "The Saturday pickup moves to Friday at 09:15. Sunday and Wednesday keep their existing times and dates.",
+          "output": "Friday    09:15\nSunday    16:30\nWednesday 08:00",
+          "change": "Moves Saturday entries back one day, carrying over their local times. All other entries keep their original schedule.",
+          "evidence": "Sunday 16:30 → Sunday 16:30\nThe calendar shows one reminder for this pickup."
+        }
+      ]
+    }
+  ]
+}
