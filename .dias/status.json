@@ -4,17 +4,17 @@
   "projectLabel": "TORC",
   "assessmentState": "scored",
   "assessmentScope": "current-milestone",
-  "percentComplete": 40,
+  "percentComplete": 60,
   "milestonePhase": "build-and-validate",
   "portfolioGroup": "agent-platform",
   "displayPriority": 500,
-  "assessedAt": "2026-11-20T11:17:54Z",
+  "assessedAt": "2026-11-20T12:22:15Z",
   "confidence": "reported",
   "currentMilestone": "Measure receiver-fitted carry against a compiled prompt on eight real interrupted tasks. P5 is merged; Mirror has a separate completed fixture experiment and partial native trial.",
-  "remainingSummary": "Qualify Claude usage capture and TORC analysis before running the 32 comparisons and publishing the result.",
-  "nextChipId": "torc:qualify-claude-accounting",
+  "remainingSummary": "Freeze the run order and measured settings, run the 32 benchmark assignments, score their outputs and publish the eight paired results.",
+  "nextChipId": "torc:carry-vs-prompt-comparison",
   "source": {
-    "label": "Two of five study stages are complete. Eight tasks have frozen prompts and verified scorers. The benchmark has zero runs.",
+    "label": "Three of five study stages are complete. All eight scorers and both accounting checks passed. The benchmark has zero runs.",
     "updatedAt": "2026-11-20"
   }
 }

@@ -11,7 +11,7 @@ five repositories are preserved and checked. See the
 [bound manifest](../evidence/2026-11-20-continuation-fixtures.json).
 The collection sections below retain the earlier unsuccessful intake history.
 The eight recovered tasks supersede the earlier six-candidate count. Benchmark
-admissions remain zero. Claude accounting and analysis still need qualification.
+admissions remain zero.
 
 The human review uses questions written for the specific case. Before reviewing real
 outputs, give both sides the same questions and name the cell, row, message or other
@@ -26,10 +26,15 @@ now frozen. Rebuilding them from the recovered inputs reproduced all sixteen
 prompts byte for byte. Windows scoring distinguished seven historical pairs. In
 a private Linux browser job, Tableforge's fixed settlement game passed all three
 tests and its interrupted version failed all three at game-page assertions.
-This completes stage 2. The next stage qualifies per-call usage capture in
-Autowork and the paired analysis in TORC. See the
+This completes stage 2. See the
 [preparation evidence](../evidence/2026-11-20-continuation-scorer-preparation.md)
 and [browser results](../evidence/2026-11-20-settlement-scorer-qualification.md).
+
+Stage 3 also passed. Two development assignments on Claude Code 2.1.325 used
+four CLI starts and produced six provider requests. The first-request and whole-assignment
+totals reconciled exactly for both workers and checkers. The next step is to freeze
+the 32-assignment schedule and run the paired comparison. Benchmark admissions
+remain zero. [Development results](../evidence/2026-11-20-claude-accounting-qualification.md)
 
 ## Goals and acceptance
 

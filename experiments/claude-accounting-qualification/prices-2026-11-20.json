@@ -1,0 +1,16 @@
+{
+  "as_of": "2026-11-20",
+  "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+  "unit": "USD per million tokens",
+  "basis": "First-party global, standard service and speed. Opus 5.5 has the same price throughout its context window.",
+  "usage_settings": {
+    "service_tier": ["standard"],
+    "inference_geo": ["global"],
+    "speed": ["standard"]
+  },
+  "models": {
+    "claude-opus-5-5": [
+      {"through": null, "fresh": 4, "write_5m": 5, "write_1h": 8, "read": 0.2, "output": 20}
+    ]
+  }
+}

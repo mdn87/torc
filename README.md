@@ -152,9 +152,10 @@ establishes mechanics only; token savings and live model trials remain unmeasure
 
 The follow-on study has eight real interrupted tasks with frozen prompts and review questions.
 Independent scoring distinguished the fixed and interrupted versions of all eight.
-The next step is to qualify Claude usage accounting before the first benchmark run.
-See the [browser scoring evidence](docs/evidence/2026-11-20-settlement-scorer-qualification.md)
-and the [two practice reviews](experiments/continuation-review/README.md).
+Claude usage accounting passed both development checks. The 32 benchmark assignments
+await their frozen run order. [Accounting results](docs/evidence/2026-11-20-claude-accounting-qualification.md)
+· [Browser scoring evidence](docs/evidence/2026-11-20-settlement-scorer-qualification.md)
+· [Practice reviews](experiments/continuation-review/README.md)
 
 ## Baseline setup
 

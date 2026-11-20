@@ -486,7 +486,7 @@
       "projectId": "torc",
       "title": "Qualify Claude usage capture and paired analysis",
       "summary": "Capture every worker and checker call in Autowork, then qualify a versioned TORC analyzer for both repetitions, cache categories and incomplete totals.",
-      "stage": "planned",
+      "stage": "done",
       "sequence": 68,
       "prereqs": [
         "torc:qualify-continuation-scoring"
@@ -496,7 +496,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-11-20T05:53:17.067Z",
-        "updatedAt": "2026-11-20T05:53:17.067Z"
+        "updatedAt": "2026-11-20T12:22:15Z"
       },
       "evidence": [
         {
@@ -504,6 +504,12 @@
           "at": "2026-11-20T05:53:17.067Z",
           "kind": "note",
           "message": "The study-specific accounting gate remains open: current analysis is v0 and the inspected Claude route uses final JSON. Qualify the owner and consumer before any benchmark."
+        },
+        {
+          "entryId": "ev:261120-claude-accounting-qualified",
+          "at": "2026-11-20T12:22:15Z",
+          "kind": "stage-change",
+          "message": "Both practice assignments passed. All six requests across four worker and checker starts reconciled exactly with Claude's totals."
         }
       ]
     },
@@ -513,7 +519,7 @@
       "projectId": "torc",
       "title": "Compare the shaped carry against a compiled prompt",
       "summary": "Run the frozen Claude-lane comparison of TORC projection against a compiled prompt on eight real tasks, then publish the result whether it wins or not.",
-      "stage": "blocked",
+      "stage": "planned",
       "sequence": 70,
       "prereqs": [
         "torc:p5-receiver-carry",
@@ -525,7 +531,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-09-27T19:40:44.000Z",
-        "updatedAt": "2026-11-20T11:17:54Z"
+        "updatedAt": "2026-11-20T12:22:15Z"
       },
       "evidence": [
         {
@@ -563,6 +569,12 @@
           "at": "2026-11-20T11:17:54Z",
           "kind": "note",
           "message": "All eight tasks have qualified scoring. The comparison awaits per-call Claude usage capture and analysis. Benchmark runs and paid spend are zero."
+        },
+        {
+          "entryId": "ev:261120-comparison-accounting-cleared",
+          "at": "2026-11-20T12:22:15Z",
+          "kind": "stage-change",
+          "message": "All eight tasks have qualified scoring and usage accounting. Freeze the run order before the first of 32 benchmark assignments. None have started."
         }
       ]
     },
