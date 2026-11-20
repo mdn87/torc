@@ -427,7 +427,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-11-20T05:53:17.067Z",
-        "updatedAt": "2026-11-20T06:21:40.326Z"
+        "updatedAt": "2026-11-20T06:46:19.913Z"
       },
       "evidence": [
         {
@@ -441,6 +441,12 @@
           "at": "2026-11-20T06:21:40.326Z",
           "kind": "note",
           "message": "Fixture feasibility is complete. Next freeze equal contexts and dependencies, protect reference solutions, and qualify good/broken scoring on the execution host."
+        },
+        {
+          "entryId": "ev:261120-human-review-design",
+          "at": "2026-11-20T06:46:19.913Z",
+          "kind": "note",
+          "message": "Operator approved a blinded review page with durable per-item answers and two practice cases. Implementation has not started; correctness and usage remain separate."
         }
       ]
     },
