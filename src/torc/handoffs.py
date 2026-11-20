@@ -8,6 +8,7 @@ from typing import Any
 
 from .canonical import canonical_json, seal_record, utc_now
 from .errors import HandoffError, LeaseConflictError
+from .holder import refresh_enrolled_holder
 from .ids import new_id, valid_id
 from .store import Store
 from .vocabulary import HANDOFF_REASON_CODES
@@ -336,6 +337,7 @@ def resolve_handoff(
                 resolved_at,
             ),
         )
+    refresh_enrolled_holder(store, snapshot["lineage_id"])
     return result
 
 

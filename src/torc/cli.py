@@ -171,6 +171,12 @@ def build_parser() -> argparse.ArgumentParser:
         "lineage", help="Operate a real local lineage through its authority lease."
     )
     lineage_commands = lineage.add_subparsers(dest="lineage_command", required=True)
+    publish_holder = lineage_commands.add_parser(
+        "publish-holder", help="Report the current holder and update after each accepted passage."
+    )
+    publish_holder.add_argument("--state-dir", type=Path, required=True)
+    publish_holder.add_argument("--lineage", required=True)
+    publish_holder.add_argument("--json", action="store_true", dest="as_json")
     lineage_create = lineage_commands.add_parser("create")
     lineage_create.add_argument("--state-dir", type=Path, required=True)
     lineage_create.add_argument("--lineage", required=True)
@@ -910,6 +916,13 @@ def main(argv: Sequence[str] | None = None) -> int:
             _print_payload(payload, args.as_json)
             return status
         if args.command == "lineage":
+            if args.lineage_command == "publish-holder":
+                from .holder import publish_holder
+
+                with Store(args.state_dir, must_exist=True) as store:
+                    path = publish_holder(store, args.lineage)
+                _print_payload({"ok": True, "holder_file": str(path)}, args.as_json)
+                return 0
             if args.lineage_command == "explain":
                 with Store(args.state_dir, read_only=True) as store:
                     payload = build_lineage_explanation(store, args.lineage)
