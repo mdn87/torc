@@ -19,6 +19,7 @@ from .errors import (
 from .fit import evaluate_fit
 from .handoffs import expected_reconstruction, prepare_handoff, resolve_handoff
 from .history import boundary_report, revision_chain
+from .holder import PUBLIC_LABEL
 from .ids import new_id, valid_id
 from .projections import compile_receiver_projection, receiver_budget
 from .rollbacks import apply_rollback
@@ -711,6 +712,13 @@ def validate_substrate(substrate: Any) -> None:
         raise InvalidInputError("substrate descriptor must be a JSON object")
     if not valid_id(substrate.get("substrate_id")):
         raise InvalidInputError("substrate descriptor requires a valid substrate_id")
+    if "board_label" in substrate:
+        if not isinstance(substrate["board_label"], str) or not PUBLIC_LABEL.fullmatch(
+            substrate["board_label"]
+        ):
+            raise InvalidInputError(
+                "board_label must be 1–32 public letters, digits, spaces or hyphens"
+            )
     for field in _SUBSTRATE_TEXT_LIST_FIELDS:
         if not _string_list(substrate.get(field)):
             raise InvalidInputError(

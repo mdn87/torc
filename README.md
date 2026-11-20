@@ -159,6 +159,8 @@ await their frozen run order. [Accounting results](docs/evidence/2026-11-20-clau
 
 ## Baseline setup
 
+An enrolled lineage can publish its last verified holder to a Dias project Board. An accepted handoff or recovery updates the Board automatically. [Board enrollment and passage instructions](docs/p2-pilot.md#show-who-holds-the-torc-on-the-dias-board)
+
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1

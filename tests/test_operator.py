@@ -11,6 +11,7 @@ from torc.canonical import canonical_json, seal_record
 from torc.cli import main
 from torc.errors import HandoffError, IntegrityError, LeaseConflictError
 from torc.handoffs import resolve_handoff
+from torc.holder import publish_holder
 from torc.operator import (
     checkpoint_operator_lineage,
     create_operator_lineage,
@@ -118,6 +119,70 @@ def _load_template(store: Store, prepared: dict[str, Any]) -> dict[str, Any]:
             encoding="utf-8"
         )
     )
+
+
+def test_board_follows_accepted_passage_only(tmp_path: Path, capsys) -> None:
+    with Store(tmp_path) as store:
+        _bootstrap(store)
+        publish = ["lineage", "publish-holder", "--state-dir", str(tmp_path),
+                   "--lineage", "torc-dev", "--json"]
+        assert main(publish) == 0
+        report = Path(json.loads(capsys.readouterr().out)["holder_file"])
+        initial = json.loads(report.read_text())
+        assert set(initial) == {"schemaVersion", "holderLabel", "holderTag", "heldSince"}
+        assert initial["holderLabel"] == "Session"
+        assert len(initial["holderTag"]) == 8
+        assert "activation-implementation" not in report.read_text()
+        for accepted in (False, True):
+            plan = _plan()
+            target = "activation-accepted" if accepted else "activation-rejected"
+            plan.update(target_activation_id=target)
+            plan["target_substrate"]["board_label"] = "Claude Code"
+            prepared = prepare_operator_handoff(
+                store, lineage_id="torc-dev", source_activation_id="activation-implementation",
+                plan=plan,
+            )
+            assert json.loads(report.read_text()) == initial
+            result = resolve_operator_handoff(
+                store, handoff_id=prepared["handoff_id"], target_activation_id=target,
+                reconstruction=_load_template(store, prepared) if accepted else {},
+            )
+            assert result["ok"] is accepted
+            if not accepted:
+                assert json.loads(report.read_text()) == initial
+        final = json.loads(report.read_text())
+        assert final["holderLabel"] == "Claude Code"
+        assert final["holderTag"] != initial["holderTag"]
+        lease = store.get_lease(result["current_authority"]["lease_id"])
+        assert final["heldSince"] == lease["issued_at"]
+        assert main(publish) == 0
+        assert json.loads(report.read_text()) == final
+
+
+def test_holder_write_failure_can_be_repaired_after_acceptance(tmp_path, monkeypatch, caplog):
+    with Store(tmp_path) as store:
+        created = _bootstrap(store)
+        report = publish_holder(store, "torc-dev")
+        initial = report.read_bytes()
+        prepared = prepare_operator_handoff(
+            store, lineage_id="torc-dev", source_activation_id=created["activation_id"],
+            plan=_plan(),
+        )
+        with monkeypatch.context() as patch:
+            def fail_replace(_source, _target):
+                raise PermissionError("display offline")
+
+            patch.setattr(Path, "replace", fail_replace)
+            result = resolve_operator_handoff(
+                store, handoff_id=prepared["handoff_id"], target_activation_id="activation-review",
+                reconstruction=_load_template(store, prepared),
+            )
+        assert result["ok"]
+        assert result["current_authority"]["activation_id"] == "activation-review"
+        assert "Retry lineage publish-holder" in caplog.text
+        assert report.read_bytes() == initial
+        publish_holder(store, "torc-dev")
+        assert report.read_bytes() != initial
 
 
 def test_authoritative_checkpoint_updates_status(tmp_path: Path) -> None:
@@ -443,6 +508,8 @@ def test_accepted_recovery_marks_source_failed_and_transfers_one_lease(
 ) -> None:
     with Store(tmp_path) as store:
         created = _bootstrap(store)
+        report = publish_holder(store, "torc-dev")
+        original = report.read_bytes()
         prepared = prepare_operator_recovery(
             store,
             lineage_id="torc-dev",
@@ -463,6 +530,7 @@ def test_accepted_recovery_marks_source_failed_and_transfers_one_lease(
         ).fetchall()
 
         assert resolved["disposition"] == "accepted"
+        assert report.read_bytes() != original
         assert store.get_activation(created["activation_id"])["state"] == "failed"
         assert store.get_activation(created["activation_id"])["ended_at"] is not None
         assert store.get_activation(prepared["target_activation_id"])["state"] == "active"

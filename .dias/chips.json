@@ -664,6 +664,58 @@
           "message": "Two local commits and a real native-turn receipt exist. Speech completed with audio submitted; audibility is unmeasured. Merge and sustained live proof remain unverified."
         }
       ]
+    },
+    {
+      "schemaVersion": 1,
+      "chipId": "torc:dias-holder",
+      "projectId": "torc",
+      "title": "Show the last TORC holder on the Dias Board",
+      "summary": "Publish the holder after accepted passage and show its public name, session tag and lease time on the project Board.",
+      "stage": "done",
+      "sequence": 110,
+      "prereqs": [],
+      "linkedRunIds": [],
+      "confidence": "reported",
+      "aheadOfPrereqs": null,
+      "timestamps": {
+        "createdAt": "2026-11-20T23:32:35.299Z",
+        "updatedAt": "2026-11-20T23:32:35.299Z"
+      },
+      "evidence": [
+        {
+          "entryId": "ev:torc-dias-holder-20261120",
+          "at": "2026-11-20T23:32:35.299Z",
+          "kind": "note",
+          "message": "A practice handoff kept the original holder after rejection and displayed the recipient after acceptance on both Dias hosts. Reload preserved the result."
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "chipId": "torc:holder-without-dias",
+      "projectId": "torc",
+      "title": "Show the TORC holder in sessions without Dias",
+      "summary": "Have compatible clients show the holder in their status bar. Other clients announce the holder on the first turn and when it changes.",
+      "stage": "planned",
+      "sequence": 120,
+      "prereqs": [
+        "torc:dias-holder"
+      ],
+      "linkedRunIds": [],
+      "confidence": "reported",
+      "aheadOfPrereqs": null,
+      "timestamps": {
+        "createdAt": "2026-11-20T23:32:35.299Z",
+        "updatedAt": "2026-11-20T23:32:35.299Z"
+      },
+      "evidence": [
+        {
+          "entryId": "ev:torc-holder-without-dias-20261120",
+          "at": "2026-11-20T23:32:35.299Z",
+          "kind": "note",
+          "message": "The fallback design specifies the report, when to announce a change, and what to show when the report is unavailable. Client hooks remain to be built."
+        }
+      ]
     }
   ]
 }
