@@ -150,10 +150,11 @@ including failed attempts, fallback, missing counters and cumulative updates.
 Its [synthetic replay report](docs/experiments/session-continuation-001/offline-milestone.md)
 establishes mechanics only; token savings and live model trials remain unmeasured.
 
-Eight real interrupted tasks have been recovered for the follow-on comparison. The
-[local human-review practice page](experiments/continuation-review/README.md) lets a reviewer
-try the rubric on two separate examples. Independent scorer qualification and per-call
-Claude accounting still precede the benchmark.
+The follow-on study has eight real interrupted tasks with frozen prompts and review questions.
+Independent scoring distinguished the fixed and interrupted versions of all eight.
+The next step is to qualify Claude usage accounting before the first benchmark run.
+See the [browser scoring evidence](docs/evidence/2026-11-20-settlement-scorer-qualification.md)
+and the [two practice reviews](experiments/continuation-review/README.md).
 
 ## Baseline setup
 

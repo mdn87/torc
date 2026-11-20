@@ -10,9 +10,8 @@ five repositories are preserved and checked. See the
 [recovery evidence](../evidence/2026-11-20-continuation-fixture-recovery.md) and
 [bound manifest](../evidence/2026-11-20-continuation-fixtures.json).
 The collection sections below retain the earlier unsuccessful intake history.
-Their six-candidate/zero-admission counts are superseded for fixture feasibility;
-benchmark admissions remain zero. Scorer/context and accounting qualification
-are still required before any comparison.
+The eight recovered tasks supersede the earlier six-candidate count. Benchmark
+admissions remain zero. Claude accounting and analysis still need qualification.
 
 The human review uses questions written for the specific case. Before reviewing real
 outputs, give both sides the same questions and name the cell, row, message or other
@@ -24,10 +23,13 @@ format. Independent automated correctness and usage accounting keep their own ga
 
 The eight case-specific question sets and both prompt files for every case are
 now frozen. Rebuilding them from the recovered inputs reproduced all sixteen
-prompts byte for byte. Historical controls have been exercised and the settlement
-browser's local connection is blocked on both isolated scorer hosts. The
-[stage 2 evidence](../evidence/2026-11-20-continuation-scorer-preparation.md)
-records the checks that ran and the requirement that remains.
+prompts byte for byte. Windows scoring distinguished seven historical pairs. In
+a private Linux browser job, Tableforge's fixed settlement game passed all three
+tests and its interrupted version failed all three at game-page assertions.
+This completes stage 2. The next stage qualifies per-call usage capture in
+Autowork and the paired analysis in TORC. See the
+[preparation evidence](../evidence/2026-11-20-continuation-scorer-preparation.md)
+and [browser results](../evidence/2026-11-20-settlement-scorer-qualification.md).
 
 ## Goals and acceptance
 

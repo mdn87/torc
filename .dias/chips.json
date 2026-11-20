@@ -417,7 +417,7 @@
       "projectId": "torc",
       "title": "Qualify scoring and freeze task context",
       "summary": "After eight tasks are eligible, bind source custody, equalize dependencies and prove independent scoring accepts good candidates and rejects broken ones.",
-      "stage": "blocked",
+      "stage": "done",
       "sequence": 66,
       "prereqs": [
         "torc:collect-continuation-fixtures"
@@ -427,7 +427,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-11-20T05:53:17.067Z",
-        "updatedAt": "2026-11-20T08:50:42Z"
+        "updatedAt": "2026-11-20T11:17:54Z"
       },
       "evidence": [
         {
@@ -471,6 +471,12 @@
           "at": "2026-11-20T08:50:42Z",
           "kind": "stage-change",
           "message": "Both prompts are frozen for all eight tasks. Seven passed isolated scoring controls. Both scorer hosts block the local connection the settlement browser needs."
+        },
+        {
+          "entryId": "ev:261120-private-browser-qualified",
+          "at": "2026-11-20T11:17:54Z",
+          "kind": "stage-change",
+          "message": "All eight scorers distinguish the historical versions. The fixed settlement game passed all three browser tests in isolation, and the interrupted game failed all three."
         }
       ]
     },
@@ -519,7 +525,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-09-27T19:40:44.000Z",
-        "updatedAt": "2026-11-20T08:50:42Z"
+        "updatedAt": "2026-11-20T11:17:54Z"
       },
       "evidence": [
         {
@@ -551,6 +557,12 @@
           "at": "2026-11-20T08:50:42Z",
           "kind": "note",
           "message": "No benchmark has run. The settlement browser needs a private local connection in the scorer. Claude usage accounting still needs qualification."
+        },
+        {
+          "entryId": "ev:261120-comparison-awaits-accounting",
+          "at": "2026-11-20T11:17:54Z",
+          "kind": "note",
+          "message": "All eight tasks have qualified scoring. The comparison awaits per-call Claude usage capture and analysis. Benchmark runs and paid spend are zero."
         }
       ]
     },
