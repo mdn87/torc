@@ -8,13 +8,13 @@
   "milestonePhase": "build-and-validate",
   "portfolioGroup": "agent-platform",
   "displayPriority": 500,
-  "assessedAt": "2026-10-31T02:20:22.000Z",
+  "assessedAt": "2026-11-20T05:53:17.067Z",
   "confidence": "reported",
-  "currentMilestone": "Measure whether TORC's receiver-fitted carry cuts continuation usage versus a compiled prompt on eight real interrupted tasks. The P5 carry is merged.",
-  "remainingSummary": "Admit eight real tasks (six candidates kept, none admitted), qualify usage capture and scoring, then run and publish the comparison. LIR use and recovery stay open.",
+  "currentMilestone": "Measure receiver-fitted carry against a compiled prompt on eight real interrupted tasks. P5 is merged; Mirror has a separate completed fixture experiment and partial native trial.",
+  "remainingSummary": "Admit eight tasks, qualify scoring and Claude accounting, then compare. Mirror native work is unmerged; sustained LIR use and recovery proof remain open.",
   "nextChipId": "torc:collect-continuation-fixtures",
   "source": {
-    "label": "Git log and plans through 2026-10-22 on master, master CI green 2026-10-22, local test run 2026-10-31 (one failure, see handoff)",
-    "updatedAt": "2026-10-31"
+    "label": "November 20 review of fetched master, local native-trial commits, plans and retained receipts; current local checks recorded in handoff.",
+    "updatedAt": "2026-11-20"
   }
 }

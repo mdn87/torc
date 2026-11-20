@@ -17,7 +17,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-08-27T07:12:00.000Z",
-        "updatedAt": "2026-09-04T02:15:47.000Z"
+        "updatedAt": "2026-11-20T05:53:17.067Z"
       },
       "evidence": [
         {
@@ -37,6 +37,12 @@
           "at": "2026-09-04T02:15:47.000Z",
           "kind": "note",
           "message": "LIR selected as the consuming workflow: TORC checkpoint authority (cc4fa8f), grants gate continuations (8bc6c77) and thread closure (b6c8fdb), committed since 2026-08-27."
+        },
+        {
+          "entryId": "ev:261120-torc-select-operator-workflow",
+          "at": "2026-11-20T05:53:17.067Z",
+          "kind": "note",
+          "message": "Rechecked: LIR checkpoint decisions and continuation grants are implemented. Selection remains complete; sustained-use proof is separate."
         }
       ]
     },
@@ -56,7 +62,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-08-27T07:12:00.000Z",
-        "updatedAt": "2026-10-31T02:20:22.000Z"
+        "updatedAt": "2026-11-20T05:53:17.067Z"
       },
       "evidence": [
         {
@@ -88,6 +94,12 @@
           "at": "2026-10-31T02:20:22.000Z",
           "kind": "note",
           "message": "Still no grant-consumption evidence in this repo through 2026-10-22; effort went to P5 and continuation measurement. Window stays open but is not being worked."
+        },
+        {
+          "entryId": "ev:261120-torc-run-sustained-consumption",
+          "at": "2026-11-20T05:53:17.067Z",
+          "kind": "note",
+          "message": "No completed proof window found. Current TORC thread has no accepted checkpoint; local authority tests do not establish sustained operator use."
         }
       ]
     },
@@ -107,7 +119,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-08-27T07:12:00.000Z",
-        "updatedAt": "2026-10-31T02:20:22.000Z"
+        "updatedAt": "2026-11-20T05:53:17.067Z"
       },
       "evidence": [
         {
@@ -127,6 +139,12 @@
           "at": "2026-10-31T02:20:22.000Z",
           "kind": "note",
           "message": "Roadmap lists recovery, rollback and branch as implemented locally; no exercise inside the selected operator workflow is recorded. Stage unchanged."
+        },
+        {
+          "entryId": "ev:261120-torc-exercise-recovery-path",
+          "at": "2026-11-20T05:53:17.067Z",
+          "kind": "note",
+          "message": "Recovery, rollback and branching are implemented locally. No retained exercise in the selected operator workflow was found; this step remains planned."
         }
       ]
     },
@@ -147,7 +165,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-08-27T07:12:00.000Z",
-        "updatedAt": "2026-08-27T07:12:00.000Z"
+        "updatedAt": "2026-11-20T05:53:17.067Z"
       },
       "evidence": [
         {
@@ -155,6 +173,12 @@
           "at": "2026-08-27T07:12:00.000Z",
           "kind": "created",
           "message": "Derived from the 2026-08-27 milestone report; operator review required before commit."
+        },
+        {
+          "entryId": "ev:261120-torc-retain-operator-evidence",
+          "at": "2026-11-20T05:53:17.067Z",
+          "kind": "note",
+          "message": "Still waits for a sustained-use window and an operator-workflow recovery exercise. Mirror fixture results do not satisfy either prerequisite."
         }
       ]
     },
@@ -172,7 +196,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-09-27T19:40:44.000Z",
-        "updatedAt": "2026-09-27T19:40:44.000Z"
+        "updatedAt": "2026-11-20T05:53:17.067Z"
       },
       "evidence": [
         {
@@ -186,6 +210,12 @@
           "at": "2026-09-27T19:40:44.000Z",
           "kind": "note",
           "message": "Merged 2026-09-19: schemas ship in the wheel, only create may make a database, inspect is read-only, and CI smokes an artifact command from the installed wheel."
+        },
+        {
+          "entryId": "ev:261120-torc-harden-cli-packaging",
+          "at": "2026-11-20T05:53:17.067Z",
+          "kind": "note",
+          "message": "Rechecked merged CLI validation and packaged schemas. This implementation step stays done; current verification is recorded in the project assessment."
         }
       ]
     },
@@ -205,7 +235,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-09-27T19:40:44.000Z",
-        "updatedAt": "2026-10-31T02:20:22.000Z"
+        "updatedAt": "2026-11-20T05:53:17.067Z"
       },
       "evidence": [
         {
@@ -249,6 +279,39 @@
           "at": "2026-10-31T02:20:22.000Z",
           "kind": "note",
           "message": "Master CI and host-identifier workflows both succeeded on 2026-10-22, read from the run list. The 2026-10-21 readiness record reports 915 local tests passing."
+        },
+        {
+          "entryId": "ev:261120-torc-p5-receiver-carry",
+          "at": "2026-11-20T05:53:17.067Z",
+          "kind": "note",
+          "message": "Receiver-fitted carry and capsule consumption remain merged. Deterministic coverage proves mechanics, not a benefit over compiled prompts."
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "chipId": "torc:tuan-projection-correlation",
+      "projectId": "torc",
+      "title": "Link projections to Tuan correlation records",
+      "summary": "Append identifier-only correlation records after projection insertion without changing sealed payloads or lineage authority.",
+      "stage": "done",
+      "sequence": 61,
+      "prereqs": [
+        "torc:p5-receiver-carry"
+      ],
+      "linkedRunIds": [],
+      "confidence": "reported",
+      "aheadOfPrereqs": null,
+      "timestamps": {
+        "createdAt": "2026-11-20T05:53:17.067Z",
+        "updatedAt": "2026-11-20T05:53:17.067Z"
+      },
+      "evidence": [
+        {
+          "entryId": "ev:261120-torc-tuan-projection-correlation",
+          "at": "2026-11-20T05:53:17.067Z",
+          "kind": "note",
+          "message": "Merged November 2 with ADR 0006 and tests. This proves the optional sidecar mechanism; current Tuan diagnostics report no observed TORC correlation hits."
         }
       ]
     },
@@ -268,7 +331,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-10-31T02:20:22.000Z",
-        "updatedAt": "2026-10-31T02:20:22.000Z"
+        "updatedAt": "2026-11-20T05:53:17.067Z"
       },
       "evidence": [
         {
@@ -288,6 +351,12 @@
           "at": "2026-10-31T02:20:22.000Z",
           "kind": "note",
           "message": "Where both portable arms passed, the TORC capsule reported 44% more input tokens than the compiled prompt. One pair on one workload, not a population effect."
+        },
+        {
+          "entryId": "ev:261120-torc-continuation-diagnostic-pilot",
+          "at": "2026-11-20T05:53:17.067Z",
+          "kind": "note",
+          "message": "The historical diagnostic remains complete with no ranking or savings claim. Historical replay support now preserves its pinned runtime and results."
         }
       ]
     },
@@ -307,7 +376,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-10-31T02:20:22.000Z",
-        "updatedAt": "2026-10-31T02:20:22.000Z"
+        "updatedAt": "2026-11-20T05:53:17.067Z"
       },
       "evidence": [
         {
@@ -327,6 +396,66 @@
           "at": "2026-10-31T02:20:22.000Z",
           "kind": "note",
           "message": "The repo shows no collection work after 2026-10-21 and the plan installs no watcher. Cases must come from naturally stopped work, not manufactured pauses."
+        },
+        {
+          "entryId": "ev:261120-torc-collect-continuation-fixtures",
+          "at": "2026-11-20T05:53:17.067Z",
+          "kind": "note",
+          "message": "Latest collection record still reports six candidates across three repositories and zero admissions. Missing task history and acceptance evidence keep the gate open."
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "chipId": "torc:qualify-continuation-scoring",
+      "projectId": "torc",
+      "title": "Qualify scoring and freeze task context",
+      "summary": "After eight tasks are eligible, bind source custody, equalize dependencies and prove independent scoring accepts good candidates and rejects broken ones.",
+      "stage": "planned",
+      "sequence": 66,
+      "prereqs": [
+        "torc:collect-continuation-fixtures"
+      ],
+      "linkedRunIds": [],
+      "confidence": "reported",
+      "aheadOfPrereqs": null,
+      "timestamps": {
+        "createdAt": "2026-11-20T05:53:17.067Z",
+        "updatedAt": "2026-11-20T05:53:17.067Z"
+      },
+      "evidence": [
+        {
+          "entryId": "ev:261120-torc-qualify-continuation-scoring",
+          "at": "2026-11-20T05:53:17.067Z",
+          "kind": "note",
+          "message": "The authorized study requires host-specific scoring and context qualification after fixture feasibility. Prior diagnostic scorer receipts alone do not admit this cohort."
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "chipId": "torc:qualify-claude-accounting",
+      "projectId": "torc",
+      "title": "Qualify Claude usage capture and paired analysis",
+      "summary": "Capture every worker and checker call in Autowork, then qualify a versioned TORC analyzer for both repetitions, cache categories and incomplete totals.",
+      "stage": "planned",
+      "sequence": 68,
+      "prereqs": [
+        "torc:qualify-continuation-scoring"
+      ],
+      "linkedRunIds": [],
+      "confidence": "reported",
+      "aheadOfPrereqs": null,
+      "timestamps": {
+        "createdAt": "2026-11-20T05:53:17.067Z",
+        "updatedAt": "2026-11-20T05:53:17.067Z"
+      },
+      "evidence": [
+        {
+          "entryId": "ev:261120-torc-qualify-claude-accounting",
+          "at": "2026-11-20T05:53:17.067Z",
+          "kind": "note",
+          "message": "The study-specific accounting gate remains open: current analysis is v0 and the inspected Claude route uses final JSON. Qualify the owner and consumer before any benchmark."
         }
       ]
     },
@@ -336,18 +465,19 @@
       "projectId": "torc",
       "title": "Compare the shaped carry against a compiled prompt",
       "summary": "Run the frozen Claude-lane comparison of TORC projection against a compiled prompt on eight real tasks, then publish the result whether it wins or not.",
-      "stage": "planned",
+      "stage": "blocked",
       "sequence": 70,
       "prereqs": [
         "torc:p5-receiver-carry",
-        "torc:collect-continuation-fixtures"
+        "torc:collect-continuation-fixtures",
+        "torc:qualify-claude-accounting"
       ],
       "linkedRunIds": [],
       "confidence": "reported",
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-09-27T19:40:44.000Z",
-        "updatedAt": "2026-10-31T02:20:22.000Z"
+        "updatedAt": "2026-11-20T05:53:17.067Z"
       },
       "evidence": [
         {
@@ -361,6 +491,12 @@
           "at": "2026-10-31T02:20:22.000Z",
           "kind": "note",
           "message": "Scope set 2026-10-21: needs eight real tasks, per-call usage capture in the execution owner and scorer qualification before admission. The $2 paid ceiling stands."
+        },
+        {
+          "entryId": "ev:261120-torc-carry-vs-prompt-comparison",
+          "at": "2026-11-20T05:53:17.067Z",
+          "kind": "note",
+          "message": "Blocked: zero of eight real tasks are admitted. Scorer qualification and per-call Claude accounting must follow fixture admission before comparison; $2 ceiling remains."
         }
       ]
     },
@@ -380,7 +516,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-09-27T19:40:44.000Z",
-        "updatedAt": "2026-09-27T19:40:44.000Z"
+        "updatedAt": "2026-11-20T05:53:17.067Z"
       },
       "evidence": [
         {
@@ -388,6 +524,66 @@
           "at": "2026-09-27T19:40:44.000Z",
           "kind": "created",
           "message": "Deferred items from the P5 doc: blocking enforcement waits for evidence from use; history before a branch point is not read."
+        },
+        {
+          "entryId": "ev:261120-torc-blocking-boundary-asks",
+          "at": "2026-11-20T05:53:17.067Z",
+          "kind": "note",
+          "message": "Still deferred until actual use justifies enforcement or cross-branch history. The unrun comparison provides no new evidence to advance this step."
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "chipId": "torc:mirror-first-experiment",
+      "projectId": "torc",
+      "title": "Complete the deterministic Mirror response experiment",
+      "summary": "Resolve scoped response settings, preserve required facts across an accepted handoff, and validate the text and speech delivery contract on fixtures.",
+      "stage": "done",
+      "sequence": 90,
+      "prereqs": [
+        "torc:p5-receiver-carry"
+      ],
+      "linkedRunIds": [],
+      "confidence": "reported",
+      "aheadOfPrereqs": null,
+      "timestamps": {
+        "createdAt": "2026-11-20T05:53:17.067Z",
+        "updatedAt": "2026-11-20T05:53:17.067Z"
+      },
+      "evidence": [
+        {
+          "entryId": "ev:261120-torc-mirror-first-experiment",
+          "at": "2026-11-20T05:53:17.067Z",
+          "kind": "note",
+          "message": "Merged PR 36 on November 6: 20 of 20 required facts retained, 40 JavaScript adapter cases passed, zero added model calls. Synthetic results do not prove live adaptation."
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "chipId": "torc:mirror-native-trial",
+      "projectId": "torc",
+      "title": "Finish and land the native Mirror trial",
+      "summary": "Complete the unmerged native adapter trial with repeated-turn and interruption evidence, verified runtime activation, and honest playback limits.",
+      "stage": "active",
+      "sequence": 100,
+      "prereqs": [
+        "torc:mirror-first-experiment"
+      ],
+      "linkedRunIds": [],
+      "confidence": "reported",
+      "aheadOfPrereqs": null,
+      "timestamps": {
+        "createdAt": "2026-11-20T05:53:17.067Z",
+        "updatedAt": "2026-11-20T05:53:17.067Z"
+      },
+      "evidence": [
+        {
+          "entryId": "ev:261120-torc-mirror-native-trial",
+          "at": "2026-11-20T05:53:17.067Z",
+          "kind": "note",
+          "message": "Two local commits and a real native-turn receipt exist. Speech completed with audio submitted; audibility is unmeasured. Merge and sustained live proof remain unverified."
         }
       ]
     }
