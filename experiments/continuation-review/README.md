@@ -62,7 +62,8 @@ Keep the original database and its source version to resume the original review.
 The page records human judgments only. Automated correctness comes from the independent
 scorer. Measured efficiency comes from the execution owner's usage ledger. A human
 preference cannot change either outcome. The practice batch contains no arm identities,
-test verdicts or usage measurements. Scorer qualification and benchmark admission remain open.
+test verdicts or usage measurements. All eight independent scorers have passed their
+historical controls. Benchmark admission awaits Claude usage accounting.
 
 ## Prepare the eight real cases
 
@@ -87,8 +88,10 @@ The comparison can collect answers once it has real, blinded result artifacts.
 
 The top-level `preparation.json` appears after all eight cases finish. Compare
 its SHA-256 with the published preparation receipt to verify a reconstruction.
-The [offline evidence](../../docs/evidence/2026-11-20-continuation-scorer-preparation.md)
-records the control checks and the remaining scorer requirement.
+The [preparation evidence](../../docs/evidence/2026-11-20-continuation-scorer-preparation.md)
+records the first seven isolated control pairs. The [settlement browser
+qualification](../../docs/evidence/2026-11-20-settlement-scorer-qualification.md)
+records the eighth pair and explains how to reproduce the browser checks.
 
 ## Verify the interface
 

@@ -4,17 +4,17 @@
   "projectLabel": "TORC",
   "assessmentState": "scored",
   "assessmentScope": "current-milestone",
-  "percentComplete": 35,
+  "percentComplete": 40,
   "milestonePhase": "build-and-validate",
   "portfolioGroup": "agent-platform",
   "displayPriority": 500,
-  "assessedAt": "2026-11-20T08:50:42Z",
+  "assessedAt": "2026-11-20T11:17:54Z",
   "confidence": "reported",
   "currentMilestone": "Measure receiver-fitted carry against a compiled prompt on eight real interrupted tasks. P5 is merged; Mirror has a separate completed fixture experiment and partial native trial.",
-  "remainingSummary": "Qualify a private local connection for the settlement browser, then qualify Claude usage accounting before running the eight-task comparison.",
-  "nextChipId": "torc:qualify-continuation-scoring",
+  "remainingSummary": "Qualify Claude usage capture and TORC analysis before running the 32 comparisons and publishing the result.",
+  "nextChipId": "torc:qualify-claude-accounting",
   "source": {
-    "label": "Both prompts are frozen for eight tasks. Seven passed isolated scoring controls. The settlement browser cannot reach its game host inside either scorer.",
+    "label": "Two of five study stages are complete. Eight tasks have frozen prompts and verified scorers. The benchmark has zero runs.",
     "updatedAt": "2026-11-20"
   }
 }

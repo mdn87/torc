@@ -1,0 +1,154 @@
+{
+  "benchmark_admissions": 0,
+  "boundary_probe_sha256": "05aa6de4f3946644ac2b8c4c8b1abcec7b6b0acb5adecb519bccc6d83152ab9e",
+  "bubblewrap_sha256": "d78807229d616606e339c5988392b9e0ab4a6a6998fa51e4590837f426a12fca",
+  "case": "tableforge-settlement-renderer",
+  "controls": {
+    "interrupted": {
+      "browser": {
+        "exit": 1,
+        "interrupted": false,
+        "owner": {
+          "action": "closed",
+          "completed": true,
+          "identity_verified": true,
+          "kind": "posix_pgid",
+          "owner_id": 4794,
+          "supervisor_pid": 4794
+        },
+        "owner_record_sha256": "27881dc08389faf7cfe0aba6ec98bcba69e61aa628bcc1abf3ad21cdf167c601",
+        "run_id": "0ba36c5f99e2462c9585c3c3d8966fb3",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_sha256": "b9fcc98e8deb552a4b9812d9b3524d479180c75b93ac9a52fe6ba72b001f68f6",
+        "timed_out": false
+      },
+      "build": {
+        "exit": 0,
+        "interrupted": false,
+        "owner": {
+          "action": "closed",
+          "completed": true,
+          "identity_verified": true,
+          "kind": "posix_pgid",
+          "owner_id": 4274,
+          "supervisor_pid": 4274
+        },
+        "owner_record_sha256": "773967255196e8df133ed96d38427d3fd73a08380e2a1b6de538df2e74bb4b37",
+        "run_id": "a585237bcbcd4ba48a3dea35a8c4803c",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_sha256": "8af4144ec0bad07166f029d092eb7344acdedabb8351af25478edea7bb7b2ea1",
+        "timed_out": false
+      },
+      "build_outputs_sha256": "361f6afa00812cf2bd472c19482ea05505633ffd156da0fd799c345def8ddd7f",
+      "candidate_sha256": "3f1d7c4160057df7627229ad7529367290c00d6637d570f8a15daad730cd3315",
+      "dependencies_sha256": "be644f2b6126edc25caa4b21ac1f04f6a50caf1c911ad8d681ced2daaf92ac40",
+      "oracle_sha256": "4dcd677a832b6c0c6f34479832ee8bf2fa2fa21ed3f6118e703030930abba95d",
+      "status": "behavior_failed",
+      "tests": {
+        "a wrong token is refused on the page and a display token cannot take a seat": "failed",
+        "the alternate package swaps the BE edge for AC and the page offers only what the package defines": "failed",
+        "two seats and the public board play the opening through the real pages": "failed"
+      }
+    },
+    "reference": {
+      "browser": {
+        "exit": 0,
+        "interrupted": false,
+        "owner": {
+          "action": "closed",
+          "completed": true,
+          "identity_verified": true,
+          "kind": "posix_pgid",
+          "owner_id": 4106,
+          "supervisor_pid": 4106
+        },
+        "owner_record_sha256": "0e77c9ecd5bff019edd0b19e25d3eb8985094bbe49f14077efd605c643cee7ef",
+        "run_id": "34b628442aac494291ef1e944ae66569",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_sha256": "950a5b38c7c580b6c335d69ffc4783e5661b04b66c9f99a01979ba31a3ab0877",
+        "timed_out": false
+      },
+      "build": {
+        "exit": 0,
+        "interrupted": false,
+        "owner": {
+          "action": "closed",
+          "completed": true,
+          "identity_verified": true,
+          "kind": "posix_pgid",
+          "owner_id": 3577,
+          "supervisor_pid": 3577
+        },
+        "owner_record_sha256": "178446f284dea3c9da29ec91796b436a9a9066deab9d9a323c883bb6b08ca1bd",
+        "run_id": "0ec3e6f13c734df186f929731df8da84",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_sha256": "9ecdd2874e8d36a0dae24291e2d460c1dbc8d5c6e90f9c5e880697591a9949c8",
+        "timed_out": false
+      },
+      "build_outputs_sha256": "c86124717138030ffc31b09986411df7ea97428214ca3b433bd5d209c1f4c83e",
+      "candidate_sha256": "6c678574f24d23d1e77e8be9a2986cccc3b94647b0a25be897996e4b9622f52a",
+      "dependencies_sha256": "be644f2b6126edc25caa4b21ac1f04f6a50caf1c911ad8d681ced2daaf92ac40",
+      "oracle_sha256": "4dcd677a832b6c0c6f34479832ee8bf2fa2fa21ed3f6118e703030930abba95d",
+      "status": "accepted",
+      "tests": {
+        "a wrong token is refused on the page and a display token cannot take a seat": "passed",
+        "the alternate package swaps the BE edge for AC and the page offers only what the package defines": "passed",
+        "two seats and the public board play the opening through the real pages": "passed"
+      }
+    }
+  },
+  "experimental_model_calls": 0,
+  "experimental_spend_usd": 0,
+  "human_reviews_of_real_cases": 0,
+  "isolated_control_pairs": 8,
+  "isolation": {
+    "observed": {
+      "external_witness_connect": "ENETUNREACH",
+      "host_loopback_connect": "ECONNREFUSED",
+      "input_open_for_writing": "EROFS",
+      "interfaces": [
+        "lo"
+      ],
+      "ipv4_default_routes": [],
+      "private_file_open": "ENOENT",
+      "read_own_file": true,
+      "runtime_open_for_writing": "EROFS",
+      "same_job_connection": true
+    },
+    "outside_witnesses_reachable_before_job": true,
+    "terminal": {
+      "exit": 0,
+      "interrupted": false,
+      "owner": {
+        "action": "closed",
+        "completed": true,
+        "identity_verified": true,
+        "kind": "posix_pgid",
+        "owner_id": 3573,
+        "supervisor_pid": 3573
+      },
+      "owner_record_sha256": "de11973922d117a5b9064970a11988f015ee2300b1c3697095946a04eed3bf0d",
+      "run_id": "573654746b354fbda0ef14cd8b213e36",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "01c47784d811fa876b23f8f27f4c5bd9a9f8024d53852a849fef282c3716cc8d",
+      "timed_out": false
+    }
+  },
+  "owner_commit": "8c83f3b917631c7caaf4563ee0f773a7ba4ca4c5",
+  "owner_sources_sha256": {
+    "src/autowork/campaign/owned_subprocess.py": "a31ecb4d54d2b591b71f899b176c174b8244650e78c727a08e19d107592d9532",
+    "src/autowork/campaign/private_browser_job.py": "b912d61a868e6241c0885fe21a7b6e936ea33f2f2569a426a8766ee2888ef178",
+    "src/autowork/campaign/process_owner.py": "809fb94060ae5be5a776263e8241b1bc3920a6812b9866d1ab33e35e6602feca",
+    "src/autowork/campaign/route_supervisor.py": "d6a0f8e1f7e24d1eb7529a4161ba60263358ae476f22c8dceed92507cb22e73e"
+  },
+  "preparation_sha256": "743f9cd5babd40b660fc87dd594d13ce72d742f620d7236057c83a928ec59ea1",
+  "prior_evidence_sha256": "f8871ec40a6ff5bb9695873945167ba6737a1a83159e3325d73e837ce02efe3d",
+  "qualification_program_sha256": "7774add299cc9648b094795bbfb807c2eb3c5d49e4acbca84e8c14a39812c3e0",
+  "runtime": {
+    "ms-playwright/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrome-headless-shell": "d34f5d1962280380a576c40cd50139f11d0ed0cfb17f69dad37e8cc8fd2b73fa",
+    "tools/pnpm/package/bin/pnpm.cjs": "b276da51dc8ca5b0d3ee3371695b50fc8b3244b281b091c63a3f082a88dadeb9",
+    "usr/bin/node": "0adde40d1b7dfa57c8bc83cbc319758c3ec6ebba21363bb2fa752ea6b267ad1b"
+  },
+  "source_sha256": "5d9b5952978a64aba4e6c3a9d1a124d1f87764be0b14bb3e9ef4ff0fb7cd7e6b",
+  "version": 1
+}
