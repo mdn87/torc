@@ -417,7 +417,7 @@
       "projectId": "torc",
       "title": "Qualify scoring and freeze task context",
       "summary": "After eight tasks are eligible, bind source custody, equalize dependencies and prove independent scoring accepts good candidates and rejects broken ones.",
-      "stage": "active",
+      "stage": "blocked",
       "sequence": 66,
       "prereqs": [
         "torc:collect-continuation-fixtures"
@@ -427,7 +427,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-11-20T05:53:17.067Z",
-        "updatedAt": "2026-11-20T07:52:11Z"
+        "updatedAt": "2026-11-20T08:50:42Z"
       },
       "evidence": [
         {
@@ -465,6 +465,12 @@
           "at": "2026-11-20T07:52:11Z",
           "kind": "note",
           "message": "Both practice batches are locked and exported. The pickup card now says what worked and what remained. The wording used for scoring is preserved."
+        },
+        {
+          "entryId": "ev:261120-isolated-control-pairs",
+          "at": "2026-11-20T08:50:42Z",
+          "kind": "stage-change",
+          "message": "Both prompts are frozen for all eight tasks. Seven passed isolated scoring controls. Both scorer hosts block the local connection the settlement browser needs."
         }
       ]
     },
@@ -513,7 +519,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-09-27T19:40:44.000Z",
-        "updatedAt": "2026-11-20T06:21:40.326Z"
+        "updatedAt": "2026-11-20T08:50:42Z"
       },
       "evidence": [
         {
@@ -539,6 +545,12 @@
           "at": "2026-11-20T06:21:40.326Z",
           "kind": "note",
           "message": "The eight-task data gate is cleared. Scorer/context and per-call accounting qualification still precede comparison. No benchmark calls; the $2 ceiling stands."
+        },
+        {
+          "entryId": "ev:261120-settlement-scoring-hold",
+          "at": "2026-11-20T08:50:42Z",
+          "kind": "note",
+          "message": "No benchmark has run. The settlement browser needs a private local connection in the scorer. Claude usage accounting still needs qualification."
         }
       ]
     },

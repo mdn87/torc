@@ -64,6 +64,32 @@ scorer. Measured efficiency comes from the execution owner's usage ledger. A hum
 preference cannot change either outcome. The practice batch contains no arm identities,
 test verdicts or usage measurements. Scorer qualification and benchmark admission remain open.
 
+## Prepare the eight real cases
+
+From a TORC checkout with the private November 20 intake and TORC installed, run
+the following command with a new destination.
+
+```powershell
+.\.venv\Scripts\python.exe experiments/continuation-review/prepare_cohort.py .torc/heldout-preparation
+```
+
+Each case has a `shared` directory with the checked starting files and a short
+briefing from the interruption. Both approaches receive those same files. The
+two files under `prompts` hold the exact alternative requests. A future worker
+receives one prompt. The SQLite preparation store, reviewer material and control
+receipts belong to the operator.
+
+`review.json` holds each question and the expected value to put beside the
+observed result on both sides. An observation the result does not show gets
+**Cannot judge**. The compiled reviewer packet also contains the questions about
+which result the reviewer would use and which visible detail led to that choice.
+The comparison can collect answers once it has real, blinded result artifacts.
+
+The top-level `preparation.json` appears after all eight cases finish. Compare
+its SHA-256 with the published preparation receipt to verify a reconstruction.
+The [offline evidence](../../docs/evidence/2026-11-20-continuation-scorer-preparation.md)
+records the control checks and the remaining scorer requirement.
+
 ## Verify the interface
 
 The storage and submission checks run with the TORC test suite. The browser test uses
