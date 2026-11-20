@@ -1,0 +1,312 @@
+{
+  "schema_version": 1,
+  "status": "fixture-feasibility-complete",
+  "stage": 1,
+  "candidate_count": 8,
+  "repository_count": 5,
+  "benchmark_admissions": 0,
+  "model_calls": 0,
+  "paid_spend_usd": 0,
+  "private_artifact_root": ".torc/fixture-intake/2026-11-20",
+  "candidates": [
+    {
+      "candidate_id": "cormac-powershell-quotes",
+      "repository": "cormac",
+      "title": "PowerShell quotation parsing",
+      "stage_1_eligible": true,
+      "benchmark_admitted": false,
+      "boundary_kind": "user_interruption",
+      "boundary_timestamp": "2026-10-15T06:18:40.431Z",
+      "source_prefix_sha256": "37fc0dfc9e1a236ee85ef953ef3f1dbdb7a45dbc4d8729bbe8bf0f6d2bcdc7a7",
+      "source_prefix_bytes": 6528338,
+      "base_commit": "b32aaae627d8181c1d182473744ecf233941754c",
+      "reference_commit": "915b8003718a0a457fdecba5396fcc95c536ad77",
+      "tree_manifest_sha256": "5ca3f1ad526894eeb8ead5dd8e6044d3ce3ef315b6191a767d5a315ec4829462",
+      "history_sha256": "ab4695f2dc9ec1454d8deae819e80a6ef93bfc7b150d1505f4ebe9eea9d51831",
+      "editable_files": [
+        "hooks/cormac_hook.py"
+      ],
+      "source_custody": "Checkpoint archive; pre-stop edits were previously matched byte-for-byte to the changed file.",
+      "feasibility_result": "4 failed and 8 passed; reference 12 passed.",
+      "evidence": [
+        {
+          "artifact": "cormac-powershell-quotes/feasibility/interrupted.log",
+          "sha256": "8e16663801c0075de25ee2fe4e658e800fa68611aa910ec6224bc4c3774d371a"
+        },
+        {
+          "artifact": "cormac-powershell-quotes/feasibility/reference.log",
+          "sha256": "455b8f428472bc8abba64a0a486ce32ed860c4935129f2f09ecc253ae20d4f9c"
+        }
+      ]
+    },
+    {
+      "candidate_id": "tableforge-coordinator",
+      "repository": "tableforge",
+      "title": "Coordinator roster and failover state",
+      "stage_1_eligible": true,
+      "benchmark_admitted": false,
+      "boundary_kind": "recorded_auto_compaction",
+      "boundary_timestamp": "2026-09-23T03:34:58.519Z",
+      "source_prefix_sha256": "fc1bfc23c279e26559f975d2ac0f1cb087e9e51c374e6bacc41faea77aff6593",
+      "source_prefix_bytes": 19983473,
+      "base_commit": "02ded670877a8d52281e5099ee2e6376d53d82ed",
+      "reference_commit": "071bdee19912440655a13eb99a28186bd846f685",
+      "tree_manifest_sha256": "85c5e398716b7f9cf84457b09b61d8355432ef54028fec031d5ec498381a15b1",
+      "history_sha256": "e39098c00fd66b688db2cf78a2eec2ffdbd0f8ef80aa71b1aedf0aabb74ebb51",
+      "editable_files": [
+        "packages/session-coordinator/src/modes.ts",
+        "packages/session-coordinator/src/attribution.ts",
+        "packages/session-coordinator/src/session.ts",
+        "packages/session-coordinator/src/gate.ts",
+        "packages/session-coordinator/src/index.ts"
+      ],
+      "source_custody": "Base plus 16 recorded operations; lockfile from original child commit 092be94, before its rebase onto parallel core work.",
+      "feasibility_result": "5 failed and 66 passed; reference 71 passed.",
+      "evidence": [
+        {
+          "artifact": "tableforge-coordinator/feasibility/interrupted-2.log",
+          "sha256": "1e298a7e139c8d354c309159865447626b7789253ec54f95db84255290382c31"
+        },
+        {
+          "artifact": "tableforge-coordinator/feasibility/reference-2.log",
+          "sha256": "bc85d8ff6d3cd0f33a8baacfbf447714641045980ccfa51caf30acd9ac1cd5a0"
+        }
+      ]
+    },
+    {
+      "candidate_id": "tableforge-persistence",
+      "repository": "tableforge",
+      "title": "Persistent journal, lease and restart recovery",
+      "stage_1_eligible": true,
+      "benchmark_admitted": false,
+      "boundary_kind": "recorded_auto_compaction",
+      "boundary_timestamp": "2026-09-23T03:45:31.795Z",
+      "source_prefix_sha256": "ce13a38287b041c0bf21eb6e9e0b71c6ec5bcb78bb956a82bdc51ef4e8225486",
+      "source_prefix_bytes": 21193121,
+      "base_commit": "d0b245f6c66bb1a58031f2d856aca570c386d528",
+      "reference_commit": "715cfcea8fa1de8f93a17c37c9b0c0c6cd8013c1",
+      "tree_manifest_sha256": "095fc43fdb9a01144ddab3139f536dca903639294d040f49e2be6eb485c97230",
+      "history_sha256": "2575a11355e533ce717e7650ea8fc7c6431ff1434fa4ec5d0c9753017dfb15ee",
+      "editable_files": [
+        "packages/session-persistence/src/index.ts",
+        "packages/session-persistence/src/journal.ts",
+        "packages/session-persistence/src/lease.ts",
+        "packages/session-persistence/src/recovery.ts",
+        "packages/session-persistence/src/store.ts"
+      ],
+      "source_custody": "Observed base plus two literal scaffold files; all later pre-stop source commands inspected.",
+      "feasibility_result": "Missing implementation; reference builds and passes 35 tests.",
+      "evidence": [
+        {
+          "artifact": "tableforge-persistence/feasibility/interrupted-build-dependencies.log",
+          "sha256": "89055bbe35954d84a01955b6352005bad2bcb49e299769cb311b7e70dba2ea2d"
+        },
+        {
+          "artifact": "tableforge-persistence/feasibility/interrupted-test-dependencies.log",
+          "sha256": "994d803bd3da89f6c94c9bd09fbaaaf60cdada8a65b72fc1b725819fcfa9d5e6"
+        },
+        {
+          "artifact": "tableforge-persistence/feasibility/reference-test-dependencies.log",
+          "sha256": "b106b070c435e55d9e16333179891de689f73d7790fd4f7d458b42455ecb8fc8"
+        }
+      ]
+    },
+    {
+      "candidate_id": "tuan-workflow-forecast",
+      "repository": "tuan",
+      "title": "Issue forecasts after durable workflow ingestion",
+      "stage_1_eligible": true,
+      "benchmark_admitted": false,
+      "boundary_kind": "automatic_compaction",
+      "boundary_timestamp": "2026-11-03T01:58:56.382Z",
+      "source_prefix_sha256": "1ef3ac3fe51c166fcfada00d977c02406082fea2b895c9e62958950cee610dec",
+      "source_prefix_bytes": 4712931,
+      "base_commit": "6c9169d12587de994ebd55a084e9e39efd096954",
+      "reference_commit": "09b64074361063e00ea87912aec5fdbdda50c704",
+      "tree_manifest_sha256": "6f54ea438ae1669c80af98fd804f1b2be0554b9d4ac2610269b90109663aa504",
+      "history_sha256": "d1c997510da507427d8dc145f0551d1bbb770fa562fbe0d11bcf79c049003789",
+      "editable_files": [
+        "src/tuan/outbox.py"
+      ],
+      "source_custody": "Observed clean source commit; later writes affect scratch, ignored run data or a separate Autowork worktree.",
+      "feasibility_result": "Interrupted acknowledgment lacks forecasts; reference passes the behavioral test.",
+      "evidence": [
+        {
+          "artifact": "tuan-workflow-forecast/feasibility/interrupted.log",
+          "sha256": "c3520d064da7a4df3f8721e5e2228496a957986e7d7c02b578b23c15c6fb809c"
+        },
+        {
+          "artifact": "tuan-workflow-forecast/feasibility/reference.log",
+          "sha256": "2cbad892da51d77d9d0fcc5aa15e76419fee8f336cacab57032081cf58e60360"
+        }
+      ]
+    },
+    {
+      "candidate_id": "tuan-incremental-validation",
+      "repository": "tuan",
+      "title": "Validate only newly acquired records",
+      "stage_1_eligible": true,
+      "benchmark_admitted": false,
+      "boundary_kind": "automatic_compaction",
+      "boundary_timestamp": "2026-11-03T07:20:06.011Z",
+      "source_prefix_sha256": "9f3dc20aa8e78d4e56f94ae8a4d8c9a2d6834b73bf77cb32d9978b4b4917d449",
+      "source_prefix_bytes": 14412471,
+      "base_commit": "1326cfe307898c58432eda0fbf6b9ca131be4677",
+      "reference_commit": "9e9511caa0674272539b031ebdadf8f6f396172f",
+      "tree_manifest_sha256": "dfa30606252a03f3b2dfc1ef88b398a19d3f339e7cc0e16e41c2d6fa211b2770",
+      "history_sha256": "110cbfd0e884624cee75f41b9905c528e42c0ccea0e672d32cd5bb22c136193c",
+      "editable_files": [
+        "src/tuan/adapters/claude.py",
+        "src/tuan/adapters/codex.py"
+      ],
+      "source_custody": "Clean status and full commit observed immediately before profiling; no subsequent source writes before compaction.",
+      "feasibility_result": "Interrupted adapter prepares discarded records; reference preserves results without that work.",
+      "evidence": [
+        {
+          "artifact": "tuan-incremental-validation/feasibility/interrupted.log",
+          "sha256": "c50c6b19fb918b67c26c38d02febdec4a67a9514eb35e588315e35a10517a23d"
+        },
+        {
+          "artifact": "tuan-incremental-validation/feasibility/reference.log",
+          "sha256": "1af11fba89eca89115c9437921013c5e642bd23f52a18cfccc337f680056cb08"
+        }
+      ]
+    },
+    {
+      "candidate_id": "autowork-agy-completion",
+      "repository": "lugos",
+      "title": "Keep Agy launches outside the Claude completion wrapper",
+      "stage_1_eligible": true,
+      "benchmark_admitted": false,
+      "boundary_kind": "automatic_compaction",
+      "boundary_timestamp": "2026-10-31T05:33:23.977Z",
+      "source_prefix_sha256": "23ebdebcb2f4996337a3b8a7af7f1a2d41eda91a207880eba9e6bd2d59acdd32",
+      "source_prefix_bytes": 10419083,
+      "base_commit": "df704c6b42542e9613a11dfdf2f1faed8672f847",
+      "reference_commit": "16a83b63aec4174762f3190836ca17874e80db90",
+      "tree_manifest_sha256": "0bc2337c0793d71cb77c5380a31253581aba0dff597249248d7b3e36f2021db7",
+      "history_sha256": "6e686a173f30d4c7e3993974f71cde357a53ec4b62fa95f86dbcf28a75b01ab0",
+      "editable_files": [
+        "autowork/src/autowork/campaign/executor_adapter.py",
+        "autowork/src/autowork/campaign/antigravity_route_execution.py"
+      ],
+      "source_custody": "New clean worktree at observed commit; full parent archive retains the config and scripts required by Autowork imports.",
+      "feasibility_result": "Interrupted implementation fails two route checks; reference passes both.",
+      "evidence": [
+        {
+          "artifact": "autowork-agy-completion/full-tree-feasibility/interrupted.log",
+          "sha256": "bee994e9d1975befeaafc5614532674babed3ddd77b95d9e42147ff9f99906c7"
+        },
+        {
+          "artifact": "autowork-agy-completion/full-tree-feasibility/reference.log",
+          "sha256": "cb17d1f360b3d0c46d0789239adb3454524bb38082ad67c7983c2ac946ddf4ed"
+        }
+      ]
+    },
+    {
+      "candidate_id": "tableforge-settlement-renderer",
+      "repository": "tableforge",
+      "title": "Settlement terminal and public display pages",
+      "stage_1_eligible": true,
+      "benchmark_admitted": false,
+      "boundary_kind": "automatic_compaction",
+      "boundary_timestamp": "2026-10-31T01:21:33.077Z",
+      "source_prefix_sha256": "b70acda4381ff7172d79a186f40882743e3bfd2449c54b55fad31ac973d68471",
+      "source_prefix_bytes": 3802377,
+      "base_commit": "c454a2e329b823fea99027bd4545d9ec2015281c",
+      "reference_commit": "da6e935f3bf06ed58d047967357e21637f51c843",
+      "tree_manifest_sha256": "c0f6933fc1ea38fa51b4c80c17aa97b70b59ae989789b164492c3b4cd7c43ee2",
+      "history_sha256": "59517b7d621710c8afbcafa240446cf50cffd5d335e2b3f681d791001d57f73d",
+      "editable_files": [
+        "packages/renderer-region-graph/src/index.ts",
+        "packages/renderer-region-graph/src/layout.ts",
+        "packages/renderer-region-graph/src/render.ts",
+        "apps/terminal/module.html",
+        "apps/terminal/src/module.ts",
+        "apps/terminal/src/module-wire.ts",
+        "apps/terminal/vite.config.ts",
+        "apps/table-display/module.html",
+        "apps/table-display/src/module.ts",
+        "apps/table-display/vite.config.ts",
+        "apps/terminal/package.json",
+        "apps/table-display/package.json",
+        "apps/session-coordinator/src/index.ts",
+        "apps/session-coordinator/src/main.ts",
+        "apps/session-coordinator/src/module-launch.ts"
+      ],
+      "source_custody": "Base plus six successful writes; lockfile reconstructed as one importer addition matching the later retained artifact.",
+      "feasibility_result": "Interrupted pages fail three browser cases; reference passes all three after a full build.",
+      "evidence": [
+        {
+          "artifact": "tableforge-settlement-renderer/feasibility/interrupted-browser-normalized.log",
+          "sha256": "878246a0a6af0e24c62cd121f9e166baabe1f3c66d95146be841cba2cc379541"
+        },
+        {
+          "artifact": "tableforge-settlement-renderer/feasibility/reference-browser.log",
+          "sha256": "f3992493ba4a8fac92c16197b91fda44d0dbeb62f96e8dac231ead5ac7bd530b"
+        },
+        {
+          "artifact": "tableforge-settlement-renderer/feasibility/reference-full-build.log",
+          "sha256": "dc6fe47c9a6c87a2c5eb2f5ef0650425155a785b9ffacb713fd685d5487ff4cf"
+        }
+      ]
+    },
+    {
+      "candidate_id": "wow-context-channel",
+      "repository": "wow-forever-helper",
+      "title": "Offline context decoding and opt-in probe",
+      "stage_1_eligible": true,
+      "benchmark_admitted": false,
+      "boundary_kind": "automatic_compaction",
+      "boundary_timestamp": "2026-10-31T05:26:29.854Z",
+      "source_prefix_sha256": "a6b4c53daa323651cb09b94b919e466066389cf86ab9b187fa5a4cf645a573ed",
+      "source_prefix_bytes": 11559034,
+      "base_commit": "1f72234915eb655fc800986f0ac796701ce41b30",
+      "reference_commit": "48cb6c9b4bebdc3d4a84404da4e1315a189059b6",
+      "tree_manifest_sha256": "ed8b0838f78e1132520cf06a56185c721b008cd5ca03ad09e20af58448952cbe",
+      "history_sha256": "58243d8d090bec07ea70623ba45bc1cebab389da2d0f8087e80ba3e671fb6ead",
+      "editable_files": [
+        "wow_helper/context/__init__.py",
+        "wow_helper/context/sanitize.py",
+        "wow_helper/context/envelope.py",
+        "wow_helper/context/tracker.py",
+        "wow_helper/context/clipboard.py",
+        "wow_helper/context/strip.py",
+        "wow_helper/context/probe.py",
+        "wow_helper/__main__.py",
+        "wow_helper/wtf.py",
+        "wow_addon/WoWCompanionProbe/WoWCompanionProbe.lua",
+        "wow_addon/WoWCompanionProbe/WoWCompanionProbe.toc"
+      ],
+      "source_custody": "New clean worktree at observed commit; subsequent commands read API docs or write scratch data only.",
+      "feasibility_result": "Interrupted tree lacks context package; reference passes 545 tests with one platform-only skip.",
+      "evidence": [
+        {
+          "artifact": "wow-context-channel/feasibility/interrupted.log",
+          "sha256": "f872ae3aae3059618ae3571db6f56f742f1d1fc5ad37db2c62ae5428492da6b3"
+        },
+        {
+          "artifact": "wow-context-channel/feasibility/reference-all-context.log",
+          "sha256": "62eb0694ec34a48ecefe9b2cf4560027722e4db3d4b7d151a5de63424b4e7065"
+        }
+      ]
+    }
+  ],
+  "development_exposure": "Root inspected source histories, reference code and tests and ran historical feasibility checks; no continuation worker has seen these fixtures.",
+  "independence": "Each entry has a separate unfinished coding requirement. Shared sessions are disclosed; repeated boundaries and the two AETA partial runs are not counted.",
+  "remaining_gates": [
+    "Host scorer qualification and good/broken controls",
+    "Sanitized equal context and dependency preparation",
+    "Owner per-call accounting and analyzer qualification"
+  ],
+  "excluded": [
+    {
+      "candidate_id": "tableforge-host-turns",
+      "reason": "Other-writer edits appear immediately after compaction; their stop-time presence is unbound."
+    },
+    {
+      "candidate_id": "sessions-page-recency",
+      "reason": "Actual prefix contains the production fix and passing focused tests; summary was stale."
+    }
+  ]
+}

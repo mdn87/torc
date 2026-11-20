@@ -8,13 +8,13 @@
   "milestonePhase": "build-and-validate",
   "portfolioGroup": "agent-platform",
   "displayPriority": 500,
-  "assessedAt": "2026-11-20T05:53:17.067Z",
+  "assessedAt": "2026-11-20T06:21:40.326Z",
   "confidence": "reported",
   "currentMilestone": "Measure receiver-fitted carry against a compiled prompt on eight real interrupted tasks. P5 is merged; Mirror has a separate completed fixture experiment and partial native trial.",
-  "remainingSummary": "Admit eight tasks, qualify scoring and Claude accounting, then compare. Mirror native work is unmerged; sustained LIR use and recovery proof remain open.",
-  "nextChipId": "torc:collect-continuation-fixtures",
+  "remainingSummary": "Eight source-feasible tasks are preserved. Qualify scoring, equal context and Claude accounting before comparison. Native Mirror, sustained use and recovery remain open.",
+  "nextChipId": "torc:qualify-continuation-scoring",
   "source": {
-    "label": "November 20 review of fetched master, local native-trial commits, plans and retained receipts; current local checks recorded in handoff.",
+    "label": "November 20 status review plus eight recovered natural interruptions and local failure/reference checks; no benchmark admissions.",
     "updatedAt": "2026-11-20"
   }
 }

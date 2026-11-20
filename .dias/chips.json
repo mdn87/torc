@@ -366,7 +366,7 @@
       "projectId": "torc",
       "title": "Collect eight real interrupted tasks across three repositories",
       "summary": "Preserve starting trees, history and acceptance checks for naturally stopped work. The operator kept the eight-task gate over a smaller pilot.",
-      "stage": "active",
+      "stage": "done",
       "sequence": 64,
       "prereqs": [
         "torc:continuation-diagnostic-pilot"
@@ -376,7 +376,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-10-31T02:20:22.000Z",
-        "updatedAt": "2026-11-20T05:53:17.067Z"
+        "updatedAt": "2026-11-20T06:21:40.326Z"
       },
       "evidence": [
         {
@@ -402,6 +402,12 @@
           "at": "2026-11-20T05:53:17.067Z",
           "kind": "note",
           "message": "Latest collection record still reports six candidates across three repositories and zero admissions. Missing task history and acceptance evidence keep the gate open."
+        },
+        {
+          "entryId": "ev:261120-recovery-collect-continuation-fixtures",
+          "at": "2026-11-20T06:21:40.326Z",
+          "kind": "note",
+          "message": "Eight source-feasible tasks across five repositories now have preserved history, starting trees and failure/reference checks. Benchmark admissions remain zero."
         }
       ]
     },
@@ -421,7 +427,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-11-20T05:53:17.067Z",
-        "updatedAt": "2026-11-20T05:53:17.067Z"
+        "updatedAt": "2026-11-20T06:21:40.326Z"
       },
       "evidence": [
         {
@@ -429,6 +435,12 @@
           "at": "2026-11-20T05:53:17.067Z",
           "kind": "note",
           "message": "The authorized study requires host-specific scoring and context qualification after fixture feasibility. Prior diagnostic scorer receipts alone do not admit this cohort."
+        },
+        {
+          "entryId": "ev:261120-recovery-qualify-continuation-scoring",
+          "at": "2026-11-20T06:21:40.326Z",
+          "kind": "note",
+          "message": "Fixture feasibility is complete. Next freeze equal contexts and dependencies, protect reference solutions, and qualify good/broken scoring on the execution host."
         }
       ]
     },
@@ -477,7 +489,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-09-27T19:40:44.000Z",
-        "updatedAt": "2026-11-20T05:53:17.067Z"
+        "updatedAt": "2026-11-20T06:21:40.326Z"
       },
       "evidence": [
         {
@@ -497,6 +509,12 @@
           "at": "2026-11-20T05:53:17.067Z",
           "kind": "note",
           "message": "Blocked: zero of eight real tasks are admitted. Scorer qualification and per-call Claude accounting must follow fixture admission before comparison; $2 ceiling remains."
+        },
+        {
+          "entryId": "ev:261120-recovery-carry-vs-prompt-comparison",
+          "at": "2026-11-20T06:21:40.326Z",
+          "kind": "note",
+          "message": "The eight-task data gate is cleared. Scorer/context and per-call accounting qualification still precede comparison. No benchmark calls; the $2 ceiling stands."
         }
       ]
     },

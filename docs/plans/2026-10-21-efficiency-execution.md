@@ -5,6 +5,15 @@ ceiling remains unchanged. Prefer subscription execution. The reviewed maximum
 is 34 experimental assignments / 68 CLI starts; development assignments are
 tracked separately and must not be presented as experimental observations.
 
+**2026-11-20 update:** stage 1 is complete: eight source-feasible tasks across
+five repositories are preserved and checked. See the
+[recovery evidence](../evidence/2026-11-20-continuation-fixture-recovery.md) and
+[bound manifest](../evidence/2026-11-20-continuation-fixtures.json).
+The collection sections below retain the earlier unsuccessful intake history.
+Their six-candidate/zero-admission counts are superseded for fixture feasibility;
+benchmark admissions remain zero. Scorer/context and accounting qualification
+are still required before any comparison.
+
 ## Goals and acceptance
 
 1. **Recover real continuation fixtures.** Establish source history, exact starting
