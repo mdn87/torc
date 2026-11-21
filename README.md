@@ -159,7 +159,7 @@ await their frozen run order. [Accounting results](docs/evidence/2026-11-20-clau
 
 ## Baseline setup
 
-An enrolled lineage can publish its last verified holder to a Dias project Board. An accepted handoff or recovery updates the Board automatically. [Board enrollment and passage instructions](docs/p2-pilot.md#show-who-holds-the-torc-on-the-dias-board)
+Say **“Put the torc on this project”** or choose **Board → Assign a torc** in Dias and drag a ring onto the Board. Its linked Work Trails share the assignment. An accepted handoff or recovery updates the reported holder automatically. [Assignment skill](.agents/skills/assign-torc/SKILL.md) · [Board and passage instructions](docs/p2-pilot.md#show-who-holds-the-torc-on-the-dias-board)
 
 ```powershell
 python -m venv .venv
