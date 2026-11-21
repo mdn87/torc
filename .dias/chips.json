@@ -692,6 +692,33 @@
     },
     {
       "schemaVersion": 1,
+      "chipId": "torc:assign-holder-on-board",
+      "projectId": "torc",
+      "title": "Assign a torc to a project Board",
+      "summary": "Use a plain-language skill or drag a ring onto a Board. Linked Work Trails share its assignment. Only a session can hold the lease.",
+      "stage": "done",
+      "sequence": 115,
+      "prereqs": [
+        "torc:dias-holder"
+      ],
+      "linkedRunIds": [],
+      "confidence": "reported",
+      "aheadOfPrereqs": null,
+      "timestamps": {
+        "createdAt": "2026-11-21T02:41:15.322Z",
+        "updatedAt": "2026-11-21T02:47:45.090Z"
+      },
+      "evidence": [
+        {
+          "entryId": "ev:torc-assign-board-20261121",
+          "at": "2026-11-21T02:47:45.090Z",
+          "kind": "note",
+          "message": "A fresh session assigned a named torc. Mouse, touch and keyboard assigned a Board on both hosts. Each restored the holder after restart and an accepted passage."
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
       "chipId": "torc:holder-without-dias",
       "projectId": "torc",
       "title": "Show the TORC holder in sessions without Dias",

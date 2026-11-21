@@ -22,6 +22,25 @@ def holder_file(store: Store, lineage_id: str) -> Path:
     return store.state_dir / "display" / key / "holder.json"
 
 
+def write_display_file(path: Path, record: dict) -> None:
+    data = (canonical_json(record) + "\n").encode("utf-8")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        if path.read_bytes() == data:
+            return
+    except FileNotFoundError:
+        pass
+    draft = NamedTemporaryFile(dir=path.parent, delete=False)
+    try:
+        with draft:
+            draft.write(data)
+            draft.flush()
+            os.fsync(draft.fileno())
+        Path(draft.name).replace(path)
+    finally:
+        Path(draft.name).unlink(missing_ok=True)
+
+
 def publish_holder(store: Store, lineage_id: str) -> Path:
     """Read and publish under one writer lock so a late publisher cannot rewind the Board."""
     from .verify import verify_store
@@ -41,22 +60,7 @@ def publish_holder(store: Store, lineage_id: str) -> Path:
             "holderTag": payload_sha256([lineage_id, authority["activation_id"]])[:8],
             "heldSince": lease["issued_at"],
         }
-        data = (canonical_json(report) + "\n").encode("utf-8")
-        path.parent.mkdir(parents=True, exist_ok=True)
-        try:
-            if path.read_bytes() == data:
-                return path
-        except FileNotFoundError:
-            pass
-        draft = NamedTemporaryFile(dir=path.parent, delete=False)
-        try:
-            with draft:
-                draft.write(data)
-                draft.flush()
-                os.fsync(draft.fileno())
-            Path(draft.name).replace(path)
-        finally:
-            Path(draft.name).unlink(missing_ok=True)
+        write_display_file(path, report)
     return path
 
 

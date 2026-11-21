@@ -167,6 +167,9 @@ def build_parser() -> argparse.ArgumentParser:
                          help="Expected record hash returned by the original carry operation.")
     capsule.add_argument("--json", action="store_true", dest="as_json")
 
+    from .board import add_board_parser
+
+    add_board_parser(subparsers)
     lineage = subparsers.add_parser(
         "lineage", help="Operate a real local lineage through its authority lease."
     )
@@ -886,6 +889,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             payload = run_mirror_command(args)
             _print_payload(payload, args.as_json)
             return 0 if payload.get("ok", payload.get("passed", True)) else 1
+        if args.command == "board":
+            from .board import run_board
+
+            _print_payload(run_board(args), args.as_json)
+            return 0
         if args.command == "projection":
             with Store(args.state_dir, read_only=True) as store:
                 capsule, control, record = derive_capsule(

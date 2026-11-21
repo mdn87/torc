@@ -29,13 +29,17 @@ Use `lineage checkpoint` with a complete canonical-state JSON file for later rea
 
 ### Show who holds the torc on the Dias Board
 
-After the first session acquires its lease, enroll that lineage once on the machine that owns its TORC store.
+Say **“Put the torc on this project”** in a session with the `assign-torc` skill. In Dias, choose **Board → Assign a torc** and drag **Project torc** onto the project Board. You can also select the ring and then the Board with touch or the keyboard. A linked Work Trail opens the same Board. The assignment is saved immediately. The first holder appears when a session takes the lease and publishes its report.
+
+For an existing lineage, say **“Put the Release review torc on Atlas.”** The skill can offer a known lineage under that public name, then assign it. Say **“Who holds the torc on Atlas?”** to read the last report. To take or pass authority, tell the holding or receiving session what you want to do. The skill uses the handoff flow above.
+
+For a manually managed or synchronized report, publish the existing lineage on the machine that owns its TORC store.
 
 ```powershell
 python -m torc lineage publish-holder --state-dir .torc/p2-pilot --lineage torc-dev --json
 ```
 
-Set the Board project's `torcHolderFile` in the private Dias project registry to the absolute `holder_file` printed by the command. Reload the Dias host. The host needs read access to that one file. The Board shows an open ring, the last reported holder, a short session tag and the UTC time that session received the lease.
+Existing private registry entries using `torcHolderFile` continue to work and appear as choices in Dias. For a separately synchronized file, configure its absolute path there and reload the host. The Board shows an open ring, the last reported holder, a short session tag and the UTC time that session received the lease.
 
 To name a session on the Board, add an optional public `"board_label": "Codex"` to its substrate descriptor before registration. Do the same for the recipient in the handoff plan, for example `"board_label": "Claude Code"`. Use up to 32 letters, numbers, spaces or hyphens. An existing descriptor without a public name displays as `Session` with its own tag. Keep personal information and session identifiers out of public labels.
 
