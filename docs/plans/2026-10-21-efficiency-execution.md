@@ -36,6 +36,11 @@ totals reconciled exactly for both workers and checkers. The next step is to fre
 the 32-assignment schedule and run the paired comparison. Benchmark admissions
 remain zero. [Development results](../evidence/2026-11-20-claude-accounting-qualification.md)
 
+**2026-11-21 update:** the 32-assignment schedule is frozen with its recorded
+seed, the qualified measured settings and digest `e02a67e8…`. The next step is
+to run the assignments in that sequence. Benchmark admissions remain zero.
+[Frozen schedule](../evidence/2026-11-21-continuation-schedule.md)
+
 ## Goals and acceptance
 
 1. **Recover real continuation fixtures.** Establish source history, exact starting

@@ -34,6 +34,14 @@ evidence when emitted, and the SHA-256 of the underlying records. A missing
 terminal or unmatched counter leaves the total unknown. The observed request
 counts remain available.
 
+## Freeze the comparison
+
+`python -m torc.claude_continuation_schedule` builds the schedule from the
+published scorer preparation and this qualification's JSON result. It refuses
+an unqualified result or one that records a benchmark admission. Without
+`--order-seed` it draws and records a new seed. The frozen schedule and its
+digest are in the [schedule evidence](../../docs/evidence/2026-11-21-continuation-schedule.md).
+
 ## Analyze a frozen comparison
 
 The offline entry point takes the frozen schedule, the published scorer

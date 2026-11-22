@@ -1,0 +1,344 @@
+{
+  "contract": "torc.claude_continuation_analysis.v1",
+  "order_seed": "1fec266c10f5f7e6bd7aeac7936519ec",
+  "preparation_sha256": "9e919604161de8f027ffdacee3345c64e22351b47be275683fcf12734e102c99",
+  "accounting_qualification_sha256": "d5f537573ce731a56acf3e5e89de7a9f64797a074960572bc9562e2922cdd253",
+  "policy": {
+    "client_version": "2.1.325",
+    "launch_sha256": "c83291bf8f747081c2f99411df4cc22093081c0a379d1e8dbf74b3719eee1d10",
+    "main_model": "claude-opus-5-5",
+    "auxiliary_models": [],
+    "cache_sharing_scope": "unknown",
+    "prices": {
+      "as_of": "2026-11-20",
+      "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+      "unit": "USD per million tokens",
+      "basis": "First-party global, standard service and speed. Opus 5.5 has the same price throughout its context window.",
+      "usage_settings": {
+        "service_tier": [
+          "standard"
+        ],
+        "inference_geo": [
+          "global"
+        ],
+        "speed": [
+          "standard"
+        ]
+      },
+      "models": {
+        "claude-opus-5-5": [
+          {
+            "through": null,
+            "fresh": 4,
+            "write_5m": 5,
+            "write_1h": 8,
+            "read": 0.2,
+            "output": 20
+          }
+        ]
+      }
+    }
+  },
+  "execution": {
+    "profile": "claude-measured-continuation",
+    "billing_mode": "subscription",
+    "shared_deadline_seconds": 600,
+    "max_starts": {
+      "worker": 1,
+      "checker": 1
+    },
+    "continuations": 0,
+    "replacements": 0,
+    "paid_ceiling_usd": 2
+  },
+  "trials": [
+    {
+      "sequence": 1,
+      "trial_id": "torc-continuation-r1-tableforge-settlement-renderer-compiled",
+      "case": "tableforge-settlement-renderer",
+      "arm": "compiled",
+      "repetition": 1,
+      "position": 1,
+      "prompt_sha256": "82cb561565ba5d76ce55790f73afcc9ab3130c7772df270e97fff6b0aaea30b9"
+    },
+    {
+      "sequence": 2,
+      "trial_id": "torc-continuation-r1-tableforge-settlement-renderer-torc",
+      "case": "tableforge-settlement-renderer",
+      "arm": "torc",
+      "repetition": 1,
+      "position": 2,
+      "prompt_sha256": "601dcf4e03a5b542bc8feecc7de0bd01f198ea6e2821608a4719d7f1a075dc09"
+    },
+    {
+      "sequence": 3,
+      "trial_id": "torc-continuation-r1-tuan-incremental-validation-torc",
+      "case": "tuan-incremental-validation",
+      "arm": "torc",
+      "repetition": 1,
+      "position": 1,
+      "prompt_sha256": "c129017b00ccaaa460df02ba61edb79a74e370350badd0641689907b13f4bd5d"
+    },
+    {
+      "sequence": 4,
+      "trial_id": "torc-continuation-r1-tuan-incremental-validation-compiled",
+      "case": "tuan-incremental-validation",
+      "arm": "compiled",
+      "repetition": 1,
+      "position": 2,
+      "prompt_sha256": "4583939181c9b08863db8685d2bdb92eb3f001c9cc1f03701a8fc0ca8d12aba4"
+    },
+    {
+      "sequence": 5,
+      "trial_id": "torc-continuation-r1-autowork-agy-completion-torc",
+      "case": "autowork-agy-completion",
+      "arm": "torc",
+      "repetition": 1,
+      "position": 1,
+      "prompt_sha256": "f7c9ecf582ee0a95bed35ad3a370a4f92115dcbd5c0b8d0fba6a30b31a141896"
+    },
+    {
+      "sequence": 6,
+      "trial_id": "torc-continuation-r1-autowork-agy-completion-compiled",
+      "case": "autowork-agy-completion",
+      "arm": "compiled",
+      "repetition": 1,
+      "position": 2,
+      "prompt_sha256": "91d93caf43f675a49c143f77385bfb3757e3c492019ebaf6ad60de5fecf42722"
+    },
+    {
+      "sequence": 7,
+      "trial_id": "torc-continuation-r1-tuan-workflow-forecast-torc",
+      "case": "tuan-workflow-forecast",
+      "arm": "torc",
+      "repetition": 1,
+      "position": 1,
+      "prompt_sha256": "e2bfe99df3d3e6ee6c113a1944a0605c9de548b6478cc944b38feb049f067f37"
+    },
+    {
+      "sequence": 8,
+      "trial_id": "torc-continuation-r1-tuan-workflow-forecast-compiled",
+      "case": "tuan-workflow-forecast",
+      "arm": "compiled",
+      "repetition": 1,
+      "position": 2,
+      "prompt_sha256": "52072c6e5735928cef484b02e64dceab3e8f9d5608470e5e390bd88bffad4caf"
+    },
+    {
+      "sequence": 9,
+      "trial_id": "torc-continuation-r1-cormac-powershell-quotes-compiled",
+      "case": "cormac-powershell-quotes",
+      "arm": "compiled",
+      "repetition": 1,
+      "position": 1,
+      "prompt_sha256": "712708331d2a8f762025dea7621ff20a65640fd909e9a73888bc30a90942cf4f"
+    },
+    {
+      "sequence": 10,
+      "trial_id": "torc-continuation-r1-cormac-powershell-quotes-torc",
+      "case": "cormac-powershell-quotes",
+      "arm": "torc",
+      "repetition": 1,
+      "position": 2,
+      "prompt_sha256": "afdbd9063d3f61e504a084f06946884d68751946a7cc9b248b10ea8cb4b21f4f"
+    },
+    {
+      "sequence": 11,
+      "trial_id": "torc-continuation-r1-tableforge-persistence-torc",
+      "case": "tableforge-persistence",
+      "arm": "torc",
+      "repetition": 1,
+      "position": 1,
+      "prompt_sha256": "7281aab314d7928ac57376347307d5ef151628d04f54de8fd447a094c38e4460"
+    },
+    {
+      "sequence": 12,
+      "trial_id": "torc-continuation-r1-tableforge-persistence-compiled",
+      "case": "tableforge-persistence",
+      "arm": "compiled",
+      "repetition": 1,
+      "position": 2,
+      "prompt_sha256": "f7988db9fb6a6052ac54b2934ee4f8f9c220d7330358efe72e2caeccc1c965a8"
+    },
+    {
+      "sequence": 13,
+      "trial_id": "torc-continuation-r1-tableforge-coordinator-torc",
+      "case": "tableforge-coordinator",
+      "arm": "torc",
+      "repetition": 1,
+      "position": 1,
+      "prompt_sha256": "1cd9f99586b78369d2e7fb5038095d9f4262d7cc98a7a838edaf8c89d4e232cf"
+    },
+    {
+      "sequence": 14,
+      "trial_id": "torc-continuation-r1-tableforge-coordinator-compiled",
+      "case": "tableforge-coordinator",
+      "arm": "compiled",
+      "repetition": 1,
+      "position": 2,
+      "prompt_sha256": "60a03e0006f09e333b7d9e1d33d79e48075556293643607e2870c65d3a6d7fb7"
+    },
+    {
+      "sequence": 15,
+      "trial_id": "torc-continuation-r1-wow-context-channel-torc",
+      "case": "wow-context-channel",
+      "arm": "torc",
+      "repetition": 1,
+      "position": 1,
+      "prompt_sha256": "b3d5eeda3df169cd602909434afacf00be1f4ce94ee43e520678a29923ba8577"
+    },
+    {
+      "sequence": 16,
+      "trial_id": "torc-continuation-r1-wow-context-channel-compiled",
+      "case": "wow-context-channel",
+      "arm": "compiled",
+      "repetition": 1,
+      "position": 2,
+      "prompt_sha256": "801fa0af386031662b3e17526c05c6d48cca9d41b76b5b33c8d0841c2579d6e5"
+    },
+    {
+      "sequence": 17,
+      "trial_id": "torc-continuation-r2-tableforge-coordinator-compiled",
+      "case": "tableforge-coordinator",
+      "arm": "compiled",
+      "repetition": 2,
+      "position": 1,
+      "prompt_sha256": "60a03e0006f09e333b7d9e1d33d79e48075556293643607e2870c65d3a6d7fb7"
+    },
+    {
+      "sequence": 18,
+      "trial_id": "torc-continuation-r2-tableforge-coordinator-torc",
+      "case": "tableforge-coordinator",
+      "arm": "torc",
+      "repetition": 2,
+      "position": 2,
+      "prompt_sha256": "1cd9f99586b78369d2e7fb5038095d9f4262d7cc98a7a838edaf8c89d4e232cf"
+    },
+    {
+      "sequence": 19,
+      "trial_id": "torc-continuation-r2-wow-context-channel-compiled",
+      "case": "wow-context-channel",
+      "arm": "compiled",
+      "repetition": 2,
+      "position": 1,
+      "prompt_sha256": "801fa0af386031662b3e17526c05c6d48cca9d41b76b5b33c8d0841c2579d6e5"
+    },
+    {
+      "sequence": 20,
+      "trial_id": "torc-continuation-r2-wow-context-channel-torc",
+      "case": "wow-context-channel",
+      "arm": "torc",
+      "repetition": 2,
+      "position": 2,
+      "prompt_sha256": "b3d5eeda3df169cd602909434afacf00be1f4ce94ee43e520678a29923ba8577"
+    },
+    {
+      "sequence": 21,
+      "trial_id": "torc-continuation-r2-tableforge-settlement-renderer-torc",
+      "case": "tableforge-settlement-renderer",
+      "arm": "torc",
+      "repetition": 2,
+      "position": 1,
+      "prompt_sha256": "601dcf4e03a5b542bc8feecc7de0bd01f198ea6e2821608a4719d7f1a075dc09"
+    },
+    {
+      "sequence": 22,
+      "trial_id": "torc-continuation-r2-tableforge-settlement-renderer-compiled",
+      "case": "tableforge-settlement-renderer",
+      "arm": "compiled",
+      "repetition": 2,
+      "position": 2,
+      "prompt_sha256": "82cb561565ba5d76ce55790f73afcc9ab3130c7772df270e97fff6b0aaea30b9"
+    },
+    {
+      "sequence": 23,
+      "trial_id": "torc-continuation-r2-autowork-agy-completion-compiled",
+      "case": "autowork-agy-completion",
+      "arm": "compiled",
+      "repetition": 2,
+      "position": 1,
+      "prompt_sha256": "91d93caf43f675a49c143f77385bfb3757e3c492019ebaf6ad60de5fecf42722"
+    },
+    {
+      "sequence": 24,
+      "trial_id": "torc-continuation-r2-autowork-agy-completion-torc",
+      "case": "autowork-agy-completion",
+      "arm": "torc",
+      "repetition": 2,
+      "position": 2,
+      "prompt_sha256": "f7c9ecf582ee0a95bed35ad3a370a4f92115dcbd5c0b8d0fba6a30b31a141896"
+    },
+    {
+      "sequence": 25,
+      "trial_id": "torc-continuation-r2-cormac-powershell-quotes-torc",
+      "case": "cormac-powershell-quotes",
+      "arm": "torc",
+      "repetition": 2,
+      "position": 1,
+      "prompt_sha256": "afdbd9063d3f61e504a084f06946884d68751946a7cc9b248b10ea8cb4b21f4f"
+    },
+    {
+      "sequence": 26,
+      "trial_id": "torc-continuation-r2-cormac-powershell-quotes-compiled",
+      "case": "cormac-powershell-quotes",
+      "arm": "compiled",
+      "repetition": 2,
+      "position": 2,
+      "prompt_sha256": "712708331d2a8f762025dea7621ff20a65640fd909e9a73888bc30a90942cf4f"
+    },
+    {
+      "sequence": 27,
+      "trial_id": "torc-continuation-r2-tableforge-persistence-compiled",
+      "case": "tableforge-persistence",
+      "arm": "compiled",
+      "repetition": 2,
+      "position": 1,
+      "prompt_sha256": "f7988db9fb6a6052ac54b2934ee4f8f9c220d7330358efe72e2caeccc1c965a8"
+    },
+    {
+      "sequence": 28,
+      "trial_id": "torc-continuation-r2-tableforge-persistence-torc",
+      "case": "tableforge-persistence",
+      "arm": "torc",
+      "repetition": 2,
+      "position": 2,
+      "prompt_sha256": "7281aab314d7928ac57376347307d5ef151628d04f54de8fd447a094c38e4460"
+    },
+    {
+      "sequence": 29,
+      "trial_id": "torc-continuation-r2-tuan-workflow-forecast-compiled",
+      "case": "tuan-workflow-forecast",
+      "arm": "compiled",
+      "repetition": 2,
+      "position": 1,
+      "prompt_sha256": "52072c6e5735928cef484b02e64dceab3e8f9d5608470e5e390bd88bffad4caf"
+    },
+    {
+      "sequence": 30,
+      "trial_id": "torc-continuation-r2-tuan-workflow-forecast-torc",
+      "case": "tuan-workflow-forecast",
+      "arm": "torc",
+      "repetition": 2,
+      "position": 2,
+      "prompt_sha256": "e2bfe99df3d3e6ee6c113a1944a0605c9de548b6478cc944b38feb049f067f37"
+    },
+    {
+      "sequence": 31,
+      "trial_id": "torc-continuation-r2-tuan-incremental-validation-compiled",
+      "case": "tuan-incremental-validation",
+      "arm": "compiled",
+      "repetition": 2,
+      "position": 1,
+      "prompt_sha256": "4583939181c9b08863db8685d2bdb92eb3f001c9cc1f03701a8fc0ca8d12aba4"
+    },
+    {
+      "sequence": 32,
+      "trial_id": "torc-continuation-r2-tuan-incremental-validation-torc",
+      "case": "tuan-incremental-validation",
+      "arm": "torc",
+      "repetition": 2,
+      "position": 2,
+      "prompt_sha256": "c129017b00ccaaa460df02ba61edb79a74e370350badd0641689907b13f4bd5d"
+    }
+  ]
+}
