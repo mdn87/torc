@@ -2,6 +2,7 @@
 
 from .errors import InvalidInputError
 from .mirror import project_response, render_context, render_text, resolve_settings
+from .mirror_native import prepare_native, project_native
 from .operator import load_json_object
 
 
@@ -12,6 +13,18 @@ def run_mirror_command(args):
         return run_experiment(args.output_dir, now=args.now)
     data = load_json_object(args.input_file)
     action = args.mirror_command
+    if action == "prepare":
+        return prepare_native(
+            data.get("binding"), data.get("signals"), now=data.get("now"),
+            sidecar_path=data.get("sidecar_path"), ttl_seconds=data.get("ttl_seconds", 300),
+        )
+    if action == "native-project":
+        return project_native(
+            data.get("settings"), data.get("binding"), data.get("signals"),
+            data.get("sidecar"), data.get("written"), data.get("response_id"),
+            now=data.get("now"), ttl_seconds=data.get("ttl_seconds", 300),
+            target_chars=data.get("target_chars", 240),
+        )
     if action == "resolve":
         return resolve_settings(
             data.get("binding"), data.get("signals"), now=data.get("now"),

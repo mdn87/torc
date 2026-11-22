@@ -135,7 +135,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     mirror = subparsers.add_parser("mirror", help="Resolve and test scoped response projections.")
     mirror_commands = mirror.add_subparsers(dest="mirror_command", required=True)
-    for action in ("resolve", "context", "project", "text"):
+    for action in ("resolve", "context", "project", "text", "prepare", "native-project"):
         command = mirror_commands.add_parser(action)
         command.add_argument("--input-file", type=Path, required=True)
         command.add_argument("--json", action="store_true", dest="as_json")
