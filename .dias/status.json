@@ -8,13 +8,13 @@
   "milestonePhase": "build-and-validate",
   "portfolioGroup": "agent-platform",
   "displayPriority": 500,
-  "assessedAt": "2026-11-20T12:22:15Z",
+  "assessedAt": "2026-11-21T12:00:00Z",
   "confidence": "reported",
   "currentMilestone": "Measure receiver-fitted carry against a compiled prompt on eight real interrupted tasks. P5 is merged; Mirror has a separate completed fixture experiment and partial native trial.",
-  "remainingSummary": "Freeze the run order and measured settings, run the 32 benchmark assignments, score their outputs and publish the eight paired results.",
+  "remainingSummary": "Run the 32 frozen benchmark assignments, score their outputs and publish the eight paired results.",
   "nextChipId": "torc:carry-vs-prompt-comparison",
   "source": {
-    "label": "Three of five study stages are complete. All eight scorers and both accounting checks passed. The benchmark has zero runs.",
-    "updatedAt": "2026-11-20"
+    "label": "Three of five study stages are complete. The run order and measured settings for the fourth are frozen. The benchmark has zero runs.",
+    "updatedAt": "2026-11-21"
   }
 }

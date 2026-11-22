@@ -531,7 +531,7 @@
       "aheadOfPrereqs": null,
       "timestamps": {
         "createdAt": "2026-09-27T19:40:44.000Z",
-        "updatedAt": "2026-11-20T12:22:15Z"
+        "updatedAt": "2026-11-21T12:00:00Z"
       },
       "evidence": [
         {
@@ -575,6 +575,12 @@
           "at": "2026-11-20T12:22:15Z",
           "kind": "stage-change",
           "message": "All eight tasks have qualified scoring and usage accounting. Freeze the run order before the first of 32 benchmark assignments. None have started."
+        },
+        {
+          "entryId": "ev:261121-comparison-schedule-frozen",
+          "at": "2026-11-21T12:00:00Z",
+          "kind": "note",
+          "message": "The 32-assignment run order and measured settings are frozen (schedule e02a67e8). Run the assignments in sequence next. None have started."
         }
       ]
     },
